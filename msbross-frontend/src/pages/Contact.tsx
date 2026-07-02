@@ -33,9 +33,12 @@ export default function Contact() {
                   <Mail className="text-cyan-400 w-5 h-5" />
                 </div>
                 <div>
-                  <div className="text-gray-400 text-sm font-mono uppercase mb-1">Email Principal</div>
-                  <a href="mailto:manuelalvarezdianez@gmail.com" className="text-white hover:text-cyan-400 transition-colors font-medium">
+                  <div className="text-gray-400 text-sm font-mono uppercase mb-1">Emails de Contacto</div>
+                  <a href="mailto:manuelalvarezdianez@gmail.com" className="text-white hover:text-cyan-400 transition-colors font-medium block">
                     manuelalvarezdianez@gmail.com
+                  </a>
+                  <a href="mailto:manuelalvarezdianez@hotmail.com" className="text-white hover:text-cyan-400 transition-colors font-medium block mt-1">
+                    manuelalvarezdianez@hotmail.com
                   </a>
                 </div>
               </div>
@@ -46,8 +49,8 @@ export default function Contact() {
                 </div>
                 <div>
                   <div className="text-gray-400 text-sm font-mono uppercase mb-1">Línea Directa</div>
-                  <a href="tel:+34675432813" className="text-white hover:text-magenta-400 transition-colors font-medium">
-                    +34 675 43 28 13
+                  <a href="tel:+34651352065" className="text-white hover:text-magenta-400 transition-colors font-medium">
+                    +34 651 35 20 65
                   </a>
                 </div>
               </div>
