@@ -75,15 +75,15 @@ export default function Home() {
           className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-white/10"
         >
           <div className="group">
-            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:scale-110 transition-transform origin-left">24</div>
+            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:scale-110 transition-transform origin-left">16</div>
             <div className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-2 flex items-center gap-1.5">
-              <Globe className="w-3 h-3 text-cyan-500" /> Apps en VIVO
+              <Globe className="w-3 h-3 text-cyan-500" /> Proyectos
             </div>
           </div>
           <div className="group">
-            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-magenta-400 to-purple-500 group-hover:scale-110 transition-transform origin-left">5+</div>
+            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-500 group-hover:scale-110 transition-transform origin-left">3</div>
             <div className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-2 flex items-center gap-1.5">
-              <Terminal className="w-3 h-3 text-magenta-500" /> Agentes IA
+              <Terminal className="w-3 h-3 text-pink-500" /> Agentes IA
             </div>
           </div>
           <div className="group">
@@ -93,9 +93,9 @@ export default function Home() {
             </div>
           </div>
           <div className="group">
-            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 group-hover:scale-110 transition-transform origin-left">99.9%</div>
+            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 group-hover:scale-110 transition-transform origin-left">SLA</div>
             <div className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-2 flex items-center gap-1.5">
-              <Network className="w-3 h-3 text-amber-500" /> Uptime
+              <Network className="w-3 h-3 text-amber-500" /> Monitorizado
             </div>
           </div>
         </motion.div>
