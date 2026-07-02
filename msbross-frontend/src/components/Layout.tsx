@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Activity, Bot, LayoutTemplate, Network, Phone } from 'lucide-react';
+import { Activity, Bot, LayoutTemplate, Network, Phone, User } from 'lucide-react';
 
 export default function Layout() {
   const location = useLocation();
@@ -9,6 +9,7 @@ export default function Layout() {
     { name: 'Agentes IA', path: '/agents', icon: Bot },
     { name: 'SaaS Tools', path: '/saas', icon: LayoutTemplate },
     { name: 'Arquitectura', path: '/architecture', icon: Network },
+    { name: 'Architect (CV)', path: '/profile', icon: User },
     { name: 'Contacto', path: '/contact', icon: Phone }
   ];
 

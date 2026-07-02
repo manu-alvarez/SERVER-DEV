@@ -5,6 +5,7 @@ import Agents from './pages/Agents';
 import SaaS from './pages/SaaS';
 import Architecture from './pages/Architecture';
 import Contact from './pages/Contact';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="agents" element={<Agents />} />
           <Route path="saas" element={<SaaS />} />
           <Route path="architecture" element={<Architecture />} />
+          <Route path="profile" element={<Profile />} />
           <Route path="contact" element={<Contact />} />
         </Route>
       </Routes>
