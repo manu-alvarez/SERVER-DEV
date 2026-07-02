@@ -25,7 +25,7 @@ export default function Architecture() {
             className="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full bg-cyan-950/40 border border-cyan-500/30"
           >
             <Server className="w-4 h-4 text-cyan-400 fill-cyan-400/20" />
-            <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest">Blueprint de Producción</span>
+            <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest">Esquema Técnico</span>
           </motion.div>
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4">
             <span className="text-white">Arquitectura del </span>
@@ -34,7 +34,7 @@ export default function Architecture() {
             </span>
           </h1>
           <p className="text-gray-400 text-lg max-w-3xl leading-relaxed">
-            Servidor VPS (Contabo). Proxy Inverso Traefik v3. Docker Compose como orquestador de microservicios. Let's Encrypt para cifrado TLS/SSL automatizado. Cada servicio expuesto mediante su propio subdominio seguro y aislado.
+            Servidor VPS (Contabo). Proxy Inverso Traefik v3. Docker Compose para el despliegue de contenedores. Let's Encrypt para certificados TLS/SSL automatizados. Cada servicio expuesto mediante su propio subdominio.
           </p>
         </div>
       </div>
@@ -82,7 +82,7 @@ export default function Architecture() {
                 Traefik v3 — Router & Proxy Inverso
               </h2>
               <p className="text-gray-400 text-lg leading-relaxed max-w-4xl">
-                Router central del sistema. Funciona como un Gateway dinámico y reverso, interceptando e inspeccionando todas las solicitudes entrantes. Utiliza el descubrimiento automático de contenedores Docker para enrutar el tráfico HTTP a HTTPS instantáneamente, generando y renovando los certificados SSL de Let's Encrypt on-the-fly sin intervención manual.
+                Funciona como un proxy inverso y enrutador principal. Utiliza la integración nativa con Docker para detectar nuevos contenedores y generar automáticamente los certificados SSL de Let's Encrypt, sirviendo el tráfico por HTTPS de forma segura y sin configuración manual.
               </p>
             </div>
           </div>

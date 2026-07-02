@@ -41,7 +41,7 @@ export default function Home() {
         >
           <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
           <span className="font-mono text-cyan-400 text-xs tracking-widest uppercase">
-            Ecosistema en Producción
+            Ecosistema de Aplicaciones
           </span>
         </motion.div>
         
@@ -52,10 +52,10 @@ export default function Home() {
           className="text-6xl lg:text-[5.5rem] font-black tracking-tighter leading-[1.05]"
         >
           <span className="text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-500 block">
-            Ingeniería
+            Proyectos y
           </span>
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 block pb-2 drop-shadow-[0_0_30px_rgba(6,182,212,0.4)]">
-            Ascendida.
+            Soluciones.
           </span>
         </motion.h1>
 
@@ -65,7 +65,7 @@ export default function Home() {
           transition={{ delay: 0.2 }}
           className="text-gray-400 text-xl lg:text-2xl max-w-xl leading-relaxed font-light"
         >
-          Un clúster masivo de <strong className="text-white font-medium">Agentes Cognitivos</strong>, <strong className="text-white font-medium">SaaS</strong> y <strong className="text-white font-medium">Microservicios</strong> orquestado bajo una única red neuronal.
+          Un conjunto de <strong className="text-white font-medium">herramientas</strong>, <strong className="text-white font-medium">aplicaciones web</strong> e <strong className="text-white font-medium">integraciones de IA</strong> creadas para aportar valor real en el día a día.
         </motion.p>
 
         <motion.div 

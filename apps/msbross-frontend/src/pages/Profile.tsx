@@ -47,7 +47,7 @@ export default function Profile() {
                   <span className="font-mono text-cyan-400 text-xs font-bold tracking-[0.2em] uppercase">Status: Online</span>
                 </div>
                 <h1 className="text-4xl font-extrabold text-white mb-1">Manu Alvarez</h1>
-                <p className="text-gray-400 font-mono text-sm uppercase tracking-wider">Full-Stack Architect</p>
+                <p className="text-gray-400 font-mono text-sm uppercase tracking-wider">Técnico de Sistemas & Desarrollador</p>
               </div>
             </div>
           </motion.div>
@@ -77,9 +77,10 @@ export default function Profile() {
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">Sobre Mí</span>
               </h2>
               <p className="text-gray-300 text-lg leading-relaxed mb-8">
-                Desarrollador y técnico informático apasionado por la creación de soluciones prácticas y eficaces de nivel empresarial. 
-                Especializado en el desarrollo web moderno, arquitectura de sistemas, integración de herramientas de Inteligencia Artificial (LLMs, Voice Agents) 
-                y la automatización de procesos para mejorar la eficiencia operativa y aportar valor real a ecosistemas complejos.
+                Técnico informático y desarrollador autodidacta apasionado por la creación de herramientas prácticas. 
+                Centrado en la programación web moderna, el despliegue de sistemas, la integración de Inteligencia Artificial 
+                y la automatización de procesos. Mi objetivo es mejorar el día a día creando soluciones útiles, 
+                reales y funcionales tanto a nivel logístico como de desarrollo.
               </p>
 
               {/* Tech Stack Horizontal Scroll/Flex */}
