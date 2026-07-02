@@ -1,0 +1,168 @@
+# Generado automáticamente por Antigravity God Mode
+version: '3.8'
+services:
+  nikolina-livekit-server:
+    image: msbross-nikolina-livekit-server:latest
+    container_name: nikolina-livekit-server
+    restart: unless-stopped
+    networks:
+      - msbross_net
+  nikolina-api-hub:
+    image: msbross-nikolina-api-hub:latest
+    container_name: nikolina-api-hub
+    restart: unless-stopped
+    networks:
+      - msbross_net
+    expose:
+      - '8001'
+    environment:
+      - PORT=8001
+  nikolina-agent:
+    image: msbross-nikolina-agent:latest
+    container_name: nikolina-agent
+    restart: unless-stopped
+    networks:
+      - msbross_net
+  it-coach-agent:
+    image: msbross-it-coach-agent:latest
+    container_name: it-coach-agent
+    restart: unless-stopped
+    networks:
+      - msbross_net
+  gas-station-backend:
+    image: msbross-gas-station-backend:latest
+    container_name: gas-station-backend
+    restart: unless-stopped
+    networks:
+      - msbross_net
+    expose:
+      - '3005'
+    environment:
+      - PORT=3005
+  industrialpro-backend:
+    image: msbross-industrialpro-backend:latest
+    container_name: industrialpro-backend
+    restart: unless-stopped
+    networks:
+      - msbross_net
+    expose:
+      - '8002'
+    environment:
+      - PORT=8002
+  iaputa-backend:
+    image: msbross-iaputa-backend:latest
+    container_name: iaputa-backend
+    restart: unless-stopped
+    networks:
+      - msbross_net
+    expose:
+      - '8006'
+    environment:
+      - PORT=8006
+  traductor-pro-server:
+    image: msbross-traductor-pro-server:latest
+    container_name: traductor-pro-server
+    restart: unless-stopped
+    networks:
+      - msbross_net
+    expose:
+      - '8004'
+    environment:
+      - PORT=8004
+  msbross-backend:
+    image: msbross-backend:latest
+    container_name: msbross-backend
+    restart: unless-stopped
+    networks:
+      - msbross_net
+  cuentos-magicos-backend:
+    image: msbross-cuentos-magicos-backend:latest
+    container_name: cuentos-magicos-backend
+    restart: unless-stopped
+    networks:
+      - msbross_net
+    expose:
+      - '8007'
+    environment:
+      - PORT=8007
+  cuentos-magicos-celery:
+    image: msbross-cuentos-magicos-celery:latest
+    container_name: cuentos-magicos-celery
+    restart: unless-stopped
+    networks:
+      - msbross_net
+  elitescout-server:
+    image: msbross-elitescout-server:latest
+    container_name: elitescout-server
+    restart: unless-stopped
+    networks:
+      - msbross_net
+    expose:
+      - '8003'
+    environment:
+      - PORT=8003
+  web-restaurante-atenea-backend:
+    image: msbross-web-restaurante-atenea-backend:latest
+    container_name: web-restaurante-atenea-backend
+    restart: unless-stopped
+    networks:
+      - msbross_net
+    expose:
+      - '8009'
+    environment:
+      - PORT=8009
+  jartosdto-backend:
+    image: msbross-jartosdto-backend:latest
+    container_name: jartosdto-backend
+    restart: unless-stopped
+    networks:
+      - msbross_net
+    expose:
+      - '8010'
+    environment:
+      - PORT=8010
+  txa-fitness-pro:
+    image: msbross-txa-fitness-pro:latest
+    container_name: txa-fitness-pro
+    restart: unless-stopped
+    networks:
+      - msbross_net
+    expose:
+      - '3456'
+    environment:
+      - PORT=3456
+  mapfre-infocol:
+    image: msbross-mapfre-infocol:latest
+    container_name: mapfre-infocol
+    restart: unless-stopped
+    networks:
+      - msbross_net
+    expose:
+      - '3333'
+    environment:
+      - PORT=3333
+  msbross-proxy:
+    image: msbross-proxy:latest
+    container_name: msbross-proxy
+    restart: unless-stopped
+    networks:
+      - msbross_net
+  it-english-backend:
+    image: msbross-it-english-backend:latest
+    container_name: it-english-backend
+    restart: unless-stopped
+    networks:
+      - msbross_net
+  perfume-trading:
+    image: msbross-perfume-trading:latest
+    container_name: perfume-trading
+    restart: unless-stopped
+    networks:
+      - msbross_net
+    expose:
+      - '3011'
+    environment:
+      - PORT=3011
+networks:
+  msbross_net:
+    driver: bridge

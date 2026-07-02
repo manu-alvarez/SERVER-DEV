@@ -1,0 +1,12 @@
+- `[/]` Fase 1: Aprovisionamiento del Servidor (VPS)
+  - `[x]` Extraer llave SSH y probar conexión a 84.247.186.126
+  - `[/]` Instalar dependencias base en Linux (Node 20, Python 3.14, PM2)
+  - `[/]` Transferir archivos del ecosistema (`rsync`)
+  - `[ ]` Configurar Cloudflared y apuntar a `manuelalvarez.dev`
+- `[x]` Fase 2: Nueva Landing Page
+  - `[x]` Resolver acceso a diseños de AiroApp (Recibidas capturas maestras)
+  - `[x]` Construir SPA en `SERVER-DEV/msbross-frontend` basada en el diseño de AiroApp.
+- `[ ]` Fase 3: Despliegue de los Microservicios
+  - `[ ]` Reconstruir venvs de Python en VPS
+  - `[ ]` Construir apps de Next.js
+  - `[ ]` Arrancar PM2 y validar todos los puertos TCP
