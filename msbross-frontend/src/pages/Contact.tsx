@@ -15,11 +15,6 @@ export default function Contact() {
         <div className="text-xs font-mono uppercase text-cyan-500 mb-4 tracking-wider">Subdominios y Contacto Directo</div>
         <div className="space-y-4">
           <div className="bg-[#0a0f1d] border border-cyan-500/20 rounded-lg p-5">
-            <h3 className="font-bold text-white mb-1">Gateway Principal (API)</h3>
-            <a href="https://proxy.msbross.me" className="text-cyan-400 text-sm hover:underline">https://proxy.msbross.me</a>
-            <p className="text-gray-500 text-sm mt-2">Punto de entrada a todos los microservicios.</p>
-          </div>
-          <div className="bg-[#0a0f1d] border border-cyan-500/20 rounded-lg p-5">
             <h3 className="font-bold text-white mb-1">Ecosistema & Portfolio</h3>
             <a href="https://manuelalvarez.dev" className="text-cyan-400 text-sm hover:underline">https://manuelalvarez.dev</a>
             <p className="text-gray-500 text-sm mt-2">Landing pública del ecosistema MSBrossAI.</p>
