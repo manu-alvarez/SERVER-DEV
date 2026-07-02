@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'msbross-frontend/**'
+      - 'apps/msbross-frontend/**'
 
 jobs:
   deploy:
@@ -22,11 +22,11 @@ jobs:
 
     - name: Install Dependencies
       run: npm ci
-      working-directory: ./msbross-frontend
+      working-directory: ./apps/msbross-frontend
 
     - name: Build Project
       run: npm run build
-      working-directory: ./msbross-frontend
+      working-directory: ./apps/msbross-frontend
 
     - name: Setup SSH
       run: |
@@ -37,4 +37,4 @@ jobs:
 
     - name: Deploy via Rsync
       run: |
-        rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./msbross-frontend/dist/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/var/www/manuelalvarez/
+        rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./apps/msbross-frontend/dist/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/var/www/manuelalvarez/
