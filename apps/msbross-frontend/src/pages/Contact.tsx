@@ -1,5 +1,5 @@
 import { motion, type Variants } from 'framer-motion';
-import { Send, MapPin, Mail, Phone, BookUser, Code, Linkedin } from 'lucide-react';
+import { Send, MapPin, Mail, Phone, BookUser, Code } from 'lucide-react';
 
 export default function Contact() {
   const containerVars: Variants = {
@@ -128,7 +128,7 @@ export default function Contact() {
 
               <a href="https://www.linkedin.com/in/manu-alvarez-dev/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group/link">
                 <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center group-hover/link:bg-blue-500/20 transition-colors border border-blue-500/20">
-                  <Linkedin className="w-5 h-5 text-blue-400" />
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-blue-400"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
                 </div>
                 <div>
                   <div className="text-gray-500 text-xs font-mono uppercase tracking-wider mb-0.5">LinkedIn</div>
