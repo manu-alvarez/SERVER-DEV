@@ -4,27 +4,36 @@ import { Link } from 'react-router-dom';
 
 export default function Home() {
   const allApps = [
-    { name: 'CombiPro', tag: 'SPORTS AI', color: 'from-orange-400 to-red-500', icon: Activity },
-    { name: 'EliteScout', tag: 'ENTERPRISE', color: 'from-yellow-400 to-amber-600', icon: Globe },
-    { name: 'EXPOSITATOR RTE', tag: 'VISION PLAY', color: 'from-green-400 to-emerald-600', icon: Target },
-    { name: 'Gas Station', tag: 'ENTERPRISE', color: 'from-orange-400 to-red-500', icon: Rocket },
-    { name: 'IndustrialPro', tag: 'ENTERPRISE', color: 'from-blue-400 to-indigo-600', icon: Shield },
-    { name: 'IT English Coach', tag: 'DEV AI', color: 'from-cyan-400 to-blue-500', icon: MessageSquare },
-    { name: 'LogiSearch', tag: 'ENTERPRISE', color: 'from-cyan-400 to-teal-500', icon: Globe },
-    { name: 'LogiTrack Almacén', tag: 'ENTERPRISE', color: 'from-blue-400 to-indigo-500', icon: Box },
-    { name: 'Mano Eléctrica', tag: 'CREATIVE AI', color: 'from-green-400 to-emerald-500', icon: Activity },
-    { name: 'MAPFRE Infocol', tag: 'ENTERPRISE', color: 'from-red-400 to-rose-600', icon: Shield },
-    { name: 'Moko-Tools', tag: 'DEV AI', color: 'from-green-400 to-teal-500', icon: Layout },
-    { name: 'Perfume ERP', tag: 'ENTERPRISE', color: 'from-red-400 to-rose-500', icon: Box },
-    { name: 'TaskFlowPro', tag: 'ENTERPRISE', color: 'from-yellow-400 to-amber-500', icon: Layout },
-    { name: 'Energía Maya', tag: 'CREATIVE AI', color: 'from-yellow-400 to-orange-500', icon: Sparkles },
-    { name: 'TxaFitnessPro', tag: 'SPORTS AI', color: 'from-purple-400 to-fuchsia-600', icon: Heart },
-    { name: 'Web Atenea', tag: 'ENTERPRISE', color: 'from-gray-300 to-slate-500', icon: Layout }
+    { name: 'App Generator', tag: 'DEV AI', color: 'from-[#f472b6] to-[#ec4899]', icon: Activity },
+    { name: 'CombiPro', tag: 'SPORTS AI', color: 'from-[#f97316] to-[#f97316]', icon: Activity },
+    { name: 'Cuentos Mágicos', tag: 'CREATIVE AI', color: 'from-[#fbbf24] to-[#f59e0b]', icon: Sparkles },
+    { name: 'Edelweiss', tag: 'VISION PLAY', color: 'from-[#ec4899] to-[#db2777]', icon: Globe },
+    { name: 'EliteScout', tag: 'TRAVEL AI', color: 'from-[#D4AF37] to-[#b4952f]', icon: Globe },
+    { name: 'EXPOSITATOR RTE', tag: 'EVALUATOR AI', color: 'from-[#10b981] to-[#059669]', icon: Target },
+    { name: 'Gas Station', tag: 'OPS PWA', color: 'from-[#f97316] to-[#ea580c]', icon: Rocket },
+    { name: 'IAPuta OS', tag: 'CORE AI', color: 'from-[#8b5cf6] to-[#7c3aed]', icon: Shield },
+    { name: 'IndustrialPro', tag: 'INDUSTRY', color: 'from-[#3b82f6] to-[#2563eb]', icon: Shield },
+    { name: 'IT English Coach', tag: 'LANGUAGE AI', color: 'from-[#00FFCC] to-[#00cca3]', icon: MessageSquare },
+    { name: 'JartosDTo', tag: 'AI CHAT', color: 'from-[#8b5cf6] to-[#7c3aed]', icon: Target },
+    { name: 'LIVEKIT Nikolina', tag: 'VOICE AI', color: 'from-[#06b6d4] to-[#0891b2]', icon: MessageSquare },
+    { name: 'LogiSearch', tag: 'LOGISTICS AI', color: 'from-[#00E5FF] to-[#00b8cc]', icon: Globe },
+    { name: 'LogiTrack Almacén', tag: 'LOGISTICS', color: 'from-[#0ea5e9] to-[#0284c7]', icon: Box },
+    { name: 'Mano Eléctrica Azul', tag: 'MOBILE APP', color: 'from-[#10b981] to-[#059669]', icon: Activity },
+    { name: 'Manuel Álvarez', tag: 'CV', color: 'from-[#3b82f6] to-[#2563eb]', icon: Layout },
+    { name: 'MAPFRE Infocol', tag: 'INSURANCE', color: 'from-[#e60028] to-[#b3001f]', icon: Shield },
+    { name: 'Moko-Tools', tag: 'DEV TOOLS', color: 'from-[#14b8a6] to-[#0d9488]', icon: Layout },
+    { name: 'MSBrOSs Assistant', tag: 'ASSISTANT', color: 'from-[#a855f7] to-[#9333ea]', icon: MessageSquare },
+    { name: 'Perfume Trading', tag: 'TRADING B2B', color: 'from-[#f43f5e] to-[#e11d48]', icon: Box },
+    { name: 'TaskFlowPro', tag: 'PRODUCTIVITY', color: 'from-[#f59e0b] to-[#d97706]', icon: Layout },
+    { name: 'Traductor PRO', tag: 'TRANSLATION', color: 'from-[#10b981] to-[#059669]', icon: Globe },
+    { name: 'Tu Energía Maya', tag: 'WEB APP', color: 'from-[#f59e0b] to-[#d97706]', icon: Sparkles },
+    { name: 'TxaFitnessPro', tag: 'FITNESS AI', color: 'from-[#a855f7] to-[#9333ea]', icon: Heart },
+    { name: 'Web Atenea', tag: 'GASTRONOMY', color: 'from-[#c4b5fd] to-[#a78bfa]', icon: Layout }
   ];
 
   // We need enough items to scroll seamlessly
-  const col1 = [...allApps.slice(0, 8), ...allApps.slice(0, 8)];
-  const col2 = [...allApps.slice(8, 16), ...allApps.slice(8, 16)];
+  const col1 = [...allApps.slice(0, 13), ...allApps.slice(0, 13)];
+  const col2 = [...allApps.slice(13, 25), ...allApps.slice(13, 25)];
 
   return (
     <div className="min-h-[85vh] flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-8 relative overflow-hidden">
@@ -93,7 +102,7 @@ export default function Home() {
             </div>
           </div>
           <div className="group">
-            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 group-hover:scale-110 transition-transform origin-left">SLA</div>
+            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 group-hover:scale-110 transition-transform origin-left">24/7</div>
             <div className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-2 flex items-center gap-1.5">
               <Network className="w-3 h-3 text-amber-500" /> Monitorizado
             </div>

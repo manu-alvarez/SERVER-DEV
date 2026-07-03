@@ -13,7 +13,7 @@ export default function SaaS() {
       tech: 'React 19, Vite, Gemini API',
       url: 'https://appgenerator.manuelalvarez.dev',
       icon: Activity,
-      color: 'from-pink-400 to-pink-500',
+      color: 'from-[#f472b6] to-[#ec4899]',
       glow: 'shadow-[0_0_30px_rgba(244,114,182,0.3)]',
       category: 'dev-ai'
     },
@@ -23,17 +23,17 @@ export default function SaaS() {
       tech: 'React 19, MUI 7',
       url: 'https://combipro.manuelalvarez.dev',
       icon: Activity,
-      color: 'from-orange-500 to-orange-600',
+      color: 'from-[#f97316] to-[#f97316]',
       glow: 'shadow-[0_0_30px_rgba(249,115,22,0.3)]',
       category: 'sports-ai'
     },
     {
-      name: 'Cuentos Mágicos AI',
+      name: 'Cuentos Mágicos',
       desc: 'Pequeño generador de cuentos infantiles.',
       tech: 'FastAPI, Celery, AI',
       url: 'https://cuentos.manuelalvarez.dev',
       icon: Sparkles,
-      color: 'from-amber-400 to-amber-500',
+      color: 'from-[#fbbf24] to-[#f59e0b]',
       glow: 'shadow-[0_0_30px_rgba(251,191,36,0.3)]',
       category: 'creative-ai'
     },
@@ -43,7 +43,7 @@ export default function SaaS() {
       tech: 'Next.js 14, Tailwind, Prisma',
       url: 'https://edelweiss.manuelalvarez.dev',
       icon: Globe,
-      color: 'from-pink-500 to-rose-600',
+      color: 'from-[#ec4899] to-[#db2777]',
       glow: 'shadow-[0_0_30px_rgba(236,72,153,0.3)]',
       category: 'enterprise'
     },
@@ -53,7 +53,7 @@ export default function SaaS() {
       tech: 'Next.js 14, Tavily API',
       url: 'https://elitescout.manuelalvarez.dev',
       icon: Globe,
-      color: 'from-yellow-400 to-yellow-600',
+      color: 'from-[#D4AF37] to-[#b4952f]',
       glow: 'shadow-[0_0_30px_rgba(212,175,55,0.3)]',
       category: 'enterprise'
     },
@@ -63,7 +63,7 @@ export default function SaaS() {
       tech: 'PWA, Speech API, Vision API',
       url: 'https://expositator.manuelalvarez.dev',
       icon: Target,
-      color: 'from-emerald-400 to-emerald-600',
+      color: 'from-[#10b981] to-[#059669]',
       glow: 'shadow-[0_0_30px_rgba(16,185,129,0.3)]',
       category: 'vision-play'
     },
@@ -73,7 +73,7 @@ export default function SaaS() {
       tech: 'PWA, FastAPI, SQLite',
       url: 'https://gasstation.manuelalvarez.dev',
       icon: Rocket,
-      color: 'from-orange-500 to-orange-600',
+      color: 'from-[#f97316] to-[#ea580c]',
       glow: 'shadow-[0_0_30px_rgba(249,115,22,0.3)]',
       category: 'enterprise'
     },
@@ -83,7 +83,7 @@ export default function SaaS() {
       tech: 'FastAPI, Python, LLM',
       url: 'https://iaputa.manuelalvarez.dev',
       icon: Shield,
-      color: 'from-violet-500 to-purple-600',
+      color: 'from-[#8b5cf6] to-[#7c3aed]',
       glow: 'shadow-[0_0_30px_rgba(139,92,246,0.3)]',
       category: 'dev-ai'
     },
@@ -93,7 +93,7 @@ export default function SaaS() {
       tech: 'FastAPI, React, Tailwind',
       url: 'https://industrial.manuelalvarez.dev',
       icon: Shield,
-      color: 'from-blue-500 to-blue-600',
+      color: 'from-[#3b82f6] to-[#2563eb]',
       glow: 'shadow-[0_0_30px_rgba(59,130,246,0.3)]',
       category: 'enterprise'
     },
@@ -103,27 +103,37 @@ export default function SaaS() {
       tech: 'PWA, Node.js, Multi-LLM',
       url: 'https://itenglish.manuelalvarez.dev',
       icon: MessageSquare,
-      color: 'from-teal-300 to-teal-500',
+      color: 'from-[#00FFCC] to-[#00cca3]',
       glow: 'shadow-[0_0_30px_rgba(0,255,204,0.3)]',
       category: 'dev-ai'
     },
     {
-      name: 'Jartosdto',
+      name: 'JartosDTo',
       desc: 'Chatbot con RAG y documentos sobre un bot de Telegram.',
       tech: 'Python, RAG, Vector DB',
       url: 'https://jartosdto.manuelalvarez.dev',
       icon: Target,
-      color: 'from-violet-500 to-purple-600',
+      color: 'from-[#8b5cf6] to-[#7c3aed]',
       glow: 'shadow-[0_0_30px_rgba(139,92,246,0.3)]',
       category: 'dev-ai'
     },
     {
+      name: 'LIVEKIT Nikolina',
+      desc: 'Asistente de voz para restaurantes con Gemini 2.5 Flash Native Audio.',
+      tech: 'LiveKit, Gemini 2.5, FastAPI',
+      url: 'https://nikolina.manuelalvarez.dev',
+      icon: MessageSquare,
+      color: 'from-[#06b6d4] to-[#0891b2]',
+      glow: 'shadow-[0_0_30px_rgba(6,182,212,0.3)]',
+      category: 'dev-ai'
+    },
+    {
       name: 'LogiSearch',
-      desc: 'Buscador logístico de rutas y simulador de tarifas (RFQs).',
+      desc: 'Buscador logístico con IA, análisis de rutas y generación de RFQs.',
       tech: 'React 19, TypeScript, Supabase',
       url: 'https://logisearch.manuelalvarez.dev',
       icon: Globe,
-      color: 'from-cyan-400 to-cyan-500',
+      color: 'from-[#00E5FF] to-[#00b8cc]',
       glow: 'shadow-[0_0_30px_rgba(0,229,255,0.3)]',
       category: 'enterprise'
     },
@@ -133,7 +143,7 @@ export default function SaaS() {
       tech: 'Trello, Kanban, Operaciones',
       url: 'https://logitrack.manuelalvarez.dev',
       icon: Box,
-      color: 'from-sky-500 to-sky-600',
+      color: 'from-[#0ea5e9] to-[#0284c7]',
       glow: 'shadow-[0_0_30px_rgba(14,165,233,0.3)]',
       category: 'enterprise'
     },
@@ -143,9 +153,19 @@ export default function SaaS() {
       tech: 'React Native, Expo Go',
       url: 'https://mano.manuelalvarez.dev',
       icon: Activity,
-      color: 'from-emerald-400 to-emerald-600',
+      color: 'from-[#10b981] to-[#059669]',
       glow: 'shadow-[0_0_30px_rgba(16,185,129,0.3)]',
       category: 'creative-ai'
+    },
+    {
+      name: 'Manuel Álvarez Diánez',
+      desc: 'Técnico en Sistemas Microinformáticos y Redes · Soporte IT · Logística Industrial.',
+      tech: 'SMR, Soporte IT, Redes, SAP',
+      url: 'https://cv.manuelalvarez.dev',
+      icon: Layout,
+      color: 'from-[#3b82f6] to-[#2563eb]',
+      glow: 'shadow-[0_0_30px_rgba(59,130,246,0.3)]',
+      category: 'enterprise'
     },
     {
       name: 'MAPFRE Infocol',
@@ -153,7 +173,7 @@ export default function SaaS() {
       tech: 'Next.js 15, Enterprise',
       url: 'https://mapfre.manuelalvarez.dev',
       icon: Shield,
-      color: 'from-red-600 to-red-700',
+      color: 'from-[#e60028] to-[#b3001f]',
       glow: 'shadow-[0_0_30px_rgba(230,0,40,0.3)]',
       category: 'enterprise'
     },
@@ -163,28 +183,18 @@ export default function SaaS() {
       tech: 'React 19, Vite 7, Tailwind',
       url: 'https://mokotools.manuelalvarez.dev',
       icon: Layout,
-      color: 'from-teal-500 to-teal-600',
+      color: 'from-[#14b8a6] to-[#0d9488]',
       glow: 'shadow-[0_0_30px_rgba(20,184,166,0.3)]',
       category: 'dev-ai'
     },
     {
-      name: 'MSBross Voice Server',
-      desc: 'Servidor central de voz Adele para interacciones auditivas.',
-      tech: 'Python, Audio Processing',
+      name: 'MSBrOSs Assistant',
+      desc: 'Asistente conversacional principal del ecosistema MSBrossAI.',
+      tech: 'Python, Flask, Gemini API',
       url: 'https://msbross-voice.manuelalvarez.dev',
-      icon: Activity,
-      color: 'from-purple-500 to-purple-600',
-      glow: 'shadow-[0_0_30px_rgba(168,85,247,0.3)]',
-      category: 'dev-ai'
-    },
-    {
-      name: 'Nikolina Voice AI',
-      desc: 'Prueba de bot de voz en tiempo real usando LiveKit.',
-      tech: 'Python, LiveKit, WebRTC',
-      url: 'https://nikolina.manuelalvarez.dev',
       icon: MessageSquare,
-      color: 'from-cyan-500 to-cyan-600',
-      glow: 'shadow-[0_0_30px_rgba(6,182,212,0.3)]',
+      color: 'from-[#a855f7] to-[#9333ea]',
+      glow: 'shadow-[0_0_30px_rgba(168,85,247,0.3)]',
       category: 'dev-ai'
     },
     {
@@ -193,7 +203,7 @@ export default function SaaS() {
       tech: 'ERP, Prisma, Next.js',
       url: 'https://perfume.manuelalvarez.dev',
       icon: Box,
-      color: 'from-rose-500 to-rose-600',
+      color: 'from-[#f43f5e] to-[#e11d48]',
       glow: 'shadow-[0_0_30px_rgba(244,63,94,0.3)]',
       category: 'enterprise'
     },
@@ -203,47 +213,47 @@ export default function SaaS() {
       tech: 'React 18, MUI 5, Zustand',
       url: 'https://taskflow.manuelalvarez.dev',
       icon: Layout,
-      color: 'from-amber-500 to-orange-500',
+      color: 'from-[#f59e0b] to-[#d97706]',
       glow: 'shadow-[0_0_30px_rgba(245,158,11,0.3)]',
       category: 'enterprise'
     },
     {
-      name: 'Traductor Pro',
-      desc: 'Un proxy básico para traducciones automatizadas.',
-      tech: 'Express, Node.js, AI',
+      name: 'Traductor PRO',
+      desc: 'Traductor neural con 4 modos, 4 providers y OCR con Tesseract.js.',
+      tech: 'Express, React 19, AI',
       url: 'https://traductor.manuelalvarez.dev',
       icon: Globe,
-      color: 'from-emerald-400 to-emerald-600',
+      color: 'from-[#10b981] to-[#059669]',
       glow: 'shadow-[0_0_30px_rgba(16,185,129,0.3)]',
       category: 'enterprise'
     },
     {
       name: 'Tu Energía Maya',
-      desc: 'Web interactiva sobre astrología Maya, kin y firmas galácticas.',
+      desc: 'Plataforma interactiva sobre sabiduría Maya, kin y firma galáctica.',
       tech: 'Web App, JavaScript, Tzolkin',
       url: 'https://energia.manuelalvarez.dev',
       icon: Sparkles,
-      color: 'from-amber-500 to-orange-500',
+      color: 'from-[#f59e0b] to-[#d97706]',
       glow: 'shadow-[0_0_30px_rgba(245,158,11,0.3)]',
       category: 'creative-ai'
     },
     {
       name: 'TxaFitnessPro',
-      desc: 'Aplicación para seguimiento de entrenamientos y nutrición.',
+      desc: 'Plataforma integral de entrenamiento y nutrición inteligente con IA.',
       tech: 'Next.js 15, React 19, Tailwind',
       url: 'https://txafitness.manuelalvarez.dev',
       icon: Heart,
-      color: 'from-purple-500 to-purple-600',
+      color: 'from-[#a855f7] to-[#9333ea]',
       glow: 'shadow-[0_0_30px_rgba(168,85,247,0.3)]',
       category: 'sports-ai'
     },
     {
       name: 'Web Restaurante Atenea',
-      desc: 'Web informativa y sistema básico de reservas.',
+      desc: 'Experiencia culinaria de alta gastronomía con sistema de reservas.',
       tech: 'HTML5, CSS3, JavaScript',
       url: 'https://atenea.manuelalvarez.dev',
       icon: Layout,
-      color: 'from-violet-300 to-violet-400',
+      color: 'from-[#c4b5fd] to-[#a78bfa]',
       glow: 'shadow-[0_0_30px_rgba(196,181,253,0.3)]',
       category: 'enterprise'
     }
