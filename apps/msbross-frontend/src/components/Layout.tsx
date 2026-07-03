@@ -45,7 +45,7 @@ export default function Layout() {
         <div className="p-6 border-b border-white/5 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.4)] p-1.5">
-              <img src="/mad_logo.png" className="w-full h-full object-contain" alt="MSBross Logo" />
+              <img src="/logo-icon.svg" className="w-full h-full object-contain" alt="MSBross Logo" />
             </div>
             <span className="font-bold text-xl tracking-tight glow-text">MSBross</span>
           </Link>
@@ -138,7 +138,7 @@ export default function Layout() {
         <div className="lg:hidden sticky top-0 z-30 bg-[#0A101C]/80 backdrop-blur-xl border-b border-white/5 px-6 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center p-1">
-              <img src="/mad_logo.png" className="w-full h-full object-contain" alt="MSBross Logo" />
+              <img src="/logo-icon.svg" className="w-full h-full object-contain" alt="MSBross Logo" />
             </div>
             <span className="font-bold text-lg tracking-tight glow-text">MSBross</span>
           </Link>
