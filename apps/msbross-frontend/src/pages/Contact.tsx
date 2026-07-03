@@ -126,13 +126,13 @@ export default function Contact() {
                 </div>
               </a>
 
-              <a href="https://linkedin.com/in/manuelalvarezdianez" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group/link">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0 group-hover/link:bg-blue-400 group-hover/link:text-[#0A101C] transition-colors">
-                  <Briefcase className="w-5 h-5" />
+              <a href="https://www.linkedin.com/in/manu-alvarez-dev/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group/link">
+                <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center group-hover/link:bg-blue-500/20 transition-colors border border-blue-500/20">
+                  <Linkedin className="w-5 h-5 text-blue-400" />
                 </div>
                 <div>
                   <div className="text-gray-500 text-xs font-mono uppercase tracking-wider mb-0.5">LinkedIn</div>
-                  <div className="text-white group-hover/link:text-blue-400 transition-colors font-medium text-sm">linkedin.com/in/manuelalvarezdianez</div>
+                  <div className="text-white group-hover/link:text-blue-400 transition-colors font-medium text-sm">linkedin.com/in/manu-alvarez-dev</div>
                 </div>
               </a>
             </div>
