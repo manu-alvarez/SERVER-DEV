@@ -1,5 +1,5 @@
 import { motion, type Variants } from 'framer-motion';
-import { Send, MapPin, Mail, Phone, BookUser, Code, Briefcase } from 'lucide-react';
+import { Send, MapPin, Mail, Phone, BookUser, Code, Linkedin } from 'lucide-react';
 
 export default function Contact() {
   const containerVars: Variants = {
