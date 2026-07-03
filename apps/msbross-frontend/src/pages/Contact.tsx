@@ -1,5 +1,5 @@
 import { motion, type Variants } from 'framer-motion';
-import { Send, MapPin, Mail, Phone, BookUser, Github, Linkedin } from 'lucide-react';
+import { Send, MapPin, Mail, Phone, BookUser, Code, Briefcase } from 'lucide-react';
 
 export default function Contact() {
   const containerVars: Variants = {
@@ -118,7 +118,7 @@ export default function Contact() {
 
               <a href="https://github.com/manu-alvarez" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group/link">
                 <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0 group-hover/link:bg-purple-400 group-hover/link:text-[#0A101C] transition-colors">
-                  <Github className="w-5 h-5" />
+                  <Code className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="text-gray-500 text-xs font-mono uppercase tracking-wider mb-0.5">GitHub</div>
@@ -128,7 +128,7 @@ export default function Contact() {
 
               <a href="https://linkedin.com/in/manuelalvarezdianez" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group/link">
                 <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0 group-hover/link:bg-blue-400 group-hover/link:text-[#0A101C] transition-colors">
-                  <Linkedin className="w-5 h-5" />
+                  <Briefcase className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="text-gray-500 text-xs font-mono uppercase tracking-wider mb-0.5">LinkedIn</div>
