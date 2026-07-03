@@ -62,7 +62,7 @@ function App() {
             <div className="hero-actions" style={{ marginTop: '1.5rem', gap: '1.5rem' }}>
               <a href="https://linkedin.com/in/manu-alvarez-dev" target="_blank" rel="noreferrer" className="icon-link" data-tooltip="LinkedIn"><Briefcase size={24} /></a>
               <a href="https://github.com/manu-alvarez" target="_blank" rel="noreferrer" className="icon-link" data-tooltip="GitHub"><Code size={24} /></a>
-              <a href="https://msbross.me" target="_blank" rel="noreferrer" className="icon-link" data-tooltip="MSBross Ecosystem"><ExternalLink size={24} /></a>
+              <a href="https://manuelalvarez.dev" target="_blank" rel="noreferrer" className="icon-link" data-tooltip="MSBross Ecosystem"><ExternalLink size={24} /></a>
               <a href="https://manuelalvarez.dev" target="_blank" rel="noreferrer" className="icon-link" data-tooltip="Manuel Álvarez Hub"><Globe size={24} /></a>
             </div>
           </motion.div>
@@ -83,7 +83,7 @@ function App() {
             <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)' }}>
               Técnico en Sistemas Microinformáticos y Redes, con experiencia multiplataforma, en virtualización y administración básica de entornos de red. Perfil orientado al sentido práctico y la eficiencia: desarrollo utilidades personalizadas e integro herramientas de Inteligencia Artificial para simplificar flujos operativos y resolver incidencias informáticas del día a día de manera honesta y organizada. 
               <br/><br/>
-              En mi tiempo personal mantengo un pequeño portfolio de aplicaciones prácticas (msbross.me) donde pongo en práctica estas habilidades. Complemento mi perfil técnico con una sólida trayectoria en logística y producción industrial en compañías de referencia como Procter & Gamble, GB Foods y Döhler, que aporta disciplina, compromiso con la seguridad y orientación a la mejora continua.
+              En mi tiempo personal mantengo un pequeño portfolio de aplicaciones prácticas (manuelalvarez.dev) donde pongo en práctica estas habilidades. Complemento mi perfil técnico con una sólida trayectoria en logística y producción industrial en compañías de referencia como Procter & Gamble, GB Foods y Döhler, que aporta disciplina, compromiso con la seguridad y orientación a la mejora continua.
             </p>
           </motion.div>
         </div>
