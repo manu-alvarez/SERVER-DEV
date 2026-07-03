@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 
 export interface AIProvider {
-  chat: { completions: any };
+  chat: { completions: { create: (params: any) => Promise<any> } };
   getDefaultModel(): string;
 }
 

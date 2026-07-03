@@ -245,7 +245,7 @@ const Tasks: React.FC = () => {
               label="Prioridad" 
               variant="filled"
               value={priority} 
-              onChange={(e) => setPriority(e.target.value as any)}
+              onChange={(e) => setPriority(e.target.value as "low" | "medium" | "high" | "urgent")}
             >
               <MenuItem value="low">🟢 Baja</MenuItem>
               <MenuItem value="medium">🟡 Media</MenuItem>

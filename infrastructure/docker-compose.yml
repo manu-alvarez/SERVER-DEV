@@ -333,7 +333,7 @@ services:
     - traefik.http.routers.perfume.rule=Host(`perfume.manuelalvarez.dev`) && PathPrefix(`/app/perfume-trading`)
     - traefik.http.routers.perfume.entrypoints=websecure
     - traefik.http.routers.perfume.tls.certresolver=myresolver
-    - traefik.http.services.perfume.loadbalancer.server.port=3011
+    - traefik.http.services.perfume.loadbalancer.server.port=3000
 
     - traefik.http.routers.perfume-redirect.rule=Host(`perfume.manuelalvarez.dev`) && !PathPrefix(`/app/perfume-trading`)
     - traefik.http.routers.perfume-redirect.entrypoints=websecure
@@ -362,7 +362,7 @@ services:
     - traefik.http.routers.txafitness.rule=Host(`txafitness.manuelalvarez.dev`) && PathPrefix(`/app/txafitnesspro`)
     - traefik.http.routers.txafitness.entrypoints=websecure
     - traefik.http.routers.txafitness.tls.certresolver=myresolver
-    - traefik.http.services.txafitness.loadbalancer.server.port=3456
+    - traefik.http.services.txafitness.loadbalancer.server.port=3000
 
     - traefik.http.routers.txafitness-redirect.rule=Host(`txafitness.manuelalvarez.dev`) && !PathPrefix(`/app/txafitnesspro`)
     - traefik.http.routers.txafitness-redirect.entrypoints=websecure

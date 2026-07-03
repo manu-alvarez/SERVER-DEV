@@ -36,7 +36,7 @@ export async function saveSearch(query: SearchQuery): Promise<SearchQuery | null
     // Keep only last 50 searches
     if (history.length > 50) history.pop()
     
-    localStorage.setItem('logisearch_searches', JSON.stringify(history))
+    try { localStorage.setItem('logisearch_searches', JSON.stringify(history)) } catch(e) { console.warn('Storage disabled', e); }
     return newSearch
   } catch (err) {
     console.error('Error saving search:', err)
@@ -68,7 +68,7 @@ export async function saveRFQ(rfq: Omit<RFQ, 'id' | 'created_at'>): Promise<RFQ 
     }
     
     rfqs.unshift(newRFQ)
-    localStorage.setItem('logisearch_rfqs', JSON.stringify(rfqs))
+    try { localStorage.setItem('logisearch_rfqs', JSON.stringify(rfqs)) } catch(e) { console.warn('Storage disabled', e); }
     
     return newRFQ
   } catch (err) {

@@ -24,7 +24,7 @@ router.post('/extras', async (req, res) => {
     }
 
     const providersToTry = ['groq', 'gemini', 'openrouter', 'openai'];
-    let lastError: any = null;
+    let lastError: Error | null = null;
     let successfulProvider = '';
     let content = '';
 
@@ -48,9 +48,9 @@ router.post('/extras', async (req, res) => {
         successfulProvider = providerName;
         console.log(`[extras] Completado con éxito usando proveedor: ${providerName}`);
         break;
-      } catch (err: any) {
-        console.warn(`[extras] Proveedor ${providerName} falló:`, err?.message || err);
-        lastError = err;
+      } catch (err) {
+        console.warn(`[extras] Proveedor ${providerName} falló:`, err instanceof Error ? err.message : err);
+        lastError = err instanceof Error ? err : new Error(String(err));
       }
     }
 
@@ -65,11 +65,11 @@ router.post('/extras', async (req, res) => {
       resultado: content.trim(),
       provider: successfulProvider,
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error(err);
     return res.status(500).json({
       error: 'Error procesando la herramienta extra',
-      details: err?.message,
+      details: err instanceof Error ? err.message : 'Unknown error',
     });
   }
 });

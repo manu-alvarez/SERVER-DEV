@@ -30,7 +30,13 @@ const LOCAL_MSGS_KEY = "jartosdto_messages";
 function getConversationsLocal(): any[] {
   if (typeof window === "undefined") return [];
   const stored = localStorage.getItem(LOCAL_CONVS_KEY);
-  return stored ? JSON.parse(stored) : [];
+  if (!stored) return [];
+  try {
+    return JSON.parse(stored);
+  } catch (e) {
+    console.error("Error parsing conversations from localStorage", e);
+    return [];
+  }
 }
 
 function saveConversationsLocal(convs: any[]) {
@@ -43,13 +49,27 @@ function getMessagesLocal(convId: string): ChatMessage[] {
   if (typeof window === "undefined") return [];
   const stored = localStorage.getItem(LOCAL_MSGS_KEY);
   if (!stored) return [];
-  const map = JSON.parse(stored);
-  return map[convId] || [];
+  try {
+    const map = JSON.parse(stored);
+    return map[convId] || [];
+  } catch (e) {
+    console.error("Error parsing messages from localStorage", e);
+    return [];
+  }
 }
 
 function saveMessagesLocal(convId: string, msgs: ChatMessage[]) {
   if (typeof window !== "undefined") {
-    const stored = localStorage.getItem(LOCAL_MSGS_KEY) || "{}";
+    try {
+      const stored = localStorage.getItem(LOCAL_MSGS_KEY) || "{}";
+      const map = JSON.parse(stored);
+      map[convId] = msgs;
+      localStorage.setItem(LOCAL_MSGS_KEY, JSON.stringify(map));
+    } catch (e) {
+      console.error("Error saving messages to localStorage", e);
+    }
+  }
+}";
     const map = JSON.parse(stored);
     map[convId] = msgs;
     localStorage.setItem(LOCAL_MSGS_KEY, JSON.stringify(map));

@@ -21,7 +21,7 @@ export default function App() {
   const [historyOpen, setHistoryOpen] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('arantxa_history', JSON.stringify(history));
+    try { localStorage.setItem('arantxa_history', JSON.stringify(history)); } catch (e) { console.error('Storage error', e); }
   }, [history]);
 
   const addToHistory = (input: string, output: string, type: string) => {
@@ -29,7 +29,7 @@ export default function App() {
     setHistory(prev => [{
       id: crypto.randomUUID(),
       timestamp: Date.now(),
-      type: type as any,
+      type: type,
       input: input.slice(0, 200),
       output: output.slice(0, 300),
       provider,

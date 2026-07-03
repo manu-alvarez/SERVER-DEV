@@ -50,7 +50,7 @@ export default function OperationsView() {
           audioRef.current?.play().catch(() => {});
           await load();
         }
-      } catch {}
+      } catch (err) { console.error("Polling error", err); }
     }, 3000);
     return () => clearInterval(iv);
   }, [load]);
@@ -63,7 +63,7 @@ export default function OperationsView() {
       setOpName('');
       setOpProduct('');
       await load();
-    } catch {}
+    } catch (err) { alert("Operación fallida. Revisa tu conexión o permisos."); console.error(err); }
   };
 
   const toggleTimer = async (timer: any) => {
@@ -75,14 +75,14 @@ export default function OperationsView() {
         elapsed_seconds: timer.elapsed_seconds,
       });
       await load();
-    } catch {}
+    } catch (err) { alert("Operación fallida. Revisa tu conexión o permisos."); console.error(err); }
   };
 
   const resetTimer = async (timer: any) => {
     try {
       await api.put(`/timers/${timer.id}`, { elapsed_seconds: 0, is_running: 0 });
       await load();
-    } catch {}
+    } catch (err) { alert("Operación fallida. Revisa tu conexión o permisos."); console.error(err); }
   };
 
   const addTimer = async (opId: number) => {
@@ -93,7 +93,7 @@ export default function OperationsView() {
     try {
       await api.post(`/operations/${opId}/timers`, { name, duration_seconds: Number(mins) * 60 });
       await load();
-    } catch {}
+    } catch (err) { alert("Operación fallida. Revisa tu conexión o permisos."); console.error(err); }
   };
 
   const toggleValve = async (valve: any) => {
@@ -103,7 +103,7 @@ export default function OperationsView() {
     try {
       await api.put(`/valves/${valve.id}`, { status: next });
       await load();
-    } catch {}
+    } catch (err) { alert("Operación fallida. Revisa tu conexión o permisos."); console.error(err); }
   };
 
   const togglePump = async (pump: any) => {
@@ -111,21 +111,21 @@ export default function OperationsView() {
     try {
       await api.put(`/pumps/${pump.id}`, { status: running ? 'stopped' : 'running', rpm: running ? 0 : 1450 });
       await load();
-    } catch {}
+    } catch (err) { alert("Operación fallida. Revisa tu conexión o permisos."); console.error(err); }
   };
 
   const toggleChecklist = async (item: any) => {
     try {
       await api.put(`/checklists/${item.id}`, { checked: item.checked ? 0 : 1 });
       await load();
-    } catch {}
+    } catch (err) { alert("Operación fallida. Revisa tu conexión o permisos."); console.error(err); }
   };
 
   const completeOp = async (opId: number) => {
     try {
       await api.put(`/operations/${opId}`, { status: 'completed' });
       await load();
-    } catch {}
+    } catch (err) { alert("Operación fallida. Revisa tu conexión o permisos."); console.error(err); }
   };
 
   const addValve = async (opId: number) => {

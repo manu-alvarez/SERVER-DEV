@@ -44,27 +44,39 @@ export function ExerciseLogger({
   const [showDetails, setShowDetails] = useState(false);
   const details = getExerciseDetails(preset.name);
 
-  // Timer Effect
+  // Timer Effect (High Precision)
+  const [endTime, setEndTime] = useState<number | null>(null);
+
   useEffect(() => {
-    if (isResting && timeLeft > 0) {
-      timerRef.current = setTimeout(() => setTimeLeft((t) => t - 1), 1000);
-    } else if (timeLeft === 0 && isResting) {
-      setIsResting(false);
-      // Optional: Play a subtle beep sound here if we had an audio file
+    if (isResting && endTime) {
+      timerRef.current = setInterval(() => {
+        const remaining = Math.ceil((endTime - Date.now()) / 1000);
+        if (remaining <= 0) {
+          setIsResting(false);
+          setTimeLeft(0);
+          setEndTime(null);
+          if (timerRef.current) clearInterval(timerRef.current);
+        } else {
+          setTimeLeft(remaining);
+        }
+      }, 100); // 100ms tick for precision
     }
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
+      if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isResting, timeLeft]);
+  }, [isResting, endTime]);
 
   const startRestTimer = () => {
-    setTimeLeft(preset.restSeconds || 60);
+    const duration = preset.restSeconds || 60;
+    setTimeLeft(duration);
+    setEndTime(Date.now() + duration * 1000);
     setIsResting(true);
   };
 
   const stopRestTimer = () => {
     setIsResting(false);
     setTimeLeft(0);
+    setEndTime(null);
   };
 
   const handleAddSet = () => {

@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import sqlite3, os, json
 from datetime import datetime
 
@@ -317,3 +319,16 @@ def import_all(data):
         return False
     finally:
         conn.close()
+
+def get_running_timers():
+    conn = get_conn()
+    # Join with operations to get the operation name
+    query = '''
+        SELECT t.*, o.name as operation_name 
+        FROM timers t
+        JOIN operations o ON t.operation_id = o.id
+        WHERE t.is_running = 1
+    '''
+    rows = [dict(r) for r in conn.execute(query).fetchall()]
+    conn.close()
+    return rows

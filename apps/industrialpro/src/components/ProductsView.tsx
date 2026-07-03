@@ -17,7 +17,7 @@ export default function ProductsView() {
     try {
       const res = await api.get('/products');
       setProducts(res.data);
-    } catch {}
+    } catch (err) { alert("Operación fallida. Revisa tu conexión o permisos."); console.error(err); }
     setLoading(false);
   };
 
@@ -32,7 +32,7 @@ export default function ProductsView() {
       else await api.post('/products', form);
       setDialog(false);
       await load();
-    } catch {}
+    } catch (err) { alert("Operación fallida. Revisa tu conexión o permisos."); console.error(err); }
   };
 
   const remove = async (id: number) => {

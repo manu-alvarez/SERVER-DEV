@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
 import { SearchBar } from "@/components/search/SearchBar";
 import { TravelSearchForm } from "@/components/search/TravelSearchForm";
+import { useSearchModes } from "@/hooks/useSearchModes";
 
 const CATEGORIES = [
   { label: "Viajes", icon: "🌍", query: "ofertas viaje pack completo", color: "gold", description: "Vuelos + Hotel + Transporte" },
@@ -14,42 +13,16 @@ const CATEGORIES = [
 ];
 
 export default function HomePage() {
-  const router = useRouter();
-  const [query, setQuery] = useState("");
-  const [searchMode, setSearchMode] = useState<"product" | "travel">("product");
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("elitescout_recent");
-    if (saved) setRecentSearches(JSON.parse(saved));
-  }, []);
-
-  const handleSearch = (customQuery?: string) => {
-    const finalQuery = customQuery || query;
-    if (!finalQuery.trim()) return;
-    
-    const updated = [finalQuery, ...recentSearches.filter((s) => s !== finalQuery)].slice(0, 5);
-    localStorage.setItem("elitescout_recent", JSON.stringify(updated));
-    router.push(`/results?q=${encodeURIComponent(finalQuery.trim())}${searchMode === "travel" ? "&type=travel" : ""}`);
-  };
-
-  const handleTravelSearch = (data: any) => {
-    const travelQuery = `Viaje de ${data.origin} a ${data.destination} en ${data.mode}`;
-    const params = new URLSearchParams({
-      q: travelQuery,
-      type: "travel",
-      origin: data.origin,
-      dest: data.destination,
-      mode: data.mode,
-      depart: data.departDate,
-      return: data.returnDate || "",
-      adults: String(data.adults),
-      children: String(data.children),
-      infants: String(data.infants),
-      tripType: data.tripType,
-    });
-    router.push(`/results?${params.toString()}`);
-  };
+  const {
+    query,
+    setQuery,
+    searchMode,
+    setSearchMode,
+    recentSearches,
+    isLoaded,
+    handleProductSearch,
+    handleTravelSearch
+  } = useSearchModes();
 
   return (
     <div className="flex flex-col items-center min-h-screen px-6 py-12 mesh-bg relative">
@@ -118,7 +91,7 @@ export default function HomePage() {
               <SearchBar
                 value={query}
                 onChange={setQuery}
-                onSearch={() => handleSearch()}
+                onSearch={() => handleProductSearch()}
                 size="hero"
                 placeholder="Busca el producto de tus sueños o una oferta de lujo..."
               />
@@ -201,7 +174,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 * idx + 0.5 }}
-              onClick={() => handleSearch(cat.query)}
+              onClick={() => handleProductSearch(cat.query)}
               className="group portal-card relative flex flex-col items-start rounded-3xl text-left transition-all duration-500 overflow-hidden h-48"
               style={{ padding: 0 }}
             >

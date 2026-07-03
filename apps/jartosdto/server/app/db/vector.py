@@ -6,6 +6,7 @@ allowing uvicorn to bind and become healthy immediately on startup.
 """
 
 import os
+import asyncio
 from typing import Optional
 
 VECTOR_STORE_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "faiss_index")
@@ -21,8 +22,9 @@ class VectorDBService:
         self._vector_store = None
         self._initialized = False
         self.index_path = os.path.join(VECTOR_STORE_PATH, "index")
+        self._init_lock = asyncio.Lock()
 
-    def _ensure_initialized(self):
+    def _initialize_sync(self):
         """Lazy-load heavy ML dependencies on first use."""
         if self._initialized:
             return
@@ -49,9 +51,15 @@ class VectorDBService:
         self._initialized = True
         print("✅ JartosDTo: Embedding model loaded.", flush=True)
 
-    async def ingest_pdf(self, file_path: str) -> str:
-        """Ingests a PDF file and adds its content to the vector database."""
-        self._ensure_initialized()
+    async def _ensure_initialized(self):
+        """Async wrapper for initialization to prevent blocking the event loop."""
+        if self._initialized:
+            return
+        async with self._init_lock:
+            if not self._initialized:
+                await asyncio.to_thread(self._initialize_sync)
+
+    def _ingest_sync(self, file_path: str) -> str:
         from langchain_community.document_loaders import PyPDFLoader
 
         loader = PyPDFLoader(file_path)
@@ -63,16 +71,21 @@ class VectorDBService:
 
         return f"Ingestados {len(docs)} fragmentos del documento."
 
-    async def retrieve_context(self, query: str, top_k: int = 3) -> str:
-        """Retrieves top_k most similar chunks for a given query."""
-        self._ensure_initialized()
-        docs = self._vector_store.similarity_search(query, k=top_k)
+    async def ingest_pdf(self, file_path: str) -> str:
+        """Ingests a PDF file and adds its content to the vector database without blocking."""
+        await self._ensure_initialized()
+        return await asyncio.to_thread(self._ingest_sync, file_path)
 
+    def _retrieve_sync(self, query: str, top_k: int) -> str:
+        docs = self._vector_store.similarity_search(query, k=top_k)
         if not docs:
             return ""
+        return "\n\n---\n\n".join([doc.page_content for doc in docs])
 
-        context = "\n\n---\n\n".join([doc.page_content for doc in docs])
-        return context
+    async def retrieve_context(self, query: str, top_k: int = 3) -> str:
+        """Retrieves top_k most similar chunks for a given query without blocking."""
+        await self._ensure_initialized()
+        return await asyncio.to_thread(self._retrieve_sync, query, top_k)
 
 
 vector_db = VectorDBService()

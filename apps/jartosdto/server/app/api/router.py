@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import os
 import json
 import uuid
@@ -17,7 +19,8 @@ async def get_models(req: Request):
     keys_str = req.headers.get("x-custom-api-keys", "{}")
     try:
         api_keys = json.loads(keys_str)
-    except:
+    except Exception as e:
+        logger.warning(f"Failed to parse x-custom-api-keys: {e}")
         api_keys = {}
 
     models = []
@@ -39,8 +42,8 @@ async def get_models(req: Request):
                             "is_vision": "vision" in m["id"].lower(),
                             "is_thinking": False
                         })
-            except Exception:
-                pass
+            except Exception as e:
+                logger.error(f"Error checking model provider: {e}")
 
         # Groq
         if api_keys.get("groq"):
@@ -61,8 +64,8 @@ async def get_models(req: Request):
                             "is_vision": "vision" in m_id.lower(),
                             "is_thinking": "deepseek-r1" in m_id.lower()
                         })
-            except Exception:
-                pass
+            except Exception as e:
+                logger.error(f"Error checking model provider: {e}")
                 
         # OpenAI
         if api_keys.get("openai"):
@@ -80,8 +83,8 @@ async def get_models(req: Request):
                                 "is_vision": "vision" in m["id"],
                                 "is_thinking": "o1" in m["id"] or "o3" in m["id"]
                             })
-            except Exception:
-                pass
+            except Exception as e:
+                logger.error(f"Error checking model provider: {e}")
 
         # Anthropic
         if api_keys.get("anthropic"):
@@ -101,8 +104,8 @@ async def get_models(req: Request):
                                 "is_vision": True,
                                 "is_thinking": "opus" in m["id"].lower() or "sonnet" in m["id"].lower()
                             })
-            except Exception:
-                pass
+            except Exception as e:
+                logger.error(f"Error checking model provider: {e}")
                 
         # Gemini (Google AI Studio)
         if api_keys.get("gemini"):
@@ -120,8 +123,8 @@ async def get_models(req: Request):
                                 "is_vision": True,
                                 "is_thinking": "thinking" in model_id.lower() or "pro" in model_id.lower()
                             })
-            except Exception:
-                pass
+            except Exception as e:
+                logger.error(f"Error checking model provider: {e}")
                 
         # OpenAI-compatible Custom Endpoints (Ollama, LlamaCPP, LMStudio, vLLM, Mistral, Minimax)
         custom_providers = [
@@ -165,8 +168,8 @@ async def get_models(req: Request):
                             "is_vision": "vision" in m_id.lower(),
                             "is_thinking": False
                         })
-            except Exception:
-                pass
+            except Exception as e:
+                logger.error(f"Error checking model provider: {e}")
 
     return models
 
@@ -245,7 +248,8 @@ async def chat_completions(req: Request, body: ChatRequest):
     keys_str = req.headers.get("x-custom-api-keys", "{}")
     try:
         api_keys = json.loads(keys_str)
-    except:
+    except Exception as e:
+        logger.warning(f"Failed to parse x-custom-api-keys: {e}")
         api_keys = {}
         
     user_query = body.messages[-1].content

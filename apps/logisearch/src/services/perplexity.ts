@@ -61,7 +61,7 @@ export async function fetchGlobalAlerts(): Promise<GlobalAlert[]> {
     const alerts: GlobalAlert[] = JSON.parse(text)
     
     // Guardar en caché
-    localStorage.setItem(CACHE_KEY, JSON.stringify({
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ } catch(e) { console.warn('Storage disabled', e); }
       timestamp: Date.now(),
       data: alerts
     }))

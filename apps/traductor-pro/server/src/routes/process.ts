@@ -74,9 +74,9 @@ Instrucción específica: ${systemPrompt}
     `.trim();
 
     const providersToTry = ['groq', 'gemini', 'openrouter', 'openai'];
-    let lastError: any = null;
+    let lastError: Error | null = null;
     let successfulProvider = '';
-    let parsed: any = null;
+    let parsed: Record<string, string> | null = null;
 
     for (const providerName of providersToTry) {
       try {
@@ -101,9 +101,9 @@ Instrucción específica: ${systemPrompt}
         successfulProvider = providerName;
         console.log(`[process] Completado con éxito usando proveedor: ${providerName}`);
         break;
-      } catch (err: any) {
-        console.warn(`[process] Proveedor ${providerName} falló:`, err?.message || err);
-        lastError = err;
+      } catch (err) {
+        console.warn(`[process] Proveedor ${providerName} falló:`, err instanceof Error ? err.message : err);
+        lastError = err instanceof Error ? err : new Error(String(err));
       }
     }
 
@@ -119,11 +119,11 @@ Instrucción específica: ${systemPrompt}
       resumen: parsed.resumen ?? '',
       provider: successfulProvider,
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error(err);
     return res.status(500).json({
       error: 'Error procesando el texto',
-      details: err?.message,
+      details: err instanceof Error ? err.message : 'Unknown error',
     });
   }
 });

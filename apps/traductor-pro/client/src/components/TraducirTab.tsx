@@ -45,7 +45,7 @@ export default function TraducirTab({ provider, onResult }: Props) {
       const data = await processText({ texto, origen, destino, modo: modo as Modo, nivelResumen: 'normal', provider });
       setResult({ traduccion: data.traduccion, resumen: '', provider: data.provider });
       onResult(texto, data.traduccion, 'traduccion');
-    } catch (e: any) {
+    } catch (e) {
       setError(e?.message || 'Error en la traducción');
     } finally {
       setLoading(false);

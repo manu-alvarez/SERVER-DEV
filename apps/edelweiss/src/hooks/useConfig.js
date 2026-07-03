@@ -44,7 +44,7 @@ export function useConfig() {
   // Sync config to localStorage whenever it changes
   useEffect(() => {
     try {
-      localStorage.setItem('visionplay-config', JSON.stringify(config));
+      try { localStorage.setItem('visionplay-config', JSON.stringify(config)); } catch(e) { console.warn('Storage disabled', e); }
     } catch (e) {
       console.warn('Failed to save config', e);
     }

@@ -221,14 +221,11 @@ export const useTaskStore = create<TaskStore>()(
             // Parse reminderTime to compare at the minute level robustly
             const reminderDate = new Date(task.reminderTime);
             if (!isNaN(reminderDate.getTime())) {
-              const isSameMinute = 
-                reminderDate.getFullYear() === now.getFullYear() &&
-                reminderDate.getMonth() === now.getMonth() &&
-                reminderDate.getDate() === now.getDate() &&
-                reminderDate.getHours() === now.getHours() &&
-                reminderDate.getMinutes() === now.getMinutes();
+              // The reminder must trigger if the current time is at or past the reminder time.
+              // Since it checks !task.reminderSent above, it won't fire twice.
+              const isDue = now >= reminderDate;
 
-              if (isSameMinute) {
+              if (isDue) {
                 // Send WhatsApp alert via CallMeBot
                 if (state.settings.whatsappEnabled) {
                   WhatsAppService.onTaskDue(task.title, task.reminderTime);

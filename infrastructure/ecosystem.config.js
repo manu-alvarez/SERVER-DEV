@@ -61,7 +61,8 @@ module.exports = {
       args: 'src/agent.py start',
       cwd: path.join(__dirname, 'apps/livekit-nikolina/agent'),
       env: {
-        PYTHONPATH: './agent/src:./server/src'
+        PYTHONPATH: './agent/src:./server/src',
+        LIVEKIT_WORKER_PORT: 8083
       },
       out_file: path.join(__dirname, 'apps/livekit-nikolina/logs/agent.log'),
       error_file: path.join(__dirname, 'apps/livekit-nikolina/logs/agent.error.log'),
@@ -181,21 +182,9 @@ module.exports = {
     },
 
     // ──────────────────────────────────────────────
-    // CUENTOSMÁGICOS AI (Creative Story Teller Backend)
+    // CUENTOSMÁGICOS AI — MANAGED BY DOCKER COMPOSE
+    // (Removed from PM2 to avoid port conflict with Docker container)
     // ──────────────────────────────────────────────
-    {
-      name: 'cuentos-magicos-backend',
-      script: path.join(__dirname, 'apps/cuentos-magicos/backend/venv/bin/python3'),
-      args: '-m uvicorn app.main:app --host 127.0.0.1 --port 8007',
-      cwd: path.join(__dirname, 'apps/cuentos-magicos/backend'),
-      out_file: path.join(__dirname, 'apps/cuentos-magicos/backend/cuentosmagicos.log'),
-      error_file: path.join(__dirname, 'apps/cuentos-magicos/backend/cuentosmagicos.error.log'),
-      autorestart: true,
-      max_restarts: 15,
-      exp_backoff_delay: 1000,
-      min_uptime: '15s',
-      max_memory_restart: '600M'
-    },
 
     {
       name: 'cuentos-magicos-celery',
@@ -212,26 +201,9 @@ module.exports = {
     },
 
     // ──────────────────────────────────────────────
-    // ELITESCOUT (Semantic Travel Finder & Price Scraper Server, Port 8003)
+    // ELITESCOUT — MANAGED BY DOCKER COMPOSE
+    // (Removed from PM2 to avoid port/SWC conflict with Docker container)
     // ──────────────────────────────────────────────
-    {
-      name: 'elitescout-server',
-      script: 'start-server.sh',
-      cwd: path.join(__dirname, 'apps/elitescout'),
-      interpreter: '/bin/bash',
-      env: {
-        PORT: '8003',
-        NEXT_SERVER_MODE: 'true',
-        NODE_ENV: 'production'
-      },
-      out_file: path.join(__dirname, 'apps/elitescout/elitescout.log'),
-      error_file: path.join(__dirname, 'apps/elitescout/elitescout.error.log'),
-      autorestart: true,
-      max_restarts: 15,
-      exp_backoff_delay: 1000,
-      min_uptime: '15s',
-      max_memory_restart: '800M'
-    },
 
     // ──────────────────────────────────────────────
     // ATENEA RESTAURANT BACKEND (Port 8009)

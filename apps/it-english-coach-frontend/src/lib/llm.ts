@@ -115,7 +115,7 @@ export async function chat(messages: {role: string, content: string}[], system?:
 
       const result = await providerChat(pid, messages, system);
       return result;
-    } catch (e: any) {
+    } catch (e) {
       console.error(`[Fallback] Provider ${pid} failed:`, e);
       lastError = e;
       // continue to next provider

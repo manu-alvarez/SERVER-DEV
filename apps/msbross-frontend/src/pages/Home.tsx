@@ -1,35 +1,10 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Globe, Database, Network, Activity, Target, Shield, Box, Layout, MessageSquare, Heart, Sparkles, Rocket, Layers } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { APPS_DATA } from '../data/apps';
 
 export default function Home() {
-  const allApps = [
-    { name: 'App Generator', tag: 'DEV AI', color: 'from-[#f472b6] to-[#ec4899]', icon: Activity },
-    { name: 'CombiPro', tag: 'SPORTS AI', color: 'from-[#f97316] to-[#f97316]', icon: Activity },
-    { name: 'Cuentos Mágicos', tag: 'CREATIVE AI', color: 'from-[#fbbf24] to-[#f59e0b]', icon: Sparkles },
-    { name: 'Edelweiss', tag: 'VISION PLAY', color: 'from-[#ec4899] to-[#db2777]', icon: Globe },
-    { name: 'EliteScout', tag: 'TRAVEL AI', color: 'from-[#D4AF37] to-[#b4952f]', icon: Globe },
-    { name: 'EXPOSITATOR RTE', tag: 'EVALUATOR AI', color: 'from-[#10b981] to-[#059669]', icon: Target },
-    { name: 'Gas Station', tag: 'OPS PWA', color: 'from-[#f97316] to-[#ea580c]', icon: Rocket },
-    { name: 'IAPuta OS', tag: 'CORE AI', color: 'from-[#8b5cf6] to-[#7c3aed]', icon: Shield },
-    { name: 'IndustrialPro', tag: 'INDUSTRY', color: 'from-[#3b82f6] to-[#2563eb]', icon: Shield },
-    { name: 'IT English Coach', tag: 'LANGUAGE AI', color: 'from-[#00FFCC] to-[#00cca3]', icon: MessageSquare },
-    { name: 'JartosDTo', tag: 'AI CHAT', color: 'from-[#8b5cf6] to-[#7c3aed]', icon: Target },
-    { name: 'LIVEKIT Nikolina', tag: 'VOICE AI', color: 'from-[#06b6d4] to-[#0891b2]', icon: MessageSquare },
-    { name: 'LogiSearch', tag: 'LOGISTICS AI', color: 'from-[#00E5FF] to-[#00b8cc]', icon: Globe },
-    { name: 'LogiTrack Almacén', tag: 'LOGISTICS', color: 'from-[#0ea5e9] to-[#0284c7]', icon: Box },
-    { name: 'Mano Eléctrica Azul', tag: 'MOBILE APP', color: 'from-[#10b981] to-[#059669]', icon: Activity },
-    { name: 'Manuel Álvarez', tag: 'CV', color: 'from-[#3b82f6] to-[#2563eb]', icon: Layout },
-    { name: 'MAPFRE Infocol', tag: 'INSURANCE', color: 'from-[#e60028] to-[#b3001f]', icon: Shield },
-    { name: 'Moko-Tools', tag: 'DEV TOOLS', color: 'from-[#14b8a6] to-[#0d9488]', icon: Layout },
-    { name: 'MSBrOSs Assistant', tag: 'ASSISTANT', color: 'from-[#a855f7] to-[#9333ea]', icon: MessageSquare },
-    { name: 'Perfume Trading', tag: 'TRADING B2B', color: 'from-[#f43f5e] to-[#e11d48]', icon: Box },
-    { name: 'TaskFlowPro', tag: 'PRODUCTIVITY', color: 'from-[#f59e0b] to-[#d97706]', icon: Layout },
-    { name: 'Traductor PRO', tag: 'TRANSLATION', color: 'from-[#10b981] to-[#059669]', icon: Globe },
-    { name: 'Tu Energía Maya', tag: 'WEB APP', color: 'from-[#f59e0b] to-[#d97706]', icon: Sparkles },
-    { name: 'TxaFitnessPro', tag: 'FITNESS AI', color: 'from-[#a855f7] to-[#9333ea]', icon: Heart },
-    { name: 'Web Atenea', tag: 'GASTRONOMY', color: 'from-[#c4b5fd] to-[#a78bfa]', icon: Layout }
-  ];
+  const allApps = APPS_DATA;
 
   // We need enough items to scroll seamlessly
   const col1 = [...allApps.slice(0, 13), ...allApps.slice(0, 13)];

@@ -35,7 +35,7 @@ export function useStats() {
         updated.lastSession = new Date().toISOString();
       }
       try {
-        localStorage.setItem('visionplay-stats', JSON.stringify(updated));
+        try { localStorage.setItem('visionplay-stats', JSON.stringify(updated)); } catch(e) { console.warn('Storage disabled', e); }
       } catch (e) {
         console.warn('Failed to save stats', e);
       }

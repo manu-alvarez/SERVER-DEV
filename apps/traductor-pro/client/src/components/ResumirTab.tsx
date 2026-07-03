@@ -25,10 +25,10 @@ export default function ResumirTab({ provider, onResult }: Props) {
     setError('');
     try {
       const mode = traducir ? 'traducir_resumir' : 'resumir';
-      const data = await processText({ texto, origen: 'auto', destino, modo: mode as any, nivelResumen: nivel as Nivel, provider });
+      const data = await processText({ texto, origen: 'auto', destino, modo: mode as 'resumir', nivelResumen: nivel as Nivel, provider });
       setResult({ traduccion: data.traduccion, resumen: data.resumen, provider: data.provider });
       onResult(texto, data.resumen || data.traduccion, 'resumen');
-    } catch (e: any) {
+    } catch (e) {
       setError(e?.message || 'Error en el resumen');
     } finally {
       setLoading(false);

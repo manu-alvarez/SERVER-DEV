@@ -107,6 +107,8 @@ DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'msbross.db')
 
 def init_db():
     with sqlite3.connect(DB_PATH) as conn:
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
         conn.execute('CREATE TABLE IF NOT EXISTS conversations (id TEXT PRIMARY KEY, title TEXT, created REAL)')
         conn.execute('CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, conv_id TEXT, role TEXT, content TEXT, timestamp REAL)')
 
@@ -114,6 +116,8 @@ init_db()
 
 def get_conversations():
     with sqlite3.connect(DB_PATH) as conn:
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
         c = conn.cursor()
         c.execute('SELECT id, title, created FROM conversations ORDER BY created DESC')
         convs = []
@@ -125,6 +129,8 @@ def get_conversations():
 
 def get_conversation(cid):
     with sqlite3.connect(DB_PATH) as conn:
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
         c = conn.cursor()
         c.execute('SELECT id, title, created FROM conversations WHERE id=?', (cid,))
         row = c.fetchone()
@@ -135,10 +141,14 @@ def get_conversation(cid):
 
 def create_conversation(cid, title):
     with sqlite3.connect(DB_PATH) as conn:
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
         conn.execute('INSERT OR IGNORE INTO conversations (id, title, created) VALUES (?, ?, ?)', (cid, title, time.time()))
 
 def add_message(cid, role, content):
     with sqlite3.connect(DB_PATH) as conn:
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
         conn.execute('INSERT INTO messages (conv_id, role, content, timestamp) VALUES (?, ?, ?, ?)', (cid, role, content, time.time()))
 
 tools_state = {"notes": [], "todos": [], "calculator_history": []}

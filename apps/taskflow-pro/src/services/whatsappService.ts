@@ -1,7 +1,8 @@
 export const WhatsAppService = {
   async sendReminder(message: string) {
     try {
-      const storageStr = localStorage.getItem('taskflowpro-v2-storage');
+      let storageStr = null;
+      try { storageStr = localStorage.getItem('taskflowpro-v2-storage'); } catch(e) { console.error('LocalStorage error', e); }
       if (!storageStr) return;
       
       const parsed = JSON.parse(storageStr);

@@ -8,6 +8,8 @@ DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.d
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA synchronous=NORMAL;")
     conn.execute("""CREATE TABLE IF NOT EXISTS chat_history (
         id INTEGER PRIMARY KEY AUTOINCREMENT, role TEXT NOT NULL, content TEXT NOT NULL,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)""")
@@ -17,18 +19,24 @@ def init_db():
 def save_message(role: str, content: str):
     if not content: return
     conn = sqlite3.connect(DB_PATH)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA synchronous=NORMAL;")
     conn.execute("INSERT INTO chat_history (role, content) VALUES (?, ?)", (role, content))
     conn.commit()
     conn.close()
 
 def get_recent_history(limit: int = 8) -> list:
     conn = sqlite3.connect(DB_PATH)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA synchronous=NORMAL;")
     rows = conn.execute("SELECT role, content FROM chat_history ORDER BY timestamp DESC LIMIT ?", (limit,)).fetchall()
     conn.close()
     return [{"role": r[0], "content": r[1]} for r in reversed(rows)]
 
 def clear_history():
     conn = sqlite3.connect(DB_PATH)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA synchronous=NORMAL;")
     conn.execute("DELETE FROM chat_history")
     conn.commit()
     conn.close()
@@ -37,6 +45,8 @@ async def cleanup_task(idle_minutes: int = 10):
     while True:
         try:
             conn = sqlite3.connect(DB_PATH)
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA synchronous=NORMAL;")
             conn.execute("DELETE FROM chat_history WHERE timestamp < datetime('now', ?)", (f'-{idle_minutes} minutes',))
             conn.commit()
             conn.close()

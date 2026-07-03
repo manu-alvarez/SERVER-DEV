@@ -26,7 +26,7 @@ export default function TutorView() {
       const system = "You are an IT English Coach. Keep responses concise, helpful, and focused on tech English. Correct mistakes gently.";
       const res = await chatLLM(newMsgs, system);
       setMessages([...newMsgs, {role:'assistant', content:res}]);
-    } catch (e: any) {
+    } catch (e) {
       setMessages([...newMsgs, {role:'assistant', content:`⚠️ Error: ${e.message}`}]);
     } finally {
       setLoading(false);

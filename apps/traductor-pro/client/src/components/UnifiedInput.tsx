@@ -23,8 +23,8 @@ export default function UnifiedInput({ value, onChange, disabled }: Props) {
       const texto = await extractText(file);
       if (texto.trim()) onChange(texto);
       else setErrorMsg('No se pudo extraer texto del documento.');
-    } catch (err: any) {
-      setErrorMsg(err?.message || 'Error al extraer texto');
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Error al extraer texto');
     } finally {
       setExtracting(false);
       e.target.value = '';
@@ -43,8 +43,8 @@ export default function UnifiedInput({ value, onChange, disabled }: Props) {
       await worker.terminate();
       if (data.text.trim()) onChange(data.text);
       else setErrorMsg('No se pudo extraer texto de la imagen.');
-    } catch (err: any) {
-      setErrorMsg(err?.message || 'Error en OCR');
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Error en OCR');
     } finally {
       setExtracting(false);
       e.target.value = '';

@@ -27,9 +27,9 @@ router.post('/extract-text', upload.single('file'), async (req, res) => {
     }
 
     return res.json({ texto: texto.trim() });
-  } catch (err: any) {
+  } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: 'Error extrayendo texto', details: err?.message });
+    return res.status(500).json({ error: 'Error extrayendo texto', details: err instanceof Error ? err.message : 'Unknown error' });
   }
 });
 

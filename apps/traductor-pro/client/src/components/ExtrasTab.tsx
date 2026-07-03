@@ -25,10 +25,10 @@ export default function ExtrasTab({ provider, onResult }: Props) {
     setError('');
     try {
       const data = await processExtras({ texto, herramienta, provider });
-      setResult({ traduccion: '', resumen: data.resultado, provider: data.provider as any });
+      setResult({ traduccion: '', resumen: data.resultado, provider: data.provider as Provider });
       onResult(texto, data.resultado, `extras:${herramienta}`);
-    } catch (e: any) {
-      setError(e?.message || 'Error');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error');
     } finally {
       setLoading(false);
     }
@@ -59,7 +59,7 @@ export default function ExtrasTab({ provider, onResult }: Props) {
       </Box>
 
       <UnifiedInput value={texto} onChange={setTexto} disabled={loading} />
-      <ResultPanel result={result} error={error} provider={result.provider as any} />
+      <ResultPanel result={result} error={error} provider={result.provider} />
     </motion.div>
   );
 }

@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import os, json, hashlib, hmac, time
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
@@ -25,7 +27,8 @@ def verify_token(token: str) -> dict:
         raise HTTPException(401, "Invalid signature")
     try:
         payload = json.loads(bytes.fromhex(b64).decode())
-    except:
+    except Exception as e:
+        logger.warning(f"Payload error: {e}")
         raise HTTPException(401, "Invalid payload")
     if payload["exp"] < time.time():
         raise HTTPException(401, "Token expired")
@@ -182,24 +185,27 @@ def delete_timer(tid: int, user: dict = Depends(get_current_user)):
 
 @app.get("/api/timers/check")
 def check_timers(user: dict = Depends(get_current_user)):
-    ops = db.get_operations("running")
+    running_timers = db.get_running_timers()
     finished = []
-    for op in ops:
-        full = db.get_operation(op["id"])
-        for t in full.get("timers", []):
-            if t["is_running"] and t["last_tick"]:
-                now = datetime.utcnow()
-                try:
-                    last = datetime.fromisoformat(t["last_tick"])
-                except:
-                    continue
-                dt = (now - last).total_seconds()
-                new_elapsed = t["elapsed_seconds"] + dt
-                if new_elapsed >= t["duration_seconds"]:
-                    db.update_timer(t["id"], {"is_running": 0, "elapsed_seconds": t["duration_seconds"]})
-                    finished.append({"timer_name": t["name"], "operation_name": op["name"], "timer_id": t["id"]})
-                else:
-                    db.update_timer(t["id"], {"elapsed_seconds": new_elapsed, "last_tick": now.isoformat()})
+    now = datetime.utcnow()
+    for t in running_timers:
+        if not t.get("last_tick"):
+            continue
+        try:
+            last = datetime.fromisoformat(t["last_tick"])
+        except Exception as e:
+            logger.warning(f"Error parsing date {t['last_tick']}: {e}")
+            continue
+            
+        dt = (now - last).total_seconds()
+        new_elapsed = t["elapsed_seconds"] + dt
+        
+        if new_elapsed >= t["duration_seconds"]:
+            db.update_timer(t["id"], {"is_running": 0, "elapsed_seconds": t["duration_seconds"]})
+            finished.append({"timer_name": t["name"], "operation_name": t["operation_name"], "timer_id": t["id"]})
+        else:
+            db.update_timer(t["id"], {"elapsed_seconds": new_elapsed, "last_tick": now.isoformat()})
+            
     return {"finished": finished}
 
 # --- Valves ---
