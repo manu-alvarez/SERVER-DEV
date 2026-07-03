@@ -189,7 +189,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Infrastructure Core Section */}
+      {/* Gestión del Servidor Section */}
       <motion.div 
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -201,7 +201,7 @@ export default function Home() {
           <div className="h-px bg-gradient-to-r from-transparent to-white/10 flex-1"></div>
           <h2 className="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-500 flex items-center gap-3">
             <Server className="w-6 h-6 text-indigo-400" />
-            Infraestructura Core
+            Gestión del Servidor
           </h2>
           <div className="h-px bg-gradient-to-r from-white/10 to-transparent flex-1"></div>
         </div>

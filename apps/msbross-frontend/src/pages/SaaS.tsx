@@ -8,6 +8,16 @@ export default function SaaS() {
 
   const tools = [
     {
+      name: 'App Generator',
+      desc: 'Generador de páginas web simples utilizando inteligencia artificial.',
+      tech: 'React 19, Vite, Gemini API',
+      url: 'https://appgenerator.manuelalvarez.dev',
+      icon: Activity,
+      color: 'from-amber-400 to-orange-600',
+      glow: 'shadow-[0_0_30px_rgba(245,158,11,0.3)]',
+      category: 'dev-ai'
+    },
+    {
       name: 'CombiPro',
       desc: 'Calculadora y generador de combinadas deportivas con probabilidad básica.',
       tech: 'React 19, MUI 7',
@@ -16,6 +26,26 @@ export default function SaaS() {
       color: 'from-orange-400 to-red-500',
       glow: 'shadow-[0_0_30px_rgba(249,115,22,0.3)]',
       category: 'sports-ai'
+    },
+    {
+      name: 'Cuentos Mágicos AI',
+      desc: 'Pequeño generador de cuentos infantiles.',
+      tech: 'FastAPI, Celery, AI',
+      url: 'https://cuentos.manuelalvarez.dev',
+      icon: Sparkles,
+      color: 'from-yellow-400 to-amber-500',
+      glow: 'shadow-[0_0_30px_rgba(250,204,21,0.3)]',
+      category: 'creative-ai'
+    },
+    {
+      name: 'Edelweiss',
+      desc: 'Plataforma de gestión y reservas para refugio de montaña.',
+      tech: 'Next.js 14, Tailwind, Prisma',
+      url: 'https://edelweiss.manuelalvarez.dev',
+      icon: Globe,
+      color: 'from-blue-400 to-indigo-500',
+      glow: 'shadow-[0_0_30px_rgba(99,102,241,0.3)]',
+      category: 'enterprise'
     },
     {
       name: 'EliteScout',
@@ -48,6 +78,16 @@ export default function SaaS() {
       category: 'enterprise'
     },
     {
+      name: 'IAPuta OS',
+      desc: 'Bot para ayuda en tareas de gestión de servidor por terminal.',
+      tech: 'FastAPI, Python, LLM',
+      url: 'https://iaputa.manuelalvarez.dev',
+      icon: Shield,
+      color: 'from-violet-400 to-indigo-500',
+      glow: 'shadow-[0_0_30px_rgba(139,92,246,0.3)]',
+      category: 'dev-ai'
+    },
+    {
       name: 'IndustrialPro',
       desc: 'App de gestión para procesos de mantenimiento y producción.',
       tech: 'FastAPI, React, Tailwind',
@@ -65,6 +105,16 @@ export default function SaaS() {
       icon: MessageSquare,
       color: 'from-cyan-400 to-blue-500',
       glow: 'shadow-[0_0_30px_rgba(34,211,238,0.3)]',
+      category: 'dev-ai'
+    },
+    {
+      name: 'Jartosdto',
+      desc: 'Chatbot con RAG y documentos sobre un bot de Telegram.',
+      tech: 'Python, RAG, Vector DB',
+      url: 'https://jartosdto.manuelalvarez.dev',
+      icon: Target,
+      color: 'from-emerald-400 to-teal-500',
+      glow: 'shadow-[0_0_30px_rgba(52,211,153,0.3)]',
       category: 'dev-ai'
     },
     {
@@ -118,6 +168,26 @@ export default function SaaS() {
       category: 'dev-ai'
     },
     {
+      name: 'MSBross Voice Server',
+      desc: 'Servidor central de voz Adele para interacciones auditivas.',
+      tech: 'Python, Audio Processing',
+      url: 'https://msbross-voice.manuelalvarez.dev',
+      icon: Activity,
+      color: 'from-purple-400 to-fuchsia-500',
+      glow: 'shadow-[0_0_30px_rgba(192,132,252,0.3)]',
+      category: 'dev-ai'
+    },
+    {
+      name: 'Nikolina Voice AI',
+      desc: 'Prueba de bot de voz en tiempo real usando LiveKit.',
+      tech: 'Python, LiveKit, WebRTC',
+      url: 'https://nikolina.manuelalvarez.dev',
+      icon: MessageSquare,
+      color: 'from-pink-400 to-rose-500',
+      glow: 'shadow-[0_0_30px_rgba(244,114,182,0.3)]',
+      category: 'dev-ai'
+    },
+    {
       name: 'Perfume Trading',
       desc: 'Sistema ERP especializado en trading B2B de perfumería.',
       tech: 'ERP, Prisma, Next.js',
@@ -135,6 +205,16 @@ export default function SaaS() {
       icon: Layout,
       color: 'from-yellow-400 to-amber-500',
       glow: 'shadow-[0_0_30px_rgba(250,204,21,0.3)]',
+      category: 'enterprise'
+    },
+    {
+      name: 'Traductor Pro',
+      desc: 'Un proxy básico para traducciones automatizadas.',
+      tech: 'Express, Node.js, AI',
+      url: 'https://traductor.manuelalvarez.dev',
+      icon: Globe,
+      color: 'from-cyan-400 to-blue-500',
+      glow: 'shadow-[0_0_30px_rgba(34,211,238,0.3)]',
       category: 'enterprise'
     },
     {
@@ -156,66 +236,6 @@ export default function SaaS() {
       color: 'from-purple-400 to-fuchsia-600',
       glow: 'shadow-[0_0_30px_rgba(192,132,252,0.3)]',
       category: 'sports-ai'
-    },
-    {
-      name: 'Nikolina Voice AI',
-      desc: 'Prueba de bot de voz en tiempo real usando LiveKit.',
-      tech: 'Python, LiveKit, WebRTC',
-      url: 'https://nikolina.manuelalvarez.dev',
-      icon: MessageSquare,
-      color: 'from-pink-400 to-rose-500',
-      glow: 'shadow-[0_0_30px_rgba(244,114,182,0.3)]',
-      category: 'dev-ai'
-    },
-    {
-      name: 'IAPuta OS',
-      desc: 'Bot para ayuda en tareas de gestión de servidor por terminal.',
-      tech: 'FastAPI, Python, LLM',
-      url: 'https://iaputa.manuelalvarez.dev',
-      icon: Shield,
-      color: 'from-violet-400 to-indigo-500',
-      glow: 'shadow-[0_0_30px_rgba(139,92,246,0.3)]',
-      category: 'dev-ai'
-    },
-    {
-      name: 'Traductor Pro',
-      desc: 'Un proxy básico para traducciones automatizadas.',
-      tech: 'Express, Node.js, AI',
-      url: 'https://traductor.manuelalvarez.dev',
-      icon: Globe,
-      color: 'from-cyan-400 to-blue-500',
-      glow: 'shadow-[0_0_30px_rgba(34,211,238,0.3)]',
-      category: 'enterprise'
-    },
-    {
-      name: 'MSBross Voice Server',
-      desc: 'Servidor central de voz Adele para interacciones auditivas.',
-      tech: 'Python, Audio Processing',
-      url: 'https://msbross-voice.manuelalvarez.dev',
-      icon: Activity,
-      color: 'from-purple-400 to-fuchsia-500',
-      glow: 'shadow-[0_0_30px_rgba(192,132,252,0.3)]',
-      category: 'dev-ai'
-    },
-    {
-      name: 'Cuentos Mágicos AI',
-      desc: 'Pequeño generador de cuentos infantiles.',
-      tech: 'FastAPI, Celery, AI',
-      url: 'https://cuentos.manuelalvarez.dev',
-      icon: Sparkles,
-      color: 'from-yellow-400 to-amber-500',
-      glow: 'shadow-[0_0_30px_rgba(250,204,21,0.3)]',
-      category: 'creative-ai'
-    },
-    {
-      name: 'Jartosdto',
-      desc: 'Chatbot con RAG y documentos sobre un bot de Telegram.',
-      tech: 'Python, RAG, Vector DB',
-      url: 'https://jartosdto.manuelalvarez.dev',
-      icon: Target,
-      color: 'from-emerald-400 to-teal-500',
-      glow: 'shadow-[0_0_30px_rgba(52,211,153,0.3)]',
-      category: 'dev-ai'
     },
     {
       name: 'Web Restaurante Atenea',
