@@ -13,7 +13,7 @@ export default function SaaS() {
       tech: 'React 19, Vite, Gemini API',
       url: 'https://appgenerator.manuelalvarez.dev',
       icon: Activity,
-      color: 'from-pink-400 to-rose-500',
+      color: 'from-pink-400 to-pink-500',
       glow: 'shadow-[0_0_30px_rgba(244,114,182,0.3)]',
       category: 'dev-ai'
     },
@@ -23,7 +23,7 @@ export default function SaaS() {
       tech: 'React 19, MUI 7',
       url: 'https://combipro.manuelalvarez.dev',
       icon: Activity,
-      color: 'from-orange-400 to-red-500',
+      color: 'from-orange-500 to-orange-600',
       glow: 'shadow-[0_0_30px_rgba(249,115,22,0.3)]',
       category: 'sports-ai'
     },
@@ -33,8 +33,8 @@ export default function SaaS() {
       tech: 'FastAPI, Celery, AI',
       url: 'https://cuentos.manuelalvarez.dev',
       icon: Sparkles,
-      color: 'from-yellow-400 to-amber-500',
-      glow: 'shadow-[0_0_30px_rgba(250,204,21,0.3)]',
+      color: 'from-amber-400 to-amber-500',
+      glow: 'shadow-[0_0_30px_rgba(251,191,36,0.3)]',
       category: 'creative-ai'
     },
     {
@@ -43,8 +43,8 @@ export default function SaaS() {
       tech: 'Next.js 14, Tailwind, Prisma',
       url: 'https://edelweiss.manuelalvarez.dev',
       icon: Globe,
-      color: 'from-sky-300 to-blue-400',
-      glow: 'shadow-[0_0_30px_rgba(125,211,252,0.3)]',
+      color: 'from-pink-500 to-rose-600',
+      glow: 'shadow-[0_0_30px_rgba(236,72,153,0.3)]',
       category: 'enterprise'
     },
     {
@@ -53,8 +53,8 @@ export default function SaaS() {
       tech: 'Next.js 14, Tavily API',
       url: 'https://elitescout.manuelalvarez.dev',
       icon: Globe,
-      color: 'from-amber-300 to-yellow-500',
-      glow: 'shadow-[0_0_30px_rgba(252,211,77,0.3)]',
+      color: 'from-yellow-400 to-yellow-600',
+      glow: 'shadow-[0_0_30px_rgba(212,175,55,0.3)]',
       category: 'enterprise'
     },
     {
@@ -63,8 +63,8 @@ export default function SaaS() {
       tech: 'PWA, Speech API, Vision API',
       url: 'https://expositator.manuelalvarez.dev',
       icon: Target,
-      color: 'from-green-400 to-emerald-600',
-      glow: 'shadow-[0_0_30px_rgba(74,222,128,0.3)]',
+      color: 'from-emerald-400 to-emerald-600',
+      glow: 'shadow-[0_0_30px_rgba(16,185,129,0.3)]',
       category: 'vision-play'
     },
     {
@@ -73,7 +73,7 @@ export default function SaaS() {
       tech: 'PWA, FastAPI, SQLite',
       url: 'https://gasstation.manuelalvarez.dev',
       icon: Rocket,
-      color: 'from-orange-500 to-red-600',
+      color: 'from-orange-500 to-orange-600',
       glow: 'shadow-[0_0_30px_rgba(249,115,22,0.3)]',
       category: 'enterprise'
     },
@@ -83,7 +83,7 @@ export default function SaaS() {
       tech: 'FastAPI, Python, LLM',
       url: 'https://iaputa.manuelalvarez.dev',
       icon: Shield,
-      color: 'from-violet-400 to-indigo-500',
+      color: 'from-violet-500 to-purple-600',
       glow: 'shadow-[0_0_30px_rgba(139,92,246,0.3)]',
       category: 'dev-ai'
     },
@@ -93,8 +93,8 @@ export default function SaaS() {
       tech: 'FastAPI, React, Tailwind',
       url: 'https://industrial.manuelalvarez.dev',
       icon: Shield,
-      color: 'from-blue-400 to-indigo-600',
-      glow: 'shadow-[0_0_30px_rgba(96,165,250,0.3)]',
+      color: 'from-blue-500 to-blue-600',
+      glow: 'shadow-[0_0_30px_rgba(59,130,246,0.3)]',
       category: 'enterprise'
     },
     {
@@ -103,8 +103,8 @@ export default function SaaS() {
       tech: 'PWA, Node.js, Multi-LLM',
       url: 'https://itenglish.manuelalvarez.dev',
       icon: MessageSquare,
-      color: 'from-red-500 to-rose-600',
-      glow: 'shadow-[0_0_30px_rgba(239,68,68,0.3)]',
+      color: 'from-teal-300 to-teal-500',
+      glow: 'shadow-[0_0_30px_rgba(0,255,204,0.3)]',
       category: 'dev-ai'
     },
     {
@@ -113,8 +113,8 @@ export default function SaaS() {
       tech: 'Python, RAG, Vector DB',
       url: 'https://jartosdto.manuelalvarez.dev',
       icon: Target,
-      color: 'from-sky-400 to-blue-500',
-      glow: 'shadow-[0_0_30px_rgba(56,189,248,0.3)]',
+      color: 'from-violet-500 to-purple-600',
+      glow: 'shadow-[0_0_30px_rgba(139,92,246,0.3)]',
       category: 'dev-ai'
     },
     {
@@ -123,8 +123,8 @@ export default function SaaS() {
       tech: 'React 19, TypeScript, Supabase',
       url: 'https://logisearch.manuelalvarez.dev',
       icon: Globe,
-      color: 'from-cyan-400 to-teal-500',
-      glow: 'shadow-[0_0_30px_rgba(34,211,238,0.3)]',
+      color: 'from-cyan-400 to-cyan-500',
+      glow: 'shadow-[0_0_30px_rgba(0,229,255,0.3)]',
       category: 'enterprise'
     },
     {
@@ -133,8 +133,8 @@ export default function SaaS() {
       tech: 'Trello, Kanban, Operaciones',
       url: 'https://logitrack.manuelalvarez.dev',
       icon: Box,
-      color: 'from-blue-500 to-indigo-600',
-      glow: 'shadow-[0_0_30px_rgba(59,130,246,0.3)]',
+      color: 'from-sky-500 to-sky-600',
+      glow: 'shadow-[0_0_30px_rgba(14,165,233,0.3)]',
       category: 'enterprise'
     },
     {
@@ -143,8 +143,8 @@ export default function SaaS() {
       tech: 'React Native, Expo Go',
       url: 'https://mano.manuelalvarez.dev',
       icon: Activity,
-      color: 'from-blue-500 to-indigo-600',
-      glow: 'shadow-[0_0_30px_rgba(59,130,246,0.3)]',
+      color: 'from-emerald-400 to-emerald-600',
+      glow: 'shadow-[0_0_30px_rgba(16,185,129,0.3)]',
       category: 'creative-ai'
     },
     {
@@ -153,8 +153,8 @@ export default function SaaS() {
       tech: 'Next.js 15, Enterprise',
       url: 'https://mapfre.manuelalvarez.dev',
       icon: Shield,
-      color: 'from-red-500 to-red-700',
-      glow: 'shadow-[0_0_30px_rgba(239,68,68,0.3)]',
+      color: 'from-red-600 to-red-700',
+      glow: 'shadow-[0_0_30px_rgba(230,0,40,0.3)]',
       category: 'enterprise'
     },
     {
@@ -163,8 +163,8 @@ export default function SaaS() {
       tech: 'React 19, Vite 7, Tailwind',
       url: 'https://mokotools.manuelalvarez.dev',
       icon: Layout,
-      color: 'from-emerald-400 to-teal-500',
-      glow: 'shadow-[0_0_30px_rgba(52,211,153,0.3)]',
+      color: 'from-teal-500 to-teal-600',
+      glow: 'shadow-[0_0_30px_rgba(20,184,166,0.3)]',
       category: 'dev-ai'
     },
     {
@@ -173,8 +173,8 @@ export default function SaaS() {
       tech: 'Python, Audio Processing',
       url: 'https://msbross-voice.manuelalvarez.dev',
       icon: Activity,
-      color: 'from-purple-400 to-fuchsia-500',
-      glow: 'shadow-[0_0_30px_rgba(192,132,252,0.3)]',
+      color: 'from-purple-500 to-purple-600',
+      glow: 'shadow-[0_0_30px_rgba(168,85,247,0.3)]',
       category: 'dev-ai'
     },
     {
@@ -183,8 +183,8 @@ export default function SaaS() {
       tech: 'Python, LiveKit, WebRTC',
       url: 'https://nikolina.manuelalvarez.dev',
       icon: MessageSquare,
-      color: 'from-pink-400 to-rose-500',
-      glow: 'shadow-[0_0_30px_rgba(244,114,182,0.3)]',
+      color: 'from-cyan-500 to-cyan-600',
+      glow: 'shadow-[0_0_30px_rgba(6,182,212,0.3)]',
       category: 'dev-ai'
     },
     {
@@ -193,8 +193,8 @@ export default function SaaS() {
       tech: 'ERP, Prisma, Next.js',
       url: 'https://perfume.manuelalvarez.dev',
       icon: Box,
-      color: 'from-rose-400 to-pink-600',
-      glow: 'shadow-[0_0_30px_rgba(251,113,133,0.3)]',
+      color: 'from-rose-500 to-rose-600',
+      glow: 'shadow-[0_0_30px_rgba(244,63,94,0.3)]',
       category: 'enterprise'
     },
     {
@@ -203,8 +203,8 @@ export default function SaaS() {
       tech: 'React 18, MUI 5, Zustand',
       url: 'https://taskflow.manuelalvarez.dev',
       icon: Layout,
-      color: 'from-amber-400 to-orange-500',
-      glow: 'shadow-[0_0_30px_rgba(251,191,36,0.3)]',
+      color: 'from-amber-500 to-orange-500',
+      glow: 'shadow-[0_0_30px_rgba(245,158,11,0.3)]',
       category: 'enterprise'
     },
     {
@@ -213,8 +213,8 @@ export default function SaaS() {
       tech: 'Express, Node.js, AI',
       url: 'https://traductor.manuelalvarez.dev',
       icon: Globe,
-      color: 'from-indigo-400 to-blue-600',
-      glow: 'shadow-[0_0_30px_rgba(129,140,248,0.3)]',
+      color: 'from-emerald-400 to-emerald-600',
+      glow: 'shadow-[0_0_30px_rgba(16,185,129,0.3)]',
       category: 'enterprise'
     },
     {
@@ -223,8 +223,8 @@ export default function SaaS() {
       tech: 'Web App, JavaScript, Tzolkin',
       url: 'https://energia.manuelalvarez.dev',
       icon: Sparkles,
-      color: 'from-yellow-400 to-orange-500',
-      glow: 'shadow-[0_0_30px_rgba(250,204,21,0.3)]',
+      color: 'from-amber-500 to-orange-500',
+      glow: 'shadow-[0_0_30px_rgba(245,158,11,0.3)]',
       category: 'creative-ai'
     },
     {
@@ -233,8 +233,8 @@ export default function SaaS() {
       tech: 'Next.js 15, React 19, Tailwind',
       url: 'https://txafitness.manuelalvarez.dev',
       icon: Heart,
-      color: 'from-purple-400 to-fuchsia-600',
-      glow: 'shadow-[0_0_30px_rgba(192,132,252,0.3)]',
+      color: 'from-purple-500 to-purple-600',
+      glow: 'shadow-[0_0_30px_rgba(168,85,247,0.3)]',
       category: 'sports-ai'
     },
     {
@@ -243,8 +243,8 @@ export default function SaaS() {
       tech: 'HTML5, CSS3, JavaScript',
       url: 'https://atenea.manuelalvarez.dev',
       icon: Layout,
-      color: 'from-amber-600 to-orange-700',
-      glow: 'shadow-[0_0_30px_rgba(217,119,6,0.3)]',
+      color: 'from-violet-300 to-violet-400',
+      glow: 'shadow-[0_0_30px_rgba(196,181,253,0.3)]',
       category: 'enterprise'
     }
   ];
