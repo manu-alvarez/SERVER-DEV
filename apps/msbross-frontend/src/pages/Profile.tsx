@@ -47,7 +47,7 @@ export default function Profile() {
                   <span className="font-mono text-cyan-400 text-xs font-bold tracking-[0.2em] uppercase">Disponible</span>
                 </div>
                 <h1 className="text-4xl font-extrabold text-white mb-1">Manu Alvarez</h1>
-                <p className="text-gray-400 font-mono text-sm uppercase tracking-wider">Especialista IT & Desarrollador de Soluciones</p>
+                <p className="text-gray-400 font-mono text-sm uppercase tracking-wider">Técnico IT de Sistemas</p>
               </div>
             </div>
           </motion.div>
@@ -77,7 +77,7 @@ export default function Profile() {
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">Sobre Mí</span>
               </h2>
               <p className="text-gray-300 text-lg leading-relaxed mb-8">
-                Profesional IT apasionado por la tecnología, la gestión de servidores y la automatización. 
+                Técnico informático apasionado por la tecnología, la gestión de servidores y la automatización. 
                 Desarrollo aplicaciones web, sistemas contenerizados y bots impulsados por Inteligencia Artificial 
                 enfocados en resolver problemas prácticos y optimizar procesos del día a día.
               </p>
