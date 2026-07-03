@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Usar transacción para asegurar que el perfil exista y se actualice atómicamente
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       const profile = await tx.profile.findUnique({ where: { userId } });
       if (!profile) {
         throw new Error("Perfil no encontrado");
