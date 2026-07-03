@@ -13,17 +13,18 @@ export default function Layout() {
 
   const mainLinks = [
     { name: 'Dashboard', path: '/', icon: Activity },
+    { name: 'BOTS IA', path: '/bots', icon: Activity },
     { name: 'ARQUITECTURA', path: '/architecture', icon: Network },
     { name: 'PERFIL TÉCNICO', path: '/profile', icon: User },
     { name: 'CONTACTO', path: '/contact', icon: Phone }
   ];
 
   const appCategories = [
-    { name: 'DEV AI', path: '/saas?cat=dev-ai' },
-    { name: 'SPORTS AI', path: '/saas?cat=sports-ai' },
-    { name: 'CREATIVE AI', path: '/saas?cat=creative-ai' },
-    { name: 'VISION PLAY', path: '/saas?cat=vision-play' },
-    { name: 'ENTERPRISE', path: '/saas?cat=enterprise' }
+    { name: 'DEV AI', path: '/apps?cat=dev-ai' },
+    { name: 'SPORTS AI', path: '/apps?cat=sports-ai' },
+    { name: 'CREATIVE AI', path: '/apps?cat=creative-ai' },
+    { name: 'VISION PLAY', path: '/apps?cat=vision-play' },
+    { name: 'ENTERPRISE', path: '/apps?cat=enterprise' }
   ];
 
   return (
@@ -69,7 +70,7 @@ export default function Layout() {
           <div className="pt-2 pb-1">
             <div className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 text-gray-400">
               <div className="flex items-center gap-3">
-                <LayoutTemplate className={`w-5 h-5 ${location.pathname.startsWith('/saas') ? 'text-indigo-400' : ''}`} />
+                <LayoutTemplate className={`w-5 h-5 ${location.pathname.startsWith('/apps') ? 'text-indigo-400' : ''}`} />
                 <span className="font-bold text-sm tracking-wider">APPS</span>
               </div>
             </div>
@@ -77,8 +78,8 @@ export default function Layout() {
             {/* Always Visible Items */}
             <div className="ml-4 pl-4 border-l border-white/10 mt-1 flex flex-col gap-1">
               <Link 
-                to="/saas"
-                className={`block px-4 py-2 rounded-lg transition-all duration-300 text-xs font-medium tracking-wide ${location.pathname === '/saas' && !location.search ? 'bg-indigo-500/10 text-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.1)]' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+                to="/apps"
+                className={`block px-4 py-2 rounded-lg transition-all duration-300 text-xs font-medium tracking-wide ${location.pathname === '/apps' && !location.search ? 'bg-indigo-500/10 text-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.1)]' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
               >
                 TODAS LAS APPS
               </Link>

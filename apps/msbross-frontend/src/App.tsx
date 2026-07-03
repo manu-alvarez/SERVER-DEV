@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './pages/Home';
-import Agents from './pages/Agents';
-import SaaS from './pages/SaaS';
+import Bots from './pages/Bots';
+import Apps from './pages/Apps';
 import Architecture from './pages/Architecture';
 import Contact from './pages/Contact';
 import Profile from './pages/Profile';
@@ -13,8 +13,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="agents" element={<Agents />} />
-          <Route path="saas" element={<SaaS />} />
+          <Route path="bots" element={<Bots />} />
+          <Route path="apps" element={<Apps />} />
           <Route path="architecture" element={<Architecture />} />
           <Route path="profile" element={<Profile />} />
           <Route path="contact" element={<Contact />} />

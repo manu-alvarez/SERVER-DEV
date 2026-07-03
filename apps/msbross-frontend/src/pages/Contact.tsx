@@ -59,10 +59,10 @@ export default function Contact() {
               </div>
               <h2 className="text-2xl font-extrabold text-white mb-2 tracking-wide group-hover:text-cyan-400 transition-colors">Manuel Álvarez</h2>
               <div className="px-3 py-1 bg-white/5 rounded-md border border-white/10 text-cyan-400 font-mono text-xs mb-4 uppercase tracking-wider">
-                Aficionado a la informática
+                Técnico & Programador
               </div>
               <p className="text-gray-400 text-sm leading-relaxed mb-6">
-                Entusiasta de los ordenadores. Me gusta trastear con servidores, contenedores y automatizaciones.
+                Técnico informático orientado a buscar soluciones. Creo aplicaciones web, gestiono servidores y automatizo procesos para mejorar el día a día.
               </p>
             </div>
             
