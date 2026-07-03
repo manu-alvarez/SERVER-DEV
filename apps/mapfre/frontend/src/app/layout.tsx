@@ -13,7 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MAPFRE - Automatización de Partes",
+  icons: { icon: "/icon.svg" },
+  title: "MAPFRE — MSBross",
   description:
     "Sistema inteligente de automatización de partes MAPFRE InfoCol con IA (Claude) y Playwright. RGPD compliant. Diseñado por Manu Alvarez.",
 };
