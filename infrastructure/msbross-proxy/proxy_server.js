@@ -242,7 +242,6 @@ const DOMAIN_APP_MAP = {
   'logitrack.manuelalvarez.dev': 'logisearch',
   'mano.manuelalvarez.dev': 'msbross',
   'mokotools.manuelalvarez.dev': 'moko-tools',
-  'energia.manuelalvarez.dev': 'industrialpro',
   'atenea.manuelalvarez.dev': 'web-restaurante-atenea',
   'taskflow.manuelalvarez.dev': 'taskflow',
   'edelweiss.manuelalvarez.dev': 'edelweiss',
