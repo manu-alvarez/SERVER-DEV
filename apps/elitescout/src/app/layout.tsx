@@ -8,8 +8,9 @@ import { ServiceWorkerRegister } from "@/components/ui/ServiceWorkerRegister";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://msbross.me/app/elitescout"),
-  title: "EliteScout — MSBrossAI",
-  description: "Plataforma de Scouting y Análisis Deportivo",
+  title: "EliteScout",
+  description: "Buscador inteligente de talento",
+  icons: { icon: "/icon.svg" },
   keywords: ["comparador de precios", "análisis de productos", "ofertas", "cupones", "IA"],
   manifest: "/manifest.json",
   appleWebApp: {
