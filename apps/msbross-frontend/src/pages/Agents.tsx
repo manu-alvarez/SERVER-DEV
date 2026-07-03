@@ -5,7 +5,7 @@ export default function Agents() {
   const agents = [
     {
       name: 'IAPuta OS',
-      desc: 'Asistente IA soberano con orbe 3D reactivo, 12 herramientas y multi-LLM.',
+      desc: 'Asistente IA personal con modelo 3D y conexión a herramientas del servidor.',
       tech: 'FastAPI, React 19, Three.js',
       url: 'https://iaputa.manuelalvarez.dev',
       icon: Brain,
@@ -15,7 +15,7 @@ export default function Agents() {
     },
     {
       name: 'JartosDTo',
-      desc: 'Plataforma unificada de chat IA con RAG, base vectorial y iOS nativo.',
+      desc: 'Chat IA con documentos cargados y aplicación móvil nativa.',
       tech: 'FastAPI, LangChain, pgvector',
       url: 'https://jartosdto.manuelalvarez.dev',
       icon: Bot,
@@ -25,7 +25,7 @@ export default function Agents() {
     },
     {
       name: 'MSBrOSs',
-      desc: 'Asistente conversacional principal del ecosistema MSBrossAI.',
+      desc: 'Asistente conversacional de propósito general.',
       tech: 'Python, Flask, Gemini API',
       url: 'https://assistant.manuelalvarez.dev',
       icon: Sparkles,
@@ -35,7 +35,7 @@ export default function Agents() {
     },
     {
       name: 'App Generator',
-      desc: 'Constructor asimétrico Split-View que genera Single-Page Apps usando Gemini 2.5.',
+      desc: 'Herramienta para generar páginas web simples utilizando inteligencia artificial.',
       tech: 'React 19, Vite, Gemini API',
       url: 'https://appgenerator.manuelalvarez.dev',
       icon: Activity,
@@ -45,7 +45,7 @@ export default function Agents() {
     },
     {
       name: 'Traductor PRO',
-      desc: 'Traductor neural con 4 modos, 4 providers y OCR con Tesseract.js.',
+      desc: 'Traductor automático usando diferentes modelos de IA y reconocimiento de texto.',
       tech: 'Express, React 19, MUI 7',
       url: 'https://traductor.manuelalvarez.dev',
       icon: Cpu,
@@ -80,7 +80,7 @@ export default function Agents() {
             className="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full bg-cyan-950/40 border border-cyan-500/30"
           >
             <Zap className="w-4 h-4 text-cyan-400 fill-cyan-400" />
-            <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest">Sistemas Autónomos</span>
+            <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest">Bots e Inteligencia Artificial</span>
           </motion.div>
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-2">
             <span className="text-white">Agentes </span>
@@ -89,7 +89,7 @@ export default function Agents() {
             </span>
           </h1>
           <p className="text-gray-400 text-lg max-w-xl leading-relaxed">
-            Cognición artificial y orquestación multi-LLM operando en tiempo real en la infraestructura core de MSBrossAI.
+            Colección de pequeños agentes conversacionales y asistentes virtuales de pruebas.
           </p>
         </div>
       </div>

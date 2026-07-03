@@ -25,7 +25,7 @@ export default function Architecture() {
             className="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full bg-cyan-950/40 border border-cyan-500/30"
           >
             <Server className="w-4 h-4 text-cyan-400 fill-cyan-400/20" />
-            <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest">Esquema Técnico</span>
+            <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest">Resumen Técnico</span>
           </motion.div>
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4">
             <span className="text-white">Arquitectura del </span>
@@ -49,7 +49,7 @@ export default function Architecture() {
           { value: '20+', label: 'Contenedores Docker', color: 'from-cyan-400 to-blue-500' },
           { value: '1', label: 'Proxy Traefik v3', color: 'from-blue-400 to-indigo-500' },
           { value: '1', label: 'Servidor VPS', color: 'from-indigo-400 to-purple-500' },
-          { value: '99.9%', label: 'Uptime SLA', color: 'from-emerald-400 to-teal-500' }
+          { value: '24/7', label: 'Monitorizado', color: 'from-emerald-400 to-teal-500' }
         ].map((stat, idx) => (
           <motion.div key={idx} variants={itemVars} className="bg-[#0A101C]/60 backdrop-blur-md border border-white/5 rounded-3xl p-6 relative overflow-hidden group">
             <div className={`absolute -bottom-10 -right-10 w-32 h-32 bg-gradient-to-br ${stat.color} rounded-full blur-[60px] opacity-10 group-hover:opacity-30 transition-opacity duration-500 pointer-events-none`}></div>
@@ -77,9 +77,9 @@ export default function Architecture() {
               <Network className="w-10 h-10 text-cyan-400" />
             </div>
             <div className="flex-1">
-              <div className="text-xs font-mono uppercase text-cyan-400 mb-2 tracking-wider">Gateway Edge</div>
+              <div className="text-xs font-mono uppercase text-cyan-400 mb-2 tracking-wider">Enrutador Principal</div>
               <h2 className="text-3xl font-bold text-white mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:to-blue-500 transition-all">
-                Traefik v3 — Router & Proxy Inverso
+                Traefik v3 — Proxy Inverso
               </h2>
               <p className="text-gray-400 text-lg leading-relaxed max-w-4xl">
                 Funciona como un proxy inverso y enrutador principal. Utiliza la integración nativa con Docker para detectar nuevos contenedores y generar automáticamente los certificados SSL de Let's Encrypt, sirviendo el tráfico por HTTPS de forma segura y sin configuración manual.
@@ -112,7 +112,7 @@ export default function Architecture() {
           },
           { 
             title: 'Contenerización', 
-            desc: 'Cada aplicación, base de datos y modelo de IA está encapsulado individualmente en un contenedor Docker con dependencias aisladas.', 
+            desc: 'Cada aplicación, base de datos y bot está encapsulado individualmente en un contenedor Docker con dependencias aisladas.', 
             icon: Box,
             color: 'text-blue-400', 
             bg: 'bg-blue-500/10' 

@@ -1,5 +1,5 @@
 import { motion, type Variants } from 'framer-motion';
-import { Send, MapPin, Mail, Phone, Lock, Terminal, Radio } from 'lucide-react';
+import { Send, MapPin, Mail, Phone, Lock, Radio } from 'lucide-react';
 
 export default function Contact() {
   const containerVars: Variants = {
@@ -25,13 +25,13 @@ export default function Contact() {
       >
         <motion.div variants={itemVars} className="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full bg-cyan-950/40 border border-cyan-500/30">
           <Radio className="w-4 h-4 text-cyan-400 animate-pulse" />
-          <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest">Enlace Abierto</span>
+          <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest">Abierto a contacto</span>
         </motion.div>
         <motion.h2 variants={itemVars} className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
           Contacto <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500">Directo</span>
         </motion.h2>
         <motion.p variants={itemVars} className="text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
-          Iniciando canal de comunicación encriptado. Disponible para propuestas de proyectos, colaboraciones corporativas o integraciones avanzadas de Inteligencia Artificial.
+          Si quieres contactar para propuestas, colaboraciones o cualquier otra cosa, tienes las puertas abiertas.
         </motion.p>
       </motion.div>
 
@@ -59,10 +59,10 @@ export default function Contact() {
               </div>
               <h2 className="text-2xl font-extrabold text-white mb-2 tracking-wide group-hover:text-cyan-400 transition-colors">Manuel Álvarez</h2>
               <div className="px-3 py-1 bg-white/5 rounded-md border border-white/10 text-cyan-400 font-mono text-xs mb-4 uppercase tracking-wider">
-                Full-Stack Architect
+                Técnico & Developer
               </div>
               <p className="text-gray-400 text-sm leading-relaxed mb-6">
-                Arquitecto de ecosistemas de Inteligencia Artificial y especialista en despliegue de microservicios e infraestructura IT de alto rendimiento.
+                Técnico Informático y Desarrollador. Experiencia en despliegue de contenedores y programación web.
               </p>
             </div>
             
@@ -124,13 +124,13 @@ export default function Contact() {
             <input type="hidden" name="_captcha" value="false" />
 
             <div className="flex items-center gap-3 mb-8 relative z-10">
-              <Terminal className="text-cyan-400 w-5 h-5" />
-              <h3 className="text-xl font-bold text-white">Transmisión de Mensaje</h3>
+              <Mail className="text-cyan-400 w-5 h-5" />
+              <h3 className="text-xl font-bold text-white">Enviar Mensaje</h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 relative z-10">
               <div className="space-y-3">
-                <label className="text-gray-400 text-xs font-mono uppercase tracking-widest pl-1">Identificador</label>
+                <label className="text-gray-400 text-xs font-mono uppercase tracking-widest pl-1">Nombre</label>
                 <input 
                   type="text"
                   name="name"
@@ -140,7 +140,7 @@ export default function Contact() {
                 />
               </div>
               <div className="space-y-3">
-                <label className="text-gray-400 text-xs font-mono uppercase tracking-widest pl-1">Vector de Retorno (Email)</label>
+                <label className="text-gray-400 text-xs font-mono uppercase tracking-widest pl-1">Email</label>
                 <input 
                   type="email"
                   name="email"
@@ -152,12 +152,12 @@ export default function Contact() {
             </div>
 
             <div className="space-y-3 mb-10 flex-1 relative z-10">
-              <label className="text-gray-400 text-xs font-mono uppercase tracking-widest pl-1">Carga Útil (Mensaje)</label>
+              <label className="text-gray-400 text-xs font-mono uppercase tracking-widest pl-1">Mensaje</label>
               <textarea 
                 name="message"
                 required
                 className="w-full h-48 bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-cyan-500 focus:bg-cyan-500/5 transition-all placeholder:text-gray-600 resize-none"
-                placeholder="Iniciando transmisión..."
+                placeholder="Escribe tu mensaje aquí..."
               ></textarea>
             </div>
 
@@ -167,7 +167,7 @@ export default function Contact() {
             >
               <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-full group-hover:h-56 opacity-10"></span>
               <span className="relative flex items-center gap-3">
-                Transmitir Datos
+                Enviar Mensaje
                 <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
               </span>
             </button>
