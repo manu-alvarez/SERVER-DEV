@@ -210,10 +210,10 @@ const NEXT_APPS = [
   'app-generator', 'cuentos-magicos', 'combipro', 'industrialpro',
   'edelweiss', 'expositator-rte', 'iaputa-os', 'jartosdto',
   'logisearch', 'moko-tools', 'msbross', 'gas-station', 'livekit-nikolina',
-  'taskflow', 'traductor-pro', 'web-restaurante-atenea'
+  'taskflow', 'traductor-pro', 'web-restaurante-atenea', 'it-english-coach',
+  'cv', 'energia-maya'
 ];
 
-// ── Domain to App Mapping ──
 const DOMAIN_APP_MAP = {
   'iaputa.manuelalvarez.dev': 'iaputa-os',
   'jartosdto.manuelalvarez.dev': 'jartosdto',
@@ -232,9 +232,11 @@ const DOMAIN_APP_MAP = {
   'logitrack.manuelalvarez.dev': 'logisearch',
   'mano.manuelalvarez.dev': 'msbross',
   'mokotools.manuelalvarez.dev': 'moko-tools',
-  'energia.manuelalvarez.dev': 'industrialpro',
+  'energia.manuelalvarez.dev': 'energia-maya',
   'atenea.manuelalvarez.dev': 'web-restaurante-atenea',
   'taskflow.manuelalvarez.dev': 'taskflow',
+  'edelweiss.manuelalvarez.dev': 'edelweiss',
+  'cv.manuelalvarez.dev': 'cv'
 };
 
 app.use((req, res, next) => {

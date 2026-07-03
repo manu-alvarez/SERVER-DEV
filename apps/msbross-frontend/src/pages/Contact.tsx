@@ -1,5 +1,5 @@
 import { motion, type Variants } from 'framer-motion';
-import { Send, MapPin, Mail, Phone, BookUser } from 'lucide-react';
+import { Send, MapPin, Mail, Phone, BookUser, Github, Linkedin } from 'lucide-react';
 
 export default function Contact() {
   const containerVars: Variants = {
@@ -74,13 +74,23 @@ export default function Contact() {
             </h3>
             
             <div className="space-y-6 relative z-10">
-              <a href="mailto:manuelalvarezdianez@gmail.com" className="flex items-center gap-4 group/link">
+              <a href="mailto:manuelalvarezdianez@hotmail.com" className="flex items-center gap-4 group/link">
                 <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center shrink-0 group-hover/link:bg-cyan-400 group-hover/link:text-[#0A101C] transition-colors">
                   <Mail className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="text-gray-500 text-xs font-mono uppercase tracking-wider mb-0.5">Email</div>
-                  <div className="text-white group-hover/link:text-cyan-400 transition-colors font-medium text-sm">manuelalvarezdianez@gmail.com</div>
+                  <div className="text-gray-500 text-xs font-mono uppercase tracking-wider mb-0.5">Email Principal</div>
+                  <div className="text-white group-hover/link:text-cyan-400 transition-colors font-medium text-sm">manuelalvarezdianez@hotmail.com</div>
+                </div>
+              </a>
+
+              <a href="mailto:manuelalvarezdianez@gmail.com" className="flex items-center gap-4 group/link">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0 group-hover/link:bg-blue-400 group-hover/link:text-[#0A101C] transition-colors">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-gray-500 text-xs font-mono uppercase tracking-wider mb-0.5">Email Secundario</div>
+                  <div className="text-white group-hover/link:text-blue-400 transition-colors font-medium text-sm">manuelalvarezdianez@gmail.com</div>
                 </div>
               </a>
 
@@ -103,6 +113,28 @@ export default function Contact() {
                   <div className="text-white font-medium text-sm">Zaragoza, España</div>
                 </div>
               </div>
+
+              <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent my-4"></div>
+
+              <a href="https://github.com/manu-alvarez" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group/link">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0 group-hover/link:bg-purple-400 group-hover/link:text-[#0A101C] transition-colors">
+                  <Github className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-gray-500 text-xs font-mono uppercase tracking-wider mb-0.5">GitHub</div>
+                  <div className="text-white group-hover/link:text-purple-400 transition-colors font-medium text-sm">github.com/manu-alvarez</div>
+                </div>
+              </a>
+
+              <a href="https://linkedin.com/in/manuelalvarezdianez" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group/link">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center shrink-0 group-hover/link:bg-blue-400 group-hover/link:text-[#0A101C] transition-colors">
+                  <Linkedin className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-gray-500 text-xs font-mono uppercase tracking-wider mb-0.5">LinkedIn</div>
+                  <div className="text-white group-hover/link:text-blue-400 transition-colors font-medium text-sm">linkedin.com/in/manuelalvarezdianez</div>
+                </div>
+              </a>
             </div>
           </motion.div>
         </div>
@@ -111,7 +143,7 @@ export default function Contact() {
         <div className="w-full lg:w-2/3">
           <motion.form 
             variants={itemVars}
-            action="https://formsubmit.co/manuelalvarezdianez@gmail.com" 
+            action="https://formsubmit.co/manuelalvarezdianez@hotmail.com" 
             method="POST"
             className="bg-[#0A101C]/60 backdrop-blur-xl border border-white/5 rounded-[2rem] p-8 md:p-12 h-full flex flex-col relative overflow-hidden"
           >
