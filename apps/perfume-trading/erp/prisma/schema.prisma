@@ -1,0 +1,137 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Brand {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  category  String   @default("Luxury") // BrandCategory enum
+  country   String?
+  createdAt DateTime @default(now())
+
+  products  Product[]
+}
+
+model Product {
+  id            String   @id @default(uuid())
+  brandId       String
+  name          String
+  line          String?
+  gender        String   @default("Unisex") // GenderType enum
+  format        String   @default("Regular") // FormatType enum
+  concentration String   @default("EDP") // ConcentrationType enum
+  sizeMl        Int
+  ean           String   @unique
+  marketPrice   Float
+  costPrice     Float?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  brand     Brand      @relation(fields: [brandId], references: [id])
+  inventory Inventory[]
+  trades    TradingItem[]
+  invoiceItems InvoiceItem[]
+}
+
+model Partner {
+  id           String   @id @default(uuid())
+  name         String
+  type         String   // EntityType enum: Supplier, Client, Both, Broker
+  email        String?
+  phone        String?
+  country      String?
+  address      String?
+  creditLimit  Float    @default(0)
+  paymentTerms String   @default("Net 30")
+  isActive     Boolean  @default(true)
+  brokerFeePct Float?
+  createdAt    DateTime @default(now())
+
+  inventory Inventory[]
+  trades    TradingItem[]
+  invoices  Invoice[]
+}
+
+model Warehouse {
+  id        String   @id @default(uuid())
+  name      String
+  code      String   @unique
+  location  String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  inventory Inventory[]
+}
+
+model Inventory {
+  id               String   @id @default(uuid())
+  productId        String
+  warehouseId      String
+  partnerId        String?
+  quantity         Int      @default(0)
+  batchCode        String
+  costPrice        Float
+  expiryDate       DateTime?
+  warehouseLocation String?
+  receivedAt       DateTime @default(now())
+
+  product   Product   @relation(fields: [productId], references: [id])
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id])
+  partner   Partner?  @relation(fields: [partnerId], references: [id])
+}
+
+model TradingItem {
+  id           String   @id @default(uuid())
+  type         String   // TradeType enum: Offer, Bid
+  partnerId    String
+  productId    String
+  quantity     Int
+  priceUnit    Float
+  incoterm     String   @default("EXW") // IncotermType enum
+  marketPrice  Float?
+  status       String   @default("Active") // TradeStatus enum
+  validUntil   DateTime?
+  notes        String?
+  createdAt    DateTime @default(now())
+
+  partner Partner @relation(fields: [partnerId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Invoice {
+  id           String   @id @default(uuid())
+  partnerId    String
+  invoiceNumber String  @unique
+  type         String   // TradeType enum
+  incoterm     String   @default("EXW") // IncotermType enum
+  totalNet     Float
+  taxPercent   Float    @default(0)
+  totalGross   Float
+  status       String   @default("Pending") // InvoiceStatus enum
+  dueDate      DateTime?
+  notes        String?
+  createdAt    DateTime @default(now())
+
+  partner Partner       @relation(fields: [partnerId], references: [id])
+  items   InvoiceItem[]
+}
+
+model InvoiceItem {
+  id          String   @id @default(uuid())
+  invoiceId   String
+  productId   String
+  description String?
+  quantity    Int
+  unitPrice   Float
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+}

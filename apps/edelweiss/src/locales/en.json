@@ -1,0 +1,34 @@
+{
+  "app": {
+    "title": "VisionPlay",
+    "guide": "Visual Stimulation Guide: Explorer Level (3 years)",
+    "modes": {
+      "alto": "High Contrast",
+      "seguimiento": "Visual Tracking",
+      "enfoque": "Focus & Accommodation",
+      "descanso": "Green Rest",
+      "formas": "Shapes & Colors"
+    },
+    "statistics": {
+      "title": "Usage Statistics",
+      "alto": "High Contrast:",
+      "seguimiento": "Visual Tracking:",
+      "enfoque": "Focus & Accommodation:",
+      "descanso": "Green Rest:",
+      "total": "Total:",
+      "lastSession": "Last Session:",
+      "reset": "Reset",
+      "close": "Close",
+      "sessions": "sessions"
+    },
+    "formasColores": {
+      "title": "Shapes & Colors",
+      "instruction": "Tap the shape that matches the shown color",
+      "correct": "Correct!",
+      "tryAgain": "Try Again",
+      "exit": "Go Home"
+    },
+    "parentalLock": "Parental Lock",
+    "speed": "Speed: {speed}s"
+  }
+}

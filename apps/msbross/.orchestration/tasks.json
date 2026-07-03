@@ -1,0 +1,31 @@
+{
+  "pending": [],
+  "in_progress": [],
+  "completed": [
+    {
+      "id": "task-001",
+      "title": "Migración a .env de Claves API",
+      "assignee": "backend_expert",
+      "status": "done"
+    },
+    {
+      "id": "task-002",
+      "title": "Persistencia de memoria con SQLite",
+      "assignee": "backend_expert",
+      "status": "done"
+    },
+    {
+      "id": "task-003",
+      "title": "Optimización de Voz con Gemini",
+      "assignee": "frontend_architect",
+      "status": "done"
+    },
+    {
+      "id": "task-004",
+      "title": "Botón Stitch / Prototipado UI",
+      "description": "Aprovechar la API nativa y el modelo visual para generar UI interactivo a través de la herramienta Stitch.",
+      "assignee": "ui_ux_designer",
+      "status": "done"
+    }
+  ]
+}

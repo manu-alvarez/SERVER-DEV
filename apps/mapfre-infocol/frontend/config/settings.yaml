@@ -1,0 +1,35 @@
+# INFOCOL Configuration File
+# Managed automatically by `infocol config` commands.
+
+province: "La Rioja"
+trade: "FONTANERIA"
+require_human_confirm: true
+auto_process_all: true
+
+ai:
+  provider: "anthropic"
+  model: "claude-sonnet-4-20260514"
+  api_key: null
+  max_retries: 3
+  temperature: 0.1
+
+browser:
+  headless: false
+  timeout_ms: 30000
+  slow_mo_ms: 100
+
+displacement:
+  threshold_km: 20.0
+  rate_per_km: 0.50
+  base_rate: 5.0
+
+logging:
+  level: "INFO"
+  log_dir: "~/.infocol/logs"
+  max_log_files: 30
+
+infocol:
+  base_url: "https://infocol.mapfre.es"
+  login_path: "/login"
+  fin_queue_path: "/servicios-pendientes"
+  username: null

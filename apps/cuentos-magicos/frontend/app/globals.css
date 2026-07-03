@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Quicksand:wght@300..700&display=swap');
+@import "tailwindcss";
+
+body {
+  font-family: 'Quicksand', system-ui, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Fredoka', 'Quicksand', system-ui, sans-serif;
+}
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}
+
+/* ═══ PREMIUM PORTAL STYLES ═══ */
+.portal-card {
+  position: relative;
+  background: rgba(255,255,255,0.02);
+  border-radius: 20px;
+  padding: 2px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-style: preserve-3d;
+}
+
+.portal-card::before {
+  content: ''; position: absolute; inset: 0; border-radius: 20px; padding: 2px;
+  background: linear-gradient(var(--border-angle, 0deg), #f59e0b, transparent 40%, transparent 60%, #f59e0b);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: borderSpin 4s linear infinite; opacity: 0.5; transition: opacity 0.4s;
+}
+
+.portal-card:hover::before { opacity: 1; box-shadow: 0 0 30px rgba(245, 158, 11, 0.5); }
+
+.portal-card-inner {
+  background: rgba(8,12,24,0.85);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-radius: 18px;
+  position: relative; overflow: hidden; height: 100%; width: 100%;
+}
+
+@keyframes borderSpin { to { --border-angle: 360deg; } }
+@property --border-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+
+@keyframes cardGlitch {
+  0% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+  20% { clip-path: inset(80% 0 10% 0); transform: translate(2px, -2px); filter: hue-rotate(-90deg); }
+  40% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, -2px); filter: hue-rotate(45deg); }
+  60% { clip-path: inset(60% 0 20% 0); transform: translate(2px, 2px); filter: hue-rotate(-45deg); }
+  80% { clip-path: inset(20% 0 60% 0); transform: translate(-1px, 1px); filter: hue-rotate(20deg); }
+  100% { clip-path: inset(0 0 0 0); transform: translate(0); filter: hue-rotate(0); }
+}
+.portal-card:hover::after {
+    content: ''; position: absolute; inset: 0; background: inherit;
+    border-radius: inherit; z-index: 10; pointer-events: none;
+    animation: cardGlitch 0.3s cubic-bezier(.25, .46, .45, .94) both;
+    opacity: 0.15; mix-blend-mode: overlay;
+}

@@ -1,0 +1,78 @@
+[project]
+name = "jartosdto-server"
+version = "0.1.0"
+description = "JartosDTo — Unified AI Chat Platform Backend"
+requires-python = ">=3.12"
+dependencies = [
+    # ── Core Framework ──
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.6.0",
+    "python-multipart>=0.0.18",
+
+    # ── Database ──
+    "sqlalchemy[asyncio]>=2.0.36",
+    "asyncpg>=0.30.0",
+    "alembic>=1.14.0",
+    "pgvector>=0.3.6",
+
+    # ── Redis ──
+    "redis[hiredis]>=5.2.0",
+
+    # ── Auth ──
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+
+    # ── AI/LLM ──
+    "litellm>=1.55.0",
+    "langchain>=0.3.13",
+    "langchain-community>=0.3.13",
+    "langchain-openai>=0.3.0",
+    "langchain-google-genai>=2.0.0",
+    "langchain-anthropic>=0.3.0",
+
+    # ── Embeddings & Vector ──
+    "openai>=1.58.0",
+    "tiktoken>=0.8.0",
+
+    # ── RAG / Documents ──
+    "pypdf>=5.1.0",
+    "python-docx>=1.1.0",
+    "openpyxl>=3.1.5",
+    "beautifulsoup4>=4.12.3",
+    # "unstructured>=0.16.0",  # optional heavy dep
+
+    # ── Web Search ──
+    "tavily-python>=0.5.0",
+    "httpx>=0.28.0",
+
+    # ── Audio (optional, install manually) ──
+    # "openai-whisper>=20240930",
+
+    # ── File Storage ──
+    "minio>=7.2.12",
+
+    # ── Utilities ──
+    "sse-starlette>=2.2.0",
+    "python-dotenv>=1.0.1",
+    "orjson>=3.10.12",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.24.0",
+    "httpx>=0.28.0",
+    "ruff>=0.8.0",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

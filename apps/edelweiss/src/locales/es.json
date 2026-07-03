@@ -1,0 +1,34 @@
+{
+  "app": {
+    "title": "VisionPlay",
+    "guide": "Guía de estimulación visual: Nivel Explorador (3 años)",
+    "modes": {
+      "alto": "Alto Contraste",
+      "seguimiento": "Seguimiento Visual",
+      "enfoque": "Enfoque y Acomodación",
+      "descanso": "Descanso Verde",
+      "formas": "Formas y Colores"
+    },
+    "statistics": {
+      "title": "Estadísticas de Uso",
+      "alto": "Alto Contraste:",
+      "seguimiento": "Seguimiento Visual:",
+      "enfoque": "Enfoque y Acomodación:",
+      "descanso": "Descanso Verde:",
+      "total": "Total:",
+      "lastSession": "Última sesión:",
+      "reset": "Reiniciar",
+      "close": "Cerrar",
+      "sessions": "sesiones"
+    },
+    "formasColores": {
+      "title": "Formas y Colores",
+      "instruction": "Toca la forma que corresponde al color mostrado",
+      "correct": "¡Correcto!",
+      "tryAgain": "Inténtalo de nuevo",
+      "exit": "Volver al inicio"
+    },
+    "parentalLock": "Bloqueo parental",
+    "speed": "Velocidad: {speed}s"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "extends": ["next/core-web-vitals", "eslint:recommended"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "ecmaFeatures": { "jsx": true }
+  },
+  "globals": {
+    "React": "readonly",
+    "JSX": "readonly"
+  },
+  "rules": {
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "ignoreRestSiblings": true }],
+    "no-duplicate-imports": "error",
+    "prefer-const": "error"
+  }
+}

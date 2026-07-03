@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@theme {
+  --color-neon-cyan: #00FFCC;
+  --color-matrix-green: #00FF88;
+  --color-deep-void: #02050A;
+  --font-sans: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-inter: 'Inter', system-ui, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: #02050A;
+    --foreground: #E8EDF6;
+  }
+  
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+}
+
+.ambient-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  z-index: -1;
+  opacity: 0.15;
+  animation: float 20s infinite alternate ease-in-out;
+  pointer-events: none;
+}
+
+.orb-1 {
+  width: 600px;
+  height: 600px;
+  background: var(--color-neon-cyan);
+  top: -100px;
+  left: -200px;
+}
+
+.orb-2 {
+  width: 500px;
+  height: 500px;
+  background: var(--color-matrix-green);
+  bottom: -200px;
+  right: -100px;
+  animation-delay: -10s;
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(100px, 100px) scale(1.2); }
+}
+
+.glass-panel {
+  background: rgba(10, 20, 30, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(0, 255, 204, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.glass-panel:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 255, 204, 0.4);
+  box-shadow: 0 10px 40px rgba(0, 255, 204, 0.2), inset 0 0 20px rgba(0, 255, 204, 0.05);
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, var(--color-neon-cyan), var(--color-matrix-green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

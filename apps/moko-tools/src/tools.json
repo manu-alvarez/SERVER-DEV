@@ -1,0 +1,1260 @@
+{
+  "categories": [
+    {
+      "id": "microsoft-office",
+      "name": "Microsoft / Office (crear al instante)",
+      "icon": "🏢",
+      "tools": [
+        {
+          "id": "word",
+          "name": "Word",
+          "url": "https://word.new",
+          "description": "Nuevo documento de Word online",
+          "shortcut": "word.new"
+        },
+        {
+          "id": "excel",
+          "name": "Excel",
+          "url": "https://excel.new",
+          "description": "Nueva hoja de Excel online",
+          "shortcut": "excel.new"
+        },
+        {
+          "id": "powerpoint",
+          "name": "Powerpoint",
+          "url": "https://powerpoint.new",
+          "description": "Nueva presentación en PowerPoint",
+          "shortcut": "powerpoint.new"
+        },
+        {
+          "id": "ppt",
+          "name": "Ppt",
+          "url": "https://ppt.new",
+          "description": "Alias de PowerPoint (duplicado funcional)",
+          "shortcut": "ppt.new"
+        },
+        {
+          "id": "onenote",
+          "name": "Onenote",
+          "url": "https://onenote.new",
+          "description": "Nueva nota en OneNote",
+          "shortcut": "onenote.new"
+        },
+        {
+          "id": "outlook",
+          "name": "Outlook",
+          "url": "https://outlook.new",
+          "description": "Abrir/redactar en Outlook",
+          "shortcut": "outlook.new"
+        },
+        {
+          "id": "todo",
+          "name": "Todo",
+          "url": "https://todo.new",
+          "description": "Nueva tarea (Microsoft To Do / según redirección)",
+          "shortcut": "todo.new"
+        },
+        {
+          "id": "teams",
+          "name": "Teams",
+          "url": "https://teams.new",
+          "description": "Abrir chat/reunión en Microsoft Teams",
+          "shortcut": "teams.new"
+        },
+        {
+          "id": "meeting",
+          "name": "Meeting",
+          "url": "https://meeting.new",
+          "description": "Crear reunión/evento (según redirección)",
+          "shortcut": "meeting.new"
+        },
+        {
+          "id": "whiteboard",
+          "name": "Whiteboard",
+          "url": "https://whiteboard.new",
+          "description": "Pizarra (Microsoft/Miro según redirección)",
+          "shortcut": "whiteboard.new"
+        }
+      ]
+    },
+    {
+      "id": "google-workspace",
+      "name": "Google Workspace (crear al instante)",
+      "icon": "📊",
+      "tools": [
+        {
+          "id": "docs",
+          "name": "Docs",
+          "url": "https://docs.new",
+          "description": "Nuevo Google Doc",
+          "shortcut": "docs.new"
+        },
+        {
+          "id": "sheets",
+          "name": "Sheets",
+          "url": "https://sheets.new",
+          "description": "Nueva hoja de cálculo",
+          "shortcut": "sheets.new"
+        },
+        {
+          "id": "slides",
+          "name": "Slides",
+          "url": "https://slides.new",
+          "description": "Nueva presentación",
+          "shortcut": "slides.new"
+        },
+        {
+          "id": "forms",
+          "name": "Forms",
+          "url": "https://forms.new",
+          "description": "Nuevo formulario",
+          "shortcut": "forms.new"
+        },
+        {
+          "id": "sites",
+          "name": "Sites",
+          "url": "https://sites.new",
+          "description": "Nuevo sitio en Google Sites",
+          "shortcut": "sites.new"
+        },
+        {
+          "id": "site",
+          "name": "Site",
+          "url": "https://site.new",
+          "description": "Alias de Sites (según redirección)",
+          "shortcut": "site.new"
+        },
+        {
+          "id": "cal",
+          "name": "Cal",
+          "url": "https://cal.new",
+          "description": "Nuevo evento en Google Calendar",
+          "shortcut": "cal.new"
+        },
+        {
+          "id": "meet",
+          "name": "Meet",
+          "url": "https://meet.new",
+          "description": "Nueva reunión en Google Meet",
+          "shortcut": "meet.new"
+        },
+        {
+          "id": "keep",
+          "name": "Keep",
+          "url": "https://keep.new",
+          "description": "Nueva nota en Google Keep",
+          "shortcut": "keep.new"
+        },
+        {
+          "id": "drawings",
+          "name": "Drawings",
+          "url": "https://drawings.new",
+          "description": "Nuevo dibujo (Google Drawings)",
+          "shortcut": "drawings.new"
+        },
+        {
+          "id": "script",
+          "name": "Script",
+          "url": "https://script.new",
+          "description": "Nuevo Google Apps Script",
+          "shortcut": "script.new"
+        },
+        {
+          "id": "mail",
+          "name": "Mail",
+          "url": "https://mail.new",
+          "description": "Redactar correo en Gmail",
+          "shortcut": "mail.new"
+        }
+      ]
+    },
+    {
+      "id": "notas-documentación-páginas",
+      "name": "Notas / documentación / páginas",
+      "icon": "📝",
+      "tools": [
+        {
+          "id": "notion",
+          "name": "Notion",
+          "url": "https://notion.new",
+          "description": "Nueva página en Notion",
+          "shortcut": "notion.new"
+        },
+        {
+          "id": "coda",
+          "name": "Coda",
+          "url": "https://coda.new",
+          "description": "Nuevo documento en Coda",
+          "shortcut": "coda.new"
+        },
+        {
+          "id": "wiki",
+          "name": "Wiki",
+          "url": "https://wiki.new",
+          "description": "Crear wiki (genérico; depende de redirección)",
+          "shortcut": "wiki.new"
+        }
+      ]
+    },
+    {
+      "id": "diseño-creatividad-y-diagramas",
+      "name": "Diseño, creatividad y diagramas",
+      "icon": "🎨",
+      "tools": [
+        {
+          "id": "canva",
+          "name": "Canva",
+          "url": "https://canva.new",
+          "description": "Nuevo diseño en Canva",
+          "shortcut": "canva.new"
+        },
+        {
+          "id": "figma",
+          "name": "Figma",
+          "url": "https://figma.new",
+          "description": "Nuevo archivo en Figma",
+          "shortcut": "figma.new"
+        },
+        {
+          "id": "figjam",
+          "name": "Figjam",
+          "url": "https://figjam.new",
+          "description": "Nueva pizarra FigJam",
+          "shortcut": "figjam.new"
+        },
+        {
+          "id": "resume",
+          "name": "Resume",
+          "url": "https://resume.new",
+          "description": "Crear CV (a menudo Canva; depende de redirección)",
+          "shortcut": "resume.new"
+        },
+        {
+          "id": "cv",
+          "name": "Cv",
+          "url": "https://cv.new",
+          "description": "Alias de CV (depende de redirección)",
+          "shortcut": "cv.new"
+        },
+        {
+          "id": "logo",
+          "name": "Logo",
+          "url": "https://logo.new",
+          "description": "Crear logo (depende de redirección)",
+          "shortcut": "logo.new"
+        },
+        {
+          "id": "poster",
+          "name": "Poster",
+          "url": "https://poster.new",
+          "description": "Crear póster (depende de redirección)",
+          "shortcut": "poster.new"
+        },
+        {
+          "id": "video",
+          "name": "Video",
+          "url": "https://video.new",
+          "description": "Crear video (depende de redirección)",
+          "shortcut": "video.new"
+        },
+        {
+          "id": "edit",
+          "name": "Edit",
+          "url": "https://edit.new",
+          "description": "Editor de fotos (depende de redirección)",
+          "shortcut": "edit.new"
+        },
+        {
+          "id": "draw",
+          "name": "Draw",
+          "url": "https://draw.new",
+          "description": "Pizarra/diagramas (p.ej. draw.io; depende)",
+          "shortcut": "draw.new"
+        },
+        {
+          "id": "diagram",
+          "name": "Diagram",
+          "url": "https://diagram.new",
+          "description": "Nuevo diagrama (diagrams.net u otro; depende)",
+          "shortcut": "diagram.new"
+        },
+        {
+          "id": "flow",
+          "name": "Flow",
+          "url": "https://flow.new",
+          "description": "Diagrama de flujo / Power Automate (aparece en varias listas; depende)",
+          "shortcut": "flow.new"
+        },
+        {
+          "id": "font",
+          "name": "Font",
+          "url": "https://font.new",
+          "description": "Google Fonts (visualización)",
+          "shortcut": "font.new"
+        },
+        {
+          "id": "svg",
+          "name": "Svg",
+          "url": "https://svg.new",
+          "description": "Editor SVG (p.ej. Boxy SVG)",
+          "shortcut": "svg.new"
+        },
+        {
+          "id": "canvas",
+          "name": "Canvas",
+          "url": "https://canvas.new",
+          "description": "Canvas de dibujo/diagramas (depende de redirección)",
+          "shortcut": "canvas.new"
+        }
+      ]
+    },
+    {
+      "id": "desarrollo-y-código",
+      "name": "Desarrollo y código (sandboxes / repos)",
+      "icon": "💻",
+      "tools": [
+        {
+          "id": "replit",
+          "name": "Replit",
+          "url": "https://replit.new",
+          "description": "Nuevo proyecto en Replit",
+          "shortcut": "replit.new"
+        },
+        {
+          "id": "repl",
+          "name": "Repl",
+          "url": "https://repl.new",
+          "description": "Alias de Replit (según redirección)",
+          "shortcut": "repl.new"
+        },
+        {
+          "id": "stackblitz",
+          "name": "Stackblitz",
+          "url": "https://stackblitz.new",
+          "description": "Nuevo proyecto en StackBlitz",
+          "shortcut": "stackblitz.new"
+        },
+        {
+          "id": "repo",
+          "name": "Repo",
+          "url": "https://repo.new",
+          "description": "Crear nuevo repositorio (GitHub)",
+          "shortcut": "repo.new"
+        },
+        {
+          "id": "gist",
+          "name": "Gist",
+          "url": "https://gist.new",
+          "description": "Crear nuevo Gist (GitHub)",
+          "shortcut": "gist.new"
+        },
+        {
+          "id": "codespaces",
+          "name": "Codespaces",
+          "url": "https://codespaces.new",
+          "description": "Iniciar Codespaces (GitHub)",
+          "shortcut": "codespaces.new"
+        },
+        {
+          "id": "github",
+          "name": "Github",
+          "url": "https://github.new",
+          "description": "Acceso/entrada a GitHub (depende de redirección)",
+          "shortcut": "github.new"
+        },
+        {
+          "id": "js",
+          "name": "Js",
+          "url": "https://js.new",
+          "description": "Sandbox JavaScript (depende)",
+          "shortcut": "js.new"
+        },
+        {
+          "id": "ts",
+          "name": "Ts",
+          "url": "https://ts.new",
+          "description": "Sandbox TypeScript (depende)",
+          "shortcut": "ts.new"
+        },
+        {
+          "id": "node",
+          "name": "Node",
+          "url": "https://node.new",
+          "description": "Sandbox Node.js (depende)",
+          "shortcut": "node.new"
+        },
+        {
+          "id": "python",
+          "name": "Python",
+          "url": "https://python.new",
+          "description": "Sandbox Python (depende)",
+          "shortcut": "python.new"
+        },
+        {
+          "id": "sql",
+          "name": "Sql",
+          "url": "https://sql.new",
+          "description": "Editor SQL (depende)",
+          "shortcut": "sql.new"
+        },
+        {
+          "id": "dev",
+          "name": "Dev",
+          "url": "https://dev.new",
+          "description": "Proyecto dev (genérico; depende)",
+          "shortcut": "dev.new"
+        },
+        {
+          "id": "data",
+          "name": "Data",
+          "url": "https://data.new",
+          "description": "Dataset (genérico; depende)",
+          "shortcut": "data.new"
+        },
+        {
+          "id": "uuid",
+          "name": "Uuid",
+          "url": "https://uuid.new",
+          "description": "Generador de UUID",
+          "shortcut": "uuid.new"
+        }
+      ]
+    },
+    {
+      "id": "inspección-performance-seguridad-y-forense",
+      "name": "Inspección, performance, seguridad y forense",
+      "icon": "🔍",
+      "tools": [
+        {
+          "id": "dns",
+          "name": "Dns",
+          "url": "https://dns.new",
+          "description": "Consola DNS (Google Cloud u otro; depende)",
+          "shortcut": "dns.new"
+        },
+        {
+          "id": "ping",
+          "name": "Ping",
+          "url": "https://ping.new",
+          "description": "Pruebas de latencia (depende)",
+          "shortcut": "ping.new"
+        },
+        {
+          "id": "http",
+          "name": "Http",
+          "url": "https://http.new",
+          "description": "Tester HTTP / APIs manual (depende)",
+          "shortcut": "http.new"
+        },
+        {
+          "id": "identity",
+          "name": "Identity",
+          "url": "https://identity.new",
+          "description": "IAM (Google Cloud; según redirección)",
+          "shortcut": "identity.new"
+        }
+      ]
+    },
+    {
+      "id": "automatización-webhooks-e-infraestructura",
+      "name": "Automatización, webhooks e infraestructura",
+      "icon": "⚙️",
+      "tools": [
+        {
+          "id": "webhook",
+          "name": "Webhook",
+          "url": "https://webhook.new",
+          "description": "Endpoint temporal webhook (aparece 2 veces; consolidado)",
+          "shortcut": "webhook.new"
+        },
+        {
+          "id": "cron",
+          "name": "Cron",
+          "url": "https://cron.new",
+          "description": "Cron / Notion Calendar (según redirección)",
+          "shortcut": "cron.new"
+        },
+        {
+          "id": "container",
+          "name": "Container",
+          "url": "https://container.new",
+          "description": "Crear contenedor / Cloud Run (según redirección)",
+          "shortcut": "container.new"
+        },
+        {
+          "id": "db",
+          "name": "Db",
+          "url": "https://db.new",
+          "description": "Crear DB Postgres (p.ej. Supabase; depende)",
+          "shortcut": "db.new"
+        },
+        {
+          "id": "workers",
+          "name": "Workers",
+          "url": "https://workers.new",
+          "description": "Cloudflare Workers",
+          "shortcut": "workers.new"
+        },
+        {
+          "id": "deploy",
+          "name": "Deploy",
+          "url": "https://deploy.new",
+          "description": "Deploy (p.ej. Vercel; depende)",
+          "shortcut": "deploy.new"
+        }
+      ]
+    },
+    {
+      "id": "comunicación-reuniones-y-contenido",
+      "name": "Comunicación, reuniones y contenido",
+      "icon": "💬",
+      "tools": [
+        {
+          "id": "zoom",
+          "name": "Zoom",
+          "url": "https://zoom.new",
+          "description": "Sala Zoom (depende)",
+          "shortcut": "zoom.new"
+        },
+        {
+          "id": "recording",
+          "name": "Recording",
+          "url": "https://recording.new",
+          "description": "Grabar pantalla (Loom; depende)",
+          "shortcut": "recording.new"
+        },
+        {
+          "id": "buffer",
+          "name": "Buffer",
+          "url": "https://buffer.new",
+          "description": "Nuevo post/gestión en Buffer",
+          "shortcut": "buffer.new"
+        },
+        {
+          "id": "post",
+          "name": "Post",
+          "url": "https://post.new",
+          "description": "Nueva publicación (genérico)",
+          "shortcut": "post.new"
+        },
+        {
+          "id": "tweet",
+          "name": "Tweet",
+          "url": "https://tweet.new",
+          "description": "Nuevo tweet/post en X (depende)",
+          "shortcut": "tweet.new"
+        },
+        {
+          "id": "story",
+          "name": "Story",
+          "url": "https://story.new",
+          "description": "Historia / editor Medium (aparece como Medium) (depende)",
+          "shortcut": "story.new"
+        },
+        {
+          "id": "blog",
+          "name": "Blog",
+          "url": "https://blog.new",
+          "description": "Nueva entrada blog (WordPress u otro; depende)",
+          "shortcut": "blog.new"
+        }
+      ]
+    },
+    {
+      "id": "pagos-facturas-y-negocio",
+      "name": "Pagos, facturas y negocio",
+      "icon": "💳",
+      "tools": [
+        {
+          "id": "invoice",
+          "name": "Invoice",
+          "url": "https://invoice.new",
+          "description": "Crear factura (Stripe u otro; depende)",
+          "shortcut": "invoice.new"
+        },
+        {
+          "id": "payment",
+          "name": "Payment",
+          "url": "https://payment.new",
+          "description": "Solicitud/enlace de pago (Stripe; según lista)",
+          "shortcut": "payment.new"
+        },
+        {
+          "id": "pay",
+          "name": "Pay",
+          "url": "https://pay.new",
+          "description": "Enlace de pago (Stripe u otro; depende)",
+          "shortcut": "pay.new"
+        },
+        {
+          "id": "llc",
+          "name": "Llc",
+          "url": "https://llc.new",
+          "description": "Stripe Atlas / registro LLC (según lista)",
+          "shortcut": "llc.new"
+        },
+        {
+          "id": "bill",
+          "name": "Bill",
+          "url": "https://bill.new",
+          "description": "Bill.com (facturas)",
+          "shortcut": "bill.new"
+        },
+        {
+          "id": "inv",
+          "name": "Inv",
+          "url": "https://inv.new",
+          "description": "Alias de factura (Bill.com; según lista)",
+          "shortcut": "inv.new"
+        },
+        {
+          "id": "nda",
+          "name": "Nda",
+          "url": "https://nda.new",
+          "description": "NDA (DocuSign; según lista)",
+          "shortcut": "nda.new"
+        },
+        {
+          "id": "notary",
+          "name": "Notary",
+          "url": "https://notary.new",
+          "description": "Notarización (DocuSign; según lista)",
+          "shortcut": "notary.new"
+        }
+      ]
+    },
+    {
+      "id": "enlaces-qr-y-utilidades-varias",
+      "name": "Enlaces, QR y utilidades varias",
+      "icon": "🔗",
+      "tools": [
+        {
+          "id": "link",
+          "name": "Link",
+          "url": "https://link.new",
+          "description": "Crear enlace/redirección",
+          "shortcut": "link.new"
+        },
+        {
+          "id": "bio",
+          "name": "Bio",
+          "url": "https://bio.new",
+          "description": "Link-in-bio (depende)",
+          "shortcut": "bio.new"
+        },
+        {
+          "id": "qr",
+          "name": "Qr",
+          "url": "https://qr.new",
+          "description": "Código QR",
+          "shortcut": "qr.new"
+        },
+        {
+          "id": "bit",
+          "name": "Bit",
+          "url": "https://bit.new",
+          "description": "Bitly (nota: se reemplaza por is.gd)",
+          "shortcut": "bit.new"
+        },
+        {
+          "id": "is-gd",
+          "name": "Is Gd",
+          "url": "https://is.gd",
+          "description": "Acortador (reemplazo preferido)"
+        },
+        {
+          "id": "compress",
+          "name": "Compress",
+          "url": "https://compress.new",
+          "description": "Comprimir archivos (depende)",
+          "shortcut": "compress.new"
+        },
+        {
+          "id": "timer",
+          "name": "Timer",
+          "url": "https://timer.new",
+          "description": "Temporizador",
+          "shortcut": "timer.new"
+        },
+        {
+          "id": "poll",
+          "name": "Poll",
+          "url": "https://poll.new",
+          "description": "Encuesta rápida (depende)",
+          "shortcut": "poll.new"
+        },
+        {
+          "id": "quiz",
+          "name": "Quiz",
+          "url": "https://quiz.new",
+          "description": "Cuestionario (depende)",
+          "shortcut": "quiz.new"
+        },
+        {
+          "id": "survey",
+          "name": "Survey",
+          "url": "https://survey.new",
+          "description": "Encuesta (Typeform/SurveyMonkey; depende)",
+          "shortcut": "survey.new"
+        },
+        {
+          "id": "plan",
+          "name": "Plan",
+          "url": "https://plan.new",
+          "description": "Plan (depende)",
+          "shortcut": "plan.new"
+        },
+        {
+          "id": "roadmap",
+          "name": "Roadmap",
+          "url": "https://roadmap.new",
+          "description": "Roadmap (depende)",
+          "shortcut": "roadmap.new"
+        },
+        {
+          "id": "track",
+          "name": "Track",
+          "url": "https://track.new",
+          "description": "Tracking envíos (depende)",
+          "shortcut": "track.new"
+        },
+        {
+          "id": "new",
+          "name": "New",
+          "url": "https://new.new",
+          "description": "“Meta-atajo” genérico para crear cosas nuevas",
+          "shortcut": "new.new"
+        }
+      ]
+    },
+    {
+      "id": "ia-y-ml",
+      "name": "IA y ML (plataformas)",
+      "icon": "🤖",
+      "tools": [
+        {
+          "id": "prompt",
+          "name": "Prompt",
+          "url": "https://prompt.new",
+          "description": "AI Studio (Gemini) (según descripción)",
+          "shortcut": "prompt.new"
+        },
+        {
+          "id": "claude",
+          "name": "Claude",
+          "url": "https://claude.new",
+          "description": "Claude",
+          "shortcut": "claude.new"
+        },
+        {
+          "id": "gemini",
+          "name": "Gemini",
+          "url": "https://gemini.new",
+          "description": "Gemini",
+          "shortcut": "gemini.new"
+        },
+        {
+          "id": "copilot",
+          "name": "Copilot",
+          "url": "https://copilot.new",
+          "description": "Microsoft Copilot",
+          "shortcut": "copilot.new"
+        },
+        {
+          "id": "ai",
+          "name": "Ai",
+          "url": "https://ai.new",
+          "description": "Proyecto IA (genérico)",
+          "shortcut": "ai.new"
+        },
+        {
+          "id": "chat",
+          "name": "Chat",
+          "url": "https://chat.new",
+          "description": "Nuevo chat (genérico)",
+          "shortcut": "chat.new"
+        },
+        {
+          "id": "image",
+          "name": "Image",
+          "url": "https://image.new",
+          "description": "Generar imagen (genérico)",
+          "shortcut": "image.new"
+        },
+        {
+          "id": "bot",
+          "name": "Bot",
+          "url": "https://bot.new",
+          "description": "Crear bot (genérico)",
+          "shortcut": "bot.new"
+        },
+        {
+          "id": "zap",
+          "name": "Zap",
+          "url": "https://zap.new",
+          "description": "Zapier (nuevo Zap)",
+          "shortcut": "zap.new"
+        }
+      ]
+    },
+    {
+      "id": "sitios-externos-incluidos-tal-cual",
+      "name": "Sitios externos (no .new) — incluidos tal cual",
+      "icon": "🌐",
+      "tools": [
+        {
+          "id": "viewdns-info",
+          "name": "Viewdns Info",
+          "url": "https://viewdns.info",
+          "description": "OSINT/DNS tools"
+        },
+        {
+          "id": "browserling-com",
+          "name": "Browserling Com",
+          "url": "https://browserling.com",
+          "description": "Navegador en navegador"
+        },
+        {
+          "id": "play-js-org",
+          "name": "Play Js Org",
+          "url": "https://play.js.org",
+          "description": "Sandbox JS"
+        },
+        {
+          "id": "sqlfiddle-com",
+          "name": "Sqlfiddle Com",
+          "url": "https://sqlfiddle.com",
+          "description": "SQL fiddle"
+        },
+        {
+          "id": "explainshell-com",
+          "name": "Explainshell Com",
+          "url": "https://explainshell.com",
+          "description": "Explicación de comandos shell"
+        },
+        {
+          "id": "n8n-io",
+          "name": "N8N Io",
+          "url": "https://n8n.io",
+          "description": "Automatización por nodos"
+        },
+        {
+          "id": "webhook-site",
+          "name": "Webhook Site",
+          "url": "https://webhook.site",
+          "description": "Inspección de webhooks"
+        },
+        {
+          "id": "modal-com",
+          "name": "Modal Com",
+          "url": "https://modal.com",
+          "description": "Serverless para IA"
+        },
+        {
+          "id": "browserless-io",
+          "name": "Browserless Io",
+          "url": "https://browserless.io",
+          "description": "Navegadores headless"
+        },
+        {
+          "id": "cyberchef-io",
+          "name": "Cyberchef Io",
+          "url": "https://cyberchef.io",
+          "description": "CyberChef"
+        }
+      ]
+    },
+    {
+      "id": "suitesherramientas-varias-incluidos-tal-cual",
+      "name": "Suites/herramientas varias (no .new) — incluidos tal cual",
+      "icon": "🛠️",
+      "tools": [
+        {
+          "id": "tinywow-com",
+          "name": "Tinywow Com",
+          "url": "https://tinywow.com",
+          "description": "Suite de herramientas IA"
+        },
+        {
+          "id": "magiceraser-io",
+          "name": "Magiceraser Io",
+          "url": "https://magiceraser.io",
+          "description": "Borrar objetos en fotos"
+        },
+        {
+          "id": "cleanup-pictures",
+          "name": "Cleanup Pictures",
+          "url": "https://cleanup.pictures",
+          "description": "Limpieza visual"
+        },
+        {
+          "id": "remove-bg",
+          "name": "Remove Bg",
+          "url": "https://remove.bg",
+          "description": "Quitar fondo"
+        },
+        {
+          "id": "neural-love",
+          "name": "Neural Love",
+          "url": "https://neural.love",
+          "description": "Arte/mejora de imagen"
+        },
+        {
+          "id": "noiz-ai",
+          "name": "Noiz Ai",
+          "url": "https://noiz.ai",
+          "description": "Resumen de vídeos (según lista)"
+        },
+        {
+          "id": "rytr-me",
+          "name": "Rytr Me",
+          "url": "https://rytr.me",
+          "description": "Redacción asistida"
+        },
+        {
+          "id": "123apps-com",
+          "name": "123Apps Com",
+          "url": "https://123apps.com",
+          "description": "Edición audio/video"
+        },
+        {
+          "id": "wordle-net",
+          "name": "Wordle Net",
+          "url": "https://wordle.net",
+          "description": "Nubes de palabras"
+        },
+        {
+          "id": "pdfcandy-com",
+          "name": "Pdfcandy Com",
+          "url": "https://pdfcandy.com",
+          "description": "Herramientas PDF"
+        },
+        {
+          "id": "omnitools-app",
+          "name": "Omnitools App",
+          "url": "https://omnitools.app",
+          "description": "Utilidades (JSON/imagen/texto)"
+        },
+        {
+          "id": "textalyser-net",
+          "name": "Textalyser Net",
+          "url": "https://textalyser.net",
+          "description": "Análisis de texto"
+        },
+        {
+          "id": "password",
+          "name": "Password",
+          "url": "https://password.new",
+          "description": "Generador de contraseñas (según lista)",
+          "shortcut": "password.new"
+        }
+      ]
+    },
+    {
+      "id": "ia-gratis",
+      "name": "IA Gratis & Free Tier",
+      "icon": "🧠",
+      "tools": [
+        {
+          "id": "chatgpt",
+          "name": "ChatGPT",
+          "url": "https://chat.openai.com",
+          "description": "Asistente conversacional de OpenAI con GPT-4o gratis.",
+          "shortcut": ""
+        },
+        {
+          "id": "claude",
+          "name": "Claude",
+          "url": "https://claude.ai",
+          "description": "Asistente IA de Anthropic con razonamiento avanzado.",
+          "shortcut": ""
+        },
+        {
+          "id": "gemini",
+          "name": "Google Gemini",
+          "url": "https://gemini.google.com",
+          "description": "IA multimodal de Google DeepMind.",
+          "shortcut": ""
+        },
+        {
+          "id": "groq",
+          "name": "Groq",
+          "url": "https://groq.com",
+          "description": "Inferencia ultrarrápida con LPU para modelos open-source.",
+          "shortcut": ""
+        },
+        {
+          "id": "groq-cloud",
+          "name": "Groq Cloud Console",
+          "url": "https://console.groq.com",
+          "description": "API de inferencia rápida. Free tier generoso.",
+          "shortcut": ""
+        },
+        {
+          "id": "huggingface",
+          "name": "HuggingFace Chat",
+          "url": "https://huggingface.co/chat",
+          "description": "Chat con modelos open-source (Llama, Mistral, etc.).",
+          "shortcut": ""
+        },
+        {
+          "id": "ai-studio",
+          "name": "Google AI Studio",
+          "url": "https://aistudio.google.com",
+          "description": "Playground de Gemini API con free tier.",
+          "shortcut": ""
+        },
+        {
+          "id": "perplexity",
+          "name": "Perplexity AI",
+          "url": "https://perplexity.ai",
+          "description": "Motor de búsqueda con IA conversacional.",
+          "shortcut": ""
+        },
+        {
+          "id": "poe",
+          "name": "Poe by Quora",
+          "url": "https://poe.com",
+          "description": "Acceso a múltiples modelos IA desde una sola interfaz.",
+          "shortcut": ""
+        },
+        {
+          "id": "openrouter",
+          "name": "OpenRouter",
+          "url": "https://openrouter.ai",
+          "description": "Proxy unificado a decenas de modelos IA con créditos gratis.",
+          "shortcut": ""
+        },
+        {
+          "id": "together",
+          "name": "Together AI",
+          "url": "https://together.ai",
+          "description": "Inferencia y fine-tuning de modelos open-source.",
+          "shortcut": ""
+        },
+        {
+          "id": "replicate",
+          "name": "Replicate",
+          "url": "https://replicate.com",
+          "description": "Ejecuta modelos IA en la nube con API sencilla.",
+          "shortcut": ""
+        },
+        {
+          "id": "colab",
+          "name": "Google Colab",
+          "url": "https://colab.new",
+          "description": "Notebooks Python con GPU gratis de Google.",
+          "shortcut": "colab.new"
+        },
+        {
+          "id": "ollama",
+          "name": "Ollama",
+          "url": "https://ollama.com",
+          "description": "Ejecuta LLMs localmente (Llama 3, Mistral, Phi, etc.).",
+          "shortcut": ""
+        },
+        {
+          "id": "notebooklm",
+          "name": "NotebookLM",
+          "url": "https://notebooklm.google.com",
+          "description": "IA de Google para investigación y resumen de documentos.",
+          "shortcut": ""
+        },
+        {
+          "id": "elevenlabs",
+          "name": "ElevenLabs",
+          "url": "https://elevenlabs.io",
+          "description": "Síntesis de voz ultra-realista con IA.",
+          "shortcut": ""
+        },
+        {
+          "id": "bolt",
+          "name": "Bolt.new",
+          "url": "https://bolt.new",
+          "description": "Genera apps full-stack completas desde un prompt.",
+          "shortcut": "bolt.new"
+        },
+        {
+          "id": "v0",
+          "name": "v0.dev",
+          "url": "https://v0.dev",
+          "description": "Generador de UI React/Next.js de Vercel con IA.",
+          "shortcut": ""
+        },
+        {
+          "id": "lovable",
+          "name": "Lovable",
+          "url": "https://lovable.dev",
+          "description": "Constructor de apps con IA desde descripción en texto.",
+          "shortcut": ""
+        },
+        {
+          "id": "cursor",
+          "name": "Cursor",
+          "url": "https://cursor.com",
+          "description": "Editor de código con IA integrada (fork de VS Code).",
+          "shortcut": ""
+        },
+        {
+          "id": "windsurf",
+          "name": "Windsurf",
+          "url": "https://windsurf.com",
+          "description": "IDE con agentes IA autónomos de Codeium.",
+          "shortcut": ""
+        },
+        {
+          "id": "mistral",
+          "name": "Mistral AI",
+          "url": "https://chat.mistral.ai",
+          "description": "Chat con modelos Mistral y Codestral.",
+          "shortcut": ""
+        },
+        {
+          "id": "deepseek",
+          "name": "DeepSeek",
+          "url": "https://chat.deepseek.com",
+          "description": "Chat con DeepSeek-V3 y R1 (razonamiento).",
+          "shortcut": ""
+        },
+        {
+          "id": "suno",
+          "name": "Suno AI",
+          "url": "https://suno.com",
+          "description": "Genera canciones completas con IA a partir de texto.",
+          "shortcut": ""
+        },
+        {
+          "id": "ideogram",
+          "name": "Ideogram",
+          "url": "https://ideogram.ai",
+          "description": "Generador de imágenes con tipografía perfecta.",
+          "shortcut": ""
+        },
+        {
+          "id": "gamma",
+          "name": "Gamma",
+          "url": "https://gamma.app",
+          "description": "Genera presentaciones y documentos profesionales con IA.",
+          "shortcut": ""
+        },
+        {
+          "id": "leonardo",
+          "name": "Leonardo AI",
+          "url": "https://leonardo.ai",
+          "description": "Generación de imágenes y assets para juegos/diseño.",
+          "shortcut": ""
+        }
+      ]
+    },
+    {
+      "id": "hacking-seguridad",
+      "name": "Hacking & Seguridad",
+      "icon": "🛡️",
+      "tools": [
+        {
+          "id": "shodan",
+          "name": "Shodan",
+          "url": "https://shodan.io",
+          "description": "Motor de búsqueda de dispositivos IoT y servicios expuestos.",
+          "shortcut": ""
+        },
+        {
+          "id": "virustotal",
+          "name": "VirusTotal",
+          "url": "https://virustotal.com",
+          "description": "Analiza archivos y URLs con 70+ motores antivirus.",
+          "shortcut": ""
+        },
+        {
+          "id": "censys",
+          "name": "Censys",
+          "url": "https://search.censys.io",
+          "description": "Escáner de infraestructura e inventario de activos.",
+          "shortcut": ""
+        },
+        {
+          "id": "haveibeenpwned",
+          "name": "Have I Been Pwned",
+          "url": "https://haveibeenpwned.com",
+          "description": "Comprueba si tu email aparece en filtraciones de datos.",
+          "shortcut": ""
+        },
+        {
+          "id": "urlscan",
+          "name": "URLScan.io",
+          "url": "https://urlscan.io",
+          "description": "Escanea y analiza URLs sospechosas de forma segura.",
+          "shortcut": ""
+        },
+        {
+          "id": "securityheaders",
+          "name": "Security Headers",
+          "url": "https://securityheaders.com",
+          "description": "Audita las cabeceras de seguridad HTTP de cualquier sitio.",
+          "shortcut": ""
+        },
+        {
+          "id": "cyberchef",
+          "name": "CyberChef",
+          "url": "https://gchq.github.io/CyberChef",
+          "description": "Navaja suiza de encoding, crypto y análisis de datos.",
+          "shortcut": ""
+        },
+        {
+          "id": "pentest-tools",
+          "name": "Pentest-Tools",
+          "url": "https://pentest-tools.com",
+          "description": "Suite online de herramientas de pentesting.",
+          "shortcut": ""
+        },
+        {
+          "id": "exploit-db",
+          "name": "Exploit-DB",
+          "url": "https://exploit-db.com",
+          "description": "Base de datos pública de exploits y vulnerabilidades.",
+          "shortcut": ""
+        },
+        {
+          "id": "inteltechniques",
+          "name": "IntelTechniques",
+          "url": "https://inteltechniques.com",
+          "description": "Recursos OSINT y herramientas de investigación.",
+          "shortcut": ""
+        },
+        {
+          "id": "epieos",
+          "name": "Epieos",
+          "url": "https://epieos.com",
+          "description": "OSINT sobre emails: encuentra cuentas asociadas.",
+          "shortcut": ""
+        },
+        {
+          "id": "requestrepo",
+          "name": "RequestRepo",
+          "url": "https://requestrepo.com",
+          "description": "Captura y analiza requests HTTP entrantes.",
+          "shortcut": ""
+        },
+        {
+          "id": "caido",
+          "name": "Caido",
+          "url": "https://caido.io",
+          "description": "Proxy de interceptación HTTP moderno (alternativa a Burp).",
+          "shortcut": ""
+        },
+        {
+          "id": "nuclei-cloud",
+          "name": "ProjectDiscovery Cloud",
+          "url": "https://cloud.projectdiscovery.io",
+          "description": "Escaneo de vulnerabilidades con Nuclei en la nube.",
+          "shortcut": ""
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "total_tools": 167,
+    "total_categories": 15,
+    "last_audit": "2026-06-01"
+  }
+}

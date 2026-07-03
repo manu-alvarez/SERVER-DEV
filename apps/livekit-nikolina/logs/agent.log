@@ -1,0 +1,74 @@
+{"message": "worker is at full capacity, marking as unavailable", "level": "INFO", "name": "livekit.agents", "load": 0.713599999999999, "threshold": 0.7, "timestamp": "2026-07-02T10:23:13.955294+00:00"}
+{"message": "worker is below capacity, marking as available", "level": "INFO", "name": "livekit.agents", "load": 0.26699999999999907, "threshold": 0.7, "timestamp": "2026-07-02T10:23:16.455353+00:00"}
+{"message": "worker is at full capacity, marking as unavailable", "level": "INFO", "name": "livekit.agents", "load": 0.8109999999999999, "threshold": 0.7, "timestamp": "2026-07-02T11:54:22.926919+00:00"}
+{"message": "worker is below capacity, marking as available", "level": "INFO", "name": "livekit.agents", "load": 0.6741999999999999, "threshold": 0.7, "timestamp": "2026-07-02T11:54:27.919770+00:00"}
+{"message": "worker is at full capacity, marking as unavailable", "level": "INFO", "name": "livekit.agents", "load": 0.8826, "threshold": 0.7, "timestamp": "2026-07-02T11:54:42.920562+00:00"}
+{"message": "worker is below capacity, marking as available", "level": "INFO", "name": "livekit.agents", "load": 0.3364000000000001, "threshold": 0.7, "timestamp": "2026-07-02T11:54:45.420670+00:00"}
+{"message": "worker is at full capacity, marking as unavailable", "level": "INFO", "name": "livekit.agents", "load": 0.8460000000000001, "threshold": 0.7, "timestamp": "2026-07-02T12:04:47.957618+00:00"}
+{"message": "worker is below capacity, marking as available", "level": "INFO", "name": "livekit.agents", "load": 0.18340000000000006, "threshold": 0.7, "timestamp": "2026-07-02T12:04:50.457048+00:00"}
+{"message": "starting worker", "level": "INFO", "name": "livekit.agents", "version": "1.6.4", "rtc-version": "1.1.12", "timestamp": "2026-07-02T13:20:41.294978+00:00"}
+{"message": "plugin registered", "level": "INFO", "name": "livekit.agents", "plugin": "livekit.plugins.google", "version": "1.6.4", "timestamp": "2026-07-02T13:20:41.295685+00:00"}
+{"message": "preloading plugins", "level": "INFO", "name": "livekit.agents", "packages": ["livekit.plugins.google", "av", "livekit.agents.inference._warmup"], "timestamp": "2026-07-02T13:20:41.295787+00:00"}
+{"message": "HTTP server listening on :8081", "level": "INFO", "name": "livekit.agents", "timestamp": "2026-07-02T13:20:41.367027+00:00"}
+{"message": "starting worker", "level": "INFO", "name": "livekit.agents", "version": "1.6.4", "rtc-version": "1.1.12", "timestamp": "2026-07-02T13:20:49.488598+00:00"}
+{"message": "plugin registered", "level": "INFO", "name": "livekit.agents", "plugin": "livekit.plugins.google", "version": "1.6.4", "timestamp": "2026-07-02T13:20:49.488786+00:00"}
+{"message": "preloading plugins", "level": "INFO", "name": "livekit.agents", "packages": ["livekit.plugins.google", "av", "livekit.agents.inference._warmup"], "timestamp": "2026-07-02T13:20:49.488855+00:00"}
+{"message": "HTTP server listening on :8081", "level": "INFO", "name": "livekit.agents", "timestamp": "2026-07-02T13:20:50.006073+00:00"}
+{"message": "initializing process", "level": "INFO", "name": "livekit.agents", "pid": 179020, "timestamp": "2026-07-02T13:20:54.704848+00:00"}
+{"message": "initializing process", "level": "INFO", "name": "livekit.agents", "pid": 179022, "timestamp": "2026-07-02T13:20:54.723539+00:00"}
+{"message": "initializing process", "level": "INFO", "name": "livekit.agents", "pid": 179024, "timestamp": "2026-07-02T13:20:54.756174+00:00"}
+{"message": "initializing process", "level": "INFO", "name": "livekit.agents", "pid": 179026, "timestamp": "2026-07-02T13:20:54.785280+00:00"}
+{"message": "Worker process prewarmed (pid=179022)", "level": "INFO", "name": "msb-assistant", "pid": 179022, "timestamp": "2026-07-02T13:20:54.839585+00:00"}
+{"message": "process initialized", "level": "INFO", "name": "livekit.agents", "pid": 179022, "elapsed_time": 0.15, "timestamp": "2026-07-02T13:20:54.869534+00:00"}
+{"message": "process initialized", "level": "INFO", "name": "livekit.agents", "pid": 179020, "elapsed_time": 0.55, "timestamp": "2026-07-02T13:20:55.253567+00:00"}
+{"message": "Worker process prewarmed (pid=179020)", "level": "INFO", "name": "msb-assistant", "pid": 179020, "timestamp": "2026-07-02T13:20:55.248592+00:00"}
+{"message": "Worker process prewarmed (pid=179024)", "level": "INFO", "name": "msb-assistant", "pid": 179024, "timestamp": "2026-07-02T13:20:55.472608+00:00"}
+{"message": "process initialized", "level": "INFO", "name": "livekit.agents", "pid": 179024, "elapsed_time": 0.72, "timestamp": "2026-07-02T13:20:55.478487+00:00"}
+{"message": "process initialized", "level": "INFO", "name": "livekit.agents", "pid": 179026, "elapsed_time": 1.18, "timestamp": "2026-07-02T13:20:55.971369+00:00"}
+{"message": "Worker process prewarmed (pid=179026)", "level": "INFO", "name": "msb-assistant", "pid": 179026, "timestamp": "2026-07-02T13:20:55.961962+00:00"}
+{"message": "registered worker", "level": "INFO", "name": "livekit.agents", "agent_name": "msb-assistant", "deployment": "", "id": "AW_DRRnGQ8wSDSX", "url": "wss://nikolina-1jg7t00i.livekit.cloud", "region": "EU West B", "protocol": 17, "timestamp": "2026-07-02T13:20:57.246179+00:00"}
+{"message": "draining worker", "level": "INFO", "name": "livekit.agents", "id": "AW_DRRnGQ8wSDSX", "timeout": 1800, "timestamp": "2026-07-02T13:23:32.752116+00:00"}
+{"message": "shutting down worker", "level": "INFO", "name": "livekit.agents", "id": "AW_DRRnGQ8wSDSX", "timestamp": "2026-07-02T13:23:32.753064+00:00"}
+{"message": "starting worker", "level": "INFO", "name": "livekit.agents", "version": "1.6.4", "rtc-version": "1.1.12", "timestamp": "2026-07-02T13:23:51.008135+00:00"}
+{"message": "plugin registered", "level": "INFO", "name": "livekit.agents", "plugin": "livekit.plugins.google", "version": "1.6.4", "timestamp": "2026-07-02T13:23:51.008334+00:00"}
+{"message": "preloading plugins", "level": "INFO", "name": "livekit.agents", "packages": ["livekit.plugins.google", "av", "livekit.agents.inference._warmup"], "timestamp": "2026-07-02T13:23:51.008401+00:00"}
+{"message": "HTTP server listening on :8081", "level": "INFO", "name": "livekit.agents", "timestamp": "2026-07-02T13:23:51.020095+00:00"}
+{"message": "initializing process", "level": "INFO", "name": "livekit.agents", "pid": 181007, "timestamp": "2026-07-02T13:23:54.498491+00:00"}
+{"message": "initializing process", "level": "INFO", "name": "livekit.agents", "pid": 181009, "timestamp": "2026-07-02T13:23:54.529623+00:00"}
+{"message": "initializing process", "level": "INFO", "name": "livekit.agents", "pid": 181011, "timestamp": "2026-07-02T13:23:54.561065+00:00"}
+{"message": "initializing process", "level": "INFO", "name": "livekit.agents", "pid": 181013, "timestamp": "2026-07-02T13:23:54.565611+00:00"}
+{"message": "process initialized", "level": "INFO", "name": "livekit.agents", "pid": 181009, "elapsed_time": 0.14, "timestamp": "2026-07-02T13:23:54.666781+00:00"}
+{"message": "Worker process prewarmed (pid=181009)", "level": "INFO", "name": "msb-assistant", "pid": 181009, "timestamp": "2026-07-02T13:23:54.618688+00:00"}
+{"message": "process initialized", "level": "INFO", "name": "livekit.agents", "pid": 181013, "elapsed_time": 0.75, "timestamp": "2026-07-02T13:23:55.319627+00:00"}
+{"message": "process initialized", "level": "INFO", "name": "livekit.agents", "pid": 181007, "elapsed_time": 1.24, "timestamp": "2026-07-02T13:23:55.737624+00:00"}
+{"message": "Worker process prewarmed (pid=181013)", "level": "INFO", "name": "msb-assistant", "pid": 181013, "timestamp": "2026-07-02T13:23:55.216667+00:00"}
+{"message": "Worker process prewarmed (pid=181007)", "level": "INFO", "name": "msb-assistant", "pid": 181007, "timestamp": "2026-07-02T13:23:55.701813+00:00"}
+{"message": "process initialized", "level": "INFO", "name": "livekit.agents", "pid": 181011, "elapsed_time": 1.29, "timestamp": "2026-07-02T13:23:55.851818+00:00"}
+{"message": "Worker process prewarmed (pid=181011)", "level": "INFO", "name": "msb-assistant", "pid": 181011, "timestamp": "2026-07-02T13:23:55.835404+00:00"}
+{"message": "registered worker", "level": "INFO", "name": "livekit.agents", "agent_name": "msb-assistant", "deployment": "", "id": "AW_cXVLL99yc2CW", "url": "wss://nikolina-1jg7t00i.livekit.cloud", "region": "EU West B", "protocol": 17, "timestamp": "2026-07-02T13:23:56.558586+00:00"}
+{"message": "draining worker", "level": "INFO", "name": "livekit.agents", "id": "AW_cXVLL99yc2CW", "timeout": 1800, "timestamp": "2026-07-02T13:25:00.295637+00:00"}
+{"message": "shutting down worker", "level": "INFO", "name": "livekit.agents", "id": "AW_cXVLL99yc2CW", "timestamp": "2026-07-02T13:25:00.296640+00:00"}
+{"message": "starting worker", "level": "INFO", "name": "livekit.agents", "version": "1.6.4", "rtc-version": "1.1.12", "timestamp": "2026-07-02T13:25:13.912164+00:00"}
+{"message": "plugin registered", "level": "INFO", "name": "livekit.agents", "plugin": "livekit.plugins.google", "version": "1.6.4", "timestamp": "2026-07-02T13:25:13.912374+00:00"}
+{"message": "preloading plugins", "level": "INFO", "name": "livekit.agents", "packages": ["livekit.plugins.google", "av", "livekit.agents.inference._warmup"], "timestamp": "2026-07-02T13:25:13.912444+00:00"}
+{"message": "HTTP server listening on :8081", "level": "INFO", "name": "livekit.agents", "timestamp": "2026-07-02T13:25:14.325689+00:00"}
+{"message": "initializing process", "level": "INFO", "name": "livekit.agents", "pid": 181982, "timestamp": "2026-07-02T13:25:19.970777+00:00"}
+{"message": "initializing process", "level": "INFO", "name": "livekit.agents", "pid": 181984, "timestamp": "2026-07-02T13:25:19.982851+00:00"}
+{"message": "initializing process", "level": "INFO", "name": "livekit.agents", "pid": 181987, "timestamp": "2026-07-02T13:25:20.014592+00:00"}
+{"message": "initializing process", "level": "INFO", "name": "livekit.agents", "pid": 181989, "timestamp": "2026-07-02T13:25:20.019176+00:00"}
+{"message": "process initialized", "level": "INFO", "name": "livekit.agents", "pid": 181984, "elapsed_time": 0.06, "timestamp": "2026-07-02T13:25:20.045823+00:00"}
+{"message": "Worker process prewarmed (pid=181984)", "level": "INFO", "name": "msb-assistant", "pid": 181984, "timestamp": "2026-07-02T13:25:20.041722+00:00"}
+{"message": "Worker process prewarmed (pid=181982)", "level": "INFO", "name": "msb-assistant", "pid": 181982, "timestamp": "2026-07-02T13:25:20.044876+00:00"}
+{"message": "process initialized", "level": "INFO", "name": "livekit.agents", "pid": 181982, "elapsed_time": 0.08, "timestamp": "2026-07-02T13:25:20.048704+00:00"}
+{"message": "process initialized", "level": "INFO", "name": "livekit.agents", "pid": 181987, "elapsed_time": 0.06, "timestamp": "2026-07-02T13:25:20.072465+00:00"}
+{"message": "Worker process prewarmed (pid=181987)", "level": "INFO", "name": "msb-assistant", "pid": 181987, "timestamp": "2026-07-02T13:25:20.060274+00:00"}
+{"message": "Worker process prewarmed (pid=181989)", "level": "INFO", "name": "msb-assistant", "pid": 181989, "timestamp": "2026-07-02T13:25:20.120317+00:00"}
+{"message": "process initialized", "level": "INFO", "name": "livekit.agents", "pid": 181989, "elapsed_time": 0.11, "timestamp": "2026-07-02T13:25:20.129580+00:00"}
+{"message": "registered worker", "level": "INFO", "name": "livekit.agents", "agent_name": "msb-assistant", "deployment": "", "id": "AW_3Yio2m5JaiSH", "url": "wss://nikolina-1jg7t00i.livekit.cloud", "region": "EU West B", "protocol": 17, "timestamp": "2026-07-02T13:25:20.354331+00:00"}
+{"message": "process is unresponsive", "level": "WARNING", "name": "livekit.agents", "delay": 524, "pid": 181989, "timestamp": "2026-07-02T13:30:06.556931+00:00"}
+{"message": "process is unresponsive", "level": "WARNING", "name": "livekit.agents", "delay": 588, "pid": 181982, "timestamp": "2026-07-02T13:30:06.621449+00:00"}
+{"message": "process is unresponsive", "level": "WARNING", "name": "livekit.agents", "delay": 520, "pid": 181982, "timestamp": "2026-07-02T13:45:48.813488+00:00"}
+{"message": "process is unresponsive", "level": "WARNING", "name": "livekit.agents", "delay": 521, "pid": 181987, "timestamp": "2026-07-02T13:45:49.354407+00:00"}
+{"message": "process is unresponsive", "level": "WARNING", "name": "livekit.agents", "delay": 934, "pid": 181989, "timestamp": "2026-07-02T13:45:49.354752+00:00"}
+{"message": "draining worker", "level": "INFO", "name": "livekit.agents", "id": "AW_3Yio2m5JaiSH", "timeout": 1800, "timestamp": "2026-07-02T13:45:55.644208+00:00"}
+{"message": "shutting down worker", "level": "INFO", "name": "livekit.agents", "id": "AW_3Yio2m5JaiSH", "timestamp": "2026-07-02T13:45:55.650372+00:00"}

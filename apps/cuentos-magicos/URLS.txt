@@ -1,0 +1,19 @@
+CUENTOS MAGICOS AI - URLs de Acceso
+====================================
+Generado: Sun May 17 17:11:03 CEST 2026
+
+🌍 EXTERNO (cualquier dispositivo/internet):
+   Frontend: https://puny-moose-make.loca.lt
+   Backend:  https://cuentos-backend-1779030532.loca.lt
+
+📱 RED LOCAL (mismo WiFi):
+   Frontend: http://192.168.1.34:3000
+   Backend:  http://192.168.1.34:8000
+
+💻 LOCAL (esta Mac):
+   Frontend: http://localhost:3000
+   Backend:  http://localhost:8000
+   API Docs: http://localhost:8000/docs
+
+⚠️  Los tuneles (.loca.lt) expiran al cerrar la terminal.
+   Para regenerarlos: ./start-external.sh

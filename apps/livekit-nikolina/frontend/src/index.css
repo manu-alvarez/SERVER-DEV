@@ -1,0 +1,94 @@
+:root {
+  --bg: #0a0a12;
+  --gold: #06b6d4;
+  --gold-light: #22d3ee;
+  --gold-dark: #0891b2;
+  --glass: rgba(20, 20, 35, 0.8);
+  --glass-border: rgba(6, 182, 212, 0.2);
+  --text: #f8f8f0;
+  --text2: rgba(248, 248, 240, 0.6);
+  --text3: rgba(248, 248, 240, 0.3);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #0a0a12 0%, #1a1020 50%, #0a1520 100%);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(6, 182, 212, 0.6); }
+}
+
+@keyframes orbPulse {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.08); filter: brightness(1.2); }
+}
+
+.animate-fadeIn { animation: fadeIn 0.5s ease forwards; }
+.animate-pulse { animation: pulse 2s ease infinite; }
+.animate-glow { animation: glow 3s ease infinite; }
+.animate-orbPulse { animation: orbPulse 2s ease infinite; }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #06b6d4, #0891b2); border-radius: 4px; }
+
+/* ═══ PREMIUM PORTAL STYLES ═══ */
+.portal-card {
+  position: relative;
+  background: rgba(255,255,255,0.02);
+  border-radius: 20px;
+  padding: 2px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-style: preserve-3d;
+}
+
+.portal-card::before {
+  content: ''; position: absolute; inset: 0; border-radius: 20px; padding: 2px;
+  background: linear-gradient(var(--border-angle, 0deg), var(--gold), transparent 40%, transparent 60%, var(--gold));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: borderSpin 4s linear infinite; opacity: 0.5; transition: opacity 0.4s;
+}
+
+.portal-card:hover::before { opacity: 1; box-shadow: 0 0 30px rgba(6, 182, 212, 0.5); }
+
+.portal-card-inner {
+  background: rgba(10, 21, 32, 0.85);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-radius: 18px;
+  position: relative; overflow: hidden; height: 100%; width: 100%;
+}
+
+@keyframes borderSpin { to { --border-angle: 360deg; } }
+@property --border-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+
+@keyframes cardGlitch {
+  0% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+  20% { clip-path: inset(80% 0 10% 0); transform: translate(2px, -2px); filter: hue-rotate(-90deg); }
+  40% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, -2px); filter: hue-rotate(45deg); }
+  60% { clip-path: inset(60% 0 20% 0); transform: translate(2px, 2px); filter: hue-rotate(-45deg); }
+  80% { clip-path: inset(20% 0 60% 0); transform: translate(-1px, 1px); filter: hue-rotate(20deg); }
+  100% { clip-path: inset(0 0 0 0); transform: translate(0); filter: hue-rotate(0); }
+}
+.portal-card:hover::after {
+    content: ''; position: absolute; inset: 0; background: inherit;
+    border-radius: inherit; z-index: 10; pointer-events: none;
+    animation: cardGlitch 0.3s cubic-bezier(.25, .46, .45, .94) both;
+    opacity: 0.15; mix-blend-mode: overlay;
+}

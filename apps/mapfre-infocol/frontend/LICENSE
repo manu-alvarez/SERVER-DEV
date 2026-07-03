@@ -1,0 +1,44 @@
+MIT License
+
+Copyright (c) 2026 Manu Alvarez Diaz
+https://linkedin.com/in/manu-alvarez
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+ADDITIONAL TERMS - MAPFRE INTEGRATION
+------------------------------------
+
+This software is designed to interact with the MAPFRE InfoCol web portal. The
+following terms apply when integrating with MAPFRE systems:
+
+1. Credentials for MAPFRE InfoCol must never be hard-coded, shared or
+   committed to version control. Use the OS keychain or encrypted local
+   storage (see config/settings.yaml).
+
+2. Personal data obtained from InfoCol (DNI, policy numbers, addresses) must
+   be sanitized before being sent to any external AI service (Claude API).
+   The sanitizer module (src/infocol/security.py) handles this automatically.
+
+3. Compliance with RGPD/LOPD is mandatory. The user is responsible for
+   informing their data protection officer about the use of this tool.
+
+4. The MAPFRE brand assets (logo, colors, typography) included in this
+   project are used for demonstration purposes only with the goal of
+   presenting this software to MAPFRE. Production use requires explicit
+   written authorization from MAPFRE S.A.

@@ -1,0 +1,170 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String?
+  email         String?   @unique
+  passwordHash  String
+
+  // Relations
+  profile       Profile?
+  assessments   Assessment[]
+  reports       DiagnosticReport[]
+  plans         CoachingPlan[]
+  activityLogs  ActivityCompletionLog[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Profile {
+  id            String    @id @default(uuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  displayName   String?
+  fitnessLevel  String?
+  primaryGoal   String?
+  equipment     String?   // JSON stored as String
+  weight        Float?
+  targetWeight  Float?
+  appState      String?   // JSON stored as String to sync Zustand
+
+  workoutLogs   WorkoutLog[]
+  setLogs       SetLog[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model WorkoutLog {
+  id              String    @id @default(uuid())
+  profileId       String
+  profile         Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  programId       String
+  dayId           String
+  startTime       DateTime
+  endTime         DateTime?
+  durationSeconds Int?
+  notes           String?
+
+  sets            SetLog[]
+
+  createdAt       DateTime  @default(now())
+}
+
+model SetLog {
+  id              String    @id @default(uuid())
+  workoutLogId    String
+  workoutLog      WorkoutLog @relation(fields: [workoutLogId], references: [id], onDelete: Cascade)
+  profileId       String
+  profile         Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  exerciseName    String
+  setNumber       Int
+  weightKg        Float?
+  reps            Int?
+  rpe             Float?
+
+  completedAt     DateTime  @default(now())
+}
+
+model Assessment {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  score           Float
+  answers         String    // JSON stored as String
+  
+  reports         DiagnosticReport[]
+  plans           CoachingPlan[]
+
+  createdAt       DateTime  @default(now())
+}
+
+model DiagnosticReport {
+  id                      String    @id @default(uuid())
+  userId                  String
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assessmentId            String
+  assessment              Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  
+  assessmentScore         Float
+  weakAreas               String    // JSON stored as String
+  completionTimeSeconds   Int
+
+  createdAt               DateTime  @default(now())
+}
+
+model CoachingPlan {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assessmentId    String
+  assessment      Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  
+  status          String    @default("ACTIVE")
+  goal            String
+  summary         String?
+  lastReviewed    DateTime?
+
+  modules         CoachingModule[]
+
+  createdAt       DateTime  @default(now())
+}
+
+model CoachingModule {
+  id                    String    @id @default(uuid())
+  planId                String
+  plan                  CoachingPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  
+  title                 String
+  description           String
+  moduleType            String
+  baseDifficulty        Int
+  difficultyMultiplier  Float     @default(1.0)
+
+  activities            Activity[]
+
+  createdAt             DateTime  @default(now())
+}
+
+model Activity {
+  id              String    @id @default(uuid())
+  moduleId        String
+  module          CoachingModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  
+  type            String
+  title           String
+  instructions    String
+  expectedMetrics String    // JSON stored as String
+
+  logs            ActivityCompletionLog[]
+
+  createdAt       DateTime  @default(now())
+}
+
+model ActivityCompletionLog {
+  id                String    @id @default(uuid())
+  activityId        String
+  activity          Activity  @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  metrics           String    // JSON stored as String
+  completionStatus  String
+
+  completedAt       DateTime  @default(now())
+}

@@ -1,0 +1,27 @@
+# MSBrOSs - TigerVNC Server Configuration
+# Mobile-optimized settings for ARM64 devices
+
+# Security
+Authentication=VncAuth
+PasswordFile=${HOME}/.vnc/passwd
+
+# Session
+Desktop=MSBrOSs
+Session=xfce4
+User=xfce4-session
+
+# Geometry - optimized for mobile
+Geometry=1920x1080
+Depth=24
+PixelFormat=RGB888
+
+# Performance: lower FPS for battery life
+FrameRate=30
+MaxFPS=30
+CompareFB=1
+EnableRawFB=1
+DisableDDT=1
+
+# Allow connections from any interface (mobile hotspot use)
+localhost=0
+AlwaysShared=1

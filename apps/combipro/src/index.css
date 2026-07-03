@@ -1,0 +1,222 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg: #02040a;
+  --bg-card: rgba(255, 255, 255, 0.015);
+  --bg-hover: rgba(255, 255, 255, 0.03);
+  --accent: #f97316; /* Orange */
+  --accent-secondary: #ea580c; /* Darker Orange */
+  --text: #f8fafc;
+  --text-muted: #64748b;
+  --border: rgba(255, 255, 255, 0.04);
+  --green: #10b981;
+  --red: #ef4444;
+  --yellow: #f59e0b;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.font-display {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* --- Animated Background Orbs --- */
+.bg-orbs-container {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.15;
+  animation: floatOrb 20s infinite ease-in-out alternate;
+}
+
+.orb-1 {
+  width: 600px; height: 600px;
+  background: var(--accent);
+  top: -10%; left: -10%;
+  animation-delay: 0s;
+}
+
+.orb-2 {
+  width: 500px; height: 500px;
+  background: #991b1b;
+  bottom: -20%; right: -10%;
+  animation-delay: -5s;
+}
+
+.orb-3 {
+  width: 400px; height: 400px;
+  background: var(--accent-secondary);
+  top: 40%; left: 50%;
+  animation-delay: -10s;
+}
+
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(100px, 50px) scale(1.2); }
+}
+
+/* --- Glassmorphism --- */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05),
+              0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.glass-panel-hover:hover {
+  background: var(--bg-hover);
+  border-color: rgba(249, 115, 22, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), 
+              0 0 20px rgba(249, 115, 22, 0.1);
+}
+
+/* --- Typography --- */
+.text-gradient {
+  background: linear-gradient(135deg, #fb923c, #ea580c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* --- Buttons & Inputs --- */
+.btn-premium {
+  position: relative;
+  background: rgba(249, 115, 22, 0.1);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.1);
+}
+
+.btn-premium::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.1), transparent);
+  transform: skewX(-20deg);
+  transition: all 0.5s ease;
+}
+
+.btn-premium:hover {
+  background: rgba(249, 115, 22, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.3);
+  color: #fff;
+}
+
+.btn-premium:hover::before {
+  left: 150%;
+}
+
+.btn-premium:disabled {
+  background: var(--bg-card);
+  color: var(--text-muted);
+  box-shadow: none;
+  transform: none;
+  cursor: not-allowed;
+}
+
+/* Custom Range Slider */
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  background: transparent;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  cursor: pointer;
+  background: rgba(255,255,255,0.05);
+  border-radius: 100px;
+}
+input[type=range]::-webkit-slider-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -7px;
+  box-shadow: 0 0 15px var(--accent);
+  transition: transform 0.2s;
+}
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ═══ PREMIUM PORTAL STYLES ═══ */
+.portal-card {
+  position: relative;
+  background: rgba(255,255,255,0.02);
+  border-radius: 20px;
+  padding: 2px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-style: preserve-3d;
+}
+
+.portal-card::before {
+  content: ''; position: absolute; inset: 0; border-radius: 20px; padding: 2px;
+  background: linear-gradient(var(--border-angle, 0deg), var(--accent), transparent 40%, transparent 60%, var(--accent));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: borderSpin 4s linear infinite; opacity: 0.5; transition: opacity 0.4s;
+}
+
+.portal-card:hover::before { opacity: 1; box-shadow: 0 0 30px rgba(249, 115, 22, 0.5); }
+
+.portal-card-inner {
+  background: rgba(8,12,24,0.85);
+  backdrop-filter: blur(24px) saturate(200%); -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border-radius: 18px;
+  position: relative; overflow: hidden; height: 100%; width: 100%;
+}
+
+@keyframes borderSpin { to { --border-angle: 360deg; } }
+@property --border-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+
+@keyframes cardGlitch {
+  0% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+  20% { clip-path: inset(80% 0 10% 0); transform: translate(2px, -2px); filter: hue-rotate(-90deg); }
+  40% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, -2px); filter: hue-rotate(45deg); }
+  60% { clip-path: inset(60% 0 20% 0); transform: translate(2px, 2px); filter: hue-rotate(-45deg); }
+  80% { clip-path: inset(20% 0 60% 0); transform: translate(-1px, 1px); filter: hue-rotate(20deg); }
+  100% { clip-path: inset(0 0 0 0); transform: translate(0); filter: hue-rotate(0); }
+}
+.portal-card:hover::after {
+    content: ''; position: absolute; inset: 0; background: inherit;
+    border-radius: inherit; z-index: 10; pointer-events: none;
+    animation: cardGlitch 0.3s cubic-bezier(.25, .46, .45, .94) both;
+    opacity: 0.15; mix-blend-mode: overlay;
+}

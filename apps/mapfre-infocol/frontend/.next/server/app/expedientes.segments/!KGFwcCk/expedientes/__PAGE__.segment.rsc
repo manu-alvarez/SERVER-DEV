@@ -1,0 +1,9 @@
+1:"$Sreact.fragment"
+2:I[78210,["/app/mapfre/_next/static/chunks/0k5fdw1nh59ic.js","/app/mapfre/_next/static/chunks/0_80dici7d8fc.js"],"ClientPageRoot"]
+3:I[47368,["/app/mapfre/_next/static/chunks/0k5fdw1nh59ic.js","/app/mapfre/_next/static/chunks/0_80dici7d8fc.js","/app/mapfre/_next/static/chunks/18oo5x515koko.js","/app/mapfre/_next/static/chunks/3o-waxpwygd68.js","/app/mapfre/_next/static/chunks/3urw1jmjgd31s.js"],"default"]
+6:I[64335,["/app/mapfre/_next/static/chunks/0k5fdw1nh59ic.js","/app/mapfre/_next/static/chunks/0_80dici7d8fc.js"],"OutletBoundary"]
+7:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/app/mapfre/_next/static/chunks/3urw1jmjgd31s.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"LcSenTLA9KUAURbn8VcGF"}
+4:{}
+5:"$0:rsc:props:children:0:props:serverProvidedParams:params"
+8:null

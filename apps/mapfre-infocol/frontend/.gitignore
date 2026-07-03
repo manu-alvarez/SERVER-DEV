@@ -1,0 +1,72 @@
+# Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+.pyc
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+coverage.xml
+*.cover
+
+# Logs
+*.log
+LOGS/*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+config/.env
+config/credentials.json
+
+# IDE
+.vscode/
+.ideavimrc
+*.swp
+*.swo
+.DS_Store
+
+# Playwright
+.playwright/
+test-results/
+playwright-report/
+playwright/.cache/
+
+# OS
+Thumbs.db
+desktop.ini
+
+# Frontend
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.vercel/
+frontend/.turbo/
+frontend/dist/
+frontend/node_modules/
+
+# Sensitive - never commit
+*.key
+*.pem
+*.p12
+credentials/
+secrets/
+data/encrypted/
+*.png

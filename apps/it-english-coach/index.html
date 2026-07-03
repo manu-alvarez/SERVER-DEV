@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>IT English Coach</title>
+<meta name="description" content="Curso de inglés A1→B2 para Técnico Junior de Sistemas: temario, role-play con IA, reading y listening." />
+<meta name="theme-color" content="#0D1420" />
+<link rel="manifest" href="./manifest.webmanifest" />
+<link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="IT English" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#02050A; --surface:rgba(10,20,30,0.6); --surface2:rgba(15,25,40,0.7); --border:rgba(0,255,204,0.2); --border-soft:rgba(0,255,204,0.08);
+    --amber:#00FF88; --amber-soft:rgba(0,255,136,.15); --teal:#00FFCC; --teal-soft:rgba(0,255,204,.15);
+    --coral:#FF7A6B; --coral-soft:rgba(255,122,107,.12); --text:#E8EDF6; --muted:#8A9BB8; --faint:#5C6C88;
+    --fs:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+    --fb:'Inter',ui-sans-serif,system-ui,sans-serif;
+    --fm:'JetBrains Mono',ui-monospace,'SFMono-Regular',monospace;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--fb);-webkit-font-smoothing:antialiased}
+  body{padding-bottom:env(safe-area-inset-bottom)}
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px}
+  ::-webkit-scrollbar-track{background:transparent}
+  button{font-family:inherit;cursor:pointer;color:inherit}
+  input,textarea,select{font-family:inherit}
+  a{color:var(--amber)}
+  svg{width:18px;height:18px;display:block}
+  :focus-visible{outline:2px solid var(--amber);outline-offset:2px;border-radius:6px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  .wrap{max-width:760px;margin:0 auto;padding:18px 16px 96px;min-height:100vh}
+  .row{display:flex;align-items:center;gap:12px}
+  .sp{flex:1}
+  .mono{font-family:var(--fm)}
+  .grot{font-family:var(--fs)}
+  .muted{color:var(--muted)} .faint{color:var(--faint)}
+  .t10{font-size:10px}.t11{font-size:11px}.t12{font-size:12px}.t125{font-size:12.5px}.t13{font-size:13px}
+  .t135{font-size:13.5px}.t14{font-size:14px}.t15{font-size:15px}.t17{font-size:17px}.t19{font-size:19px}
+  .up{text-transform:uppercase;letter-spacing:.06em}
+
+
+  /* ambient orbs */
+  .orb { position: fixed; width: 600px; height: 600px; border-radius: 50%; filter: blur(120px); z-index: -1; opacity: 0.15; animation: float 20s infinite alternate ease-in-out; pointer-events: none; }
+  .orb-1 { background: var(--teal); top: -100px; left: -200px; }
+  .orb-2 { background: var(--amber); bottom: -200px; right: -100px; animation-delay: -10s; }
+  @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(100px, 100px) scale(1.2); } }
+  .gradient-text { background: linear-gradient(90deg, var(--teal), var(--amber)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+  /* header */
+  header .logo{height:40px;width:40px;border-radius:12px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .iconbtn{height:38px;width:38px;border-radius:10px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .prog{flex:1;height:8px;border:1px solid var(--border-soft);background:var(--surface2);border-radius:999px;overflow:hidden}
+  .prog>i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--amber),var(--teal));transition:width .4s}
+
+  /* bottom nav */
+  nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(13,20,32,.92);backdrop-filter:blur(10px);border-top:1px solid var(--border-soft);padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
+  nav.tabs .inner{max-width:760px;margin:0 auto;display:flex;gap:4px}
+  nav.tabs button{flex:1;background:transparent;border:0;border-radius:12px;padding:8px 2px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:11px}
+  nav.tabs button.on{color:var(--text);background:var(--surface)}
+  nav.tabs svg{width:20px;height:20px}
+
+  /* cards / chips / badges */
+  .card{background:var(--surface);border:1px solid var(--border-soft);border-radius:18px;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 8px 32px rgba(0,0,0,0.5);transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);}
+  .card.pad{padding:14px}
+  .card:hover{transform:translateY(-4px);border-color:var(--teal);box-shadow:0 10px 40px rgba(0,255,204,0.2), inset 0 0 20px rgba(0,255,204,0.05);}
+  .badge{font-family:var(--fm);font-size:11px;color:var(--muted);border:1px solid var(--border);border-radius:6px;padding:2px 8px;white-space:nowrap}
+  .chip{background:var(--surface2);border:1px solid var(--border-soft);border-radius:10px;padding:6px 10px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:all 0.2s ease;}
+  .chip:hover{border-color:var(--teal);box-shadow:0 0 10px rgba(0,229,255,0.2);}
+  .chip .en{font-family:var(--fm);font-size:13px;line-height:1.2}
+  .chip .es{color:var(--faint);font-size:11px;line-height:1.2;margin-top:2px}
+  .dot{height:6px;width:6px;border-radius:999px;display:inline-block}
+  .seclabel{font-family:var(--fm);font-size:11px;color:var(--muted)}
+  .btn{border:1px solid var(--border);background:var(--surface2);border-radius:12px;padding:10px 14px;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:8px;justify-content:center;transition:all 0.3s ease;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+  .btn.primary{background:linear-gradient(45deg, var(--teal), var(--amber));color:#02050A;border:none;box-shadow:0 0 20px rgba(0,255,204,0.4);text-shadow:none;font-weight:700;}
+  .btn.primary:hover{box-shadow:0 0 35px rgba(0,255,204,0.7);transform:scale(1.05);}
+  .btn.teal{background:transparent;color:var(--teal);border:1px solid var(--teal);box-shadow:0 0 15px rgba(0,255,204,0.2);}
+  .btn.teal:hover{background:var(--teal);color:#02050A;box-shadow:0 0 30px rgba(0,255,204,0.6);transform:scale(1.05);}
+  .btn.ghost{background:transparent}
+  .btn:disabled{opacity:.55;cursor:default}
+  .input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:12px;padding:10px 12px;font-size:14px;outline:none;transition:all 0.3s ease;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+  .input:focus{border-color:var(--teal);box-shadow:0 0 10px rgba(0,229,255,0.3);}
+  textarea.input{resize:none;line-height:1.5}
+  label.lbl{font-size:12px;color:var(--muted);display:block;margin:0 0 5px}
+  .stateBtn{height:32px;width:32px;border-radius:999px;border:1px solid var(--faint);background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+  .grid2{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:560px){.grid2{grid-template-columns:1fr 1fr}}
+  .gridChips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  @media(min-width:560px){.gridChips{grid-template-columns:1fr 1fr 1fr}}
+  .cardsGrid{display:grid;grid-template-columns:1fr;gap:10px}
+  @media(min-width:560px){.cardsGrid{grid-template-columns:1fr 1fr}}
+
+  /* chat */
+  .bubble{border-radius:18px;padding:10px 14px;font-size:14px;line-height:1.55;max-width:86%}
+  .bot{background:var(--surface);border:1px solid var(--border);border-top-left-radius:6px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 2px 10px rgba(0,0,0,0.2);}
+  .me{background:var(--teal-soft);border:1px solid rgba(0,229,255,.35);border-top-right-radius:6px;margin-left:auto;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 2px 10px rgba(0,229,255,0.1);}
+  .avatar{height:32px;width:32px;border-radius:999px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .review{background:var(--surface);border:1px solid var(--border-soft);border-radius:14px;overflow:hidden}
+  .review .hd{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border-soft)}
+  .diff{background:var(--bg);border:1px solid var(--border-soft);border-radius:10px;padding:8px;font-family:var(--fm);font-size:12.5px;line-height:1.45}
+  .del{color:var(--coral)} .add{color:var(--teal)}
+  .typing{display:inline-flex;gap:4px;align-items:center}
+  .typing i{height:6px;width:6px;border-radius:999px;background:var(--muted);animation:blink 1.2s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:1}}
+  .spin{animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* mcq */
+  .opt{width:100%;text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.4;display:flex;gap:10px;align-items:flex-start}
+  .opt .k{font-family:var(--fm);color:var(--faint);flex-shrink:0}
+  .opt.sel{border-color:var(--amber);background:var(--amber-soft)}
+  .opt.correct{border-color:var(--teal);background:var(--teal-soft)}
+  .opt.wrong{border-color:var(--coral);background:var(--coral-soft)}
+  .explain{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5}
+  .note{background:var(--surface2);border:1px solid var(--border-soft);border-radius:10px;padding:8px 10px;font-size:12.5px;color:var(--muted);line-height:1.5}
+  .alert{border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:1.5}
+  .alert.warn{background:var(--coral-soft);border:1px solid rgba(255,122,107,.35);color:var(--coral)}
+  .pill{font-size:11px;border-radius:999px;padding:3px 9px;border:1px solid var(--border);color:var(--muted)}
+  hr.sep{border:0;border-top:1px solid var(--border-soft);margin:16px 0}
+</style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+<div id="app"></div>
+
+<script id="app-script">
+"use strict";
+/* =========================================================================
+   IT ENGLISH COACH — standalone PWA (vanilla JS, sin dependencias)
+   ========================================================================= */
+
+/* ---------- tiny helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const app = document.getElementById("app");
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function h(tag, attrs = {}, ...kids){
+  const e = document.createElement(tag);
+  for(const k in attrs){
+    if(k === "class") e.className = attrs[k];
+    else if(k === "html") e.innerHTML = attrs[k];
+    else if(k.startsWith("on") && typeof attrs[k] === "function") e.addEventListener(k.slice(2), attrs[k]);
+    else if(attrs[k] != null) e.setAttribute(k, attrs[k]);
+  }
+  for(const kid of kids.flat()){ if(kid==null) continue; e.append(kid.nodeType ? kid : document.createTextNode(kid)); }
+  return e;
+}
+const LS = {
+  get(k, def){ try{ const v = localStorage.getItem(k); return v==null?def:JSON.parse(v);}catch(e){return def;} },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+/* inline svg icons (stroke=currentColor) */
+const I = {
+  terminal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>',
+  chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+  grad:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 3 3 6 3s6-2 6-3v-5"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H2a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 3.6 8a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 3.6h.09A1.65 1.65 0 0 0 9 2.09V2a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 16 3.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 20.4 8v.09a1.65 1.65 0 0 0 1.51 1H22a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
+  chevron:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
+  send:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>',
+  reset:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>',
+  spark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  bot:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4M8 2h8"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/></svg>',
+  play:'<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>',
+  pause:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>',
+  ear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 3-2 4-2 7a3 3 0 0 1-6 0"/><path d="M8 13a2 2 0 0 1 4 0"/></svg>',
+  key:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="M10.5 12.5 21 2m-4 0 3 3m-6 3 3 3"/></svg>',
+};
+function icon(name, cls){ return h("span",{class:cls||"",html:I[name]}); }
+
+/* =========================================================================
+   DATA — curriculum
+   ========================================================================= */
+const MODULES = [
+ {code:"M0",from:"A1",to:"A1",title:"Arranque · Presentarse y el equipo",
+  og:["Saludar, presentarse y despedirse","Deletrear nombres y correos","Números, horas y datos personales"],
+  oi:["Nombrar el hardware básico de un puesto","Vocabulario del entorno de oficina"],
+  vg:[["Hello / Goodbye","Hola / Adiós"],["My name is…","Me llamo…"],["Nice to meet you","Encantado"],["Could you spell that?","¿Puede deletrearlo?"],["phone number","número de teléfono"],["email address","correo"]],
+  vi:[["computer / PC","ordenador"],["screen · monitor","pantalla"],["keyboard","teclado"],["mouse","ratón"],["cable","cable"],["power button","botón de encendido"],["headset","auriculares"],["workstation","puesto de trabajo"]],
+  gr:["Verbo to be (am/is/are)","Pronombres personales","Artículos a / an / the"],
+  ph:["My name is Manu and I work in IT support.","Can you spell your surname, please?"]},
+ {code:"M1",from:"A1",to:"A2",title:"Rutinas · Mi jornada de soporte",
+  og:["Hablar de rutinas diarias","Decir la hora, días y meses","Frecuencia (always, usually, never)"],
+  oi:["Describir tu puesto y tus tareas","Describir la configuración de un equipo"],
+  vg:[["to wake up","despertarse"],["to start work","empezar a trabajar"],["in the morning","por la mañana"],["every day","cada día"],["at 9 a.m.","a las 9"],["weekday / weekend","laborable / finde"]],
+  vi:[["to log in / out","iniciar / cerrar sesión"],["to check emails","revisar el correo"],["to open a ticket","abrir un ticket"],["shift","turno"],["task","tarea"],["to set up","configurar"],["user account","cuenta de usuario"],["desktop","escritorio"]],
+  gr:["Present Simple (afirm./neg./preg.)","Adverbios de frecuencia","do / does en preguntas"],
+  ph:["I usually start my shift at 8 and check the ticket queue.","She logs in and opens the helpdesk tool."]},
+ {code:"M2",from:"A2",to:"A2",title:"Describir · Problemas y síntomas",
+  og:["Describir objetos con adjetivos","Colores, tamaños y cantidades","Expresar existencia (there is/are)"],
+  oi:["Describir un fallo de hardware","Explicar síntomas de una incidencia"],
+  vg:[["big / small","grande / pequeño"],["broken","roto"],["heavy / light","pesado / ligero"],["new / old","nuevo / viejo"],["there is / are","hay"]],
+  vi:[["It doesn't work","No funciona"],["to freeze","colgarse"],["to crash","fallar / colapsar"],["error message","mensaje de error"],["slow","lento"],["to overheat","sobrecalentarse"],["blue screen","pantallazo azul"],["warning light","luz de aviso"]],
+  gr:["there is / there are","Present Continuous (am + -ing)","have / has got"],
+  ph:["The laptop is very slow and it keeps freezing.","There is an error message on the screen."]},
+ {code:"M3",from:"A2",to:"B1",title:"Helpdesk · La primera llamada",
+  og:["Etiqueta telefónica y cortesía","Peticiones educadas (can / could)","Deletrear y confirmar datos"],
+  oi:["Abrir y registrar un ticket","Guiar en pasos básicos de troubleshooting"],
+  vg:[["How can I help you?","¿En qué puedo ayudar?"],["Could you…, please?","¿Podría…?"],["Let me check","Déjeme comprobar"],["One moment, please","Un momento"],["to confirm","confirmar"]],
+  vi:[["to restart / reboot","reiniciar"],["to unplug / plug in","desenchufar / enchufar"],["to update","actualizar"],["to reset the password","restablecer contraseña"],["ticket number","nº de ticket"],["remote access","acceso remoto"],["step by step","paso a paso"],["Did it work?","¿Funcionó?"]],
+  gr:["Imperativos para instrucciones","can / could (peticiones)","should (consejos)"],
+  ph:["Could you restart the computer and tell me what happens?","Let me open a ticket. Can you confirm your email?"]},
+ {code:"M4",from:"A2",to:"B1",title:"Pasado · Qué ocurrió",
+  og:["Hablar del pasado (finde, viajes)","Contar una secuencia de hechos","Preguntas en pasado"],
+  oi:["Reportar qué pasó en una incidencia","Reconstruir el historial del problema"],
+  vg:[["yesterday","ayer"],["last week","la semana pasada"],["I went / I saw","fui / vi"],["ago","hace (tiempo)"],["Then… / After that…","Luego… / Después…"]],
+  vi:[["The system went down","El sistema se cayó"],["It happened when…","Ocurrió cuando…"],["to reproduce the error","reproducir el error"],["root cause","causa raíz"],["log file","registro / log"],["downtime","tiempo de inactividad"],["to restore","restaurar"],["to roll back","revertir"]],
+  gr:["Past Simple (reg. e irreg.)","Past Continuous (was/were + -ing)","when / while"],
+  ph:["The server went down at 3 p.m. when the user tried to save.","I checked the logs and found the root cause."]},
+ {code:"M5",from:"B1",to:"B1",title:"Redes · Conectividad y configuración",
+  og:["Dar y pedir direcciones","Preposiciones de lugar","Comparar (more / better / the best)"],
+  oi:["Vocabulario de redes (IP, DNS, DHCP)","Diagnosticar y explicar problemas de red"],
+  vg:[["next to / between","al lado de / entre"],["Turn left / right","Gire a la izq. / dcha."],["faster than","más rápido que"],["the best option","la mejor opción"]],
+  vi:[["network","red"],["router / switch","router / switch"],["IP address","dirección IP"],["DNS / DHCP","DNS / DHCP"],["to ping","hacer ping"],["bandwidth","ancho de banda"],["latency","latencia"],["wired / wireless","cableado / inalámbrico"],["firewall","cortafuegos"],["to connect / disconnect","conectar / desconectar"]],
+  gr:["Preposiciones de lugar y movimiento","Comparativos y superlativos","too / enough"],
+  ph:["The wireless connection is slower than the wired one.","Try to ping the router to check if the network is up."]},
+ {code:"M6",from:"B1",to:"B1",title:"Sistemas · Windows y Linux",
+  og:["Explicar procesos paso a paso","Conectores (first, then, finally)","Voz pasiva básica"],
+  oi:["Administrar SO (línea de comandos, permisos)","Comparar entornos Windows y Linux"],
+  vg:[["first / then / finally","primero / luego / finalmente"],["is done / is created","se hace / se crea"],["in order to","para (finalidad)"],["make sure that…","asegúrate de que…"]],
+  vi:[["operating system (OS)","sistema operativo"],["command line / terminal","línea de comandos"],["to run a command","ejecutar un comando"],["file / folder","archivo / carpeta"],["permissions","permisos"],["to install / uninstall","instalar / desinstalar"],["driver","controlador"],["distribution (distro)","distribución"],["admin / root rights","permisos de admin"],["to grant / revoke access","conceder / revocar acceso"]],
+  gr:["Conectores de secuencia","Voz pasiva en presente (is/are + participio)","Gerundio tras preposición"],
+  ph:["First, open the terminal; then run the command as administrator.","The update is installed automatically after the reboot."]},
+ {code:"M7",from:"B1",to:"B1",title:"Ágiles · Scrum, Kanban y el Daily",
+  og:["Reuniones: opinar, acordar y discrepar","Turnos de palabra","Planes (going to)"],
+  oi:["Participar en un Daily Standup","Vocabulario de sprint, backlog y bloqueos"],
+  vg:[["I agree / disagree","Estoy / No estoy de acuerdo"],["In my opinion…","En mi opinión…"],["Go ahead","Adelante"],["Let's move on","Sigamos"]],
+  vi:[["Daily Standup","reunión diaria"],["sprint / backlog","sprint / pila"],["blocker","bloqueo"],["to be blocked by…","estar bloqueado por…"],["work in progress (WIP)","trabajo en curso"],["to prioritize","priorizar"],["deadline","fecha límite"],["done / in review","hecho / en revisión"],["stakeholder","interesado"],["retrospective","retrospectiva"]],
+  gr:["Present Perfect (have/has + participio)","for / since / already / yet","be going to (planes)"],
+  ph:["Yesterday I closed three tickets; today I'm going to work on the network issue.","I'm blocked by the access request, so I need help."]},
+ {code:"M8",from:"B1",to:"B2",title:"Escalado · Comunicación compleja",
+  og:["Hacer sugerencias e hipótesis","Escribir emails formales","Peticiones indirectas"],
+  oi:["Escalar una incidencia a nivel 2/3","Redactar informes y SLAs"],
+  vg:[["I would suggest…","Yo sugeriría…"],["If I were you…","Yo que tú…"],["I'm writing to…","Le escribo para…"],["Please find attached…","Adjunto…"]],
+  vi:[["to escalate","escalar"],["to assign / reassign","asignar / reasignar"],["priority (high/low)","prioridad"],["SLA","acuerdo de nivel de servicio"],["incident report","informe de incidencia"],["workaround","solución temporal"],["known issue","problema conocido"],["to follow up","dar seguimiento"],["on-call","de guardia"],["ASAP","cuanto antes"]],
+  gr:["First conditional (if + present, will)","Estilo indirecto básico","make / let / allow"],
+  ph:["If the issue isn't fixed today, we will escalate it to level 2.","I would suggest a temporary workaround while we investigate."]},
+ {code:"M9",from:"B2",to:"B2",title:"Automatización · Scripts y despliegue",
+  og:["Explicar procesos y causa-efecto","Cláusulas de relativo","Hipótesis (second conditional)"],
+  oi:["Automatización de tareas y scripting","Despliegue de servidores locales / CI-CD"],
+  vg:[["because of / due to","debido a"],["which / that / who","que / quien"],["If I had…, I would…","Si tuviera…, haría…"],["as a result","como resultado"]],
+  vi:[["to automate","automatizar"],["script","script"],["scheduled task / cron job","tarea programada"],["to deploy","desplegar"],["local server","servidor local"],["virtual machine (VM)","máquina virtual"],["container","contenedor"],["pipeline (CI/CD)","tubería CI/CD"],["backup","copia de seguridad"],["to trigger","desencadenar"]],
+  gr:["Cláusulas de relativo","Second conditional","so / such / because of"],
+  ph:["We use a script that automatically backs up the database every night.","If we automated this task, we would save two hours a day."]},
+ {code:"M10",from:"B2",to:"B2",title:"Vanguardia · IA, agentes y domótica",
+  og:["Hablar del futuro y de tendencias","Modales de probabilidad","Opinar sobre tecnología"],
+  oi:["Vocabulario de agentes de IA y prompts","IoT y domótica (smart home)"],
+  vg:[["will / won't","(no) sucederá"],["might / may","podría / puede que"],["I reckon…","Yo creo…"],["It's likely that…","Es probable que…"]],
+  vi:[["AI agent","agente de IA"],["prompt","instrucción / prompt"],["to fine-tune","ajustar / afinar"],["machine learning","aprendizaje automático"],["smart home","hogar inteligente"],["sensor","sensor"],["IoT device","dispositivo IoT"],["to integrate","integrar"],["voice assistant","asistente de voz"],["to trigger a routine","activar una rutina"]],
+  gr:["Formas de futuro (will / going to / present cont.)","Modales de probabilidad (might, must, can't)","used to / would (hábitos)"],
+  ph:["This AI agent might handle the first level of support in the future.","When the sensor detects motion, it triggers a routine that turns on the lights."]},
+ {code:"M11",from:"B2",to:"B2",title:"Profesional · Entrevista y fluidez",
+  og:["Entrevista de trabajo (método STAR)","Hablar de fortalezas y logros","Conectores del discurso"],
+  oi:["Describir tu experiencia como técnico junior","Responder preguntas técnicas con seguridad"],
+  vg:[["My strengths are…","Mis fortalezas son…"],["I'm good at…","Se me da bien…"],["For example / However","Por ejemplo / Sin embargo"],["To sum up","En resumen"]],
+  vi:[["experience / background","experiencia / formación"],["to troubleshoot","diagnosticar y resolver"],["hands-on experience","experiencia práctica"],["to be responsible for…","ser responsable de…"],["achievement","logro"],["team player","persona de equipo"],["to handle pressure","gestionar la presión"],["available to start","disponible para empezar"],["notice period","preaviso"],["salary expectations","expectativas salariales"]],
+  gr:["Repaso general de tiempos verbales","Phrasal verbs frecuentes en IT","Marcadores del discurso"],
+  ph:["I have hands-on experience troubleshooting Windows and Linux systems.","In my last role I was responsible for the first level of support."]},
+];
+
+const CATS = {
+  helpdesk:{label:"Helpdesk",color:"var(--amber)"}, networks:{label:"Redes",color:"var(--teal)"},
+  systems:{label:"Sistemas",color:"var(--teal)"}, agile:{label:"Ágiles",color:"var(--amber)"},
+  tech:{label:"Vanguardia",color:"var(--teal)"}, life:{label:"Vida real",color:"var(--amber)"},
+  interview:{label:"Entrevista",color:"var(--coral)"},
+};
+
+const SCENARIOS = [
+ {id:"s-pc",cat:"helpdesk",level:"A2",title:"El PC no enciende",role:"Eres el técnico. Un usuario llama porque su ordenador no arranca.",persona:"Interpretas a Sarah, usuaria de oficina, poco técnica y algo nerviosa. Su ordenador no enciende. En realidad el cable de corriente está flojo, pero no lo sabes hasta que el técnico te guíe a comprobarlo. Empieza tú describiendo el problema."},
+ {id:"s-pass",cat:"helpdesk",level:"A2",title:"Contraseña bloqueada",role:"Eres el técnico. Un usuario no puede iniciar sesión: cuenta bloqueada.",persona:"Interpretas a Tom, comercial que ha olvidado su contraseña y su cuenta se ha bloqueado tras varios intentos. Necesitas volver a entrar para una reunión. Empieza tú explicando la urgencia."},
+ {id:"s-slow",cat:"helpdesk",level:"B1",title:"El equipo va muy lento",role:"Eres el técnico. El usuario se queja de que todo va lentísimo.",persona:"Interpretas a Marta, de contabilidad. El portátil va muy lento y se congela al abrir varias aplicaciones. Tiene muchas pestañas y programas abiertos. Empieza tú describiendo los síntomas."},
+ {id:"s-print",cat:"helpdesk",level:"B1",title:"La impresora de red no imprime",role:"Eres el técnico. Nadie de la planta puede imprimir.",persona:"Interpretas a David, de recepción. La impresora de red no responde y toda la planta está afectada. Otros compañeros también se quejan. Empieza tú reportando el problema."},
+ {id:"s-net",cat:"networks",level:"B1",title:"Sin conexión a internet",role:"Eres el técnico. Un usuario se ha quedado sin red.",persona:"Interpretas a Lucía, en teletrabajo por VPN. De repente ha perdido la conexión. El icono de wifi aparece con un aviso. Empieza tú describiendo qué ves en pantalla."},
+ {id:"s-linux",cat:"systems",level:"B1",title:"Permisos en Linux",role:"Eres el técnico. Guías a un compañero por la terminal de Linux.",persona:"Interpretas a Pablo, desarrollador junior que no puede ejecutar un script: recibe 'Permission denied'. Sabe algo de terminal pero necesita ayuda con permisos. Empieza tú explicando el error que ves."},
+ {id:"s-daily",cat:"agile",level:"B1",title:"Daily Standup",role:"Participas en la reunión diaria del equipo de soporte. TÚ eres el técnico junior que reporta.",persona:"Interpretas a Elena, la Scrum Master del equipo de soporte IT. Diriges el Daily Standup y pides al alumno que responda: qué hizo ayer, qué hará hoy y si tiene bloqueos. Empieza tú saludando y dando paso."},
+ {id:"s-esc",cat:"agile",level:"B2",title:"Escalar a nivel 2",role:"Eres el técnico de nivel 1. Debes escalar una incidencia a un compañero senior.",persona:"Interpretas a Robert, técnico senior de nivel 2. El alumno (nivel 1) tiene que explicarte una incidencia que no puede resolver y convencerte de que la tomes. Pregunta qué pasos ha probado, prioridad e impacto. Empieza tú preguntando qué necesita."},
+ {id:"s-ai",cat:"tech",level:"B2",title:"Presentar una automatización",role:"Presentas a tu responsable una idea para automatizar tareas con un agente de IA.",persona:"Interpretas a Nadia, responsable de operaciones. El alumno quiere proponerte automatizar la clasificación de tickets con un agente de IA. Eres receptiva pero exigente: pregunta por beneficios, riesgos y coste. Empieza tú preguntándole qué propone."},
+ {id:"s-cafe",cat:"life",level:"A2",title:"Un café en el trabajo",role:"Charla informal con un compañero nuevo en la cafetería.",persona:"Interpretas a Jake, compañero nuevo de otro equipo. Es la hora del café y charláis relajados: de dónde sois, qué hacéis, planes de finde. Mantén el nivel sencillo y amable. Empieza tú presentándote."},
+ {id:"s-air",cat:"life",level:"B1",title:"Check-in en el aeropuerto",role:"Vas a un congreso de tecnología. Facturas en el mostrador.",persona:"Interpretas al agente de facturación de una aerolínea. El alumno viaja a una conferencia de IT. Gestiona tarjeta de embarque, equipaje y asiento, y haz las preguntas de seguridad habituales. Empieza tú saludando y pidiendo el pasaporte."},
+ {id:"s-int",cat:"interview",level:"B2",title:"Entrevista: Técnico Junior de Sistemas",role:"Entrevista de trabajo en inglés para IT Support / Junior Systems.",persona:"Interpretas a Karen, IT Manager que entrevista al alumno para Técnico Junior de Sistemas / Helpdesk. Preguntas realistas: preséntate, experiencia con Windows/Linux, cómo resuelves una incidencia, trabajo en equipo, disponibilidad. Una pregunta cada vez. Empieza tú dando la bienvenida y pidiendo que se presente."},
+];
+
+/* reading bank */
+const READING = [
+ {id:"r1",level:"A2",cat:"life",title:"A New Work Laptop",
+  text:"Hi, I'm Elena and I work in an office in Madrid. This week my company gave me a new laptop. It is light and fast, and the screen is bigger than my old one. In the morning I turn it on, I log in with my password, and I check my emails. I like it a lot, but the keyboard is a little different, so sometimes I make mistakes when I type.",
+  qs:[
+   {q:"Where does Elena work?",opts:["In an office in Madrid","In a shop","At home","In a school"],a:0,ex:"“I work in an office in Madrid.”"},
+   {q:"What is new?",opts:["Her laptop","Her phone","Her desk","Her car"],a:0,ex:"“my company gave me a new laptop.”"},
+   {q:"The new screen is ___ than the old one.",opts:["bigger","smaller","older","darker"],a:0,ex:"“the screen is bigger than my old one.”"},
+   {q:"Why does she sometimes make mistakes?",opts:["The keyboard is a little different","The laptop is slow","The screen is small","She is tired"],a:0,ex:"“the keyboard is a little different, so sometimes I make mistakes.”"}]},
+ {id:"r2",level:"A2",cat:"helpdesk",title:"A Support Email",
+  text:"Subject: My computer is very slow.\n\nHello IT team,\nSince yesterday my computer has been very slow. It takes five minutes to open a program, and sometimes the screen freezes. I have restarted it twice, but the problem is still there. I have an important meeting at 3 p.m., so I need help soon.\nThank you,\nDavid (Sales department)",
+  qs:[
+   {q:"When did the problem start?",opts:["Yesterday","Last week","This morning","Two hours ago"],a:0,ex:"“Since yesterday my computer has been very slow.”"},
+   {q:"What happens sometimes?",opts:["The screen freezes","The computer turns off","The internet stops","The printer breaks"],a:0,ex:"“sometimes the screen freezes.”"},
+   {q:"What has David already tried?",opts:["Restarting the computer","Calling a colleague","Buying a new PC","Updating Windows"],a:0,ex:"“I have restarted it twice.”"},
+   {q:"Why does he need help soon?",opts:["He has a meeting at 3 p.m.","He wants to go home","His boss is angry","He is on holiday"],a:0,ex:"“I have an important meeting at 3 p.m.”"}]},
+ {id:"r3",level:"B1",cat:"networks",title:"Restarting the Router",
+  text:"If you lose your internet connection at home, restarting the router often solves the problem. First, unplug the router from the power and wait about thirty seconds. Then plug it back in and wait for the lights to become stable — this can take two or three minutes. When the connection light is green, try to open a website. If you still have no internet after this, the problem may be with your provider, so you should contact their support team.",
+  qs:[
+   {q:"What should you do first?",opts:["Unplug the router","Call the provider","Open a website","Change the cable"],a:0,ex:"“First, unplug the router from the power.”"},
+   {q:"How long should you wait before plugging it back in?",opts:["About thirty seconds","Five minutes","One hour","Ten seconds"],a:0,ex:"“wait about thirty seconds.”"},
+   {q:"What does a green connection light mean?",opts:["The connection is ready","There is no internet","The router is broken","You must wait more"],a:0,ex:"“When the connection light is green, try to open a website.”"},
+   {q:"If there is still no internet, who should you contact?",opts:["Your provider's support team","A friend","The police","Nobody"],a:0,ex:"“you should contact their support team.”"}]},
+ {id:"r4",level:"B1",cat:"life",title:"A Weekend in Lisbon",
+  text:"Last weekend I travelled to Lisbon with two friends. We arrived on Friday evening and took a taxi to our hotel in the city centre. On Saturday we walked around the old town, tried some local food, and visited a famous castle with great views. The weather was warm and sunny. On Sunday morning we did some shopping before our flight home. It was a short trip, but we really enjoyed it and we want to go back next year.",
+  qs:[
+   {q:"Who did the writer travel with?",opts:["Two friends","Their family","Alone","Colleagues"],a:0,ex:"“I travelled to Lisbon with two friends.”"},
+   {q:"When did they arrive?",opts:["Friday evening","Saturday morning","Sunday","Thursday night"],a:0,ex:"“We arrived on Friday evening.”"},
+   {q:"What did they visit on Saturday?",opts:["A castle","A museum","A beach","A stadium"],a:0,ex:"“visited a famous castle with great views.”"},
+   {q:"How was the weather?",opts:["Warm and sunny","Cold and rainy","Windy","Foggy"],a:0,ex:"“The weather was warm and sunny.”"},
+   {q:"What do they want to do?",opts:["Go back next year","Move to Lisbon","Never return","Stay longer"],a:0,ex:"“we want to go back next year.”"}]},
+ {id:"r5",level:"B2",cat:"systems",title:"Incident Report: Server Outage",
+  text:"At 14:20 on Monday, the main application server went down and around 200 users lost access to the internal system. The on-call engineer checked the logs and discovered that the disk was completely full because of an old backup process that had not been cleaned up. As a temporary workaround, the team deleted the outdated backup files, which restored the service within twenty minutes. To prevent this from happening again, the team scheduled an automated task to remove old backups every night and added an alert that triggers when disk usage goes above 80%.",
+  qs:[
+   {q:"How many users were affected?",opts:["About 200","About 20","About 2,000","Only a few"],a:0,ex:"“around 200 users lost access.”"},
+   {q:"What was the root cause?",opts:["The disk was full","A power cut","A network attack","A software update"],a:0,ex:"“the disk was completely full because of an old backup process.”"},
+   {q:"What was the temporary workaround?",opts:["Deleting outdated backup files","Restarting the server","Buying a new disk","Calling the provider"],a:0,ex:"“the team deleted the outdated backup files.”"},
+   {q:"What will the new alert do?",opts:["Trigger when disk usage is above 80%","Send a daily report","Restart the server","Block new users"],a:0,ex:"“an alert that triggers when disk usage goes above 80%.”"},
+   {q:"What is the purpose of the scheduled task?",opts:["To remove old backups every night","To create more backups","To update the system","To add users"],a:0,ex:"“an automated task to remove old backups every night.”"}]},
+ {id:"r6",level:"B2",cat:"tech",title:"Getting Started with a Smart Home",
+  text:"A smart home lets you control devices such as lights, heating, and cameras from your phone or with your voice. Most systems use a central hub that connects to your Wi-Fi and communicates with sensors around the house. For example, a motion sensor can detect when you enter a room and automatically turn on the lights. You can also create routines: when you say 'good night', the system might lock the doors, turn off the lights, and lower the heating at the same time. However, because these devices are connected to the internet, it is important to use strong passwords and keep the software updated to avoid security risks.",
+  qs:[
+   {q:"How can you control a smart home?",opts:["From your phone or with your voice","Only with a remote","Only from a computer","With a key"],a:0,ex:"“from your phone or with your voice.”"},
+   {q:"What does the central hub connect to?",opts:["Your Wi-Fi","The television","A printer","The car"],a:0,ex:"“a central hub that connects to your Wi-Fi.”"},
+   {q:"What can a motion sensor do?",opts:["Turn on the lights when you enter","Lock the car","Play music","Send emails"],a:0,ex:"“a motion sensor can detect when you enter a room and automatically turn on the lights.”"},
+   {q:"What might happen when you say 'good night'?",opts:["Doors lock, lights off, heating lower","The alarm rings","The TV turns on","Nothing"],a:0,ex:"“lock the doors, turn off the lights, and lower the heating.”"},
+   {q:"Why is security important?",opts:["Devices are connected to the internet","They use batteries","They are expensive","They are big"],a:0,ex:"“because these devices are connected to the internet.”"}]},
+];
+
+/* listening bank (TTS reads the lines) */
+const LISTENING = [
+ {id:"l1",level:"A2",cat:"life",title:"Coffee Break",
+  lines:[
+   {who:"Jake",text:"Hi, I'm Jake. I just started in the marketing team. Are you new here too?"},
+   {who:"You",text:"Hello Jake, nice to meet you. I'm on the IT support team. I started three weeks ago."},
+   {who:"Jake",text:"Oh, great. This coffee machine is a bit complicated. How do you like the job so far?"},
+   {who:"You",text:"I like it a lot. The people are friendly and I'm learning new things every day."},
+   {who:"Jake",text:"That's good to hear. Do you have any plans for the weekend?"},
+   {who:"You",text:"Yes, I'm going to visit my family and play some football on Sunday."}],
+  qs:[
+   {q:"Which team is Jake on?",opts:["Marketing","IT support","Sales","Finance"],a:0,ex:"“I just started in the marketing team.”"},
+   {q:"How long has the other person worked here?",opts:["Three weeks","Three days","Three months","One year"],a:0,ex:"“I started three weeks ago.”"},
+   {q:"What does the person think about the job?",opts:["They like it a lot","It is boring","It is too hard","They want to leave"],a:0,ex:"“I like it a lot.”"},
+   {q:"What are their weekend plans?",opts:["Visit family and play football","Work","Travel abroad","Study"],a:0,ex:"“visit my family and play some football on Sunday.”"}]},
+ {id:"l2",level:"B1",cat:"helpdesk",title:"A Support Call",
+  lines:[
+   {who:"Agent",text:"Good morning, IT helpdesk, this is Sarah speaking. How can I help you?"},
+   {who:"Caller",text:"Hi, I can't log in to my computer. It says my password is incorrect, but I'm sure it's the right one."},
+   {who:"Agent",text:"Okay, don't worry. Can you tell me your username, please?"},
+   {who:"Caller",text:"Yes, it's d dot martin."},
+   {who:"Agent",text:"Thank you. I can see your account is locked because of too many attempts. I'll reset it now. Please try again in two minutes."},
+   {who:"Caller",text:"Perfect, thank you very much."}],
+  qs:[
+   {q:"What is the caller's problem?",opts:["They can't log in","The internet is down","The printer is broken","The screen is black"],a:0,ex:"“I can't log in to my computer.”"},
+   {q:"Why is the account locked?",opts:["Too many login attempts","A virus","An update","A power cut"],a:0,ex:"“your account is locked because of too many attempts.”"},
+   {q:"What will the agent do?",opts:["Reset the account","Send a new computer","Call the manager","Close the ticket"],a:0,ex:"“I'll reset it now.”"},
+   {q:"When should the caller try again?",opts:["In two minutes","Tomorrow","In one hour","Immediately"],a:0,ex:"“Please try again in two minutes.”"}]},
+ {id:"l3",level:"B1",cat:"agile",title:"Daily Standup",
+  lines:[
+   {who:"Elena",text:"Good morning everyone, let's start the daily standup. Tom, can you begin? What did you do yesterday?"},
+   {who:"Tom",text:"Yesterday I closed three support tickets and I finished the network documentation. Today I'm going to work on the printer issue on the second floor. I don't have any blockers."},
+   {who:"Elena",text:"Great, thank you. Remember we have the sprint review on Friday, so please update your tasks on the board."}],
+  qs:[
+   {q:"What did Tom do yesterday?",opts:["Closed tickets and finished documentation","Went on holiday","Fixed the printer","Nothing"],a:0,ex:"“I closed three support tickets and I finished the network documentation.”"},
+   {q:"What will Tom do today?",opts:["Work on the printer issue","Write emails","Attend a meeting","Install servers"],a:0,ex:"“Today I'm going to work on the printer issue.”"},
+   {q:"Does Tom have any blockers?",opts:["No","Yes, one","Yes, two","He didn't say"],a:0,ex:"“I don't have any blockers.”"},
+   {q:"When is the sprint review?",opts:["Friday","Monday","Wednesday","Today"],a:0,ex:"“we have the sprint review on Friday.”"}]},
+ {id:"l4",level:"B2",cat:"tech",title:"Automation Announcement",
+  lines:[
+   {who:"Nadia",text:"Hi team, I want to share some news about our support process. Starting next month, we're going to introduce an AI agent that will automatically classify incoming tickets by priority and topic. This should save us a lot of time on repetitive tasks and let us focus on the more complex issues. Of course, every ticket will still be reviewed by a person, so nothing will be closed automatically. We'll run a two-week trial first, and I'd really appreciate your feedback during that period."}],
+  qs:[
+   {q:"What will the AI agent do?",opts:["Classify tickets by priority and topic","Reply to customers","Delete old tickets","Reset passwords"],a:0,ex:"“classify incoming tickets by priority and topic.”"},
+   {q:"When will it start?",opts:["Next month","Today","Next year","Next week"],a:0,ex:"“Starting next month…”"},
+   {q:"Will tickets be closed automatically?",opts:["No, a person reviews them","Yes, all of them","Only urgent ones","Yes, at night"],a:0,ex:"“every ticket will still be reviewed by a person, so nothing will be closed automatically.”"},
+   {q:"How long is the trial period?",opts:["Two weeks","One month","Two days","Six months"],a:0,ex:"“We'll run a two-week trial first.”"}]},
+];
+
+const DICTATION = [
+ "Please restart your computer.",
+ "The server has been down since this morning.",
+ "I can't connect to the wireless network.",
+ "Could you open a ticket for this issue?",
+ "We need to update the operating system tonight.",
+ "The printer on the second floor is not working.",
+ "Let's automate this task with a script.",
+ "I'll follow up with you after the meeting.",
+];
+
+/* =========================================================================
+   PROVIDERS + AI
+   ========================================================================= */
+const PROVIDERS = {
+  anthropic:{label:"Anthropic (Claude)",kind:"anthropic",model:"claude-sonnet-4-6",keyUrl:"https://console.anthropic.com/settings/keys",hint:"Cabecera x-api-key. Funciona desde el navegador con acceso directo habilitado."},
+  gemini:{label:"Google Gemini",kind:"gemini",model:"gemini-2.5-flash",keyUrl:"https://aistudio.google.com/apikey",hint:"La API key viaja en la URL. CORS permitido en navegador."},
+  openrouter:{label:"OpenRouter",kind:"openai",base:"https://openrouter.ai/api/v1",model:"openai/gpt-4o-mini",keyUrl:"https://openrouter.ai/keys",hint:"Compatible con OpenAI. Da acceso a muchos modelos con una sola key."},
+  mistral:{label:"Mistral",kind:"openai",base:"https://api.mistral.ai/v1",model:"mistral-small-latest",keyUrl:"https://console.mistral.ai/api-keys",hint:"Compatible con OpenAI."},
+  perplexity:{label:"Perplexity",kind:"openai",base:"https://api.perplexity.ai",model:"sonar",keyUrl:"https://www.perplexity.ai/settings/api",hint:"Compatible con OpenAI. Si el navegador bloquea por CORS, activa el proxy."},
+  opencodezen:{label:"OpenCode Zen",kind:"openai",base:"https://opencode.ai/zen/v1",model:"claude-sonnet-4-5",keyUrl:"https://opencode.ai/auth",hint:"Compatible con OpenAI. Base: opencode.ai/zen/v1"},
+  custom:{label:"Personalizado (OpenAI-compatible)",kind:"openai",base:"",model:"",keyUrl:"",hint:"Introduce tu propia Base URL (terminada en /v1) y el nombre del modelo."},
+};
+const PROVIDER_ORDER = ["anthropic","gemini","openrouter","mistral","perplexity","opencodezen","custom"];
+
+function defaultSettings(){
+  const keys = {}, models = {};
+  for(const p in PROVIDERS){ keys[p]=""; models[p]=PROVIDERS[p].model||""; }
+  return { provider:"anthropic", proxyUrl:"", customBase:"", keys, models, voice:"", rate:0.95 };
+}
+let settings = Object.assign(defaultSettings(), LS.get("itenglish:settings", {}));
+// ensure nested objects exist after merge
+settings.keys = Object.assign(defaultSettings().keys, settings.keys||{});
+settings.models = Object.assign(defaultSettings().models, settings.models||{});
+function saveSettings(){ LS.set("itenglish:settings", settings); }
+
+let progress = LS.get("itenglish:progress", {status:{}});
+function saveProgress(){ LS.set("itenglish:progress", progress); }
+
+function activeProviderReady(){
+  const p = settings.provider;
+  if(p==="custom") return !!(settings.customBase && settings.keys.custom);
+  return !!settings.keys[p];
+}
+function providerFetch(url, opts){
+  const px = (settings.proxyUrl||"").trim();
+  if(px){ const u = px.replace(/\/+$/,"") + "/proxy?url=" + encodeURIComponent(url); return fetch(u, opts); }
+  return fetch(url, opts);
+}
+async function readErr(res){ try{ const t = await res.text(); return t.slice(0,300); }catch(e){ return ""; } }
+
+/* messages: [{role:'user'|'assistant', content}] ; returns assistant text */
+async function chat(messages, system){
+  const pid = settings.provider, P = PROVIDERS[pid];
+  const key = settings.keys[pid];
+  const model = (settings.models[pid] || P.model || "").trim();
+  if(pid!=="custom" && !key) throw new Error("Falta la API key de "+P.label+". Ábrela en Ajustes.");
+  if(pid==="custom" && (!settings.customBase || !key)) throw new Error("Configura Base URL, API key y modelo del proveedor personalizado en Ajustes.");
+  if(!model) throw new Error("Falta el nombre del modelo en Ajustes.");
+
+  if(P.kind==="anthropic"){
+    const res = await providerFetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body:JSON.stringify({model,max_tokens:1000,system,messages})
+    });
+    if(!res.ok) throw new Error("HTTP "+res.status+" · "+await readErr(res));
+    const d = await res.json();
+    return (d.content||[]).map(b=>b.type==="text"?b.text:"").join("\n");
+  }
+  if(P.kind==="gemini"){
+    const url = "https://generativelanguage.googleapis.com/v1beta/models/"+encodeURIComponent(model)+":generateContent?key="+encodeURIComponent(key);
+    const contents = messages.map(m=>({role: m.role==="assistant"?"model":"user", parts:[{text:m.content}]}));
+    const body = {contents, generationConfig:{maxOutputTokens:1200}};
+    if(system) body.systemInstruction = {parts:[{text:system}]};
+    const res = await providerFetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    if(!res.ok) throw new Error("HTTP "+res.status+" · "+await readErr(res));
+    const d = await res.json();
+    return (d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts || []).map(p=>p.text||"").join("");
+  }
+  // openai-compatible
+  const base = (pid==="custom" ? settings.customBase : P.base).replace(/\/+$/,"");
+  const url = base + "/chat/completions";
+  const msgs = system ? [{role:"system",content:system}, ...messages] : messages;
+  const headers = {"Content-Type":"application/json","Authorization":"Bearer "+key};
+  if(pid==="openrouter"){ headers["X-Title"]="IT English Coach"; }
+  const res = await providerFetch(url,{method:"POST",headers,body:JSON.stringify({model,max_tokens:1000,messages:msgs})});
+  if(!res.ok) throw new Error("HTTP "+res.status+" · "+await readErr(res));
+  const d = await res.json();
+  return (d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content) || "";
+}
+
+const JSON_CONTRACT = "\nResponde ÚNICAMENTE con un objeto JSON válido, sin texto adicional y SIN vallas de código. Estructura EXACTA:\n{\n \"corrections\": [ { \"original\": \"lo que escribió el alumno\", \"corrected\": \"versión correcta\", \"note\": \"explicación breve en español\" } ],\n \"level\": \"A1|A2|B1|B2 (estimación del mensaje del alumno)\",\n \"feedback_es\": \"1-2 frases en español: algo positivo + un consejo\",\n \"reply_en\": \"tu respuesta EN INGLÉS, en tu personaje (1-3 frases)\",\n \"suggestion_en\": \"una frase natural en inglés que el alumno podría decir a continuación\"\n}\nReglas: 'corrections' incluye SOLO errores reales (gramática, sintaxis, vocabulario, naturalidad); si el mensaje es correcto devuelve []. No corrijas mayúsculas/puntuación menores. Mantén 'reply_en' en el nivel del escenario y usa vocabulario técnico cuando corresponda. Sé alentador y conciso. Nunca rompas el personaje en 'reply_en'.";
+function roleplaySystem(sc){
+  return "Eres un profesor de inglés experto en capacitación corporativa y técnica que, además, interpreta un rol dentro de una simulación (role-play) para un alumno hispanohablante que se prepara como Técnico Junior de Sistemas.\nNivel objetivo: "+sc.level+".\nSituación: "+sc.role+"\nTu personaje: "+sc.persona+JSON_CONTRACT;
+}
+const TUTOR_SYSTEM = "Eres un profesor de inglés experto en inglés general y en inglés técnico para IT y soporte de sistemas. Tu alumno es hispanohablante y se prepara para Técnico Junior de Sistemas (helpdesk, redes, Windows/Linux, metodologías ágiles, automatización, IA, domótica).\n- Responde de forma clara y estructurada. Explica en español cuando enseñes gramática o vocabulario, pero da SIEMPRE los ejemplos y frases modelo en inglés.\n- Si el alumno escribe en inglés con errores, corrígelos mostrando \"❌ original → ✅ corrección\" antes de continuar.\n- Adapta el nivel (A1–B2) a lo que demuestre el alumno.\n- Puedes proponer mini-ejercicios, listas de vocabulario o simular preguntas de entrevista.\n- Sé conciso y práctico (máx. ~180 palabras salvo que pidan más).";
+
+function parseJSON(text){
+  let t = (text||"").trim().replace(/^```(json)?/i,"").replace(/```$/,"").trim();
+  try{ return JSON.parse(t); }catch(e){}
+  const s = t.indexOf("{"), e = t.lastIndexOf("}");
+  if(s>=0 && e>s){ try{ return JSON.parse(t.slice(s,e+1)); }catch(_){} }
+  return null;
+}
+
+/* =========================================================================
+   ROUTER + HEADER + NAV
+   ========================================================================= */
+let route = { tab:"temario", sub:"reading", detail:null };
+function go(tab, extra){ route = Object.assign({tab, sub:route.sub, detail:null}, extra||{}); render(); }
+
+function header(){
+  const done = MODULES.filter(m=>progress.status[m.code]==="done").length;
+  const pct = Math.round(done/MODULES.length*100);
+  const wrap = h("header",{});
+  const top = h("div",{class:"row"});
+  const logo = h("div",{class:"logo"}); logo.append(iconAmber());
+  const mid = h("div",{class:"sp",style:"min-width:0"},
+    h("div",{class:"mono t11",style:"color:var(--faint)",html:'<span style="color:var(--teal)">~/english</span> $ ./coach'}),
+    h("div",{class:"grot t19",style:"font-weight:700;line-height:1.1"},"IT English Coach"));
+  const gear = h("button",{class:"iconbtn","aria-label":"Ajustes",onclick:()=>go("ajustes")}); gear.append(icon("gear","muted")); gear.querySelector("span").style.width="18px";
+  top.append(logo, mid, gear);
+  const pr = h("div",{class:"row",style:"margin-top:12px"},
+    (function(){const b=h("div",{class:"prog"});b.append(h("i",{style:"width:"+pct+"%"}));return b;})(),
+    h("span",{class:"mono t11 muted"},done+"/"+MODULES.length+" · "+pct+"%"));
+  wrap.append(top, pr);
+  wrap.append(h("p",{class:"t12",style:"color:var(--faint);margin:8px 0 0;line-height:1.4"},
+    "Objetivo A1/A2 → B1/B2 · inglés general + soporte, redes, sistemas, ágiles, automatización, IA y domótica."));
+  return wrap;
+}
+function iconAmber(){ const s=icon("terminal"); s.style.color="var(--amber)"; s.style.width="20px"; s.querySelector("svg").style.width="20px"; s.querySelector("svg").style.height="20px"; return s; }
+
+function nav(){
+  const items = [["temario","Temario","terminal"],["practica","Práctica","chat"],["pruebas","Pruebas","book"],["tutor","Tutor","grad"]];
+  const bar = h("nav",{class:"tabs"});
+  const inner = h("div",{class:"inner"});
+  for(const [id,label,ic] of items){
+    const on = route.tab===id;
+    const b = h("button",{class:on?"on":"",onclick:()=>go(id)});
+    const sv = h("span",{html:I[ic]}); b.append(sv, h("span",{},label));
+    if(on) sv.style.color="var(--amber)";
+    inner.append(b);
+  }
+  bar.append(inner);
+  return bar;
+}
+
+function render(){
+  app.innerHTML = "";
+  const wrap = h("div",{class:"wrap"});
+  wrap.append(header());
+  const view = h("main",{style:"margin-top:18px"});
+  wrap.append(view);
+  app.append(wrap, nav());
+  const t = route.tab;
+  if(t==="temario") viewTemario(view);
+  else if(t==="practica") viewPractica(view);
+  else if(t==="pruebas") viewPruebas(view);
+  else if(t==="tutor") viewTutor(view);
+  else if(t==="ajustes") viewAjustes(view);
+  window.scrollTo(0,0);
+}
+
+/* =========================================================================
+   VIEW: TEMARIO
+   ========================================================================= */
+function stateNext(s){ return s==="pending"?"active":s==="active"?"done":"pending"; }
+function stateBtn(code){
+  const s = progress.status[code]||"pending";
+  const b = h("button",{class:"stateBtn",title:"Pulsa para cambiar el estado","aria-label":"Estado del módulo"});
+  const set = ()=>{
+    const st = progress.status[code]||"pending";
+    b.style.borderColor = st==="pending"?"var(--faint)":st==="active"?"var(--amber)":"var(--teal)";
+    b.style.background = st==="pending"?"transparent":st==="active"?"var(--amber-soft)":"var(--teal-soft)";
+    b.innerHTML = st==="done"? I.check : st==="active"? '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/></svg>';
+    const col = st==="pending"?"var(--faint)":st==="active"?"var(--amber)":"var(--teal)";
+    b.querySelector("svg").style.width="16px"; b.querySelector("svg").style.height="16px"; b.style.color=col;
+  };
+  set();
+  b.addEventListener("click",()=>{ progress.status[code]=stateNext(progress.status[code]||"pending"); saveProgress(); set(); updateProgressBar(); });
+  return b;
+}
+function updateProgressBar(){
+  const done = MODULES.filter(m=>progress.status[m.code]==="done").length;
+  const pct = Math.round(done/MODULES.length*100);
+  const bar = $(".prog>i"); if(bar) bar.style.width = pct+"%";
+  const lbl = $(".prog"); if(lbl && lbl.parentElement){ const s=lbl.parentElement.querySelector(".mono.t11.muted"); if(s) s.textContent = done+"/"+MODULES.length+" · "+pct+"%"; }
+}
+function levelBadge(from,to){ return h("span",{class:"badge"}, from===to?from:(from+" → "+to)); }
+function secLabel(color,text){ const w=h("div",{class:"row",style:"gap:6px"}); w.append(h("span",{class:"dot",style:"background:"+color}), h("span",{class:"seclabel"},text)); return w; }
+
+function viewTemario(view){
+  view.append(h("p",{class:"t14 muted",style:"line-height:1.55;margin:0 0 14px"},
+    "Ruta A1 → B2 en 12 módulos, equilibrio 50% inglés general / 50% IT. Pulsa el círculo para marcar cada módulo como en curso o completado."));
+  MODULES.forEach(m=>{
+    const card = h("div",{class:"card",style:"margin-bottom:12px;overflow:hidden"});
+    const head = h("div",{class:"row",style:"padding:12px"});
+    head.append(stateBtn(m.code));
+    const body = document.createElement("div");
+    const openBtn = h("button",{style:"flex:1;text-align:left;background:transparent;border:0;min-width:0;padding:0"});
+    openBtn.append(
+      h("div",{class:"row",style:"gap:8px;flex-wrap:wrap"}, h("span",{class:"mono t11",style:"color:var(--faint)"},m.code), levelBadge(m.from,m.to)),
+      h("div",{class:"grot t15",style:"font-weight:600;margin-top:4px;line-height:1.25"},m.title));
+    const chev = h("span",{html:I.chevron,style:"color:var(--muted);transition:transform .2s"}); chev.querySelector("svg").style.width="18px";chev.querySelector("svg").style.height="18px";
+    head.append(openBtn, chev);
+    card.append(head);
+    let open=false;
+    openBtn.addEventListener("click",()=>{
+      open=!open; chev.style.transform=open?"rotate(180deg)":"none";
+      if(open && !body.dataset.built){ buildModuleBody(body,m); body.dataset.built="1"; }
+      body.style.display = open?"block":"none";
+    });
+    body.style.display="none";
+    card.append(body);
+    view.append(card);
+  });
+}
+function chipGrid(list, accent){ const g=h("div",{class:"gridChips"}); list.forEach(v=>{ const c=h("div",{class:"chip"}); c.append(h("div",{class:"en",style:accent?"color:"+accent:""},v[0]), h("div",{class:"es"},v[1])); g.append(c); }); return g; }
+function bullets(items){ const ul=h("div",{style:"margin-top:6px"}); items.forEach(t=>{ ul.append(h("div",{class:"t135",style:"line-height:1.35;margin-bottom:4px;display:flex;gap:8px"}, h("span",{style:"color:var(--faint)"},"›"), h("span",{},t))); }); return ul; }
+function buildModuleBody(body,m){
+  body.style.borderTop="1px solid var(--border-soft)"; body.style.padding="14px";
+  const g1 = h("div",{class:"grid2"});
+  const c1=document.createElement("div"); c1.append(secLabel("var(--amber)","Objetivos · General"), bullets(m.og));
+  const c2=document.createElement("div"); c2.append(secLabel("var(--teal)","Objetivos · IT / Sistemas"), bullets(m.oi));
+  g1.append(c1,c2); body.append(g1);
+  const vg=document.createElement("div"); vg.style.marginTop="14px"; vg.append(secLabel("var(--amber)","Vocabulario general")); const vgg=chipGrid(m.vg); vgg.style.marginTop="6px"; vg.append(vgg); body.append(vg);
+  const vi=document.createElement("div"); vi.style.marginTop="14px"; vi.append(secLabel("var(--teal)","Vocabulario IT")); const vii=chipGrid(m.vi,"var(--teal)"); vii.style.marginTop="6px"; vi.append(vii); body.append(vi);
+  const g2 = h("div",{class:"grid2"}); g2.style.marginTop="14px";
+  const gg=document.createElement("div"); gg.append(secLabel("var(--muted)","Gramática"), bullets(m.gr));
+  const pp=document.createElement("div"); pp.append(secLabel("var(--muted)","Frases modelo"));
+  const pw=h("div",{style:"margin-top:6px;display:flex;flex-direction:column;gap:6px"});
+  m.ph.forEach(p=> pw.append(h("div",{class:"mono t12",style:"background:var(--surface2);border:1px solid var(--border-soft);border-radius:10px;padding:6px 10px;line-height:1.35"},"“"+p+"”")));
+  pp.append(pw); g2.append(gg,pp); body.append(g2);
+}
+
+/* =========================================================================
+   VIEW: PRÁCTICA (role-play)
+   ========================================================================= */
+function needKeyBanner(view, what){
+  const b = h("div",{class:"card pad",style:"text-align:center"});
+  b.append(icon("key","muted"));
+  b.querySelector("span").style.color="var(--amber)"; b.querySelector("svg").style.width="26px"; b.querySelector("svg").style.height="26px";
+  b.append(h("div",{class:"grot t15",style:"font-weight:600;margin-top:8px"},"Configura un proveedor de IA"),
+    h("p",{class:"t135 muted",style:"line-height:1.55;margin:6px 0 12px"},(what||"Esta sección")+" usa un modelo de lenguaje. Añade la API key de uno de los proveedores (Anthropic, Gemini, OpenRouter, Mistral, Perplexity u OpenCode Zen) para empezar."),
+    (function(){const btn=h("button",{class:"btn primary",onclick:()=>go("ajustes")},"Abrir Ajustes"); return btn;})());
+  view.append(b);
+}
+
+function viewPractica(view){
+  if(route.detail){ const sc = SCENARIOS.find(s=>s.id===route.detail); if(sc){ chatScreen(view, {mode:"roleplay", scenario:sc}); return; } }
+  view.append(h("p",{class:"t14 muted",style:"line-height:1.55;margin:0 0 14px"},
+    "Elige una simulación. Asumes el rol indicado y respondes en inglés; la IA interpreta al otro personaje, corrige tus errores tipo code review y sigue la conversación."));
+  if(!activeProviderReady()){ needKeyBanner(view,"La práctica con role-play"); view.append(h("hr",{class:"sep"})); }
+  const grid = h("div",{class:"cardsGrid"});
+  SCENARIOS.forEach(s=>{
+    const cat = CATS[s.cat];
+    const card = h("button",{class:"card",style:"padding:14px;text-align:left;border:1px solid var(--border-soft)",onclick:()=>{ route.detail=s.id; render(); }});
+    card.append(
+      h("div",{class:"row",style:"gap:8px;margin-bottom:8px"},
+        h("span",{class:"mono t10 up",style:"color:"+cat.color},cat.label), levelBadge(s.level,s.level)),
+      h("div",{class:"grot t15",style:"font-weight:600;line-height:1.25"},s.title),
+      h("div",{class:"t125 muted",style:"margin-top:4px;line-height:1.4"},s.role));
+    grid.append(card);
+  });
+  view.append(grid);
+}
+
+/* =========================================================================
+   VIEW: TUTOR
+   ========================================================================= */
+const QUICK = [
+  "Explícame el Present Perfect con ejemplos de soporte IT.",
+  "Dame 12 palabras clave de redes con su traducción.",
+  "Corrige este email: 'Dear team, I writing for inform the server is down since morning.'",
+  "Hazme una pregunta de entrevista para IT Junior y espera mi respuesta.",
+];
+function viewTutor(view){
+  if(!activeProviderReady()){ needKeyBanner(view,"El tutor con IA"); return; }
+  chatScreen(view, {mode:"tutor"});
+}
+
+/* =========================================================================
+   CHAT SCREEN (shared by role-play + tutor)
+   ========================================================================= */
+function chatScreen(view, cfg){
+  const isRP = cfg.mode==="roleplay";
+  const sc = cfg.scenario;
+  // header
+  if(isRP){
+    const cat = CATS[sc.cat];
+    const bar = h("div",{class:"row",style:"margin-bottom:12px"});
+    const back = h("button",{class:"iconbtn",onclick:()=>{ route.detail=null; render(); }}); back.append(icon("back","muted")); back.querySelector("svg").style.width="18px";back.querySelector("svg").style.height="18px";
+    const mid = h("div",{class:"sp",style:"min-width:0"},
+      h("div",{class:"row",style:"gap:8px"}, h("span",{class:"mono t10 up",style:"color:"+cat.color},cat.label), levelBadge(sc.level,sc.level)),
+      h("div",{class:"grot t15",style:"font-weight:600;line-height:1.2"},sc.title));
+    const rst = h("button",{class:"iconbtn",title:"Reiniciar",onclick:()=>{ route.detail=sc.id; render(); }}); rst.append(icon("reset","muted")); rst.querySelector("svg").style.width="16px";rst.querySelector("svg").style.height="16px";
+    bar.append(back, mid, rst);
+    view.append(bar);
+    view.append(h("div",{class:"note",style:"margin-bottom:12px"}, h("span",{class:"mono t10 up",style:"color:var(--text);margin-right:8px"},"Tu rol"), sc.role));
+  } else {
+    view.append(h("div",{class:"row",style:"margin-bottom:12px"},
+      h("div",{class:"sp"}, h("div",{class:"grot t17",style:"font-weight:700"},"Tutor IA"),
+        h("div",{class:"t125 muted"},"Gramática, vocabulario, corrección de emails y simulacros."))));
+  }
+
+  const stream = h("div",{style:"display:flex;flex-direction:column;gap:12px;min-height:120px"});
+  view.append(stream);
+
+  // quick prompts (tutor, empty state)
+  let quickWrap=null;
+  if(!isRP){
+    quickWrap = h("div",{style:"display:flex;flex-direction:column;gap:8px;margin-top:4px"});
+    QUICK.forEach(q=>{
+      const b=h("button",{class:"card",style:"padding:12px 14px;text-align:left;border:1px solid var(--border-soft);display:flex;gap:8px;align-items:center;font-size:13.5px;line-height:1.35",onclick:()=>{ input.value=q; sendNow(); }});
+      const sp=h("span",{html:I.spark,style:"color:var(--amber);flex-shrink:0"}); sp.querySelector("svg").style.width="15px";sp.querySelector("svg").style.height="15px";
+      b.append(sp, h("span",{},q)); quickWrap.append(b);
+    });
+    stream.append(quickWrap);
+  }
+
+  // suggestion + error slots
+  const suggestSlot = h("div",{});
+  const errSlot = h("div",{});
+  // input row
+  const input = h("textarea",{class:"input",rows:"1",placeholder:isRP?"Escribe tu respuesta en inglés…":"Pregunta a tu tutor…"});
+  const sendBtn = h("button",{class:"btn",style:"height:44px;width:44px;padding:0;flex-shrink:0"});
+  const sendIcon = h("span",{html:I.send}); sendIcon.querySelector("svg").style.width="18px";sendIcon.querySelector("svg").style.height="18px";
+  sendBtn.append(sendIcon);
+  const inputRow = h("div",{class:"row",style:"margin-top:12px;align-items:flex-end;gap:8px"}, input, sendBtn);
+  view.append(suggestSlot, errSlot, inputRow);
+
+  function setSendState(){ const has = input.value.trim().length>0 && !busy; sendBtn.className="btn"+(has?(isRP?" primary":" teal"):""); sendBtn.disabled=!has; }
+  input.addEventListener("input",()=>{ input.style.height="auto"; input.style.height=Math.min(input.scrollHeight,140)+"px"; setSendState(); });
+  input.addEventListener("keydown",e=>{ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); sendNow(); } });
+  sendBtn.addEventListener("click",sendNow);
+  setSendState();
+
+  // state
+  const history = [];       // [{role, content}] sent to API
+  let busy=false;
+  const SEED = "(Comienza la simulación ahora. Preséntate e inicia el escenario en inglés según tu personaje. Aún no hay mensaje del alumno, así que 'corrections' debe ser [].)";
+
+  function bubbleMe(text){
+    stream.append(h("div",{style:"display:flex;justify-content:flex-end"}, h("div",{class:"bubble me"},text)));
+    scrollDown();
+  }
+  function avatar(kind){ const a=h("div",{class:"avatar"}); const s=h("span",{html:kind==="tutor"?I.grad:I.bot}); s.querySelector("svg").style.width="16px";s.querySelector("svg").style.height="16px"; s.style.color=kind==="tutor"?"var(--teal)":(isRP?CATS[sc.cat].color:"var(--teal)"); a.append(s); return a; }
+  function bubbleBot(text){
+    const row=h("div",{style:"display:flex;gap:8px"}, avatar(isRP?"bot":"tutor"), h("div",{class:"bubble bot",style:"white-space:pre-wrap"},text));
+    stream.append(row); scrollDown();
+  }
+  function reviewBlock(data){
+    if(!data) return;
+    const hasCorr = data.corrections && data.corrections.length>0;
+    if(!hasCorr && !data.feedback_es) return;
+    const box=h("div",{class:"review"});
+    const hd=h("div",{class:"hd"}, h("span",{class:"mono t10 up",style:"color:var(--faint)"},"review"));
+    if(data.level) hd.append(h("span",{class:"badge",style:"font-size:10px;padding:1px 6px"},"tu nivel: "+data.level));
+    if(!hasCorr) hd.append(h("span",{class:"row",style:"margin-left:auto;gap:5px;color:var(--teal);font-size:12px"}, (function(){const s=h("span",{html:I.check});s.querySelector("svg").style.width="13px";s.querySelector("svg").style.height="13px";return s;})(), "¡Sin errores!"));
+    box.append(hd);
+    if(hasCorr){
+      const body=h("div",{style:"padding:8px;display:flex;flex-direction:column;gap:8px"});
+      data.corrections.forEach(c=>{
+        const d=h("div",{class:"diff"});
+        d.append(h("div",{class:"del"},"- "+(c.original||"")), h("div",{class:"add"},"+ "+(c.corrected||"")));
+        if(c.note) d.append(h("div",{class:"muted",style:"font-family:var(--fb);font-size:12px;margin-top:4px;line-height:1.4"},c.note));
+        body.append(d);
+      });
+      box.append(body);
+    }
+    if(data.feedback_es) box.append(h("div",{style:"border-top:1px solid var(--border-soft);padding:8px 12px;color:var(--muted);font-size:12.5px;line-height:1.45"},data.feedback_es));
+    stream.append(box); scrollDown();
+  }
+  let typingRow=null;
+  function showTyping(){
+    typingRow=h("div",{style:"display:flex;gap:8px;align-items:center;color:var(--muted)"}, avatar(isRP?"bot":"tutor"),
+      h("span",{class:"typing"}, h("i",{}),h("i",{}),h("i",{})), h("span",{class:"t125"}, isRP?"escribiendo…":"pensando…"));
+    stream.append(typingRow); scrollDown();
+  }
+  function hideTyping(){ if(typingRow){ typingRow.remove(); typingRow=null; } }
+  function scrollDown(){ requestAnimationFrame(()=>window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})); }
+  function showErr(msg, retry){
+    errSlot.innerHTML="";
+    const a=h("div",{class:"alert warn",style:"margin-top:12px;display:flex;gap:10px;align-items:center;justify-content:space-between"}, h("span",{},msg));
+    if(retry){ const r=h("button",{class:"btn ghost",style:"padding:4px 10px;font-size:12px;border-color:rgba(255,122,107,.4);color:var(--coral)",onclick:()=>{ errSlot.innerHTML=""; retry(); }},"Reintentar"); a.append(r); }
+    errSlot.append(a);
+  }
+  function showSuggestion(text){
+    suggestSlot.innerHTML="";
+    if(!text) return;
+    const b=h("button",{class:"card",style:"width:100%;text-align:left;padding:8px 12px;margin-top:12px;border:1px solid var(--border-soft);display:flex;gap:8px;align-items:center;font-size:12.5px;line-height:1.4;color:var(--muted)",onclick:()=>{ input.value=text; input.dispatchEvent(new Event("input")); input.focus(); }});
+    const sp=h("span",{html:I.spark,style:"color:var(--amber);flex-shrink:0"}); sp.querySelector("svg").style.width="13px";sp.querySelector("svg").style.height="13px";
+    b.append(sp, h("span",{html:'<span style="color:var(--faint)">sugerencia:</span> “'+esc(text)+'”'})); suggestSlot.append(b);
+  }
+
+  async function sendNow(){
+    const t = input.value.trim(); if(!t || busy) return;
+    if(quickWrap){ quickWrap.remove(); quickWrap=null; }
+    input.value=""; input.style.height="auto"; setSendState(); errSlot.innerHTML=""; suggestSlot.innerHTML="";
+    bubbleMe(t);
+    busy=true; setSendState(); showTyping();
+    const sys = isRP ? roleplaySystem(sc) : TUTOR_SYSTEM;
+    const toSend = history.concat([{role:"user",content:t}]);
+    try{
+      const out = await chat(toSend, sys);
+      hideTyping();
+      if(isRP){
+        const data = parseJSON(out) || {reply_en:out, corrections:[]};
+        reviewBlock(data);
+        const reply = data.reply_en || out;
+        bubbleBot(reply);
+        history.push({role:"user",content:t},{role:"assistant",content:reply});
+        showSuggestion(data.suggestion_en);
+      } else {
+        bubbleBot(out||"…");
+        history.push({role:"user",content:t},{role:"assistant",content:out||""});
+      }
+    }catch(e){
+      hideTyping();
+      showErr(String(e.message||e), ()=>{ input.value=t; input.dispatchEvent(new Event("input")); sendNow(); });
+    }finally{ busy=false; setSendState(); }
+  }
+
+  // kickoff for role-play
+  if(isRP){
+    busy=true; showTyping();
+    (async()=>{
+      try{
+        const out = await chat([{role:"user",content:SEED}], roleplaySystem(sc));
+        hideTyping();
+        const data = parseJSON(out) || {reply_en:out, corrections:[]};
+        const reply = data.reply_en || out;
+        bubbleBot(reply);
+        history.push({role:"user",content:SEED},{role:"assistant",content:reply});
+        showSuggestion(data.suggestion_en);
+      }catch(e){ hideTyping(); showErr("No se pudo iniciar la simulación: "+String(e.message||e), ()=>{ route.detail=sc.id; render(); }); }
+      finally{ busy=false; setSendState(); }
+    })();
+  }
+}
+
+/* =========================================================================
+   VIEW: PRUEBAS (reading / listening / dictation)
+   ========================================================================= */
+function viewPruebas(view){
+  // sub tabs
+  const tabs = [["reading","Reading","book"],["listening","Listening","ear"]];
+  const bar = h("div",{class:"card",style:"padding:4px;display:flex;gap:4px;margin-bottom:16px"});
+  tabs.forEach(([id,label,ic])=>{
+    const on = route.sub===id;
+    const b=h("button",{style:"flex:1;border:1px solid "+(on?"var(--border)":"transparent")+";background:"+(on?"var(--surface2)":"transparent")+";color:"+(on?"var(--text)":"var(--muted)")+";border-radius:10px;padding:8px;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px",onclick:()=>{ route.sub=id; route.detail=null; render(); }});
+    const s=h("span",{html:I[ic]}); s.querySelector("svg").style.width="15px";s.querySelector("svg").style.height="15px"; if(on)s.style.color="var(--amber)";
+    b.append(s, h("span",{},label)); bar.append(b);
+  });
+  view.append(bar);
+  if(route.sub==="listening") viewListening(view); else viewReading(view);
+}
+
+function catPill(cat){ const c=CATS[cat]; return h("span",{class:"mono t10 up",style:"color:"+(c?c.color:"var(--muted)")}, c?c.label:cat); }
+
+/* ---- Reading ---- */
+function viewReading(view){
+  if(route.detail){ const it=READING.find(r=>r.id===route.detail); if(it){ readingDetail(view,it); return; } }
+  view.append(h("p",{class:"t14 muted",style:"line-height:1.55;margin:0 0 14px"},"Lee cada texto y responde las preguntas. Corrección y explicación al instante."));
+  const grid=h("div",{class:"cardsGrid"});
+  READING.forEach(it=>{
+    const card=h("button",{class:"card",style:"padding:14px;text-align:left;border:1px solid var(--border-soft)",onclick:()=>{ route.detail=it.id; render(); }});
+    card.append(h("div",{class:"row",style:"gap:8px;margin-bottom:8px"}, catPill(it.cat), levelBadge(it.level,it.level)),
+      h("div",{class:"grot t15",style:"font-weight:600;line-height:1.25"},it.title),
+      h("div",{class:"t125 muted",style:"margin-top:4px"}, it.qs.length+" preguntas"));
+    grid.append(card);
+  });
+  view.append(grid);
+}
+function backBar(view,title,sub,onBack){
+  const bar=h("div",{class:"row",style:"margin-bottom:14px"});
+  const back=h("button",{class:"iconbtn",onclick:onBack}); back.append(icon("back","muted")); back.querySelector("svg").style.width="18px";back.querySelector("svg").style.height="18px";
+  bar.append(back, h("div",{class:"sp"}, h("div",{class:"grot t15",style:"font-weight:600;line-height:1.2"},title), sub?h("div",{class:"t125 muted"},sub):null));
+  view.append(bar);
+}
+function questionBlock(qs, onDone){
+  const answers = new Array(qs.length).fill(-1);
+  let graded=false;
+  const wrap=h("div",{});
+  const blocks=[];
+  qs.forEach((question,qi)=>{
+    const qb=h("div",{class:"card pad",style:"margin-bottom:10px"});
+    qb.append(h("div",{class:"t14",style:"font-weight:600;line-height:1.4;margin-bottom:8px"},(qi+1)+". "+question.q));
+    const optWrap=h("div",{style:"display:flex;flex-direction:column;gap:8px"});
+    const optEls=[];
+    question.opts.forEach((opt,oi)=>{
+      const ob=h("button",{class:"opt"});
+      ob.append(h("span",{class:"k"},String.fromCharCode(65+oi)), h("span",{},opt));
+      ob.addEventListener("click",()=>{ if(graded) return; answers[qi]=oi; optEls.forEach((e,i)=>e.className="opt"+(i===oi?" sel":"")); });
+      optWrap.append(ob); optEls.push(ob);
+    });
+    qb.append(optWrap);
+    const exp=h("div",{class:"explain",style:"display:none"});
+    qb.append(exp);
+    wrap.append(qb);
+    blocks.push({optEls,exp,question});
+  });
+  const actions=h("div",{class:"row",style:"gap:10px;margin-top:4px"});
+  const grade=h("button",{class:"btn primary"},"Corregir");
+  const scoreEl=h("span",{class:"t14",style:"font-weight:600"});
+  actions.append(grade, scoreEl);
+  wrap.append(actions);
+  grade.addEventListener("click",()=>{
+    if(!graded){
+      let score=0;
+      blocks.forEach((b,qi)=>{
+        const correct=b.question.a;
+        b.optEls.forEach((e,i)=>{ e.className="opt"+(i===correct?" correct":(i===answers[qi]&&answers[qi]!==correct?" wrong":"")); });
+        if(answers[qi]===correct) score++;
+        b.exp.style.display="block";
+        b.exp.innerHTML = (answers[qi]===correct?'<span style="color:var(--teal)">✓ Correcto. </span>':'<span style="color:var(--coral)">✗ Respuesta correcta: '+String.fromCharCode(65+correct)+'. </span>') + esc(b.question.ex||"");
+      });
+      graded=true;
+      scoreEl.textContent = "Puntuación: "+score+"/"+qs.length;
+      scoreEl.style.color = score===qs.length?"var(--teal)":score>=Math.ceil(qs.length/2)?"var(--amber)":"var(--coral)";
+      grade.textContent="Reintentar";
+      if(onDone) onDone(score,qs.length);
+    } else {
+      graded=false; answers.fill(-1);
+      blocks.forEach(b=>{ b.optEls.forEach(e=>e.className="opt"); b.exp.style.display="none"; });
+      grade.textContent="Corregir"; scoreEl.textContent="";
+    }
+    window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
+  });
+  return wrap;
+}
+function readingDetail(view,it){
+  backBar(view,it.title,CATS[it.cat].label+" · "+it.level,()=>{ route.detail=null; render(); });
+  const textCard=h("div",{class:"card pad",style:"margin-bottom:16px"});
+  textCard.append(h("div",{class:"seclabel",style:"margin-bottom:8px"},"TEXT"));
+  it.text.split("\n").forEach(par=>{ if(par.trim()==="") return; textCard.append(h("p",{class:"t14",style:"line-height:1.65;margin:0 0 10px"},par)); });
+  view.append(textCard);
+  view.append(h("div",{class:"seclabel",style:"margin:0 0 10px"},"COMPREHENSION"));
+  view.append(questionBlock(it.qs));
+}
+
+/* ---- Listening (Web Speech API) ---- */
+let VOICES=[];
+function loadVoices(){ try{ VOICES = window.speechSynthesis ? speechSynthesis.getVoices() : []; }catch(e){ VOICES=[]; } }
+if(window.speechSynthesis){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+function enVoices(){ return VOICES.filter(v=>/^en(-|_|$)/i.test(v.lang)); }
+function pickVoice(pref){ const en=enVoices(); if(!en.length) return null; if(pref){ const f=en.find(v=>v.name===pref); if(f) return f; } return en[0]; }
+
+function viewListening(view){
+  if(!window.speechSynthesis){
+    view.append(h("div",{class:"alert warn"},"Tu navegador no soporta síntesis de voz (Web Speech API). Prueba en Chrome, Edge o Safari."));
+    return;
+  }
+  if(route.detail){
+    if(route.detail==="dictation"){ dictationDetail(view); return; }
+    const it=LISTENING.find(l=>l.id===route.detail); if(it){ listeningDetail(view,it); return; }
+  }
+  view.append(h("p",{class:"t14 muted",style:"line-height:1.55;margin:0 0 14px"},"Escucha el audio (voz del dispositivo), responde las preguntas y luego revela la transcripción. Incluye también un ejercicio de dictado."));
+  // voice selector
+  const vcard=h("div",{class:"card pad",style:"margin-bottom:16px"});
+  vcard.append(h("label",{class:"lbl"},"Voz en inglés"));
+  const sel=h("select",{class:"input"});
+  const refresh=()=>{ sel.innerHTML=""; const en=enVoices(); if(!en.length){ sel.append(h("option",{value:""},"(cargando voces… pulsa reproducir)")); } en.forEach(v=>{ const o=h("option",{value:v.name}, v.name+" · "+v.lang); if(settings.voice===v.name)o.selected=true; sel.append(o); }); };
+  refresh(); if(window.speechSynthesis) speechSynthesis.onvoiceschanged=()=>{ loadVoices(); refresh(); };
+  sel.addEventListener("change",()=>{ settings.voice=sel.value; saveSettings(); });
+  vcard.append(sel);
+  vcard.append(h("div",{class:"row",style:"margin-top:12px;gap:10px"},
+    h("label",{class:"lbl",style:"margin:0"},"Velocidad"),
+    (function(){const r=h("input",{type:"range",min:"0.6",max:"1.1",step:"0.05",value:String(settings.rate||0.95),style:"flex:1"}); const lab=h("span",{class:"mono t12 muted"},(settings.rate||0.95).toFixed(2)+"×"); r.addEventListener("input",()=>{ settings.rate=parseFloat(r.value); saveSettings(); lab.textContent=settings.rate.toFixed(2)+"×"; }); const w=h("div",{class:"row",style:"flex:1;gap:8px"},r,lab); return w;})()));
+  view.append(vcard);
+
+  const grid=h("div",{class:"cardsGrid"});
+  LISTENING.forEach(it=>{
+    const card=h("button",{class:"card",style:"padding:14px;text-align:left;border:1px solid var(--border-soft)",onclick:()=>{ route.detail=it.id; render(); }});
+    card.append(h("div",{class:"row",style:"gap:8px;margin-bottom:8px"}, catPill(it.cat), levelBadge(it.level,it.level)),
+      h("div",{class:"grot t15",style:"font-weight:600;line-height:1.25"},it.title),
+      h("div",{class:"t125 muted",style:"margin-top:4px"}, it.qs.length+" preguntas · "+(it.lines.length>1?"diálogo":"monólogo")));
+    grid.append(card);
+  });
+  const dict=h("button",{class:"card",style:"padding:14px;text-align:left;border:1px solid var(--border-soft)",onclick:()=>{ route.detail="dictation"; render(); }});
+  dict.append(h("div",{class:"row",style:"gap:8px;margin-bottom:8px"}, h("span",{class:"mono t10 up",style:"color:var(--amber)"},"Dictado"), h("span",{class:"pill"},"A2–B2")),
+    h("div",{class:"grot t15",style:"font-weight:600;line-height:1.25"},"Dictation"),
+    h("div",{class:"t125 muted",style:"margin-top:4px"}, DICTATION.length+" frases · escribe lo que oigas"));
+  grid.append(dict);
+  view.append(grid);
+}
+
+function makePlayer(lines){
+  // returns {node} with play/pause/restart controls
+  let idx=0, playing=false, paused=false;
+  const wrap=h("div",{class:"card pad"});
+  const btnPlay=h("button",{class:"btn primary",style:"gap:8px"});
+  const playLbl=h("span",{},"Reproducir");
+  const pIcon=h("span",{html:I.play}); pIcon.querySelector("svg").style.width="16px";pIcon.querySelector("svg").style.height="16px";
+  btnPlay.append(pIcon, playLbl);
+  const btnRe=h("button",{class:"btn ghost",style:"gap:8px"}); const rI=h("span",{html:I.reset});rI.querySelector("svg").style.width="15px";rI.querySelector("svg").style.height="15px"; btnRe.append(rI, h("span",{},"Reiniciar"));
+  const status=h("span",{class:"t125 muted"});
+  wrap.append(h("div",{class:"row",style:"gap:10px;flex-wrap:wrap"}, btnPlay, btnRe, status));
+  wrap.append(h("div",{class:"t125 muted",style:"margin-top:10px;display:flex;gap:6px;align-items:center"},
+    (function(){const s=h("span",{html:I.ear});s.querySelector("svg").style.width="14px";s.querySelector("svg").style.height="14px";s.style.color="var(--teal)";return s;})(),
+    "Audio generado por la voz del dispositivo. Transcripción oculta hasta que respondas."));
+
+  const speakers = Array.from(new Set(lines.map(l=>l.who)));
+  function voiceFor(who){
+    const en=enVoices(); if(!en.length) return null;
+    const primary=pickVoice(settings.voice)||en[0];
+    if(speakers.length<2 || who===speakers[0]) return primary;
+    const alt = en.find(v=>v!==primary) || primary;
+    return alt;
+  }
+  function speakFrom(i){
+    if(!window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    idx=i; playing=true; paused=false; updateBtn();
+    const queue = lines.slice(i);
+    let k=i;
+    queue.forEach((line)=>{
+      const u=new SpeechSynthesisUtterance(line.text);
+      const v=voiceFor(line.who); if(v){ u.voice=v; u.lang=v.lang; } else { u.lang="en-US"; }
+      u.rate=settings.rate||0.95;
+      u.onstart=()=>{ status.textContent = speakers.length>1? (line.who+" hablando…") : "Reproduciendo…"; };
+      u.onend=()=>{ k++; idx=k; if(k>=lines.length){ playing=false; paused=false; status.textContent="Fin del audio."; updateBtn(); } };
+      speechSynthesis.speak(u);
+    });
+  }
+  function updateBtn(){
+    if(playing && !paused){ playLbl.textContent="Pausar"; pIcon.innerHTML=I.pause; }
+    else if(paused){ playLbl.textContent="Continuar"; pIcon.innerHTML=I.play; }
+    else { playLbl.textContent="Reproducir"; pIcon.innerHTML=I.play; }
+    pIcon.querySelector("svg").style.width="16px";pIcon.querySelector("svg").style.height="16px";
+  }
+  btnPlay.addEventListener("click",()=>{
+    if(!playing){ loadVoices(); speakFrom(0); }
+    else if(paused){ speechSynthesis.resume(); paused=false; updateBtn(); status.textContent="Reproduciendo…"; }
+    else { speechSynthesis.pause(); paused=true; updateBtn(); status.textContent="En pausa."; }
+  });
+  btnRe.addEventListener("click",()=>{ loadVoices(); speakFrom(0); });
+  return {node:wrap, stop:()=>{ try{speechSynthesis.cancel();}catch(e){} }};
+}
+
+function listeningDetail(view,it){
+  backBar(view,it.title,CATS[it.cat].label+" · "+it.level,()=>{ if(window.speechSynthesis)speechSynthesis.cancel(); route.detail=null; render(); });
+  const player=makePlayer(it.lines);
+  view.append(player.node);
+  view.append(h("div",{class:"seclabel",style:"margin:16px 0 10px"},"COMPREHENSION"));
+  const transWrap=h("div",{});
+  const qb=questionBlock(it.qs, ()=>{ revealBtn.style.display="inline-flex"; });
+  view.append(qb);
+  const revealBtn=h("button",{class:"btn ghost",style:"margin-top:14px;display:none"},"Mostrar transcripción");
+  view.append(revealBtn, transWrap);
+  revealBtn.addEventListener("click",()=>{
+    if(transWrap.dataset.open){ transWrap.innerHTML=""; transWrap.dataset.open=""; revealBtn.textContent="Mostrar transcripción"; return; }
+    const card=h("div",{class:"card pad",style:"margin-top:12px"});
+    card.append(h("div",{class:"seclabel",style:"margin-bottom:8px"},"TRANSCRIPT"));
+    it.lines.forEach(l=>{ card.append(h("p",{class:"t14",style:"line-height:1.6;margin:0 0 8px"}, (it.lines.length>1?h("b",{style:"color:var(--muted)"},l.who+": "):null), l.text)); });
+    transWrap.append(card); transWrap.dataset.open="1"; revealBtn.textContent="Ocultar transcripción";
+  });
+}
+
+/* ---- Dictation ---- */
+function normalize(s){ return s.toLowerCase().replace(/[^a-z0-9'\s]/g,"").replace(/\s+/g," ").trim(); }
+function dictationDetail(view){
+  backBar(view,"Dictation","Escribe exactamente lo que oigas",()=>{ if(window.speechSynthesis)speechSynthesis.cancel(); route.detail=null; render(); });
+  let i=0;
+  const card=h("div",{class:"card pad"});
+  const counter=h("div",{class:"row",style:"margin-bottom:12px"}, h("span",{class:"mono t12 muted"}), h("div",{class:"sp"}));
+  const controls=h("div",{class:"row",style:"gap:10px;flex-wrap:wrap"});
+  const play=h("button",{class:"btn primary",style:"gap:8px"}); const pi=h("span",{html:I.play});pi.querySelector("svg").style.width="16px";pi.querySelector("svg").style.height="16px"; play.append(pi, h("span",{},"Escuchar"));
+  const slow=h("button",{class:"btn ghost"},"Más despacio");
+  controls.append(play, slow);
+  const ta=h("textarea",{class:"input",rows:"2",placeholder:"Escribe la frase que has oído…",style:"margin-top:12px"});
+  const check=h("button",{class:"btn teal",style:"margin-top:12px"},"Comprobar");
+  const result=h("div",{style:"margin-top:12px"});
+  const nav=h("div",{class:"row",style:"gap:10px;margin-top:12px"});
+  const prev=h("button",{class:"btn ghost"},"Anterior"); const next=h("button",{class:"btn"},"Siguiente");
+  nav.append(prev, next);
+  card.append(counter, controls, ta, check, result, nav);
+  view.append(card);
+
+  function speak(rate){ if(!window.speechSynthesis) return; loadVoices(); speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(DICTATION[i]); const v=pickVoice(settings.voice); if(v){u.voice=v;u.lang=v.lang;}else u.lang="en-US"; u.rate=rate||settings.rate||0.95; speechSynthesis.speak(u); }
+  function load(){
+    counter.querySelector(".mono").textContent = "Frase "+(i+1)+" / "+DICTATION.length;
+    ta.value=""; result.innerHTML=""; prev.disabled=i===0; next.disabled=i===DICTATION.length-1;
+  }
+  play.addEventListener("click",()=>speak());
+  slow.addEventListener("click",()=>speak(0.7));
+  check.addEventListener("click",()=>{
+    const target=DICTATION[i]; const ok = normalize(ta.value)===normalize(target);
+    result.innerHTML="";
+    if(ok){ result.append(h("div",{class:"alert",style:"background:var(--teal-soft);border:1px solid rgba(52,216,192,.35);color:var(--teal)"},"✓ ¡Perfecto! "+target)); }
+    else {
+      const box=h("div",{class:"card pad"});
+      box.append(h("div",{class:"t125 muted",style:"margin-bottom:6px"},"Comparación:"));
+      box.append(h("div",{class:"diff"}, diffWords(target, ta.value)));
+      box.append(h("div",{class:"t135",style:"margin-top:8px"}, h("span",{class:"muted"},"Correcto: "), h("b",{},target)));
+      result.append(box);
+    }
+  });
+  function diffWords(target, typed){
+    const tw=target.split(/\s+/), gw=normalize(typed).split(/\s+/).filter(Boolean);
+    const gset=gw;
+    const frag=document.createDocumentFragment();
+    tw.forEach((w,idx)=>{
+      const clean=normalize(w);
+      const good = gset[idx]!=null && gset[idx]===clean;
+      const span=h("span",{style:"color:"+(good?"var(--teal)":"var(--coral)")}, w+" ");
+      frag.append(span);
+    });
+    return frag;
+  }
+  prev.addEventListener("click",()=>{ if(i>0){i--;load();} });
+  next.addEventListener("click",()=>{ if(i<DICTATION.length-1){i++;load();} });
+  load();
+}
+
+/* =========================================================================
+   VIEW: AJUSTES (settings)
+   ========================================================================= */
+function viewAjustes(view){
+  const bar=h("div",{class:"row",style:"margin-bottom:14px"});
+  const back=h("button",{class:"iconbtn",onclick:()=>go("temario")}); back.append(icon("back","muted")); back.querySelector("svg").style.width="18px";back.querySelector("svg").style.height="18px";
+  bar.append(back, h("div",{class:"sp"}, h("div",{class:"grot t17",style:"font-weight:700"},"Ajustes"), h("div",{class:"t125 muted"},"Proveedor de IA y claves de API")));
+  view.append(bar);
+
+  // active provider
+  const actCard=h("div",{class:"card pad",style:"margin-bottom:14px"});
+  actCard.append(h("label",{class:"lbl"},"Proveedor activo (usado por Práctica y Tutor)"));
+  const sel=h("select",{class:"input"});
+  PROVIDER_ORDER.forEach(p=>{ const o=h("option",{value:p}, PROVIDERS[p].label); if(settings.provider===p)o.selected=true; sel.append(o); });
+  sel.addEventListener("change",()=>{ settings.provider=sel.value; saveSettings(); statusEl.textContent=""; });
+  actCard.append(sel);
+  // proxy
+  actCard.append(h("label",{class:"lbl",style:"margin-top:12px"},"Proxy URL (opcional, para CORS · usa server.js)"));
+  const proxy=h("input",{class:"input",type:"text",placeholder:"https://msbross.me/english",value:settings.proxyUrl||""});
+  proxy.addEventListener("input",()=>{ settings.proxyUrl=proxy.value.trim(); saveSettings(); });
+  actCard.append(proxy);
+  // test
+  const testRow=h("div",{class:"row",style:"gap:10px;margin-top:12px"});
+  const testBtn=h("button",{class:"btn primary"},"Probar conexión");
+  const statusEl=h("span",{class:"t125"});
+  testRow.append(testBtn, statusEl);
+  actCard.append(testRow);
+  testBtn.addEventListener("click",async()=>{
+    statusEl.style.color="var(--muted)"; statusEl.textContent="Probando…"; testBtn.disabled=true;
+    try{
+      const out = await chat([{role:"user",content:"Reply with exactly: OK"}], "You are a connection test. Reply with exactly: OK");
+      statusEl.style.color="var(--teal)"; statusEl.textContent = "✓ Conectado ("+(out||"").trim().slice(0,20)+")";
+    }catch(e){ statusEl.style.color="var(--coral)"; statusEl.textContent="✗ "+String(e.message||e); }
+    finally{ testBtn.disabled=false; }
+  });
+  view.append(actCard);
+
+  view.append(h("div",{class:"note",style:"margin-bottom:14px"},
+    "🔒 Las claves se guardan solo en este dispositivo (localStorage) y se envían únicamente al proveedor que elijas (o a tu proxy). Nadie más las ve. Los apartados Temario, Reading y Listening funcionan sin clave."));
+
+  // per-provider keys
+  PROVIDER_ORDER.forEach(pid=>{
+    const P=PROVIDERS[pid];
+    const card=h("div",{class:"card pad",style:"margin-bottom:10px"});
+    const head=h("div",{class:"row",style:"gap:8px;margin-bottom:8px"});
+    head.append(h("span",{class:"dot",style:"background:"+(settings.provider===pid?"var(--amber)":"var(--faint)")}),
+      h("span",{class:"grot t14",style:"font-weight:600"},P.label));
+    if(settings.provider===pid) head.append(h("span",{class:"pill",style:"border-color:var(--amber);color:var(--amber)"},"activo"));
+    card.append(head);
+    card.append(h("div",{class:"t12 muted",style:"line-height:1.45;margin-bottom:8px"},P.hint));
+    if(pid==="custom"){
+      card.append(h("label",{class:"lbl"},"Base URL"));
+      const b=h("input",{class:"input",type:"text",placeholder:"https://tu-endpoint/v1",value:settings.customBase||""});
+      b.addEventListener("input",()=>{ settings.customBase=b.value.trim(); saveSettings(); });
+      card.append(b);
+    }
+    card.append(h("label",{class:"lbl",style:"margin-top:10px"},"API key"));
+    const k=h("input",{class:"input",type:"password",autocomplete:"off",placeholder:"pega tu clave…",value:settings.keys[pid]||""});
+    k.addEventListener("input",()=>{ settings.keys[pid]=k.value.trim(); saveSettings(); });
+    card.append(k);
+    card.append(h("label",{class:"lbl",style:"margin-top:10px"},"Modelo"));
+    const m=h("input",{class:"input",type:"text",placeholder:P.model||"nombre-del-modelo",value:settings.models[pid]||""});
+    m.addEventListener("input",()=>{ settings.models[pid]=m.value.trim(); saveSettings(); });
+    card.append(m);
+    if(P.keyUrl) card.append(h("div",{style:"margin-top:8px"}, h("a",{href:P.keyUrl,target:"_blank",rel:"noopener",class:"t125"},"Obtener API key ↗")));
+    view.append(card);
+  });
+
+  view.append(h("hr",{class:"sep"}));
+  // reset progress
+  const rp=h("button",{class:"btn ghost",style:"color:var(--coral);border-color:rgba(255,122,107,.35)"},"Borrar progreso del temario");
+  rp.addEventListener("click",()=>{ if(confirm("¿Borrar el estado de todos los módulos?")){ progress={status:{}}; saveProgress(); go("temario"); } });
+  view.append(rp);
+  view.append(h("p",{class:"t11 faint",style:"margin-top:14px;line-height:1.5;text-align:center"},"IT English Coach · app autohospedable · v1"));
+}
+
+/* =========================================================================
+   BOOT
+   ========================================================================= */
+render();
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{ navigator.serviceWorker.register("./sw.js").catch(()=>{}); });
+}
+</script>
+</body>
+</html>

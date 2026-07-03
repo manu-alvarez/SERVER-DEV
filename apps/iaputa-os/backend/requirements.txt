@@ -1,0 +1,32 @@
+# Core framework
+fastapi
+uvicorn
+python-multipart
+aiofiles
+pydantic-settings
+python-dotenv
+
+# AI / LLM
+groq
+
+# Tools
+duckduckgo-search
+pyautogui
+pillow
+edge-tts
+
+# Google Workspace
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+httpx
+
+# Microsoft
+msal
+msal-extensions
+
+# Monitoring
+sentry-sdk[fastapi]
+
+# Security
+slowapi

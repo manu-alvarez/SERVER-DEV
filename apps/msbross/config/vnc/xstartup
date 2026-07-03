@@ -1,0 +1,61 @@
+#!/bin/bash
+# ===========================================================================
+# MSBrOSs - VNC xstartup Configuration
+# Launches XFCE4 session with mobile-optimized settings automatically
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+# Environment
+# ---------------------------------------------------------------------------
+export XKL_XMODMAP_DISABLE=1
+export XDG_SESSION_TYPE=x11
+export XDG_SESSION_DESKTOP=XFCE
+export XDG_CURRENT_DESKTOP=XFCE
+export DESKTOP_SESSION=XFCE
+export SHELL=/bin/bash
+
+# ---------------------------------------------------------------------------
+# D-BUS
+# ---------------------------------------------------------------------------
+if [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
+    eval "$(dbus-launch --sh-syntax --exit-with-session)" 2>/dev/null || true
+fi
+
+# ---------------------------------------------------------------------------
+# Mobile display optimizations
+# ---------------------------------------------------------------------------
+export GDK_SCALE=1
+export GDK_DPI_SCALE=1.5
+export ELM_SCALE=1.5
+export QT_AUTO_SCREEN_SET_SCALE_FACTOR=1
+export QT_SCREEN_SCALE_FACTORS=1.5
+export QT_QPA_PLATFORMTHEME=gtk2
+export GTK_THEME=WhiteSur-light
+
+# ---------------------------------------------------------------------------
+# Disable power management and screen blanking
+# ---------------------------------------------------------------------------
+xset s off
+xset s noblank
+xset -dpms
+
+# ---------------------------------------------------------------------------
+# Set cursor
+# ---------------------------------------------------------------------------
+xsetroot -cursor_name left_ptr
+
+# ---------------------------------------------------------------------------
+# Start desktop
+# ---------------------------------------------------------------------------
+startxfce4 &
+
+# ---------------------------------------------------------------------------
+# Start Plank dock after desktop initializes
+# ---------------------------------------------------------------------------
+sleep 4
+if command -v plank &>/dev/null; then
+    plank &
+fi
+
+# Wait
+wait
