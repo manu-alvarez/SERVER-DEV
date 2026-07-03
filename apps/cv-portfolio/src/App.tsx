@@ -26,6 +26,21 @@ function App() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
           >
+            <div style={{ marginBottom: '2rem' }}>
+              <img 
+                src="/avatar.png" 
+                alt="Manuel Álvarez" 
+                style={{ 
+                  width: '150px', 
+                  height: '150px', 
+                  borderRadius: '50%', 
+                  objectFit: 'cover', 
+                  border: '4px solid rgba(255, 255, 255, 0.1)',
+                  boxShadow: '0 0 20px rgba(59, 130, 246, 0.5)',
+                  filter: 'grayscale(20%)'
+                }} 
+              />
+            </div>
             <h1 className="hero-title">Manuel Álvarez Diánez</h1>
             <h2 className="hero-subtitle">
               Soporte IT · Sistemas & Redes · Perfil Logístico
