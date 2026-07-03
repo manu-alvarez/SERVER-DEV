@@ -319,42 +319,9 @@ app.use('/app/elitescout', createProxyMiddleware({
   }
 }));
 
-app.use('/app/txafitnesspro', createProxyMiddleware({
-  target: 'http://txa-fitness-pro:3456',
-  changeOrigin: true,
-  pathRewrite: (path, req) => req.originalUrl.replace(/^\/app\/[a-zA-Z0-9-]+/, ''),
-  on: {
-    error: (err, req, res) => {
-      console.error(`[Proxy error] ${req.url} -> http://txa-fitness-pro:3456: ${err.message}`);
-      if (res && res.writeHead) res.status(502).json({ error: 'Backend unavailable', detail: err.message });
-    }
-  }
-}));
-
-app.use('/app/perfume-trading', createProxyMiddleware({
-  target: 'http://perfume-trading:3011',
-  changeOrigin: true,
-  pathRewrite: (path, req) => req.originalUrl.replace(/^\/app\/[a-zA-Z0-9-]+/, ''),
-  on: {
-    error: (err, req, res) => {
-      console.error(`[Proxy error] ${req.url} -> http://perfume-trading:3011: ${err.message}`);
-      if (res && res.writeHead) res.status(502).json({ error: 'Backend unavailable', detail: err.message });
-    }
-  }
-}));
 
 
-app.use('/app/mapfre', createProxyMiddleware({
-  target: 'http://mapfre-infocol:3333',
-  changeOrigin: true,
-  pathRewrite: (path, req) => req.originalUrl.replace(/^\/app\/[a-zA-Z0-9-]+/, ''),
-  on: {
-    error: (err, req, res) => {
-      console.error(`[Proxy error] ${req.url} -> http://mapfre-infocol:3333: ${err.message}`);
-      if (res && res.writeHead) res.status(502).json({ error: 'Backend unavailable', detail: err.message });
-    }
-  }
-}));
+
 app.use('/_traductor',     createProxyMiddleware(proxyOpts('http://traductor-backend:8004', '/_traductor')));
 app.use('/_msbross',       createProxyMiddleware(proxyOpts('http://msbross-backend:8005', '/_msbross')));
 app.use('/_iaputa',        createProxyMiddleware(proxyOpts('http://iaputa-backend:8006', '/_iaputa')));
