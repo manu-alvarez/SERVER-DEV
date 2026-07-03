@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "Cuentos Mágicos — MSBross",
   description: "Generador de cuentos infantiles personalizados con IA.",
   manifest: "/manifest.json",
-  icons: { icon: "/icon.svg" },
+  icons: { icon: "/icon.png" },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

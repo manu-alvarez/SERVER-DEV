@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://msbross.me/app/jartosdto"),
   title: "JartosDTo — MSBross",
   description: "Tu web de recetas y organización de comidas",
-  icons: { icon: "/icon.svg" },
+  icons: { icon: "/icon.png" },
 };
 
 export default function RootLayout({

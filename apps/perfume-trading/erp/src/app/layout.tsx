@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "Perfume Trading — MSBross",
   description: "Sistema ERP especializado en trading B2B de perfumería. Potenciado por Prisma y Node.js.",
   manifest: "/manifest.json",
-  icons: { icon: "/icon.svg" },
+  icons: { icon: "/icon.png" },
 };
 
 export default function RootLayout({

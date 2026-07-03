@@ -32,11 +32,11 @@ viteApps.forEach(app => {
     html = html.replace(/<title>.*?<\/title>/gi, `<title>${app.title}</title>`);
     
     // Replace <link rel="icon"...>
-    html = html.replace(/<link[^>]*rel=["']?icon["']?[^>]*>/gi, `<link rel="icon" type="image/svg+xml" href="/logo-icon.svg" />`);
+    html = html.replace(/<link[^>]*rel=["']?icon["']?[^>]*>/gi, `<link rel="icon" type="image/png" href="/logo-icon.png" />`);
     
     // If it didn't have an icon tag, inject it before </head>
-    if (!html.includes('logo-icon.svg')) {
-      html = html.replace('</head>', `  <link rel="icon" type="image/svg+xml" href="/logo-icon.svg" />\n</head>`);
+    if (!html.includes('logo-icon.png')) {
+      html = html.replace('</head>', `  <link rel="icon" type="image/png" href="/logo-icon.png" />\n</head>`);
     }
     
     fs.writeFileSync(htmlPath, html);

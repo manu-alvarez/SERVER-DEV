@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: "TxaFitness — MSBross",
   description: "Plataforma de entrenamiento diario, membresías y control de progreso.",
   manifest: "/manifest.json",
-  icons: { icon: "/icon.svg" },
+  icons: { icon: "/icon.png" },
   applicationName: "TxaFitness",
   authors: [{ name: "TxaFitness Team" }],
   openGraph: {

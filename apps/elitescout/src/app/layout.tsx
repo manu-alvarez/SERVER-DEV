@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://msbross.me/app/elitescout"),
   title: "EliteScout — MSBross",
   description: "Buscador inteligente de talento",
-  icons: { icon: "/icon.svg" },
+  icons: { icon: "/icon.png" },
   keywords: ["comparador de precios", "análisis de productos", "ofertas", "cupones", "IA"],
   manifest: "/manifest.json",
   appleWebApp: {

@@ -23,12 +23,12 @@ nextApps.forEach(app => {
     
     // Check if icons exists, if not, add it to metadata object
     if (!layout.includes('icons:')) {
-      layout = layout.replace(/(export const metadata:\s*Metadata\s*=\s*{)/, `$1\n  icons: { icon: "/icon.svg" },`);
+      layout = layout.replace(/(export const metadata:\s*Metadata\s*=\s*{)/, `$1\n  icons: { icon: "/icon.png" },`);
     } else {
       // If it exists, replace the icons object
-      layout = layout.replace(/icons:\s*{[^}]*}/g, `icons: { icon: "/icon.svg" }`);
+      layout = layout.replace(/icons:\s*{[^}]*}/g, `icons: { icon: "/icon.png" }`);
       // If it was icons: [{...}] format
-      layout = layout.replace(/icons:\s*\[[^\]]*\]/g, `icons: { icon: "/icon.svg" }`);
+      layout = layout.replace(/icons:\s*\[[^\]]*\]/g, `icons: { icon: "/icon.png" }`);
     }
     
     fs.writeFileSync(layoutPath, layout);
