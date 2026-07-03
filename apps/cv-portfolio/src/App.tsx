@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Download, ExternalLink, Code, Briefcase, Mail, MapPin } from 'lucide-react';
+import { Download, ExternalLink, Code, Briefcase, Mail, MapPin, Globe } from 'lucide-react';
 import './App.css';
 
 function App() {
@@ -60,9 +60,10 @@ function App() {
             </div>
 
             <div className="hero-actions" style={{ marginTop: '1.5rem', gap: '1.5rem' }}>
-              <a href="https://linkedin.com/in/manu-alvarez-dev" target="_blank" rel="noreferrer" style={{ color: 'var(--text-secondary)' }}><Briefcase size={24} /></a>
-              <a href="https://github.com/manu-alvarez" target="_blank" rel="noreferrer" style={{ color: 'var(--text-secondary)' }}><Code size={24} /></a>
-              <a href="https://msbross.me" target="_blank" rel="noreferrer" style={{ color: 'var(--text-secondary)' }}><ExternalLink size={24} /></a>
+              <a href="https://linkedin.com/in/manu-alvarez-dev" target="_blank" rel="noreferrer" title="LinkedIn" style={{ color: 'var(--text-secondary)' }}><Briefcase size={24} /></a>
+              <a href="https://github.com/manu-alvarez" target="_blank" rel="noreferrer" title="GitHub" style={{ color: 'var(--text-secondary)' }}><Code size={24} /></a>
+              <a href="https://msbross.me" target="_blank" rel="noreferrer" title="MSBross Ecosystem" style={{ color: 'var(--text-secondary)' }}><ExternalLink size={24} /></a>
+              <a href="https://manuelalvarez.dev" target="_blank" rel="noreferrer" title="Manuel Álvarez Hub" style={{ color: 'var(--text-secondary)' }}><Globe size={24} /></a>
             </div>
           </motion.div>
         </div>
