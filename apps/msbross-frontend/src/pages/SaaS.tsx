@@ -9,7 +9,7 @@ export default function SaaS() {
   const tools = [
     {
       name: 'CombiPro',
-      desc: 'Generador de combinadas deportivas con algoritmo de probabilidad real y perfiles de riesgo.',
+      desc: 'Calculadora y generador de combinadas deportivas con probabilidad básica.',
       tech: 'React 19, MUI 7',
       url: 'https://combipro.manuelalvarez.dev',
       icon: Activity,
@@ -19,7 +19,7 @@ export default function SaaS() {
     },
     {
       name: 'EliteScout',
-      desc: 'Buscador semántico de viajes y productos mediante inteligencia artificial avanzada.',
+      desc: 'Buscador de viajes y productos impulsado por IA.',
       tech: 'Next.js 14, Tavily API',
       url: 'https://elitescout.manuelalvarez.dev',
       icon: Globe,
@@ -29,7 +29,7 @@ export default function SaaS() {
     },
     {
       name: 'EXPOSITATOR RTE',
-      desc: 'Motor interactivo de evaluación en tiempo real para exposiciones orales.',
+      desc: 'Herramienta de evaluación y feedback para exposiciones orales.',
       tech: 'PWA, Speech API, Vision API',
       url: 'https://expositator.manuelalvarez.dev',
       icon: Target,
@@ -49,7 +49,7 @@ export default function SaaS() {
     },
     {
       name: 'IndustrialPro',
-      desc: 'Plataforma de gestión industrial para procesos productivos y mantenimiento.',
+      desc: 'App de gestión para procesos de mantenimiento y producción.',
       tech: 'FastAPI, React, Tailwind',
       url: 'https://industrial.manuelalvarez.dev',
       icon: Shield,
@@ -69,7 +69,7 @@ export default function SaaS() {
     },
     {
       name: 'LogiSearch',
-      desc: 'Buscador logístico con IA, análisis de rutas y generación de RFQs.',
+      desc: 'Buscador logístico de rutas y simulador de tarifas (RFQs).',
       tech: 'React 19, TypeScript, Supabase',
       url: 'https://logisearch.manuelalvarez.dev',
       icon: Globe,
@@ -79,7 +79,7 @@ export default function SaaS() {
     },
     {
       name: 'LogiTrack Almacén',
-      desc: 'Sistema de gestión integral de operaciones de almacén y supply chain.',
+      desc: 'App sencilla para la gestión de tareas de almacén y suministro.',
       tech: 'Trello, Kanban, Operaciones',
       url: 'https://logitrack.manuelalvarez.dev',
       icon: Box,
@@ -99,7 +99,7 @@ export default function SaaS() {
     },
     {
       name: 'MAPFRE Infocol',
-      desc: 'Sistema avanzado de información, tasación y gestión documental para seguros.',
+      desc: 'App de información y gestión de documentos para seguros.',
       tech: 'Next.js 15, Enterprise',
       url: 'https://mapfre.manuelalvarez.dev',
       icon: Shield,
@@ -139,7 +139,7 @@ export default function SaaS() {
     },
     {
       name: 'Tu Energía Maya',
-      desc: 'Plataforma interactiva sobre sabiduría Maya, kin y firma galáctica.',
+      desc: 'Web interactiva sobre astrología Maya, kin y firmas galácticas.',
       tech: 'Web App, JavaScript, Tzolkin',
       url: 'https://energia.manuelalvarez.dev',
       icon: Sparkles,
@@ -149,7 +149,7 @@ export default function SaaS() {
     },
     {
       name: 'TxaFitnessPro',
-      desc: 'Plataforma integral de entrenamiento y nutrición inteligente con IA.',
+      desc: 'Aplicación para seguimiento de entrenamientos y nutrición.',
       tech: 'Next.js 15, React 19, Tailwind',
       url: 'https://txafitness.manuelalvarez.dev',
       icon: Heart,
@@ -159,7 +159,7 @@ export default function SaaS() {
     },
     {
       name: 'Nikolina Voice AI',
-      desc: 'Agente conversacional en tiempo real impulsado por LiveKit y WebRTC.',
+      desc: 'Prueba de bot de voz en tiempo real usando LiveKit.',
       tech: 'Python, LiveKit, WebRTC',
       url: 'https://nikolina.manuelalvarez.dev',
       icon: MessageSquare,
@@ -169,7 +169,7 @@ export default function SaaS() {
     },
     {
       name: 'IAPuta OS',
-      desc: 'Asistente de Inteligencia Artificial para gestión del sistema operativo backend.',
+      desc: 'Bot para ayuda en tareas de gestión de servidor por terminal.',
       tech: 'FastAPI, Python, LLM',
       url: 'https://iaputa.manuelalvarez.dev',
       icon: Shield,
@@ -179,7 +179,7 @@ export default function SaaS() {
     },
     {
       name: 'Traductor Pro',
-      desc: 'Servidor proxy de traducción neuronal de alta precisión.',
+      desc: 'Un proxy básico para traducciones automatizadas.',
       tech: 'Express, Node.js, AI',
       url: 'https://traductor.manuelalvarez.dev',
       icon: Globe,
@@ -199,7 +199,7 @@ export default function SaaS() {
     },
     {
       name: 'Cuentos Mágicos AI',
-      desc: 'Generador creativo de cuentos narrativos usando Modelos de Lenguaje.',
+      desc: 'Pequeño generador de cuentos infantiles.',
       tech: 'FastAPI, Celery, AI',
       url: 'https://cuentos.manuelalvarez.dev',
       icon: Sparkles,
@@ -209,7 +209,7 @@ export default function SaaS() {
     },
     {
       name: 'Jartosdto',
-      desc: 'Sistema avanzado de Recuperación y Generación de Contexto (RAG) con Multi-LLM.',
+      desc: 'Chatbot con RAG y documentos sobre un bot de Telegram.',
       tech: 'Python, RAG, Vector DB',
       url: 'https://jartosdto.manuelalvarez.dev',
       icon: Target,
@@ -219,7 +219,7 @@ export default function SaaS() {
     },
     {
       name: 'Web Restaurante Atenea',
-      desc: 'Experiencia culinaria de alta gastronomía con sistema de reservas.',
+      desc: 'Web informativa y sistema básico de reservas.',
       tech: 'HTML5, CSS3, JavaScript',
       url: 'https://atenea.manuelalvarez.dev',
       icon: Layout,
@@ -249,12 +249,12 @@ export default function SaaS() {
 
   const getCategoryTitle = () => {
     switch (categoryFilter) {
-      case 'dev-ai': return 'DEV AI Platforms';
-      case 'sports-ai': return 'SPORTS AI Platforms';
-      case 'creative-ai': return 'CREATIVE AI Platforms';
-      case 'vision-play': return 'VISION PLAY Apps';
-      case 'enterprise': return 'ENTERPRISE & Operations';
-      default: return 'SaaS & B2B Platforms';
+      case 'dev-ai': return 'DEV & AI';
+      case 'sports-ai': return 'Deportes';
+      case 'creative-ai': return 'Creatividad';
+      case 'vision-play': return 'Visión & Juegos';
+      case 'enterprise': return 'Gestión & Logística';
+      default: return 'Mis Aplicaciones';
     }
   };
 
@@ -283,7 +283,7 @@ export default function SaaS() {
             </span>
           </motion.h1>
           <p className="text-gray-400 text-lg max-w-xl leading-relaxed mt-2">
-            Catálogo de aplicaciones, proyectos y herramientas desarrolladas para el área de {categoryFilter ? categoryFilter.replace('-', ' ').toUpperCase() : 'múltiples sectores'}.
+            Lista de aplicaciones, pequeños proyectos y herramientas para el área de {categoryFilter ? categoryFilter.replace('-', ' ').toUpperCase() : 'diferentes áreas'}.
           </p>
         </div>
       </div>

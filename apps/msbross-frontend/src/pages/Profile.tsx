@@ -44,10 +44,10 @@ export default function Profile() {
               <div className="absolute bottom-0 left-0 right-0 p-8">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_rgba(34,211,238,0.8)]"></div>
-                  <span className="font-mono text-cyan-400 text-xs font-bold tracking-[0.2em] uppercase">Status: Online</span>
+                  <span className="font-mono text-cyan-400 text-xs font-bold tracking-[0.2em] uppercase">Disponible</span>
                 </div>
                 <h1 className="text-4xl font-extrabold text-white mb-1">Manu Alvarez</h1>
-                <p className="text-gray-400 font-mono text-sm uppercase tracking-wider">Técnico de Sistemas & Desarrollador</p>
+                <p className="text-gray-400 font-mono text-sm uppercase tracking-wider">Técnico Informático & Desarrollador</p>
               </div>
             </div>
           </motion.div>
@@ -56,13 +56,13 @@ export default function Profile() {
           <motion.div variants={itemVars} className="grid grid-cols-2 gap-4">
             <div className="bg-[#0A101C]/60 backdrop-blur-md border border-white/5 rounded-3xl p-5 hover:border-cyan-500/30 transition-colors group">
               <Code2 className="w-6 h-6 text-cyan-400 mb-3 group-hover:scale-110 transition-transform" />
-              <div className="text-2xl font-bold text-white mb-1">24+</div>
-              <div className="text-xs text-gray-500 font-mono uppercase tracking-wider">Apps Deployadas</div>
+              <div className="text-2xl font-bold text-white mb-1">22+</div>
+              <div className="text-xs text-gray-500 font-mono uppercase tracking-wider">Apps Desarrolladas</div>
             </div>
             <div className="bg-[#0A101C]/60 backdrop-blur-md border border-white/5 rounded-3xl p-5 hover:border-magenta-500/30 transition-colors group">
               <Brain className="w-6 h-6 text-magenta-400 mb-3 group-hover:scale-110 transition-transform" />
-              <div className="text-2xl font-bold text-white mb-1">AI</div>
-              <div className="text-xs text-gray-500 font-mono uppercase tracking-wider">Integración Nativa</div>
+              <div className="text-2xl font-bold text-white mb-1">IA</div>
+              <div className="text-xs text-gray-500 font-mono uppercase tracking-wider">y Agentes Bot</div>
             </div>
           </motion.div>
         </div>
@@ -77,16 +77,15 @@ export default function Profile() {
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">Sobre Mí</span>
               </h2>
               <p className="text-gray-300 text-lg leading-relaxed mb-8">
-                Técnico informático y desarrollador autodidacta apasionado por la creación de herramientas prácticas. 
-                Centrado en la programación web moderna, el despliegue de sistemas, la integración de Inteligencia Artificial 
-                y la automatización de procesos. Mi objetivo es mejorar el día a día creando soluciones útiles, 
-                reales y funcionales tanto a nivel logístico como de desarrollo.
+                Técnico informático y desarrollador autodidacta. Me gusta programar herramientas prácticas 
+                y pequeñas automatizaciones que me faciliten el trabajo y el día a día. Aprendiendo 
+                continuamente sobre desarrollo web, contenedores y bots conversacionales con Inteligencia Artificial.
               </p>
 
               {/* Tech Stack Horizontal Scroll/Flex */}
               <div className="flex flex-col gap-3">
                 <div className="text-xs text-cyan-400 font-mono uppercase tracking-widest flex items-center gap-2">
-                  <Network className="w-4 h-4" /> Tech Stack Core
+                  <Network className="w-4 h-4" /> Tecnologías Principales
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {['React 19', 'Next.js 15', 'Node.js', 'FastAPI', 'Python', 'Docker', 'Traefik', 'Gemini AI', 'LiveKit WebRTC', 'TailwindCSS'].map((tech) => (
@@ -131,7 +130,7 @@ export default function Profile() {
                 <div className="p-3 rounded-xl bg-magenta-500/10 text-magenta-400">
                   <Terminal className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-bold text-white">Log de Experiencia</h3>
+                <h3 className="text-xl font-bold text-white">Experiencia Laboral</h3>
               </div>
               
               <ul className="space-y-6 relative before:absolute before:inset-y-0 before:left-[11px] before:w-[2px] before:bg-white/5">

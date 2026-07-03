@@ -41,7 +41,7 @@ export default function Home() {
         >
           <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
           <span className="font-mono text-indigo-400 text-xs tracking-widest uppercase">
-            Ecosistema de Aplicaciones
+            Mis Aplicaciones
           </span>
         </motion.div>
         
@@ -52,10 +52,10 @@ export default function Home() {
           className="text-6xl lg:text-[5.5rem] font-black tracking-tighter leading-[1.05]"
         >
           <span className="text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-500 block">
-            Proyectos y
+            Mis Proyectos
           </span>
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-violet-500 to-fuchsia-600 block pb-2 drop-shadow-[0_0_30px_rgba(99,102,241,0.4)]">
-            MSBrossAI Digital
+            Personales
           </span>
         </motion.h1>
 
@@ -65,7 +65,7 @@ export default function Home() {
           transition={{ delay: 0.2 }}
           className="text-gray-400 text-xl lg:text-2xl max-w-xl leading-relaxed font-light"
         >
-          Un conjunto de <strong className="text-white font-medium">herramientas</strong>, <strong className="text-white font-medium">aplicaciones web</strong> e <strong className="text-white font-medium">integraciones de IA</strong> creadas para aportar valor real en el día a día.
+          Una modesta colección de herramientas, pequeños scripts y aplicaciones web que voy programando para intentar solucionar problemas del día a día.
         </motion.p>
 
         <motion.div 
@@ -109,7 +109,7 @@ export default function Home() {
           <Link to="/saas" className="inline-block">
             <button className="group relative flex items-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-700 px-8 py-4 text-white font-bold tracking-wide transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(6,182,212,0.6)]">
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
-              <span className="relative z-10">Explorar Ecosistema</span>
+              <span className="relative z-10">Ver todos los proyectos</span>
               <ArrowRight className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
           </Link>
