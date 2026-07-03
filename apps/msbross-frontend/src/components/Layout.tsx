@@ -5,6 +5,7 @@ import { Activity, LayoutTemplate, Network, Phone, User, Menu, X } from 'lucide-
 export default function Layout() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAppsOpen, setIsAppsOpen] = useState(false);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -12,7 +13,7 @@ export default function Layout() {
   }, [location]);
 
   const mainLinks = [
-    { name: 'Dashboard', path: '/', icon: Activity },
+    { name: 'HOME', path: '/', icon: Activity },
     { name: 'BOTS IA', path: '/bots', icon: Activity },
     { name: 'ARQUITECTURA', path: '/architecture', icon: Network },
     { name: 'PERFIL TÉCNICO', path: '/profile', icon: User },
@@ -63,20 +64,28 @@ export default function Layout() {
             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${location.pathname === '/' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 shadow-[0_0_10px_rgba(99,102,241,0.15)]' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
           >
             <Activity className={`w-5 h-5 ${location.pathname === '/' ? 'text-indigo-400' : ''}`} />
-            <span className="font-medium text-sm">Dashboard</span>
+            <span className="font-medium text-sm">HOME</span>
           </Link>
 
-          {/* SaaS Dropdown (Always Open) */}
+          {/* SaaS Dropdown (Collapsible) */}
           <div className="pt-2 pb-1">
-            <div className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 text-gray-400">
+            <button 
+              onClick={() => setIsAppsOpen(!isAppsOpen)}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 text-gray-400 hover:bg-white/5 hover:text-white cursor-pointer"
+            >
               <div className="flex items-center gap-3">
                 <LayoutTemplate className={`w-5 h-5 ${location.pathname.startsWith('/apps') ? 'text-indigo-400' : ''}`} />
                 <span className="font-bold text-sm tracking-wider">APPS</span>
               </div>
-            </div>
+              <div className={`transition-transform duration-300 ${isAppsOpen ? 'rotate-180' : ''}`}>
+                <svg className="w-4 h-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </button>
             
-            {/* Always Visible Items */}
-            <div className="ml-4 pl-4 border-l border-white/10 mt-1 flex flex-col gap-1">
+            {/* Collapsible Items */}
+            <div className={`ml-4 pl-4 border-l border-white/10 mt-1 flex flex-col gap-1 overflow-hidden transition-all duration-300 ${isAppsOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
               <Link 
                 to="/apps"
                 className={`block px-4 py-2 rounded-lg transition-all duration-300 text-xs font-medium tracking-wide ${location.pathname === '/apps' && !location.search ? 'bg-indigo-500/10 text-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.1)]' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
