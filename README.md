@@ -63,6 +63,18 @@ Para que el despliegue automático funcione sin errores de conexión SSH, los si
 
 ---
 
+## 🛡️ Auditoría de Seguridad (Nivel 99 - Modo Ómnicron-Quetta)
+
+Todo el ecosistema ha sido auditado bajo estándares estrictos de seguridad de código:
+- **CORS Estricto:** Los backends (FastAPI, Express, Node) utilizan `allow_origin_regex` o listas blancas dinámicas (`CORS_ORIGINS`) en lugar de comodines `*`.
+- **Inyección de Código Prevenida:** 
+  - Subprocesos gestionados vía bindings seguros (`asyncio.create_subprocess_exec` o `subprocess.run` con arrays, NUNCA `shell=True`).
+  - Base de datos (SQLite/PostgreSQL) blindadas usando consultas preparadas (`?`) o Prisma ORM para evitar SQLi.
+- **Limpieza de Hardcodes:** Todas las IPs de staging obsoletas han sido purgadas, y los enlaces rotos (ej. perfiles de LinkedIn antiguos) han sido actualizados a sus URLs canónicas (`manu-alvarez-dev`).
+- **Secrets Seguros:** Gestión estricta a través de `.env` sin exponer tokens ni credenciales en código cliente.
+
+---
+
 ## 💻 Desarrollo Local
 
 Para levantar la infraestructura localmente:
