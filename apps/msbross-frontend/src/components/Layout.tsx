@@ -43,7 +43,7 @@ export default function Layout() {
       >
         <div className="p-6 border-b border-white/5 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-500 flex items-center justify-center shadow-[0_0_15px_rgba(0,229,255,0.4)] p-1.5">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.4)] p-1.5">
               <img src="/logo-icon.svg" className="w-full h-full object-contain" alt="MSBross Logo" />
             </div>
             <span className="font-bold text-xl tracking-tight glow-text">MSBross</span>
@@ -60,48 +60,42 @@ export default function Layout() {
           {/* Dashboard */}
           <Link 
             to="/"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${location.pathname === '/' ? 'bg-[#00E5FF]/10 text-[#00E5FF] border border-[#00E5FF]/30 shadow-[0_0_10px_rgba(0,229,255,0.15)]' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${location.pathname === '/' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 shadow-[0_0_10px_rgba(99,102,241,0.15)]' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
           >
-            <Activity className={`w-5 h-5 ${location.pathname === '/' ? 'text-[#00E5FF]' : ''}`} />
+            <Activity className={`w-5 h-5 ${location.pathname === '/' ? 'text-indigo-400' : ''}`} />
             <span className="font-medium text-sm">Dashboard</span>
           </Link>
 
-          {/* SaaS Dropdown */}
+          {/* SaaS Dropdown (Always Open) */}
           <div className="pt-2 pb-1">
-            <button 
-              onClick={() => setIsAppsOpen(!isAppsOpen)}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 ${location.pathname.startsWith('/saas') && !isAppsOpen ? 'bg-[#00E5FF]/10 text-[#00E5FF] border border-[#00E5FF]/30' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
-            >
+            <div className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 text-gray-400">
               <div className="flex items-center gap-3">
-                <LayoutTemplate className={`w-5 h-5 ${location.pathname.startsWith('/saas') && !isAppsOpen ? 'text-[#00E5FF]' : ''}`} />
-                <span className="font-medium text-sm">SAAS & APPS</span>
+                <LayoutTemplate className={`w-5 h-5 ${location.pathname.startsWith('/saas') ? 'text-indigo-400' : ''}`} />
+                <span className="font-bold text-sm tracking-wider">APPS</span>
               </div>
-              {isAppsOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-            </button>
+            </div>
             
-            {/* Dropdown Items */}
-            {isAppsOpen && (
-              <div className="ml-4 pl-4 border-l border-white/10 mt-1 flex flex-col gap-1">
-                <Link 
-                  to="/saas"
-                  className={`block px-4 py-2 rounded-lg transition-all duration-300 text-xs font-medium tracking-wide ${location.pathname === '/saas' && !location.search ? 'bg-[#00E5FF]/10 text-[#00E5FF] shadow-[0_0_10px_rgba(0,229,255,0.1)]' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
-                >
-                  TODAS LAS APPS
-                </Link>
-                {appCategories.map(cat => {
-                  const isActive = location.search === `?cat=${cat.path.split('=')[1]}`;
-                  return (
-                    <Link 
-                      key={cat.path}
-                      to={cat.path}
-                      className={`block px-4 py-2 rounded-lg transition-all duration-300 text-xs font-medium tracking-wide ${isActive ? 'bg-[#00E5FF]/10 text-[#00E5FF] shadow-[0_0_10px_rgba(0,229,255,0.1)]' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
-                    >
-                      {cat.name}
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
+            {/* Always Visible Items */}
+            <div className="ml-4 pl-4 border-l border-white/10 mt-1 flex flex-col gap-1">
+              <Link 
+                to="/saas"
+                className={`block px-4 py-2 rounded-lg transition-all duration-300 text-xs font-medium tracking-wide ${location.pathname === '/saas' && !location.search ? 'bg-indigo-500/10 text-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.1)]' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+              >
+                TODAS LAS APPS
+              </Link>
+              {appCategories.map(cat => {
+                const isActive = location.search === `?cat=${cat.path.split('=')[1]}`;
+                return (
+                  <Link 
+                    key={cat.path}
+                    to={cat.path}
+                    className={`block px-4 py-2 rounded-lg transition-all duration-300 text-xs font-medium tracking-wide ${isActive ? 'bg-indigo-500/10 text-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.1)]' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+                  >
+                    {cat.name}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
 
           {/* Remaining Links */}
@@ -112,9 +106,9 @@ export default function Layout() {
               <Link 
                 key={link.path}
                 to={link.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${isActive ? 'bg-[#00E5FF]/10 text-[#00E5FF] border border-[#00E5FF]/30 shadow-[0_0_10px_rgba(0,229,255,0.15)]' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${isActive ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 shadow-[0_0_10px_rgba(99,102,241,0.15)]' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
               >
-                <Icon className={`w-5 h-5 ${isActive ? 'text-[#00E5FF]' : ''}`} />
+                <Icon className={`w-5 h-5 ${isActive ? 'text-indigo-400' : ''}`} />
                 <span className="font-medium text-sm">{link.name}</span>
               </Link>
             );
@@ -134,7 +128,7 @@ export default function Layout() {
         {/* Mobile Header */}
         <div className="lg:hidden sticky top-0 z-30 bg-[#0A101C]/80 backdrop-blur-xl border-b border-white/5 px-6 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-500 flex items-center justify-center p-1">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center p-1">
               <img src="/logo-icon.svg" className="w-full h-full object-contain" alt="MSBross Logo" />
             </div>
             <span className="font-bold text-lg tracking-tight glow-text">MSBross</span>

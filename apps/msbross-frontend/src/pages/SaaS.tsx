@@ -158,6 +158,66 @@ export default function SaaS() {
       category: 'sports-ai'
     },
     {
+      name: 'Nikolina Voice AI',
+      desc: 'Agente conversacional en tiempo real impulsado por LiveKit y WebRTC.',
+      tech: 'Python, LiveKit, WebRTC',
+      url: 'https://nikolina.manuelalvarez.dev',
+      icon: MessageSquare,
+      color: 'from-pink-400 to-rose-500',
+      glow: 'shadow-[0_0_30px_rgba(244,114,182,0.3)]',
+      category: 'dev-ai'
+    },
+    {
+      name: 'IAPuta OS',
+      desc: 'Asistente de Inteligencia Artificial para gestión del sistema operativo backend.',
+      tech: 'FastAPI, Python, LLM',
+      url: 'https://iaputa.manuelalvarez.dev',
+      icon: Shield,
+      color: 'from-violet-400 to-indigo-500',
+      glow: 'shadow-[0_0_30px_rgba(139,92,246,0.3)]',
+      category: 'dev-ai'
+    },
+    {
+      name: 'Traductor Pro',
+      desc: 'Servidor proxy de traducción neuronal de alta precisión.',
+      tech: 'Express, Node.js, AI',
+      url: 'https://traductor.manuelalvarez.dev',
+      icon: Globe,
+      color: 'from-cyan-400 to-blue-500',
+      glow: 'shadow-[0_0_30px_rgba(34,211,238,0.3)]',
+      category: 'enterprise'
+    },
+    {
+      name: 'MSBross Voice Server',
+      desc: 'Servidor central de voz Adele para interacciones auditivas.',
+      tech: 'Python, Audio Processing',
+      url: 'https://msbross-voice.manuelalvarez.dev',
+      icon: Activity,
+      color: 'from-purple-400 to-fuchsia-500',
+      glow: 'shadow-[0_0_30px_rgba(192,132,252,0.3)]',
+      category: 'dev-ai'
+    },
+    {
+      name: 'Cuentos Mágicos AI',
+      desc: 'Generador creativo de cuentos narrativos usando Modelos de Lenguaje.',
+      tech: 'FastAPI, Celery, AI',
+      url: 'https://cuentos.manuelalvarez.dev',
+      icon: Sparkles,
+      color: 'from-yellow-400 to-amber-500',
+      glow: 'shadow-[0_0_30px_rgba(250,204,21,0.3)]',
+      category: 'creative-ai'
+    },
+    {
+      name: 'Jartosdto',
+      desc: 'Sistema avanzado de Recuperación y Generación de Contexto (RAG) con Multi-LLM.',
+      tech: 'Python, RAG, Vector DB',
+      url: 'https://jartosdto.manuelalvarez.dev',
+      icon: Target,
+      color: 'from-emerald-400 to-teal-500',
+      glow: 'shadow-[0_0_30px_rgba(52,211,153,0.3)]',
+      category: 'dev-ai'
+    },
+    {
       name: 'Web Restaurante Atenea',
       desc: 'Experiencia culinaria de alta gastronomía con sistema de reservas.',
       tech: 'HTML5, CSS3, JavaScript',

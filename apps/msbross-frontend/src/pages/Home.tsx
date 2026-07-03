@@ -40,7 +40,7 @@ export default function Home() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-xl"
         >
           <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
-          <span className="font-mono text-cyan-400 text-xs tracking-widest uppercase">
+          <span className="font-mono text-indigo-400 text-xs tracking-widest uppercase">
             Ecosistema de Aplicaciones
           </span>
         </motion.div>
@@ -54,8 +54,8 @@ export default function Home() {
           <span className="text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-500 block">
             Proyectos y
           </span>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 block pb-2 drop-shadow-[0_0_30px_rgba(6,182,212,0.4)]">
-            Soluciones.
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-violet-500 to-fuchsia-600 block pb-2 drop-shadow-[0_0_30px_rgba(99,102,241,0.4)]">
+            MSBrossAI Digital
           </span>
         </motion.h1>
 
@@ -75,9 +75,9 @@ export default function Home() {
           className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-white/10"
         >
           <div className="group">
-            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:scale-110 transition-transform origin-left">16</div>
+            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-500 group-hover:scale-110 transition-transform origin-left">22</div>
             <div className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-2 flex items-center gap-1.5">
-              <Globe className="w-3 h-3 text-cyan-500" /> Proyectos
+              <Globe className="w-3 h-3 text-indigo-500" /> Proyectos
             </div>
           </div>
           <div className="group">
@@ -138,7 +138,7 @@ export default function Home() {
                     <div className={`p-2 rounded-lg bg-gradient-to-br ${app.color} bg-opacity-20`}>
                       <Icon className="w-5 h-5 text-white" />
                     </div>
-                    <span className="text-[9px] font-mono text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded-full uppercase">
+                    <span className="text-[9px] font-mono text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded-full uppercase">
                       {app.tag}
                     </span>
                   </div>
