@@ -174,7 +174,7 @@ services:
     image: msbross-msbross:latest
     labels:
       - traefik.enable=true
-      - traefik.http.routers.msbross-backend.rule=Host(`msbross.manuelalvarez.dev`)
+      - traefik.http.routers.msbross-backend.rule=Host(`msbross-voice.manuelalvarez.dev`)
       - traefik.http.routers.msbross-backend.entrypoints=websecure
       - traefik.http.routers.msbross-backend.tls.certresolver=myresolver
       - traefik.http.services.msbross-backend.loadbalancer.server.port=8005
@@ -306,14 +306,29 @@ services:
       - traefik.http.routers.msbross-proxy-itenglish.service=msbross-proxy-svc
       - traefik.http.routers.msbross-proxy-jartosdto.tls.certresolver=myresolver
       - traefik.http.routers.proxy-perfume.middlewares=perfume-addprefix
+      - traefik.http.routers.proxy-perfume.service=msbross-proxy-svc
       - traefik.http.routers.msbross-proxy-traductor.entrypoints=websecure
       - traefik.http.routers.proxy-cyberguard.tls.certresolver=myresolver
+      - traefik.http.routers.proxy-cyberguard.service=msbross-proxy-svc
       - traefik.http.routers.msbross-proxy-traductor.rule=Host(`traductor.manuelalvarez.dev`)
       - traefik.http.routers.proxy-txafitness.tls.certresolver=myresolver
+      - traefik.http.routers.proxy-txafitness.service=msbross-proxy-svc
       - traefik.http.routers.msbross-proxy-cuentos.tls.certresolver=myresolver
       - traefik.http.routers.msbross-proxy-proxy.tls.certresolver=myresolver
       - traefik.http.routers.proxy-txafitness.entrypoints=websecure
       - traefik.http.routers.proxy-txafitness.rule=Host(`txafitness.manuelalvarez.dev`)
+      - traefik.http.routers.proxy-taskflow.service=msbross-proxy-svc
+      - traefik.http.routers.proxy-logisearch.service=msbross-proxy-svc
+      - traefik.http.routers.proxy-alphatrader.service=msbross-proxy-svc
+      - traefik.http.routers.proxy-mapfre.service=msbross-proxy-svc
+      - traefik.http.routers.msbross-proxy-edelweiss.rule=Host(`edelweiss.manuelalvarez.dev`)
+      - traefik.http.routers.msbross-proxy-edelweiss.entrypoints=websecure
+      - traefik.http.routers.msbross-proxy-edelweiss.tls.certresolver=myresolver
+      - traefik.http.routers.msbross-proxy-edelweiss.service=msbross-proxy-svc
+      - traefik.http.routers.msbross-proxy-cv.rule=Host(`cv.manuelalvarez.dev`)
+      - traefik.http.routers.msbross-proxy-cv.entrypoints=websecure
+      - traefik.http.routers.msbross-proxy-cv.tls.certresolver=myresolver
+      - traefik.http.routers.msbross-proxy-cv.service=msbross-proxy-svc
     networks: *id001
     ports:
       - 127.0.0.1:8080:8080
