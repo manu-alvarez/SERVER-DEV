@@ -212,7 +212,6 @@ services:
     - traefik.http.routers.msbross-proxy-jartosdto.entrypoints=websecure
     - traefik.http.routers.msbross-proxy-industrial.entrypoints=websecure
     - traefik.http.routers.msbross-proxy-logitrack.entrypoints=websecure
-    - traefik.http.routers.msbross-proxy-energia.tls.certresolver=myresolver
     - traefik.http.routers.msbross-proxy-nikolina.rule=Host(`nikolina.manuelalvarez.dev`)
     - traefik.http.routers.msbross-proxy-expositator.entrypoints=websecure
     - traefik.http.routers.msbross-proxy-cuentos.rule=Host(`cuentos.manuelalvarez.dev`)
@@ -228,8 +227,7 @@ services:
     - traefik.http.routers.msbross-proxy-combipro.entrypoints=websecure
     - traefik.http.routers.msbross-proxy-proxy.service=msbross-proxy-svc
     - traefik.http.routers.msbross-proxy-atenea.tls.certresolver=myresolver
-    - traefik.http.routers.msbross-proxy-energia.rule=Host(`energia.manuelalvarez.dev`)
-    - traefik.http.routers.msbross-proxy-energia.service=msbross-proxy-svc
+
     - traefik.http.routers.msbross-proxy-nikolina.service=msbross-proxy-svc
     - traefik.http.routers.proxy-taskflow.entrypoints=websecure
     - traefik.http.routers.msbross-proxy-appgenerator.entrypoints=websecure
@@ -262,7 +260,7 @@ services:
     - traefik.http.routers.msbross-proxy-atenea.entrypoints=websecure
     - traefik.http.routers.msbross-proxy-gasstation.entrypoints=websecure
     - traefik.http.routers.msbross-proxy-appgenerator.tls.certresolver=myresolver
-    - traefik.http.routers.msbross-proxy-energia.entrypoints=websecure
+
     - traefik.http.routers.msbross-proxy-combipro.tls.certresolver=myresolver
     - traefik.http.routers.msbross-proxy-elitescout.entrypoints=websecure
     - traefik.http.routers.proxy-taskflow.rule=Host(`taskflow.manuelalvarez.dev`)
