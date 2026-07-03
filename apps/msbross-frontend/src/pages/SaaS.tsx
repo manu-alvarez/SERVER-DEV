@@ -229,9 +229,10 @@ export default function SaaS() {
     }
   ];
 
-  const filteredTools = categoryFilter 
+  const filteredTools = (categoryFilter 
     ? tools.filter(tool => tool.category === categoryFilter)
-    : tools;
+    : tools
+  ).sort((a, b) => a.name.localeCompare(b.name));
 
   const containerVars: Variants = {
     hidden: { opacity: 0 },
@@ -297,6 +298,10 @@ export default function SaaS() {
         {filteredTools.length > 0 ? (
           filteredTools.map((tool, i) => {
             const Icon = tool.icon;
+            const match = tool.glow.match(/rgba\((.*?)\)/);
+            const rgbValues = match ? match[1].split(',').slice(0, 3).join(',') : '99,102,241';
+            const neonStyle = { '--neon-color': `rgba(${rgbValues}, 0.5)`, '--neon-border': `rgba(${rgbValues}, 0.8)` } as React.CSSProperties;
+
             return (
               <motion.a 
                 key={i} 
@@ -304,10 +309,11 @@ export default function SaaS() {
                 href={tool.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative overflow-hidden rounded-3xl bg-[#0A101C]/60 backdrop-blur-xl border border-white/5 p-6 transition-all duration-500 hover:-translate-y-2 hover:border-white/20"
+                style={neonStyle}
+                className="group relative overflow-hidden rounded-3xl bg-[#0A101C]/60 backdrop-blur-xl border border-white/5 p-6 transition-all duration-500 hover:-translate-y-2 hover-neon"
               >
                 {/* Subtle background glow */}
-                <div className={`absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br ${tool.color} rounded-full blur-[80px] opacity-10 group-hover:opacity-30 transition-opacity duration-500 pointer-events-none`}></div>
+                <div className={`absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br ${tool.color} rounded-full blur-[80px] opacity-10 group-hover:opacity-40 transition-opacity duration-500 pointer-events-none`}></div>
 
                 <div className="flex flex-col h-full relative z-10">
                   <div className="flex justify-between items-start mb-6">
