@@ -1,4 +1,4 @@
-import { Rocket, Box, Globe, Shield, Activity, Target, Layout, MessageSquare, Heart, Sparkles, Layers } from 'lucide-react';
+import { Rocket, Box, Globe, Shield, Activity, Target, Layout, MessageSquare, Heart, Sparkles } from 'lucide-react';
 
 export const APPS_DATA = [
   {

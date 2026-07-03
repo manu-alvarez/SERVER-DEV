@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Globe, Database, Network, Activity, Target, Shield, Box, Layout, MessageSquare, Heart, Sparkles, Rocket, Layers } from 'lucide-react';
+import { ArrowRight, Globe, Database, Network, Activity, Box, Layers } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { APPS_DATA } from '../data/apps';
 

@@ -1,4 +1,4 @@
-import { Rocket, Box, Globe, Shield, Activity, Target, Layout, MessageSquare, Heart, Sparkles, ArrowUpRight, Zap, LayoutTemplate } from 'lucide-react';
+import { ArrowUpRight, Zap } from 'lucide-react';
 import { motion, type Variants } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
 import { APPS_DATA } from '../data/apps';
