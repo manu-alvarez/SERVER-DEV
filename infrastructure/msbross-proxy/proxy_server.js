@@ -16,6 +16,11 @@ const WWW  = path.join(__dirname, 'www');
 // ── Compression (gzip/brotli for all text responses) ──
 app.use(compression({ level: 6, threshold: 1024 }));
 
+// Fallback global routes for favicons
+app.get(/\/(favicon\.ico|favicon\.svg|vite\.svg|logo\.png|logo\.svg|apple-touch-icon\.png)$/, (req, res) => {
+  res.sendFile(path.join(__dirname, 'favicon.png'));
+});
+
 // ── Security Headers ──
 app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
@@ -144,7 +149,7 @@ const BACKEND_MAP = {
   'jartosdto-backend': 8010,
   'gas-station': 3005,
   'perfume-trading': 3011,
-  'mapfre-infocol': 3333,
+  'mapfre': 3333,
   'txa-fitness-pro': 3456,
 };
 
@@ -221,7 +226,7 @@ const NEXT_APPS = [
   'edelweiss', 'expositator-rte', 'iaputa-os', 'jartosdto',
   'logisearch', 'moko-tools', 'msbross', 'gas-station', 'livekit-nikolina',
   'taskflow', 'traductor-pro', 'web-restaurante-atenea', 'it-english-coach',
-  'cv'
+  'cv', 'logitrack'
 ];
 
 const DOMAIN_APP_MAP = {
@@ -239,7 +244,7 @@ const DOMAIN_APP_MAP = {
   'expositator.manuelalvarez.dev': 'expositator-rte',
   'itenglish.manuelalvarez.dev': 'it-english-coach',
   'logisearch.manuelalvarez.dev': 'logisearch',
-  'logitrack.manuelalvarez.dev': 'logisearch',
+  'logitrack.manuelalvarez.dev': 'logitrack',
   'mano.manuelalvarez.dev': 'msbross',
   'mokotools.manuelalvarez.dev': 'moko-tools',
   'atenea.manuelalvarez.dev': 'web-restaurante-atenea',
@@ -250,6 +255,12 @@ const DOMAIN_APP_MAP = {
 
 app.use((req, res, next) => {
   const host = req.hostname;
+  
+  // Mano Eléctrica Azul redirect to Play Store
+  if (host === 'mano.manuelalvarez.dev') {
+    return res.redirect(302, 'https://play.google.com/store/apps/details?id=com.manoelectricaazul.app');
+  }
+
   const mappedApp = DOMAIN_APP_MAP[host];
   if (mappedApp && !req.url.startsWith('/api') && !req.url.startsWith('/_')) {
     if (req.url === '/') {

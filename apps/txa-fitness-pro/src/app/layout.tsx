@@ -6,9 +6,13 @@ import { AuthProvider } from "@/components/auth/session-provider";
 import { SyncManager } from "@/components/auth/sync-manager";
 
 export const metadata: Metadata = {
-  title: "TxaFitness - Entrenamiento Diario",
-  description:
-    "App de entrenamientos diarios con registro de series, repeticiones y seguimiento de progreso.",
+  title: "TxaFitness",
+  description: "Plataforma de entrenamiento diario, membresías y control de progreso.",
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/apple-icon.png",
+  },
   applicationName: "TxaFitness",
   authors: [{ name: "TxaFitness Team" }],
   openGraph: {

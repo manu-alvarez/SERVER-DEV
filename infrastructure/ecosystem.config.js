@@ -301,16 +301,17 @@ module.exports = {
     // MAPFRE INFOCOL (Insurance Claim Automation Dashboard, Next.js SSR, Port 3333)
     // ──────────────────────────────────────────────
     {
-      name: 'mapfre-infocol',
-      script: 'node_modules/.bin/next',
-      args: 'start -p 3333 -H 127.0.0.1',
-      cwd: path.join(__dirname, 'apps/mapfre-infocol/frontend'),
+      name: 'mapfre',
+      script: 'npm',
+      args: 'run start',
+      cwd: path.join(__dirname, 'apps/mapfre/frontend'),
       env: {
-        NODE_ENV: 'production',
-        PORT: '3333'
+        PORT: 3333,
+        NODE_ENV: 'production'
       },
-      out_file: path.join(__dirname, 'apps/mapfre-infocol/frontend/mapfre-infocol.log'),
-      error_file: path.join(__dirname, 'apps/mapfre-infocol/frontend/mapfre-infocol.error.log'),
+      out_file: path.join(__dirname, 'apps/mapfre/frontend/mapfre.log'),
+      error_file: path.join(__dirname, 'apps/mapfre/frontend/mapfre.error.log'),
+      time: true,
       autorestart: true,
       max_restarts: 15,
       exp_backoff_delay: 1000,

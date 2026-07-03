@@ -104,9 +104,6 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
               <span className="text-base font-bold lowercase tracking-tight text-white leading-none">
                 mapfre
               </span>
-              <span className="mt-1 text-[10px] font-medium uppercase tracking-widest text-muted-foreground/60">
-                INFOCOL · v1.0
-              </span>
             </div>
           </Link>
           <button

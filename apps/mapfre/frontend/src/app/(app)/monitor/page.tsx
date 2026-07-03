@@ -94,7 +94,7 @@ export default function MonitorPage() {
   const startProcessing = async () => {
     if (processing) return;
     setProcessing(true);
-    setProcessingMsg("Iniciando motor INFOCOL...");
+    setProcessingMsg("Iniciando motor InfoCool...");
     addLog("INFO", "Lanzando infocol run --dry-run (modo seguro)");
 
     try {

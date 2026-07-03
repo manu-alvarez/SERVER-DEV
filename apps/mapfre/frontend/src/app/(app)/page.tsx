@@ -116,7 +116,7 @@ export default function Home() {
               variants={itemVariants}
               className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg"
             >
-              INFOCOL procesa los expedientes FIN del portal, aplica los códigos de tarifa correctos
+              InfoCool procesa los expedientes FIN del portal, aplica los códigos de tarifa correctos
               y rellena los formularios. Tú solo revisas y confirmas.
             </motion.p>
 

@@ -151,7 +151,7 @@ export default function SaaS() {
       name: 'Mano Eléctrica Azul',
       desc: 'App multiplataforma en Google Play para exploración interactiva y Tzolkin.',
       tech: 'React Native, Expo Go',
-      url: 'https://mano.manuelalvarez.dev',
+      url: 'https://play.google.com/store/apps/details?id=com.manoelectricaazul.app',
       icon: Activity,
       color: 'from-[#10b981] to-[#059669]',
       glow: 'shadow-[0_0_30px_rgba(16,185,129,0.3)]',

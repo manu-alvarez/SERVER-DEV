@@ -5,9 +5,10 @@ import MagicBackground from "@/components/MagicBackground";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://msbross.me/app/cuentos-magicos"),
-  title: "Cuentos Mágicos — MSBrossAI",
-  description: "Generador de Cuentos Infantiles Personalizados",
-  manifest: "/app/cuentos-magicos/manifest.json",
+  title: "Cuentos Mágicos",
+  description: "Generador de cuentos infantiles personalizados con IA.",
+  manifest: "/manifest.json",
+  icons: { icon: "/icon.svg" },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

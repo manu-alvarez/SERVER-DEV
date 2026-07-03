@@ -83,7 +83,7 @@ class Settings(BaseSettings):
     STABILITY_AI_KEY: str = ""
 
     # Storage
-    STORAGE_PROVIDER: str = "supabase"
+    STORAGE_PROVIDER: str = "local"
     STORAGE_BUCKET: str = "cuentos-magicos"
     STORAGE_PUBLIC_URL: str = ""
     AWS_ACCESS_KEY_ID: str = ""

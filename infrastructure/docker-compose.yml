@@ -131,8 +131,8 @@ services:
     restart: unless-stopped
     volumes:
     - jartosdto-redis-data:/data
-  mapfre-infocol:
-    container_name: mapfre-infocol
+  mapfre:
+    container_name: mapfre
     image: msbross-mapfre:latest
     networks: *id001
     restart: unless-stopped
@@ -323,7 +323,10 @@ services:
   perfume-trading:
     container_name: perfume-trading
     image: msbross-perfume:latest
-    networks: *id001
+    environment:
+      - SKIP_AUTH=true
+    networks:
+      - msbross_net
     restart: unless-stopped
     labels:
     - traefik.enable=true

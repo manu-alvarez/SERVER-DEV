@@ -49,8 +49,8 @@ FRONTEND_URL=$(grep 'https://' /tmp/lt-frontend.log | head -1 | grep -o 'https:/
 # Update frontend env
 cat > frontend/.env.local << EOF
 NEXT_PUBLIC_API_BASE_URL=${BACKEND_URL}
-NEXT_PUBLIC_SUPABASE_URL=https://ujktxhqxhxkbrhczbhcf.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqa3R4aHF4aHhrYnJoY3piaGNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMjM4ODQsImV4cCI6MjA4Nzg5OTg4NH0.HQPF1pb2gDCltEBQpLccp58kYAuqFldCCspTZln4IPU
+# NEXT_PUBLIC_SUPABASE_URL=https://ujktxhqxhxkbrhczbhcf.supabase.co
+# NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqa3R4aHF4aHhrYnJoY3piaGNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzMjM4ODQsImV4cCI6MjA4Nzg5OTg4NH0.HQPF1pb2gDCltEBQpLccp58kYAuqFldCCspTZln4IPU
 EOF
 
 # Save URLs

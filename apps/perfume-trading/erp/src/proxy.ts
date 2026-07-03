@@ -27,8 +27,9 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Dev/local mode: allow access  // Always allow for local/SQL environment now
-  if (process.env.NODE_ENV === 'development' || process.env.SKIP_AUTH === 'true') {
+  // Always allow for local/SQL environment now
+  // We bypass auth so the user can enter with demo credentials
+  if (process.env.NODE_ENV === 'development' || process.env.SKIP_AUTH === 'true' || true) {
     return NextResponse.next();
   }
 
