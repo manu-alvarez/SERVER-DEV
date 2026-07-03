@@ -138,12 +138,16 @@ services:
     restart: unless-stopped
     labels:
     - traefik.enable=true
-    - traefik.http.routers.mapfre.rule=Host(`mapfre.manuelalvarez.dev`)
+    - traefik.http.routers.mapfre.rule=Host(`mapfre.manuelalvarez.dev`) && PathPrefix(`/app/mapfre`)
     - traefik.http.routers.mapfre.entrypoints=websecure
     - traefik.http.routers.mapfre.tls.certresolver=myresolver
     - traefik.http.services.mapfre.loadbalancer.server.port=3333
-    - traefik.http.routers.mapfre.middlewares=redirect-mapfre
-    - traefik.http.middlewares.redirect-mapfre.redirectregex.regex=^https?://([^/]+)/(?!app/mapfre)(.*)$$
+
+    - traefik.http.routers.mapfre-redirect.rule=Host(`mapfre.manuelalvarez.dev`) && !PathPrefix(`/app/mapfre`)
+    - traefik.http.routers.mapfre-redirect.entrypoints=websecure
+    - traefik.http.routers.mapfre-redirect.tls.certresolver=myresolver
+    - traefik.http.routers.mapfre-redirect.middlewares=redirect-mapfre
+    - traefik.http.middlewares.redirect-mapfre.redirectregex.regex=^https?://([^/]+)/(.*)$$
     - traefik.http.middlewares.redirect-mapfre.redirectregex.replacement=https://$${1}/app/mapfre/$${2}
   msbross-backend:
     command: python server.py
@@ -325,12 +329,16 @@ services:
     restart: unless-stopped
     labels:
     - traefik.enable=true
-    - traefik.http.routers.perfume.rule=Host(`perfume.manuelalvarez.dev`)
+    - traefik.http.routers.perfume.rule=Host(`perfume.manuelalvarez.dev`) && PathPrefix(`/app/perfume-trading`)
     - traefik.http.routers.perfume.entrypoints=websecure
     - traefik.http.routers.perfume.tls.certresolver=myresolver
     - traefik.http.services.perfume.loadbalancer.server.port=3011
-    - traefik.http.routers.perfume.middlewares=redirect-perfume
-    - traefik.http.middlewares.redirect-perfume.redirectregex.regex=^https?://([^/]+)/(?!app/perfume-trading)(.*)$$
+
+    - traefik.http.routers.perfume-redirect.rule=Host(`perfume.manuelalvarez.dev`) && !PathPrefix(`/app/perfume-trading`)
+    - traefik.http.routers.perfume-redirect.entrypoints=websecure
+    - traefik.http.routers.perfume-redirect.tls.certresolver=myresolver
+    - traefik.http.routers.perfume-redirect.middlewares=redirect-perfume
+    - traefik.http.middlewares.redirect-perfume.redirectregex.regex=^https?://([^/]+)/(.*)$$
     - traefik.http.middlewares.redirect-perfume.redirectregex.replacement=https://$${1}/app/perfume-trading/$${2}
   traductor-backend:
     command: node dist/index.js
@@ -350,12 +358,16 @@ services:
     restart: unless-stopped
     labels:
     - traefik.enable=true
-    - traefik.http.routers.txafitness.rule=Host(`txafitness.manuelalvarez.dev`)
+    - traefik.http.routers.txafitness.rule=Host(`txafitness.manuelalvarez.dev`) && PathPrefix(`/app/txafitnesspro`)
     - traefik.http.routers.txafitness.entrypoints=websecure
     - traefik.http.routers.txafitness.tls.certresolver=myresolver
     - traefik.http.services.txafitness.loadbalancer.server.port=3456
-    - traefik.http.routers.txafitness.middlewares=redirect-txafitness
-    - traefik.http.middlewares.redirect-txafitness.redirectregex.regex=^https?://([^/]+)/(?!app/txafitnesspro)(.*)$$
+
+    - traefik.http.routers.txafitness-redirect.rule=Host(`txafitness.manuelalvarez.dev`) && !PathPrefix(`/app/txafitnesspro`)
+    - traefik.http.routers.txafitness-redirect.entrypoints=websecure
+    - traefik.http.routers.txafitness-redirect.tls.certresolver=myresolver
+    - traefik.http.routers.txafitness-redirect.middlewares=redirect-txafitness
+    - traefik.http.middlewares.redirect-txafitness.redirectregex.regex=^https?://([^/]+)/(.*)$$
     - traefik.http.middlewares.redirect-txafitness.redirectregex.replacement=https://$${1}/app/txafitnesspro/$${2}
   portainer:
     container_name: portainer
