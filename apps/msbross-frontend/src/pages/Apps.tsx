@@ -228,16 +228,6 @@ export default function SaaS() {
       category: 'enterprise'
     },
     {
-      name: 'Tu Energía Maya',
-      desc: 'Plataforma interactiva sobre sabiduría Maya, kin y firma galáctica.',
-      tech: 'Web App, JavaScript, Tzolkin',
-      url: 'https://energia.manuelalvarez.dev',
-      icon: Sparkles,
-      color: 'from-[#f59e0b] to-[#d97706]',
-      glow: 'shadow-[0_0_30px_rgba(245,158,11,0.3)]',
-      category: 'creative-ai'
-    },
-    {
       name: 'TxaFitnessPro',
       desc: 'Plataforma integral de entrenamiento y nutrición inteligente con IA.',
       tech: 'Next.js 15, React 19, Tailwind',
