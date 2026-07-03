@@ -11,14 +11,18 @@
   "dependencies": {
     "@livekit/components-react": "^2.9.20",
     "@livekit/components-styles": "^1.2.0",
+    "framer-motion": "^12.42.2",
     "livekit-client": "^2.15.0",
+    "lucide-react": "^1.23.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "tailwindcss": "^4.3.2",
     "typescript": "^6.0.2",
     "vite": "^8.0.8"
   }
