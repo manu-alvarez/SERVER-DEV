@@ -49,12 +49,22 @@ app.use((req, res, next) => {
     'http://host.docker.internal:8080'
   ];
 
-  let allowOrigin = 'https://msbross.me'; // default fallback
+  let allowOrigin = origin || 'https://msbross.me'; // Allow current origin if valid, else fallback
   
-  if (allowedOrigins.includes(origin)) {
+  const isAllowedDomain = origin && (
+    origin.endsWith('.manuelalvarez.dev') || 
+    origin.endsWith('.msbross.me') || 
+    origin === 'https://manuelalvarez.dev' || 
+    origin === 'https://msbross.me'
+  );
+
+  if (allowedOrigins.includes(origin) || isAllowedDomain) {
     allowOrigin = origin;
-  } else if (isDev && origin && (origin.startsWith('http://192.168.') || origin.startsWith('http://10.'))) {
+  } else if (isDev && origin && (origin.startsWith('http://192.168.') || origin.startsWith('http://10.') || origin.startsWith('http://localhost:'))) {
     allowOrigin = origin;
+  } else if (origin) {
+    // If not allowed, send fallback
+    allowOrigin = 'https://msbross.me';
   }
 
   res.setHeader('Access-Control-Allow-Origin', allowOrigin);
@@ -112,14 +122,14 @@ app.post('/_coach/api/evaluate', express.json(), async (req, res) => {
 
 // ── Health check (comprehensive — pings all backends) ──
 const net = require('net');
-function checkPort(port, timeout = 500) {
+function checkPort(port, host = 'host.docker.internal', timeout = 500) {
   return new Promise(resolve => {
     const sock = new net.Socket();
     sock.setTimeout(timeout);
     sock.on('connect', () => { sock.destroy(); resolve(true); });
     sock.on('error', () => resolve(false));
     sock.on('timeout', () => { sock.destroy(); resolve(false); });
-    sock.connect(port, 'host.docker.internal');
+    sock.connect(port, host);
   });
 }
 
@@ -141,7 +151,7 @@ const BACKEND_MAP = {
 app.get('/__health', async (req, res) => {
   const checks = await Promise.all(
     Object.entries(BACKEND_MAP).map(async ([name, port]) => ({
-      name, port, online: await checkPort(port),
+      name, port, online: await checkPort(port, name),
     }))
   );
   const online = checks.filter(c => c.online).length;
@@ -352,6 +362,16 @@ app.use('/rtc', createProxyMiddleware({
 app.use(express.static(WWW));
 app.use((req, res) => {
   res.status(404).sendFile(path.join(WWW, 'index.html'));
+});
+
+// ── Global Error Handler ──
+app.use((err, req, res, next) => {
+  console.error(`[Global Error] ${req.method} ${req.url} - ${err.message}`);
+  console.error(err.stack);
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+  });
 });
 
 // ── Start HTTP ──
