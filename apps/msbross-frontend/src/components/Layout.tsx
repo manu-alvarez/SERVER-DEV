@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Activity, LayoutTemplate, Network, Phone, User, ChevronDown, ChevronRight, Menu, X } from 'lucide-react';
+import { Activity, LayoutTemplate, Network, Phone, User, Menu, X } from 'lucide-react';
 
 export default function Layout() {
   const location = useLocation();
-  const [isAppsOpen, setIsAppsOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Close mobile menu on route change
