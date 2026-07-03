@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Terminal, Globe, Database, Network, Activity, Target, Shield, Box, Layout, MessageSquare, Heart, Sparkles, Rocket } from 'lucide-react';
+import { ArrowRight, Terminal, Globe, Database, Network, Activity, Target, Shield, Box, Layout, MessageSquare, Heart, Sparkles, Rocket, Server } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Home() {
@@ -27,164 +27,251 @@ export default function Home() {
   const col2 = [...allApps.slice(8, 16), ...allApps.slice(8, 16)];
 
   return (
-    <div className="min-h-[85vh] flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-8 relative overflow-hidden">
-      {/* Ambient background glow */}
-      <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cyan-900/20 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[600px] h-[600px] bg-purple-900/20 rounded-full blur-[120px] pointer-events-none"></div>
+    <div className="space-y-24 pb-12 relative overflow-hidden">
+      {/* Hero Section */}
+      <div className="min-h-[85vh] flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-8 relative">
+        {/* Ambient background glow */}
+        <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cyan-900/20 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute top-1/2 right-0 -translate-y-1/2 w-[600px] h-[600px] bg-purple-900/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-      {/* Left Column: Typography */}
-      <div className="w-full lg:w-1/2 space-y-8 relative z-50 p-2 lg:p-4">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }} 
-          animate={{ opacity: 1, y: 0 }} 
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-xl"
-        >
-          <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
-          <span className="font-mono text-indigo-400 text-xs tracking-widest uppercase">
-            Mis Aplicaciones
-          </span>
-        </motion.div>
-        
-        <motion.h1 
-          initial={{ opacity: 0, y: 20 }} 
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-6xl lg:text-[5.5rem] font-black tracking-tighter leading-[1.05]"
-        >
-          <span className="text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-500 block">
-            Mis Proyectos
-          </span>
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-violet-500 to-fuchsia-600 block pb-2 drop-shadow-[0_0_30px_rgba(99,102,241,0.4)]">
-            Personales
-          </span>
-        </motion.h1>
-
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-gray-400 text-xl lg:text-2xl max-w-xl leading-relaxed font-light"
-        >
-          Una modesta colección de herramientas, pequeños scripts y aplicaciones web que voy programando para intentar solucionar problemas del día a día.
-        </motion.p>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-white/10"
-        >
-          <div className="group">
-            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-500 group-hover:scale-110 transition-transform origin-left">22</div>
-            <div className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-2 flex items-center gap-1.5">
-              <Globe className="w-3 h-3 text-indigo-500" /> Proyectos
-            </div>
-          </div>
-          <div className="group">
-            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-500 group-hover:scale-110 transition-transform origin-left">3</div>
-            <div className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-2 flex items-center gap-1.5">
-              <Terminal className="w-3 h-3 text-pink-500" /> Agentes IA
-            </div>
-          </div>
-          <div className="group">
-            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500 group-hover:scale-110 transition-transform origin-left">20+</div>
-            <div className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-2 flex items-center gap-1.5">
-              <Database className="w-3 h-3 text-emerald-500" /> Contenedores
-            </div>
-          </div>
-          <div className="group">
-            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 group-hover:scale-110 transition-transform origin-left">SLA</div>
-            <div className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-2 flex items-center gap-1.5">
-              <Network className="w-3 h-3 text-amber-500" /> Monitorizado
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="pt-8 flex gap-4"
-        >
-          <Link to="/saas" className="inline-block">
-            <button className="group relative flex items-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-700 px-8 py-4 text-white font-bold tracking-wide transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(6,182,212,0.6)]">
-              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
-              <span className="relative z-10">Ver todos los proyectos</span>
-              <ArrowRight className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-          </Link>
-        </motion.div>
-      </div>
-
-      {/* Right Column: Infinite Live Stream */}
-      <div className="w-full lg:w-1/2 relative h-[700px] flex items-center justify-center overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)]">
-        
-        {/* Grid Background */}
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
-
-        <div className="flex gap-4 md:gap-6 relative w-full justify-center rotate-[-5deg] scale-[0.6] sm:scale-75 md:scale-100 lg:scale-110">
-          
-          {/* Column 1 (Scrolls UP) */}
+        {/* Left Column: Typography */}
+        <div className="w-full lg:w-1/2 space-y-8 relative z-50 p-2 lg:p-4">
           <motion.div 
-            className="flex flex-col gap-6"
-            animate={{ y: ["0%", "-50%"] }}
-            transition={{ duration: 25, ease: "linear", repeat: Infinity }}
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-xl"
           >
-            {col1.map((app, i) => {
-              const Icon = app.icon;
-              return (
-                <div key={`col1-${i}`} className="w-56 md:w-64 p-4 md:p-5 rounded-2xl bg-[#0A101C]/90 backdrop-blur-md border border-white/10 shadow-xl flex flex-col gap-4 group hover:border-cyan-500/50 transition-colors">
-                  <div className="flex justify-between items-center">
-                    <div className={`p-2 rounded-lg bg-gradient-to-br ${app.color} bg-opacity-20`}>
-                      <Icon className="w-5 h-5 text-white" />
-                    </div>
-                    <span className="text-[9px] font-mono text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded-full uppercase">
-                      {app.tag}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-white font-bold text-lg leading-none">{app.name}</h3>
-                    <div className="flex items-center gap-2 mt-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                      <span className="text-[10px] font-mono text-gray-500">SYS_ONLINE</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
+            <span className="font-mono text-indigo-400 text-xs tracking-widest uppercase">
+              Mis Aplicaciones
+            </span>
+          </motion.div>
+          
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-6xl lg:text-[5.5rem] font-black tracking-tighter leading-[1.05]"
+          >
+            <span className="text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-500 block">
+              Mis Proyectos
+            </span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-violet-500 to-fuchsia-600 block pb-2 drop-shadow-[0_0_30px_rgba(99,102,241,0.4)]">
+              Personales
+            </span>
+          </motion.h1>
+
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-gray-400 text-xl lg:text-2xl max-w-xl leading-relaxed font-light"
+          >
+            Una modesta colección de herramientas, pequeños scripts y aplicaciones web que voy programando para intentar solucionar problemas del día a día.
+          </motion.p>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-white/10"
+          >
+            <div className="group">
+              <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-500 group-hover:scale-110 transition-transform origin-left">22</div>
+              <div className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-2 flex items-center gap-1.5">
+                <Globe className="w-3 h-3 text-indigo-500" /> Proyectos
+              </div>
+            </div>
+            <div className="group">
+              <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-500 group-hover:scale-110 transition-transform origin-left">3</div>
+              <div className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-2 flex items-center gap-1.5">
+                <Terminal className="w-3 h-3 text-pink-500" /> Agentes IA
+              </div>
+            </div>
+            <div className="group">
+              <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500 group-hover:scale-110 transition-transform origin-left">20+</div>
+              <div className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-2 flex items-center gap-1.5">
+                <Database className="w-3 h-3 text-emerald-500" /> Contenedores
+              </div>
+            </div>
+            <div className="group">
+              <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 group-hover:scale-110 transition-transform origin-left">SLA</div>
+              <div className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-2 flex items-center gap-1.5">
+                <Network className="w-3 h-3 text-amber-500" /> Monitorizado
+              </div>
+            </div>
           </motion.div>
 
-          {/* Column 2 (Scrolls DOWN) */}
           <motion.div 
-            className="flex flex-col gap-6"
-            animate={{ y: ["-50%", "0%"] }}
-            transition={{ duration: 30, ease: "linear", repeat: Infinity }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="pt-8 flex gap-4"
           >
-            {col2.map((app, i) => {
-              const Icon = app.icon;
-              return (
-                <div key={`col2-${i}`} className="w-56 md:w-64 p-4 md:p-5 rounded-2xl bg-[#0A101C]/90 backdrop-blur-md border border-white/10 shadow-xl flex flex-col gap-4 group hover:border-purple-500/50 transition-colors">
-                  <div className="flex justify-between items-center">
-                    <div className={`p-2 rounded-lg bg-gradient-to-br ${app.color} bg-opacity-20`}>
-                      <Icon className="w-5 h-5 text-white" />
-                    </div>
-                    <span className="text-[9px] font-mono text-magenta-400 border border-magenta-500/20 px-2 py-0.5 rounded-full uppercase">
-                      {app.tag}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-white font-bold text-lg leading-none">{app.name}</h3>
-                    <div className="flex items-center gap-2 mt-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                      <span className="text-[10px] font-mono text-gray-500">SYS_ONLINE</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            <Link to="/saas" className="inline-block">
+              <button className="group relative flex items-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-700 px-8 py-4 text-white font-bold tracking-wide transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(6,182,212,0.6)]">
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+                <span className="relative z-10">Ver todos los proyectos</span>
+                <ArrowRight className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </Link>
           </motion.div>
         </div>
+
+        {/* Right Column: Infinite Live Stream */}
+        <div className="w-full lg:w-1/2 relative h-[700px] flex items-center justify-center overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)]">
+          
+          {/* Grid Background */}
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
+
+          <div className="flex gap-4 md:gap-6 relative w-full justify-center rotate-[-5deg] scale-[0.6] sm:scale-75 md:scale-100 lg:scale-110">
+            
+            {/* Column 1 (Scrolls UP) */}
+            <motion.div 
+              className="flex flex-col gap-6"
+              animate={{ y: ["0%", "-50%"] }}
+              transition={{ duration: 25, ease: "linear", repeat: Infinity }}
+            >
+              {col1.map((app, i) => {
+                const Icon = app.icon;
+                return (
+                  <div key={`col1-${i}`} className="w-56 md:w-64 p-4 md:p-5 rounded-2xl bg-[#0A101C]/90 backdrop-blur-md border border-white/10 shadow-xl flex flex-col gap-4 group hover:border-cyan-500/50 transition-colors">
+                    <div className="flex justify-between items-center">
+                      <div className={`p-2 rounded-lg bg-gradient-to-br ${app.color} bg-opacity-20`}>
+                        <Icon className="w-5 h-5 text-white" />
+                      </div>
+                      <span className="text-[9px] font-mono text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded-full uppercase">
+                        {app.tag}
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="text-white font-bold text-lg leading-none">{app.name}</h3>
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <span className="text-[10px] font-mono text-gray-500">SYS_ONLINE</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </motion.div>
+
+            {/* Column 2 (Scrolls DOWN) */}
+            <motion.div 
+              className="flex flex-col gap-6"
+              animate={{ y: ["-50%", "0%"] }}
+              transition={{ duration: 30, ease: "linear", repeat: Infinity }}
+            >
+              {col2.map((app, i) => {
+                const Icon = app.icon;
+                return (
+                  <div key={`col2-${i}`} className="w-56 md:w-64 p-4 md:p-5 rounded-2xl bg-[#0A101C]/90 backdrop-blur-md border border-white/10 shadow-xl flex flex-col gap-4 group hover:border-purple-500/50 transition-colors">
+                    <div className="flex justify-between items-center">
+                      <div className={`p-2 rounded-lg bg-gradient-to-br ${app.color} bg-opacity-20`}>
+                        <Icon className="w-5 h-5 text-white" />
+                      </div>
+                      <span className="text-[9px] font-mono text-magenta-400 border border-magenta-500/20 px-2 py-0.5 rounded-full uppercase">
+                        {app.tag}
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="text-white font-bold text-lg leading-none">{app.name}</h3>
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <span className="text-[10px] font-mono text-gray-500">SYS_ONLINE</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </motion.div>
+          </div>
+        </div>
       </div>
+
+      {/* Infrastructure Core Section */}
+      <motion.div 
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+        className="w-full relative z-10 pt-10"
+      >
+        <div className="flex items-center gap-4 mb-8">
+          <div className="h-px bg-gradient-to-r from-transparent to-white/10 flex-1"></div>
+          <h2 className="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-500 flex items-center gap-3">
+            <Server className="w-6 h-6 text-indigo-400" />
+            Infraestructura Core
+          </h2>
+          <div className="h-px bg-gradient-to-r from-white/10 to-transparent flex-1"></div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            {
+              name: 'Traefik v3',
+              desc: 'Enrutador y Proxy Inverso Automático',
+              url: 'https://traefik.manuelalvarez.dev',
+              color: 'from-blue-400 to-indigo-600',
+              icon: Network,
+              glow: 'hover:shadow-[0_0_40px_rgba(99,102,241,0.25)]',
+              border: 'hover:border-indigo-500/40'
+            },
+            {
+              name: 'Portainer',
+              desc: 'Gestión Visual de Contenedores Docker',
+              url: 'https://portainer.manuelalvarez.dev',
+              color: 'from-cyan-400 to-blue-500',
+              icon: Box,
+              glow: 'hover:shadow-[0_0_40px_rgba(6,182,212,0.25)]',
+              border: 'hover:border-cyan-500/40'
+            },
+            {
+              name: 'Uptime Kuma',
+              desc: 'Monitorización 24/7 y Alertas en Tiempo Real',
+              url: 'https://monitor.manuelalvarez.dev',
+              color: 'from-emerald-400 to-teal-500',
+              icon: Activity,
+              glow: 'hover:shadow-[0_0_40px_rgba(16,185,129,0.25)]',
+              border: 'hover:border-emerald-500/40'
+            }
+          ].map((service, idx) => {
+            const Icon = service.icon;
+            return (
+              <a 
+                key={idx}
+                href={service.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`group relative overflow-hidden rounded-[2rem] bg-[#0A101C]/80 backdrop-blur-xl border border-white/5 p-8 transition-all duration-500 hover:-translate-y-2 ${service.border} ${service.glow}`}
+              >
+                {/* Background ambient glow */}
+                <div className={`absolute -right-20 -top-20 w-48 h-48 bg-gradient-to-br ${service.color} rounded-full blur-[80px] opacity-10 group-hover:opacity-30 transition-opacity duration-700 pointer-events-none`}></div>
+                
+                <div className="flex items-start justify-between mb-6 relative z-10">
+                  <div className={`p-4 rounded-2xl bg-gradient-to-br ${service.color} bg-opacity-10 shadow-lg group-hover:scale-110 transition-transform duration-500`}>
+                    <Icon className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="p-2 rounded-full bg-white/5 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+                    <ArrowRight className="w-5 h-5 text-white" />
+                  </div>
+                </div>
+                
+                <div className="relative z-10">
+                  <h3 className="text-2xl font-bold text-white mb-2">{service.name}</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">{service.desc}</p>
+                </div>
+                
+                {/* Connection status dot */}
+                <div className="absolute bottom-8 right-8 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.6)]"></div>
+                  <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Activo</span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </motion.div>
     </div>
   );
 }
