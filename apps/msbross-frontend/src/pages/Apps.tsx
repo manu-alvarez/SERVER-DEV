@@ -15,7 +15,7 @@ export default function SaaS() {
       icon: Activity,
       color: 'from-[#f472b6] to-[#ec4899]',
       glow: 'shadow-[0_0_30px_rgba(244,114,182,0.3)]',
-      category: 'dev-ai'
+      category: 'utilities'
     },
     {
       name: 'CombiPro',
@@ -25,7 +25,7 @@ export default function SaaS() {
       icon: Activity,
       color: 'from-[#f97316] to-[#f97316]',
       glow: 'shadow-[0_0_30px_rgba(249,115,22,0.3)]',
-      category: 'sports-ai'
+      category: 'industrial'
     },
     {
       name: 'Cuentos Mágicos',
@@ -35,7 +35,7 @@ export default function SaaS() {
       icon: Sparkles,
       color: 'from-[#fbbf24] to-[#f59e0b]',
       glow: 'shadow-[0_0_30px_rgba(251,191,36,0.3)]',
-      category: 'creative-ai'
+      category: 'core'
     },
     {
       name: 'Edelweiss',
@@ -45,7 +45,7 @@ export default function SaaS() {
       icon: Globe,
       color: 'from-[#ec4899] to-[#db2777]',
       glow: 'shadow-[0_0_30px_rgba(236,72,153,0.3)]',
-      category: 'enterprise'
+      category: 'frontend'
     },
     {
       name: 'EliteScout',
@@ -55,7 +55,7 @@ export default function SaaS() {
       icon: Globe,
       color: 'from-[#D4AF37] to-[#b4952f]',
       glow: 'shadow-[0_0_30px_rgba(212,175,55,0.3)]',
-      category: 'enterprise'
+      category: 'platforms'
     },
     {
       name: 'EXPOSITATOR RTE',
@@ -65,7 +65,7 @@ export default function SaaS() {
       icon: Target,
       color: 'from-[#10b981] to-[#059669]',
       glow: 'shadow-[0_0_30px_rgba(16,185,129,0.3)]',
-      category: 'vision-play'
+      category: 'utilities'
     },
     {
       name: 'Gas Station',
@@ -75,7 +75,7 @@ export default function SaaS() {
       icon: Rocket,
       color: 'from-[#f97316] to-[#ea580c]',
       glow: 'shadow-[0_0_30px_rgba(249,115,22,0.3)]',
-      category: 'enterprise'
+      category: 'core'
     },
     {
       name: 'IAPuta OS',
@@ -85,7 +85,7 @@ export default function SaaS() {
       icon: Shield,
       color: 'from-[#8b5cf6] to-[#7c3aed]',
       glow: 'shadow-[0_0_30px_rgba(139,92,246,0.3)]',
-      category: 'dev-ai'
+      category: 'platforms'
     },
     {
       name: 'IndustrialPro',
@@ -95,7 +95,7 @@ export default function SaaS() {
       icon: Shield,
       color: 'from-[#3b82f6] to-[#2563eb]',
       glow: 'shadow-[0_0_30px_rgba(59,130,246,0.3)]',
-      category: 'enterprise'
+      category: 'industrial'
     },
     {
       name: 'IT English Coach',
@@ -105,7 +105,7 @@ export default function SaaS() {
       icon: MessageSquare,
       color: 'from-[#00FFCC] to-[#00cca3]',
       glow: 'shadow-[0_0_30px_rgba(0,255,204,0.3)]',
-      category: 'dev-ai'
+      category: 'operations'
     },
     {
       name: 'JartosDTo',
@@ -115,7 +115,7 @@ export default function SaaS() {
       icon: Target,
       color: 'from-[#8b5cf6] to-[#7c3aed]',
       glow: 'shadow-[0_0_30px_rgba(139,92,246,0.3)]',
-      category: 'dev-ai'
+      category: 'core'
     },
     {
       name: 'LIVEKIT Nikolina',
@@ -125,7 +125,7 @@ export default function SaaS() {
       icon: MessageSquare,
       color: 'from-[#06b6d4] to-[#0891b2]',
       glow: 'shadow-[0_0_30px_rgba(6,182,212,0.3)]',
-      category: 'dev-ai'
+      category: 'core'
     },
     {
       name: 'LogiSearch',
@@ -135,7 +135,7 @@ export default function SaaS() {
       icon: Globe,
       color: 'from-[#00E5FF] to-[#00b8cc]',
       glow: 'shadow-[0_0_30px_rgba(0,229,255,0.3)]',
-      category: 'enterprise'
+      category: 'operations'
     },
     {
       name: 'LogiTrack Almacén',
@@ -145,7 +145,7 @@ export default function SaaS() {
       icon: Box,
       color: 'from-[#0ea5e9] to-[#0284c7]',
       glow: 'shadow-[0_0_30px_rgba(14,165,233,0.3)]',
-      category: 'enterprise'
+      category: 'operations'
     },
     {
       name: 'Mano Eléctrica Azul',
@@ -155,7 +155,7 @@ export default function SaaS() {
       icon: Activity,
       color: 'from-[#10b981] to-[#059669]',
       glow: 'shadow-[0_0_30px_rgba(16,185,129,0.3)]',
-      category: 'creative-ai'
+      category: 'operations'
     },
     {
       name: 'Manuel Álvarez Diánez',
@@ -165,7 +165,7 @@ export default function SaaS() {
       icon: Layout,
       color: 'from-[#3b82f6] to-[#2563eb]',
       glow: 'shadow-[0_0_30px_rgba(59,130,246,0.3)]',
-      category: 'enterprise'
+      category: 'frontend'
     },
     {
       name: 'MAPFRE Infocol',
@@ -175,7 +175,7 @@ export default function SaaS() {
       icon: Shield,
       color: 'from-[#e60028] to-[#b3001f]',
       glow: 'shadow-[0_0_30px_rgba(230,0,40,0.3)]',
-      category: 'enterprise'
+      category: 'platforms'
     },
     {
       name: 'Moko-Tools',
@@ -185,7 +185,17 @@ export default function SaaS() {
       icon: Layout,
       color: 'from-[#14b8a6] to-[#0d9488]',
       glow: 'shadow-[0_0_30px_rgba(20,184,166,0.3)]',
-      category: 'dev-ai'
+      category: 'utilities'
+    },
+    {
+      name: 'MSBross Frontend',
+      desc: 'La plataforma principal del ecosistema que engloba todas las aplicaciones.',
+      tech: 'React 19, Vite, Framer Motion',
+      url: 'https://msbross.me',
+      icon: LayoutTemplate,
+      color: 'from-[#f43f5e] to-[#e11d48]',
+      glow: 'shadow-[0_0_30px_rgba(244,63,94,0.3)]',
+      category: 'frontend'
     },
     {
       name: 'MSBrOSs Assistant',
@@ -195,7 +205,7 @@ export default function SaaS() {
       icon: MessageSquare,
       color: 'from-[#a855f7] to-[#9333ea]',
       glow: 'shadow-[0_0_30px_rgba(168,85,247,0.3)]',
-      category: 'dev-ai'
+      category: 'core'
     },
     {
       name: 'Perfume Trading',
@@ -205,7 +215,7 @@ export default function SaaS() {
       icon: Box,
       color: 'from-[#f43f5e] to-[#e11d48]',
       glow: 'shadow-[0_0_30px_rgba(244,63,94,0.3)]',
-      category: 'enterprise'
+      category: 'platforms'
     },
     {
       name: 'TaskFlowPro',
@@ -215,7 +225,7 @@ export default function SaaS() {
       icon: Layout,
       color: 'from-[#f59e0b] to-[#d97706]',
       glow: 'shadow-[0_0_30px_rgba(245,158,11,0.3)]',
-      category: 'enterprise'
+      category: 'industrial'
     },
     {
       name: 'Traductor PRO',
@@ -225,7 +235,7 @@ export default function SaaS() {
       icon: Globe,
       color: 'from-[#10b981] to-[#059669]',
       glow: 'shadow-[0_0_30px_rgba(16,185,129,0.3)]',
-      category: 'enterprise'
+      category: 'industrial'
     },
     {
       name: 'TxaFitnessPro',
@@ -235,7 +245,7 @@ export default function SaaS() {
       icon: Heart,
       color: 'from-[#a855f7] to-[#9333ea]',
       glow: 'shadow-[0_0_30px_rgba(168,85,247,0.3)]',
-      category: 'sports-ai'
+      category: 'frontend'
     },
     {
       name: 'Web Restaurante Atenea',
@@ -245,7 +255,7 @@ export default function SaaS() {
       icon: Layout,
       color: 'from-[#c4b5fd] to-[#a78bfa]',
       glow: 'shadow-[0_0_30px_rgba(196,181,253,0.3)]',
-      category: 'enterprise'
+      category: 'frontend'
     }
   ];
 
@@ -269,11 +279,12 @@ export default function SaaS() {
 
   const getCategoryTitle = () => {
     switch (categoryFilter) {
-      case 'dev-ai': return 'DEV & AI';
-      case 'sports-ai': return 'Deportes';
-      case 'creative-ai': return 'Creatividad';
-      case 'vision-play': return 'Visión & Juegos';
-      case 'enterprise': return 'Gestión & Logística';
+      case 'core': return 'Eje Core & APIs';
+      case 'platforms': return 'Plataformas Externas';
+      case 'industrial': return 'Ecosistema Industrial';
+      case 'frontend': return 'Frontend & Ocio';
+      case 'operations': return 'Operaciones';
+      case 'utilities': return 'Utilidades';
       default: return 'Mis Aplicaciones';
     }
   };

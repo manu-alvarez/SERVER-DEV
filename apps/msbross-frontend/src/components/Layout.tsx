@@ -14,18 +14,18 @@ export default function Layout() {
 
   const mainLinks = [
     { name: 'HOME', path: '/', icon: Activity },
-    { name: 'BOTS IA', path: '/bots', icon: Activity },
     { name: 'ARQUITECTURA', path: '/architecture', icon: Network },
     { name: 'PERFIL TÉCNICO', path: '/profile', icon: User },
     { name: 'CONTACTO', path: '/contact', icon: Phone }
   ];
 
   const appCategories = [
-    { name: 'DEV AI', path: '/apps?cat=dev-ai' },
-    { name: 'SPORTS AI', path: '/apps?cat=sports-ai' },
-    { name: 'CREATIVE AI', path: '/apps?cat=creative-ai' },
-    { name: 'VISION PLAY', path: '/apps?cat=vision-play' },
-    { name: 'ENTERPRISE', path: '/apps?cat=enterprise' }
+    { name: 'EJE CORE', path: '/apps?cat=core' },
+    { name: 'PLATAFORMAS', path: '/apps?cat=platforms' },
+    { name: 'ECO. INDUSTRIAL', path: '/apps?cat=industrial' },
+    { name: 'FRONTEND & OCIO', path: '/apps?cat=frontend' },
+    { name: 'OPERACIONES', path: '/apps?cat=operations' },
+    { name: 'UTILIDADES', path: '/apps?cat=utilities' }
   ];
 
   return (
