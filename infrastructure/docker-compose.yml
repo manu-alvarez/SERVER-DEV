@@ -11,11 +11,6 @@ services:
       - PORT=8007
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@msbross-cuentos-db:5432/cuentos_magicos
     image: msbross-cuentos-magicos-backend:latest
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.cuentos-magicos-backend.entrypoints=websecure
-      - traefik.http.routers.cuentos-magicos-backend.tls.certresolver=myresolver
-      - traefik.http.services.cuentos-magicos-backend.loadbalancer.server.port=8007
     networks: &id001
       - msbross_net
     restart: unless-stopped
@@ -29,11 +24,6 @@ services:
     environment:
       - PORT=8003
     image: node:22-alpine
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.elitescout-backend.entrypoints=websecure
-      - traefik.http.routers.elitescout-backend.tls.certresolver=myresolver
-      - traefik.http.services.elitescout-backend.loadbalancer.server.port=8003
     networks: *id001
     restart: unless-stopped
     volumes:
@@ -45,11 +35,6 @@ services:
     environment:
       - PORT=3005
     image: msbross-gas-station-backend:latest
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.gas-station-backend.entrypoints=websecure
-      - traefik.http.routers.gas-station-backend.tls.certresolver=myresolver
-      - traefik.http.services.gas-station-backend.loadbalancer.server.port=3005
     networks: *id001
     restart: unless-stopped
     volumes:
@@ -60,11 +45,6 @@ services:
     environment:
       - PORT=8006
     image: msbross-iaputa-backend:latest
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.iaputa-backend.entrypoints=websecure
-      - traefik.http.routers.iaputa-backend.tls.certresolver=myresolver
-      - traefik.http.services.iaputa-backend.loadbalancer.server.port=8006
     networks: *id001
     restart: unless-stopped
     volumes:
@@ -75,11 +55,6 @@ services:
     environment:
       - PORT=8002
     image: msbross-industrial-backend:latest
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.industrialpro-backend.entrypoints=websecure
-      - traefik.http.routers.industrialpro-backend.tls.certresolver=myresolver
-      - traefik.http.services.industrialpro-backend.loadbalancer.server.port=8002
     networks: *id001
     restart: unless-stopped
     volumes:
@@ -123,11 +98,6 @@ services:
     environment:
       - PORT=8010
     image: msbross-jartosdto-backend:latest
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.jartosdto-backend.entrypoints=websecure
-      - traefik.http.routers.jartosdto-backend.tls.certresolver=myresolver
-      - traefik.http.services.jartosdto-backend.loadbalancer.server.port=8010
     networks: *id001
     restart: unless-stopped
     volumes:
@@ -357,11 +327,6 @@ services:
     environment:
       - PORT=8001
     image: msbross-nikolina-backend:latest
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.nikolina.entrypoints=websecure
-      - traefik.http.routers.nikolina.tls.certresolver=myresolver
-      - traefik.http.services.nikolina.loadbalancer.server.port=8001
     networks: *id001
     restart: unless-stopped
     volumes:
@@ -377,11 +342,6 @@ services:
     environment:
       - PORT=8004
     image: node:22-alpine
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.traductor-backend.entrypoints=websecure
-      - traefik.http.routers.traductor-backend.tls.certresolver=myresolver
-      - traefik.http.services.traductor-backend.loadbalancer.server.port=8004
     networks: *id001
     restart: unless-stopped
     volumes:
