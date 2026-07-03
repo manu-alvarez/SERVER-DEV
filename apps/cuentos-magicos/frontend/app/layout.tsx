@@ -17,15 +17,7 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
-  icons: {
-    icon: [
-      { url: "/app/cuentos-magicos/icons/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/app/cuentos-magicos/icons/icon-512.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: [
-      { url: "/app/cuentos-magicos/icons/icon-192.png", sizes: "192x192", type: "image/png" },
-    ],
-  },
+  
 };
 
 export const viewport: Viewport = {
