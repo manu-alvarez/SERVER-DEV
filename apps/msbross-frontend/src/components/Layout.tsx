@@ -39,7 +39,7 @@ export default function Layout() {
 
       {/* Sidebar Glass Panel */}
       <aside 
-        className={`fixed lg:relative w-72 lg:w-64 flex-shrink-0 flex flex-col my-4 ml-4 rounded-2xl overflow-hidden z-50 h-[calc(100vh-2rem)] transition-transform duration-300 ease-in-out bg-[#050B14] lg:bg-[#111827]/70 backdrop-blur-xl border border-white/5 shadow-[20px_0_40px_rgba(0,0,0,0.5)] lg:shadow-none ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-[150%] lg:translate-x-0'}`}
+        className={`fixed top-0 left-0 lg:static w-72 lg:w-64 flex-shrink-0 flex flex-col lg:my-4 lg:ml-4 h-full lg:h-[calc(100vh-2rem)] lg:rounded-2xl overflow-hidden z-[100] transition-transform duration-300 ease-in-out bg-slate-950 lg:bg-[#111827]/70 lg:backdrop-blur-xl border-r lg:border border-white/5 shadow-[20px_0_40px_rgba(0,0,0,0.5)] lg:shadow-none ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
       >
         <div className="p-6 border-b border-white/5 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
