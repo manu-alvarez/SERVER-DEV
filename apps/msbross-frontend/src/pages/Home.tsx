@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Terminal, Globe, Database, Network, Activity, Target, Shield, Box, Layout, MessageSquare, Heart, Sparkles, Rocket } from 'lucide-react';
+import { ArrowRight, Terminal, Globe, Database, Network, Activity, Target, Shield, Box, Layout, MessageSquare, Heart, Sparkles, Rocket, Layers } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Home() {
@@ -84,15 +84,15 @@ export default function Home() {
           className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-white/10"
         >
           <div className="group">
-            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-500 group-hover:scale-110 transition-transform origin-left">22</div>
+            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-500 group-hover:scale-110 transition-transform origin-left">25</div>
             <div className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-2 flex items-center gap-1.5">
               <Globe className="w-3 h-3 text-indigo-500" /> Proyectos
             </div>
           </div>
-          <Link to="/bots" className="group cursor-pointer">
-            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-500 group-hover:scale-110 transition-transform origin-left">3</div>
+          <Link to="/apps" className="group cursor-pointer">
+            <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-500 group-hover:scale-110 transition-transform origin-left">6</div>
             <div className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mt-2 flex items-center gap-1.5 group-hover:text-pink-400 transition-colors">
-              <Terminal className="w-3 h-3 text-pink-500" /> Bots IA
+              <Layers className="w-3 h-3 text-pink-500" /> Fases Estratégicas
             </div>
           </Link>
           <div className="group">
