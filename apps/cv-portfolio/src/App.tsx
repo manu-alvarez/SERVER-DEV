@@ -60,10 +60,10 @@ function App() {
             </div>
 
             <div className="hero-actions" style={{ marginTop: '1.5rem', gap: '1.5rem' }}>
-              <a href="https://linkedin.com/in/manu-alvarez-dev" target="_blank" rel="noreferrer" title="LinkedIn" style={{ color: 'var(--text-secondary)' }}><Briefcase size={24} /></a>
-              <a href="https://github.com/manu-alvarez" target="_blank" rel="noreferrer" title="GitHub" style={{ color: 'var(--text-secondary)' }}><Code size={24} /></a>
-              <a href="https://msbross.me" target="_blank" rel="noreferrer" title="MSBross Ecosystem" style={{ color: 'var(--text-secondary)' }}><ExternalLink size={24} /></a>
-              <a href="https://manuelalvarez.dev" target="_blank" rel="noreferrer" title="Manuel Álvarez Hub" style={{ color: 'var(--text-secondary)' }}><Globe size={24} /></a>
+              <a href="https://linkedin.com/in/manu-alvarez-dev" target="_blank" rel="noreferrer" className="icon-link" data-tooltip="LinkedIn"><Briefcase size={24} /></a>
+              <a href="https://github.com/manu-alvarez" target="_blank" rel="noreferrer" className="icon-link" data-tooltip="GitHub"><Code size={24} /></a>
+              <a href="https://msbross.me" target="_blank" rel="noreferrer" className="icon-link" data-tooltip="MSBross Ecosystem"><ExternalLink size={24} /></a>
+              <a href="https://manuelalvarez.dev" target="_blank" rel="noreferrer" className="icon-link" data-tooltip="Manuel Álvarez Hub"><Globe size={24} /></a>
             </div>
           </motion.div>
         </div>
@@ -205,7 +205,7 @@ function App() {
       {/* FOOTER */}
       <footer style={{ padding: '3rem 0', textAlign: 'center', borderTop: '1px solid var(--glass-border)', backgroundColor: '#0a0b0e' }}>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>© {new Date().getFullYear()} Manuel Álvarez Diánez. Todos los derechos reservados.</p>
-        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', opacity: 0.7 }}>Creado para msbross.me</p>
+
       </footer>
     </>
   );
