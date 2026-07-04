@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Box, TextField, IconButton, CircularProgress, Alert, Tooltip, Stack, Typography } from '@mui/material';
-import FileUploadIcon from '@mui/icons-material/FileUpload';
-import ImageIcon from '@mui/icons-material/Image';
+import { Upload, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { extractText } from '../api';
+import { Textarea } from './ui/Input';
+import { Button } from './ui/Button';
 
 interface Props {
   value: string;
@@ -52,36 +52,45 @@ export default function UnifiedInput({ value, onChange, disabled }: Props) {
   };
 
   return (
-    <Box sx={{ position: 'relative' }}>
-      <TextField
-        fullWidth multiline minRows={8} maxRows={20}
-        label="Texto de entrada"
+    <div className="relative w-full group">
+      <Textarea
+        placeholder="Escribe, pega texto o sube un documento para comenzar..."
         value={value}
         onChange={e => onChange(e.target.value)}
         disabled={disabled || extracting}
-        sx={{ '& .MuiOutlinedInput-root': { p: { xs: 2, md: 3 } } }}
+        className="min-h-[250px] pb-14 text-base focus-visible:ring-neon-emerald/50 resize-none transition-all duration-300 group-hover:border-white/20"
       />
 
-      <Stack direction="row" spacing={1} sx={{ position: 'absolute', bottom: 12, right: 12, zIndex: 1, alignItems: 'center' }}>
-        {extracting && <CircularProgress size={24} />}
-        <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
+      <div className="absolute bottom-3 right-3 flex items-center gap-3">
+        {extracting && <Loader2 className="animate-spin text-neon-emerald" size={20} />}
+        <span className="text-xs text-white/40 mr-2">
           {value.length} caracteres
-        </Typography>
-        <Tooltip title="Subir documento (PDF, DOCX, TXT)">
-          <IconButton color="primary" component="label" disabled={disabled || extracting} size="small">
-            <input type="file" accept=".pdf,.docx,.txt" hidden onChange={handleDocumentChange} />
-            <FileUploadIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Subir imagen (OCR)">
-          <IconButton color="secondary" component="label" disabled={disabled || extracting} size="small">
-            <input type="file" accept="image/*" hidden onChange={handleImageChange} />
-            <ImageIcon />
-          </IconButton>
-        </Tooltip>
-      </Stack>
+        </span>
+        
+        <label title="Subir documento (PDF, DOCX, TXT)">
+          <input type="file" accept=".pdf,.docx,.txt" hidden onChange={handleDocumentChange} disabled={disabled || extracting} />
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-400 hover:bg-emerald-400/10 pointer-events-none" onClick={() => {}}>
+            <span className="pointer-events-auto cursor-pointer flex items-center justify-center">
+              <Upload size={18} />
+            </span>
+          </Button>
+        </label>
+        
+        <label title="Subir imagen (OCR)">
+          <input type="file" accept="image/*" hidden onChange={handleImageChange} disabled={disabled || extracting} />
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-cyan-400 hover:bg-cyan-400/10 pointer-events-none" onClick={() => {}}>
+            <span className="pointer-events-auto cursor-pointer flex items-center justify-center">
+              <ImageIcon size={18} />
+            </span>
+          </Button>
+        </label>
+      </div>
 
-      {errorMsg && <Alert severity="warning" sx={{ mt: 2 }}>{errorMsg}</Alert>}
-    </Box>
+      {errorMsg && (
+        <div className="mt-2 text-sm text-red-400 bg-red-400/10 p-3 rounded-lg border border-red-400/20">
+          {errorMsg}
+        </div>
+      )}
+    </div>
   );
 }

@@ -1,26 +1,24 @@
-import { useRef } from 'react';
-import { Box, Typography, IconButton, Tooltip, Stack, Button, Alert, Chip, Fade } from '@mui/material';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import DownloadIcon from '@mui/icons-material/Download';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { jsPDF } from 'jspdf';
+import { Copy, FileDown } from 'lucide-react';
 import { ProcessResult, Provider, PROVIDERS } from '../api';
+import { Button } from './ui/Button';
 
 interface Props {
   result: ProcessResult;
   error: string;
-  provider?: Provider;
+  provider?: Provider | string;
 }
 
 export default function ResultPanel({ result, error, provider }: Props) {
-  const { traduccion, resumen } = result;
-  const hasResult = !!(traduccion || resumen);
+  const { traduccion, resumen, resultado } = result as any;
+  const hasResult = !!(traduccion || resumen || resultado);
   const provInfo = PROVIDERS.find(p => p.id === provider);
 
   const handleCopy = async () => {
     const text = [
       traduccion ? `Traducción:\n${traduccion}` : '',
       resumen ? `Resumen:\n${resumen}` : '',
+      resultado ? `Resultado:\n${resultado}` : '',
     ].filter(Boolean).join('\n\n');
     await navigator.clipboard.writeText(text);
   };
@@ -30,82 +28,104 @@ export default function ResultPanel({ result, error, provider }: Props) {
     const margin = 40;
     const maxWidth = 515;
     doc.setFontSize(18);
-    doc.setTextColor('#1a73e8');
+    doc.setTextColor('#10b981'); // Emerald
     doc.text('Traductor PRO - Resultado', margin, 50);
     let y = 90;
 
-    if (traduccion) {
+    const addSection = (title: string, content: string) => {
       doc.setFontSize(13);
       doc.setTextColor('#333');
       doc.setFont('helvetica', 'bold');
-      doc.text('Traducción', margin, y);
+      doc.text(title, margin, y);
       y += 18;
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(11);
-      doc.text(doc.splitTextToSize(traduccion, maxWidth), margin, y);
-      y += (doc.splitTextToSize(traduccion, maxWidth).length * 14) + 20;
-    }
-    if (resumen) {
-      doc.setFontSize(13);
-      doc.setTextColor('#333');
-      doc.setFont('helvetica', 'bold');
-      doc.text('Resumen', margin, y);
-      y += 18;
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(11);
-      doc.text(doc.splitTextToSize(resumen, maxWidth), margin, y);
-    }
+      const lines = doc.splitTextToSize(content, maxWidth);
+      doc.text(lines, margin, y);
+      y += (lines.length * 14) + 20;
+    };
+
+    if (traduccion) addSection('Traducción', traduccion);
+    if (resumen) addSection('Resumen', resumen);
+    if (resultado) addSection('Resultado', resultado);
+
     doc.save('resultado.pdf');
   };
 
   return (
-    <Box sx={{ mt: 3 }}>
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+    <div className="mt-6">
+      {error && (
+        <div className="mb-4 text-sm text-red-400 bg-red-400/10 p-4 rounded-xl border border-red-400/20 shadow-[0_0_15px_rgba(248,113,113,0.1)]">
+          {error}
+        </div>
+      )}
 
       {!hasResult && !error && (
-        <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
+        <div className="text-sm text-white/40 text-center py-8">
           El resultado aparecerá aquí...
-        </Typography>
-      )}
-
-      {traduccion && (
-        <Fade in timeout={500}>
-          <Box sx={{ mb: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <Typography variant="subtitle2" color="primary" fontWeight={700}>Traducción</Typography>
-              {provInfo && <Chip size="small" label={provInfo.label} sx={{ bgcolor: provInfo.color, color: '#fff', fontWeight: 600 }} />}
-            </Box>
-            <Box sx={{ p: 3, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.08)' }}>
-              <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.8 }}>{traduccion}</Typography>
-            </Box>
-          </Box>
-        </Fade>
-      )}
-
-      {resumen && (
-        <Fade in timeout={500}>
-          <Box sx={{ mb: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <Typography variant="subtitle2" color="secondary" fontWeight={700}>Resumen</Typography>
-              {provInfo && <Chip size="small" label={provInfo.label} sx={{ bgcolor: provInfo.color, color: '#fff', fontWeight: 600 }} />}
-            </Box>
-            <Box sx={{ p: 3, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.08)' }}>
-              <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.8 }}>{resumen}</Typography>
-            </Box>
-          </Box>
-        </Fade>
+        </div>
       )}
 
       {hasResult && (
-        <Stack direction="row" spacing={1} justifyContent="center">
-          <Tooltip title="Copiar al portapapeles">
-            <IconButton onClick={handleCopy} color="primary"><ContentCopyIcon /></IconButton>
-          </Tooltip>
-          <Tooltip title="Descargar PDF">
-            <IconButton onClick={handleExportPDF} color="primary"><PictureAsPdfIcon /></IconButton>
-          </Tooltip>
-        </Stack>
+        <div className="space-y-6">
+          {traduccion && (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="flex items-center gap-3 mb-3">
+                <h3 className="text-lg font-bold text-emerald-400">Traducción</h3>
+                {provInfo && (
+                  <span className="text-xs font-bold px-2 py-1 rounded-full text-white shadow-sm" style={{ backgroundColor: provInfo.color }}>
+                    {provInfo.label}
+                  </span>
+                )}
+              </div>
+              <div className="p-6 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-lg text-white whitespace-pre-wrap leading-relaxed text-[15px]">
+                {traduccion}
+              </div>
+            </div>
+          )}
+
+          {resumen && (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
+              <div className="flex items-center gap-3 mb-3">
+                <h3 className="text-lg font-bold text-cyan-400">Resumen</h3>
+                {provInfo && (
+                  <span className="text-xs font-bold px-2 py-1 rounded-full text-white shadow-sm" style={{ backgroundColor: provInfo.color }}>
+                    {provInfo.label}
+                  </span>
+                )}
+              </div>
+              <div className="p-6 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-lg text-white whitespace-pre-wrap leading-relaxed text-[15px]">
+                {resumen}
+              </div>
+            </div>
+          )}
+
+          {resultado && (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="flex items-center gap-3 mb-3">
+                <h3 className="text-lg font-bold text-purple-400">Resultado Extra</h3>
+                {provInfo && (
+                  <span className="text-xs font-bold px-2 py-1 rounded-full text-white shadow-sm" style={{ backgroundColor: provInfo.color }}>
+                    {provInfo.label}
+                  </span>
+                )}
+              </div>
+              <div className="p-6 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-lg text-white whitespace-pre-wrap leading-relaxed text-[15px]">
+                {resultado}
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center justify-center gap-4 pt-4">
+            <Button variant="glass" size="icon" onClick={handleCopy} title="Copiar al portapapeles">
+              <Copy size={20} className="text-emerald-400" />
+            </Button>
+            <Button variant="glass" size="icon" onClick={handleExportPDF} title="Descargar PDF">
+              <FileDown size={20} className="text-cyan-400" />
+            </Button>
+          </div>
+        </div>
       )}
-    </Box>
+    </div>
   );
 }

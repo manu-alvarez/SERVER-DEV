@@ -1,65 +1,84 @@
 import { useState } from 'react';
-import { FormControl, InputLabel, Select, MenuItem, Button, CircularProgress, Box, Card, CardContent, Typography } from '@mui/material';
-import { motion } from 'framer-motion';
+import { useMutation } from '@tanstack/react-query';
+import { Loader2 } from 'lucide-react';
 import UnifiedInput from './UnifiedInput';
 import ResultPanel from './ResultPanel';
-import { Provider, processExtras, EXTRA_TOOLS, ProcessResult } from '../api';
+import { processExtras, EXTRA_TOOLS, ExtrasPayload } from '../api';
+import { useAppStore } from '../store';
+import { Button } from './ui/Button';
+import { Select } from './ui/Select';
+import { GlassCard } from './ui/index';
 
-interface Props {
-  provider: Provider;
-  onResult: (input: string, output: string, type: string) => void;
-}
-
-export default function ExtrasTab({ provider, onResult }: Props) {
+export default function ExtrasTab() {
   const [texto, setTexto] = useState('');
   const [herramienta, setHerramienta] = useState('keywords');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<ProcessResult>({ traduccion: '', resumen: '' });
-  const [error, setError] = useState('');
+  
+  const provider = useAppStore(state => state.provider);
+  const addToHistory = useAppStore(state => state.addToHistory);
 
   const tool = EXTRA_TOOLS.find(t => t.id === herramienta);
 
-  const handleProcesar = async () => {
-    if (!texto.trim()) return;
-    setLoading(true);
-    setError('');
-    try {
-      const data = await processExtras({ texto, herramienta, provider });
-      setResult({ traduccion: '', resumen: data.resultado, provider: data.provider as Provider });
-      onResult(texto, data.resultado, `extras:${herramienta}`);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error');
-    } finally {
-      setLoading(false);
+  const mutation = useMutation({
+    mutationFn: (payload: ExtrasPayload) => processExtras(payload),
+    onSuccess: (data) => {
+      addToHistory({
+        type: 'extras',
+        input: texto,
+        output: data.resultado,
+        provider: data.provider || provider,
+      });
     }
+  });
+
+  const handleProcesar = () => {
+    if (!texto.trim()) return;
+    mutation.mutate({ texto, herramienta, provider });
   };
 
+  const isValid = texto.trim().length > 0;
+
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-      <Box sx={{ mb: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <FormControl fullWidth size="small">
-          <InputLabel>Herramienta</InputLabel>
-          <Select label="Herramienta" value={herramienta} onChange={e => setHerramienta(e.target.value)}>
-            {EXTRA_TOOLS.map(t => <MenuItem key={t.id} value={t.id}>{t.label}</MenuItem>)}
-          </Select>
-        </FormControl>
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <GlassCard className="p-4 sm:p-6 mb-6">
+        <div className="max-w-md mx-auto mb-6">
+          <div className="space-y-2 mb-4">
+            <label className="text-xs font-semibold text-white/60 uppercase tracking-wider ml-1">Herramienta</label>
+            <Select 
+              value={herramienta} 
+              onChange={e => setHerramienta(e.target.value)}
+              options={EXTRA_TOOLS.map(t => ({ value: t.id, label: t.label }))}
+            />
+          </div>
 
-        {tool && (
-          <Card variant="outlined" sx={{ bgcolor: 'rgba(255,255,255,0.02)' }}>
-            <CardContent sx={{ py: 1.5 }}>
-              <Typography variant="caption" color="text.secondary">{tool.desc}</Typography>
-            </CardContent>
-          </Card>
-        )}
+          {tool && (
+            <div className="p-3 bg-white/5 rounded-xl text-center border border-white/5 mb-6">
+              <span className="text-sm text-white/60">{tool.desc}</span>
+            </div>
+          )}
 
-        <Button variant="contained" size="large" onClick={handleProcesar} disabled={loading || !texto.trim()}
-          sx={{ alignSelf: 'center', px: 6, py: 1.5, borderRadius: 100, fontWeight: 700, fontSize: '1rem' }}>
-          {loading ? <CircularProgress size={24} color="inherit" /> : 'Ejecutar'}
-        </Button>
-      </Box>
+          <div className="flex justify-center">
+            <Button 
+              variant="neon" 
+              size="lg" 
+              onClick={handleProcesar} 
+              disabled={mutation.isPending || !isValid}
+              className="w-full sm:w-auto min-w-[200px] border-purple-500/50 shadow-[0_0_15px_rgba(168,85,247,0.2)] bg-neon-purple/20 text-purple-400 hover:bg-neon-purple/30"
+            >
+              {mutation.isPending ? <Loader2 className="animate-spin mr-2" size={20} /> : 'Ejecutar Herramienta'}
+            </Button>
+          </div>
+        </div>
 
-      <UnifiedInput value={texto} onChange={setTexto} disabled={loading} />
-      <ResultPanel result={result} error={error} provider={result.provider} />
-    </motion.div>
+        <UnifiedInput value={texto} onChange={setTexto} disabled={mutation.isPending} />
+      </GlassCard>
+
+      {(mutation.data || mutation.isError) && (
+        <ResultPanel 
+          result={{ traduccion: '', resumen: '', resultado: mutation.data?.resultado }} 
+          error={mutation.error?.message || ''} 
+          provider={mutation.data?.provider || provider} 
+        />
+      )}
+    </div>
   );
 }

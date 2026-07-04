@@ -1,46 +1,59 @@
-export type Modo =
-  | 'traducir_estandar' | 'traducir' | 'traducir_profesional' | 'traducir_coloquial'
-  | 'resumir' | 'traducir_resumir' | 'normal' | 'literal' | 'profesional' | 'coloquial';
+import { z } from 'zod';
 
-export type Nivel = 'breve' | 'normal' | 'detallado';
-export type Provider = 'groq' | 'openai' | 'gemini' | 'openrouter';
+export const ProviderSchema = z.enum(['groq', 'openai', 'gemini', 'openrouter']);
+export type Provider = z.infer<typeof ProviderSchema>;
 
-export interface ProcessPayload {
-  texto: string;
-  origen: string;
-  destino: string;
-  modo: Modo;
-  nivelResumen: Nivel;
-  provider?: Provider;
-}
+export const ModoSchema = z.enum([
+  'traducir_estandar', 'traducir', 'traducir_profesional', 'traducir_coloquial',
+  'resumir', 'traducir_resumir', 'normal', 'literal', 'profesional', 'coloquial'
+]);
+export type Modo = z.infer<typeof ModoSchema>;
 
-export interface ProcessResult {
-  traduccion: string;
-  resumen: string;
-  provider?: string;
-}
+export const NivelSchema = z.enum(['breve', 'normal', 'detallado']);
+export type Nivel = z.infer<typeof NivelSchema>;
 
-export interface ExtrasPayload {
-  texto: string;
-  herramienta: string;
-  provider?: Provider;
-}
+export const ProcessPayloadSchema = z.object({
+  texto: z.string(),
+  origen: z.string(),
+  destino: z.string(),
+  modo: ModoSchema,
+  nivelResumen: NivelSchema,
+  provider: ProviderSchema.optional(),
+});
+export type ProcessPayload = z.infer<typeof ProcessPayloadSchema>;
 
-export interface ExtrasResult {
-  resultado: string;
-  provider?: string;
-}
+export const ProcessResultSchema = z.object({
+  traduccion: z.string().default(""),
+  resumen: z.string().default(""),
+  resultado: z.string().optional(),
+  provider: z.string().optional(),
+});
+export type ProcessResult = z.infer<typeof ProcessResultSchema>;
 
-export interface HistoryEntry {
-  id: string;
-  timestamp: number;
-  type: 'traduccion' | 'resumen' | 'extras';
-  input: string;
-  output: string;
-  provider: string;
-  sourceLang?: string;
-  targetLang?: string;
-}
+export const ExtrasPayloadSchema = z.object({
+  texto: z.string(),
+  herramienta: z.string(),
+  provider: ProviderSchema.optional(),
+});
+export type ExtrasPayload = z.infer<typeof ExtrasPayloadSchema>;
+
+export const ExtrasResultSchema = z.object({
+  resultado: z.string().default(""),
+  provider: z.string().optional(),
+});
+export type ExtrasResult = z.infer<typeof ExtrasResultSchema>;
+
+export const HistoryEntrySchema = z.object({
+  id: z.string(),
+  timestamp: z.number(),
+  type: z.enum(['traduccion', 'resumen', 'extras']),
+  input: z.string(),
+  output: z.string(),
+  provider: z.string(),
+  sourceLang: z.string().optional(),
+  targetLang: z.string().optional(),
+});
+export type HistoryEntry = z.infer<typeof HistoryEntrySchema>;
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/_traductor/api';
 
@@ -54,7 +67,8 @@ export async function processText(payload: ProcessPayload): Promise<ProcessResul
     const body = await res.json().catch(() => null);
     throw new Error(body?.error || `Error API: ${res.status}`);
   }
-  return res.json();
+  const data = await res.json();
+  return ProcessResultSchema.parse(data);
 }
 
 export async function processExtras(payload: ExtrasPayload): Promise<ExtrasResult> {
@@ -67,7 +81,8 @@ export async function processExtras(payload: ExtrasPayload): Promise<ExtrasResul
     const body = await res.json().catch(() => null);
     throw new Error(body?.error || `Error API: ${res.status}`);
   }
-  return res.json();
+  const data = await res.json();
+  return ExtrasResultSchema.parse(data);
 }
 
 export async function extractText(file: File): Promise<string> {
