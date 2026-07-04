@@ -13,10 +13,10 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://msbross.me/app/perfume-trading"),
-  title: "Perfume Trading — MSBross",
+  title: "Perfume Trading",
   description: "Sistema ERP especializado en trading B2B de perfumería. Potenciado por Prisma y Node.js.",
   manifest: "/manifest.json",
-  icons: { icon: "/icon.png" },
+  icons: { icon: "/icon.png?v=2" },
 };
 
 export default function RootLayout({

@@ -19,7 +19,7 @@ export function LoginForm() {
     setError(null);
     setLoading(true);
 
-    const syntheticEmail = `${name.toLowerCase().replace(/\s+/g, '')}@txa.local`;
+    const syntheticEmail = name.includes('@') ? name : `${name.toLowerCase().replace(/\s+/g, '')}@txa.local`;
     const result = await signIn("credentials", {
       email: syntheticEmail,
       password,

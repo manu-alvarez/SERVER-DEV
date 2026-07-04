@@ -11,5 +11,5 @@
   "/api/expedientes/[id]/route": "app/api/expedientes/[id]/route.js",
   "/api/expedientes/route": "app/api/expedientes/route.js",
   "/api/run/route": "app/api/run/route.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js"
+  "/icon.png/route": "app/icon.png/route.js"
 }

@@ -104,7 +104,7 @@ self.__SERVER_FILES_MANIFEST={
         "transform": "lodash/{{member}}"
       }
     },
-    "outputFileTracingRoot": "/home/ubuntu/MSBrossAI",
+    "outputFileTracingRoot": "/Users/manu/Desktop/SERVER-DEV",
     "allowedDevOrigins": [
       "localhost",
       "127.0.0.1",
@@ -172,7 +172,7 @@ self.__SERVER_FILES_MANIFEST={
       "proxyPrefetch": "flexible",
       "optimisticClientCache": true,
       "manualClientBasePath": false,
-      "cpus": 5,
+      "cpus": 11,
       "memoryBasedWorkersCount": false,
       "imgOptConcurrency": null,
       "imgOptTimeoutInSeconds": 7,
@@ -310,12 +310,12 @@ self.__SERVER_FILES_MANIFEST={
     "bundlePagesRouterDependencies": false,
     "configFileName": "next.config.mjs",
     "turbopack": {
-      "root": "/home/ubuntu/MSBrossAI"
+      "root": "/Users/manu/Desktop/SERVER-DEV"
     },
     "distDirRoot": ".next"
   },
-  "appDir": "/home/ubuntu/MSBrossAI/apps/mapfre-infocol/frontend",
-  "relativeAppDir": "apps/mapfre-infocol/frontend",
+  "appDir": "/Users/manu/Desktop/SERVER-DEV/apps/mapfre/frontend",
+  "relativeAppDir": "apps/mapfre/frontend",
   "files": [
     ".next/package.json",
     ".next/routes-manifest.json",

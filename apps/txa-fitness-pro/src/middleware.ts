@@ -8,13 +8,14 @@ export default withAuth({
 
 export const config = {
   matcher: [
-    "/",
-    "/dashboard/:path*",
-    "/assessment/:path*",
-    "/progress/:path*",
-    "/log/:path*",
-    "/plan/:path*",
-    "/profile/:path*",
-    "/ai-nutrition/:path*"
+    // DESACTIVADO TEMPORALMENTE
+    // "/",
+    // "/dashboard/:path*",
+    // "/assessment/:path*",
+    // "/progress/:path*",
+    // "/log/:path*",
+    // "/plan/:path*",
+    // "/profile/:path*",
+    // "/ai-nutrition/:path*"
   ],
 };

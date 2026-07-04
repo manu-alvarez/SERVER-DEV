@@ -114,7 +114,7 @@ export function Sidebar({ open = false, onClose, user = DEFAULT_USER }: SidebarP
      * @todo Implement secure authentication provider sign-out.
      * Direct window location mutations risk bypassing clean up routines.
      */
-    if (window.confirm("¿Cerrar sesión de InfoCOL?")) {
+    if (window.confirm("¿Cerrar sesión de MAPFRE?")) {
       router.push("/");
     }
   }, [router]);

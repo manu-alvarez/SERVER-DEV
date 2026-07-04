@@ -6,14 +6,14 @@ import { AuthProvider } from "@/components/auth/session-provider";
 import { SyncManager } from "@/components/auth/sync-manager";
 
 export const metadata: Metadata = {
-  title: "TxaFitness — MSBross",
+  title: "TxaFitness",
   description: "Plataforma de entrenamiento diario, membresías y control de progreso.",
   manifest: "/manifest.json",
-  icons: { icon: "/icon.png" },
+  icons: { icon: "/icon.png?v=2" },
   applicationName: "TxaFitness",
   authors: [{ name: "TxaFitness Team" }],
   openGraph: {
-    title: "TxaFitness — MSBross",
+    title: "TxaFitness",
     description: "Entrena, registra, progresa.",
     type: "website",
   },

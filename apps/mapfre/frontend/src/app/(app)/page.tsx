@@ -116,7 +116,7 @@ export default function Home() {
               variants={itemVariants}
               className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg"
             >
-              InfoCool procesa los expedientes FIN del portal, aplica los códigos de tarifa correctos
+              MAPFRE procesa los expedientes FIN del portal, aplica los códigos de tarifa correctos
               y rellena los formularios. Tú solo revisas y confirmas.
             </motion.p>
 
@@ -167,7 +167,7 @@ export default function Home() {
                   <div className="flex items-center gap-2">
                     <span className="h-1.5 w-1.5 rounded-full bg-success shadow-sm shadow-success/50" />
                     <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                      En vivo · InfoCol
+                      En vivo · MAPFRE
                     </span>
                   </div>
                   <Badge variant="success" className="font-mono">
