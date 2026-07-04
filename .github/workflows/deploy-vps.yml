@@ -1,0 +1,52 @@
+name: Deploy VPS Apps
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/txa-fitness-pro/**'
+      - 'apps/perfume-trading/**'
+      - 'apps/mapfre/**'
+      - 'infrastructure/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Deploy Apps via Rsync
+      run: |
+        echo "Sincronizando código fuente (apps/)..."
+        rsync -avz --exclude 'node_modules' --exclude 'dist' --exclude '.git' --exclude '__pycache__' --exclude 'venv' --exclude '.env' -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./apps/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/MSBrossAI/apps/
+
+    - name: Deploy Infrastructure via Rsync
+      run: |
+        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/docker-compose.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/MSBrossAI/docker-compose.yml
+        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/ecosystem.config.js ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/MSBrossAI/ecosystem.config.js
+
+    - name: Reload PM2 and Docker
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          cd ~/MSBrossAI
+          echo "Reiniciando contenedores Docker..."
+          docker compose up -d --build
+          echo "Recargando PM2..."
+          pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js
+          pm2 save
+          echo "✅ ¡Despliegue finalizado exitosamente en el servidor!"
