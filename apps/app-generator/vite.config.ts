@@ -5,5 +5,5 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: './', // Esto es VITAL para que los assets carguen bien en subdirectorios de Nginx (msbross.me/app-generator)
+  base: '/', // Esto es VITAL para que los assets carguen bien en subdirectorios de Nginx (msbross.me/app-generator)
 })

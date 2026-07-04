@@ -151,7 +151,7 @@ export default function Contact() {
             <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-magenta-500/10 rounded-full blur-[100px] pointer-events-none"></div>
 
             {/* FormSubmit Config */}
-            <input type="hidden" name="_subject" value="Nuevo mensaje desde MSBross.me!" />
+            <input type="hidden" name="_subject" value="Nuevo mensaje desde manuelalvarez.dev!" />
             <input type="hidden" name="_template" value="table" />
             <input type="hidden" name="_captcha" value="false" />
 

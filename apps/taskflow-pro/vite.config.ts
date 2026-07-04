@@ -10,7 +10,7 @@ const removeCrossOrigin: Plugin = {
 };
 
 export default defineConfig({
-  base: './',
+  base: '/',
   plugins: [react(), tailwindcss(), removeCrossOrigin],
   server: { port: 8887 },
   preview: { port: 8887 },

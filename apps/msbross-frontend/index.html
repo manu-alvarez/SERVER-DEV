@@ -8,6 +8,26 @@
     <title>MSBross Ecosystem — MSBross</title>
   </head>
   <body>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+            console.log('Service Worker unregistered to force update');
+          }
+        }).catch(function(err) {
+          console.log('Service Worker unregistration failed: ', err);
+        });
+      }
+      
+      // Also clear caches
+      if ('caches' in window) {
+        caches.keys().then(function(names) {
+          for (let name of names)
+            caches.delete(name);
+        });
+      }
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

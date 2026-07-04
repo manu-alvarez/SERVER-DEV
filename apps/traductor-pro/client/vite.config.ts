@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: './', // Para despliegues en subcarpetas /traductor/
+  base: '/', // Para despliegues en subcarpetas /traductor/
   server: {
     port: 5175,
     proxy: {
