@@ -29,21 +29,21 @@ jobs:
     - name: Deploy Apps via Rsync
       run: |
         echo "Sincronizando código fuente (apps/)..."
-        rsync -avz --exclude 'node_modules' --exclude 'dist' --exclude '.git' --exclude '__pycache__' --exclude 'venv' --exclude '.env' -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./apps/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/MSBrossAI/apps/
+        rsync -avz --exclude 'node_modules' --exclude 'dist' --exclude '.git' --exclude '__pycache__' --exclude 'venv' --exclude '.env' -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./apps/ ubuntu@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/apps/
 
     - name: Deploy Infrastructure via Rsync
       run: |
-        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/docker-compose.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/MSBrossAI/docker-compose.yml
-        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/ecosystem.config.js ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:~/MSBrossAI/ecosystem.config.js
+        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/docker-compose.yml ubuntu@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/docker-compose.yml
+        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/ecosystem.config.js ubuntu@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/ecosystem.config.js
 
     - name: Reload PM2 and Docker
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
+        username: ubuntu
         key: ${{ secrets.VPS_SSH_KEY }}
         script: |
-          cd ~/MSBrossAI
+          cd /home/ubuntu/MSBrossAI
           echo "Reiniciando contenedores Docker..."
           docker compose up -d --build
           echo "Recargando PM2..."
