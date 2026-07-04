@@ -21,13 +21,31 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-    - name: Debug VPS Connection
+    - name: Ensure target directory exists
       run: |
-        echo "=== DEBUG INFO ==="
-        ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "whoami && pwd && ls -la /home/ubuntu/MSBrossAI || ls -la /root/MSBrossAI"
-        echo "=================="
+        ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "mkdir -p /home/ubuntu/MSBrossAI/apps /home/ubuntu/MSBrossAI/infrastructure"
 
     - name: Deploy Apps via Rsync
       run: |
         echo "Sincronizando código fuente (apps/)..."
         rsync -avz --exclude 'node_modules' --exclude 'dist' --exclude '.git' --exclude '__pycache__' --exclude 'venv' --exclude '.env' -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./apps/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/apps/ || exit 1
+
+    - name: Deploy Infrastructure via Rsync
+      run: |
+        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/docker-compose.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/docker-compose.yml || exit 1
+        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./ecosystem.config.js ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/ecosystem.config.js || exit 1
+
+    - name: Reload PM2 and Docker
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          cd /home/ubuntu/MSBrossAI
+          echo "Reiniciando contenedores Docker..."
+          docker compose up -d --build
+          echo "Recargando PM2..."
+          pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js
+          pm2 save
+          echo "✅ ¡Despliegue finalizado exitosamente en el servidor!"
