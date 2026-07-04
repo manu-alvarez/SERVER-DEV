@@ -4,11 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'apps/txa-fitness-pro/**'
-      - 'apps/perfume-trading/**'
-      - 'apps/mapfre/**'
-      - 'infrastructure/**'
   workflow_dispatch:
 
 jobs:
@@ -26,21 +21,25 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
+    - name: Ensure target directory exists
+      run: |
+        ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "mkdir -p /home/ubuntu/MSBrossAI/apps /home/ubuntu/MSBrossAI/infrastructure"
+
     - name: Deploy Apps via Rsync
       run: |
         echo "Sincronizando código fuente (apps/)..."
-        rsync -avz --exclude 'node_modules' --exclude 'dist' --exclude '.git' --exclude '__pycache__' --exclude 'venv' --exclude '.env' -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./apps/ ubuntu@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/apps/
+        rsync -avz --exclude 'node_modules' --exclude 'dist' --exclude '.git' --exclude '__pycache__' --exclude 'venv' --exclude '.env' -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./apps/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/apps/
 
     - name: Deploy Infrastructure via Rsync
       run: |
-        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/docker-compose.yml ubuntu@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/docker-compose.yml
-        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/ecosystem.config.js ubuntu@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/ecosystem.config.js
+        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/docker-compose.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/docker-compose.yml
+        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/ecosystem.config.js ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/ecosystem.config.js
 
     - name: Reload PM2 and Docker
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.VPS_HOST }}
-        username: ubuntu
+        username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_SSH_KEY }}
         script: |
           cd /home/ubuntu/MSBrossAI
