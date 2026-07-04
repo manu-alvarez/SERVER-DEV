@@ -1,24 +1,25 @@
 import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { z } from 'zod';
 import { WRITING, CATS } from '../lib/data';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PenTool, Send, Loader2 } from 'lucide-react';
 import SkillsRadar from '../components/SkillsRadar';
 
+const EvaluateResponseSchema = z.object({
+  text: z.string(),
+});
+
 export default function WritingView() {
   const [texts, setTexts] = useState<Record<string, string>>({});
-  const [evaluating, setEvaluating] = useState<string | null>(null);
   const [feedbacks, setFeedbacks] = useState<Record<string, string>>({});
 
   const handleTextChange = (id: string, val: string) => {
     setTexts(prev => ({ ...prev, [id]: val }));
   };
 
-  const handleEvaluate = async (id: string, promptText: string) => {
-    const userText = texts[id];
-    if (!userText || userText.trim() === '') return;
-
-    setEvaluating(id);
-    try {
+  const evaluateMutation = useMutation({
+    mutationFn: async ({ id, promptText, userText }: { id: string, promptText: string, userText: string }) => {
       const response = await fetch('/_coach/api/evaluate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -28,11 +29,21 @@ export default function WritingView() {
       });
       if (!response.ok) throw new Error('API Error');
       const data = await response.json();
-      setFeedbacks(prev => ({ ...prev, [id]: data.text || "No feedback received." }));
-    } catch (err) {
-      setFeedbacks(prev => ({ ...prev, [id]: "Error evaluating the text. Please try again later." }));
+      const parsed = EvaluateResponseSchema.parse(data);
+      return { id, text: parsed.text };
+    },
+    onSuccess: (data) => {
+      setFeedbacks(prev => ({ ...prev, [data.id]: data.text || "No feedback received." }));
+    },
+    onError: (_, variables) => {
+      setFeedbacks(prev => ({ ...prev, [variables.id]: "Error evaluating the text. Please try again later." }));
     }
-    setEvaluating(null);
+  });
+
+  const handleEvaluate = (id: string, promptText: string) => {
+    const userText = texts[id];
+    if (!userText || userText.trim() === '') return;
+    evaluateMutation.mutate({ id, promptText, userText });
   };
 
   return (
@@ -82,17 +93,17 @@ export default function WritingView() {
                         onChange={(e) => handleTextChange(item.id, e.target.value)}
                         placeholder={item.hint || "Type your answer here..."}
                         className="w-full h-32 bg-surface border border-border/50 rounded-xl p-4 text-sm text-white placeholder-muted focus:outline-none focus:border-neon-cyan/50 resize-none transition-colors"
-                        disabled={!!feedbacks[item.id] || evaluating === item.id}
+                        disabled={!!feedbacks[item.id] || (evaluateMutation.isPending && evaluateMutation.variables?.id === item.id)}
                       ></textarea>
 
                       {!feedbacks[item.id] && (
                         <div className="flex justify-end mt-4">
                           <button
                             onClick={() => handleEvaluate(item.id, item.prompt)}
-                            disabled={!texts[item.id] || texts[item.id].trim() === '' || evaluating === item.id}
+                            disabled={!texts[item.id] || texts[item.id].trim() === '' || (evaluateMutation.isPending && evaluateMutation.variables?.id === item.id)}
                             className="flex items-center gap-2 bg-neon-cyan/10 hover:bg-neon-cyan/20 text-neon-cyan px-4 py-2 rounded-lg text-sm font-bold transition-all disabled:opacity-50"
                           >
-                            {evaluating === item.id ? (
+                            {(evaluateMutation.isPending && evaluateMutation.variables?.id === item.id) ? (
                               <><Loader2 size={16} className="animate-spin" /> Evaluando...</>
                             ) : (
                               <><Send size={16} /> Evaluar con IA</>

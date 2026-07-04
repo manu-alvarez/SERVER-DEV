@@ -69,11 +69,6 @@ function saveMessagesLocal(convId: string, msgs: ChatMessage[]) {
       console.error("Error saving messages to localStorage", e);
     }
   }
-}";
-    const map = JSON.parse(stored);
-    map[convId] = msgs;
-    localStorage.setItem(LOCAL_MSGS_KEY, JSON.stringify(map));
-  }
 }
 
 /** Authenticated fetch wrapper. */

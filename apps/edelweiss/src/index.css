@@ -1,65 +1,83 @@
-:root {
-  --pink: #ec4899;
-  --purple: #a78bda;
-  --blue: #7eaed4;
-  --green: #5fbf9e;
-  --yellow: #d4a836;
-  --orange: #d49060;
-  --red: #d48080;
-  --bg: #0e0e12;
-  --card: #1c1c22;
-  --text: #d4d4dc;
+@import "tailwindcss";
+
+@theme {
+  --color-brand-50: #fdf2f8;
+  --color-brand-100: #fce7f3;
+  --color-brand-200: #fbcfe8;
+  --color-brand-300: #f9a8d4;
+  --color-brand-400: #f472b6;
+  --color-brand-500: #ec4899;
+  --color-brand-600: #db2777;
+  --color-brand-900: #831843;
+  --color-brand-950: #500724;
+  
+  --color-accent-300: #7dd3fc;
+  --color-accent-400: #38bdf8;
+  --color-accent-500: #0ea5e9;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+@layer base {
+  :root {
+    background-color: #030712;
+    color: #f8fafc;
+  }
+}
 
-body {
-  font-family: 'Nunito', sans-serif;
-  background: linear-gradient(135deg, #0c0c10 0%, #14141c 50%, #0e1612 100%);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
+@layer utilities {
+  .glass-panel {
+    @apply bg-[#080c18]/85 backdrop-blur-xl border border-white/5 rounded-2xl shadow-2xl;
+  }
+  
+  .glass-panel-hover {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.4)] hover:border-brand-500/30;
+  }
+  
+  .btn-premium {
+    @apply relative overflow-hidden transition-all duration-300 transform 
+           bg-gradient-to-r from-brand-600 to-accent-500 text-white
+           hover:from-brand-500 hover:to-accent-400
+           hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(236,72,153,0.3)]
+           hover:shadow-[0_0_30px_rgba(236,72,153,0.6)];
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-r from-brand-400 to-accent-400 text-transparent bg-clip-text;
+  }
+}
+
+/* Orbs Background */
+.bg-orbs-container {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, #080c18 0%, #030712 100%);
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+  animation: float 20s infinite ease-in-out alternate;
+}
+
+.orb-1 { width: 500px; height: 500px; background: var(--color-brand-500); top: -100px; left: -100px; }
+.orb-2 { width: 400px; height: 400px; background: var(--color-accent-500); bottom: -100px; right: -100px; animation-delay: -5s; }
+.orb-3 { width: 300px; height: 300px; background: #8b5cf6; top: 40%; left: 40%; animation-delay: -10s; opacity: 0.1; }
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(30px, 50px) scale(1.1); }
+}
+
+@keyframes sparkle {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
 }
 
 @keyframes bounce {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-20px); }
 }
-
-@keyframes wiggle {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-5deg); }
-  75% { transform: rotate(5deg); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-15px) scale(1.05); }
-}
-
-@keyframes sparkle {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.2); }
-}
-
-@keyframes slideIn {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes pop {
-  0% { transform: scale(0); opacity: 0; }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-.animate-bounce { animation: bounce 1s ease infinite; }
-.animate-wiggle { animation: wiggle 0.5s ease infinite; }
-.animate-float { animation: float 3s ease-in-out infinite; }
-.animate-sparkle { animation: sparkle 1.5s ease infinite; }
-.animate-slideIn { animation: slideIn 0.5s ease forwards; }
-.animate-pop { animation: pop 0.3s ease forwards; }
-
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #1a1a20; }
-::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 10px; }

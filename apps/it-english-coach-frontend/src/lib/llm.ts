@@ -1,4 +1,5 @@
 import { useAppStore } from '../store';
+import { z } from 'zod';
 
 export const PROVIDERS = {
   custom: { id: "custom", label: "Custom (OpenAI-compatible)", kind: "openai", url: "" },
@@ -8,6 +9,31 @@ export const PROVIDERS = {
   groq: { id: "groq", label: "Groq", url: "https://api.groq.com/openai/v1/chat/completions", kind: "openai" },
   openrouter: { id: "openrouter", label: "OpenRouter", url: "https://openrouter.ai/api/v1/chat/completions", kind: "openai" }
 };
+
+// --- Zod Schemas ---
+const AnthropicResponseSchema = z.object({
+  content: z.array(z.object({
+    type: z.string(),
+    text: z.string().optional()
+  })).optional()
+}).catch({});
+
+const GeminiResponseSchema = z.object({
+  candidates: z.array(z.object({
+    content: z.object({
+      parts: z.array(z.object({ text: z.string().optional() })).optional()
+    }).optional()
+  })).optional()
+}).catch({});
+
+const OpenAIResponseSchema = z.object({
+  choices: z.array(z.object({
+    message: z.object({
+      content: z.string().nullable().optional()
+    }).optional()
+  })).optional()
+}).catch({});
+// -------------------
 
 async function readErr(res: Response) {
   try {
@@ -50,8 +76,9 @@ async function providerChat(pid: string, messages: {role: string, content: strin
       body: JSON.stringify({ model, max_tokens: 1500, system, messages })
     });
     if (!res.ok) throw new Error("HTTP " + res.status + " · " + await readErr(res));
-    const d = await res.json();
-    return (d.content || []).map((b: any) => b.type === "text" ? b.text : "").join("\n");
+    const data = await res.json();
+    const parsed = AnthropicResponseSchema.parse(data);
+    return (parsed.content || []).map((b: any) => b.type === "text" ? b.text : "").join("\n");
   }
 
   if (P.kind === "gemini") {
@@ -69,8 +96,9 @@ async function providerChat(pid: string, messages: {role: string, content: strin
       body: JSON.stringify(body)
     });
     if (!res.ok) throw new Error("HTTP " + res.status + " · " + await readErr(res));
-    const d = await res.json();
-    return (d.candidates && d.candidates[0]?.content?.parts || []).map((p: any) => p.text || "").join("");
+    const data = await res.json();
+    const parsed = GeminiResponseSchema.parse(data);
+    return (parsed.candidates && parsed.candidates[0]?.content?.parts || []).map((p: any) => p.text || "").join("");
   }
 
   // openai-compatible
@@ -88,8 +116,9 @@ async function providerChat(pid: string, messages: {role: string, content: strin
     body: JSON.stringify({ model, messages: msgs })
   });
   if (!res.ok) throw new Error("HTTP " + res.status + " · " + await readErr(res));
-  const d = await res.json();
-  return d.choices && d.choices[0] && d.choices[0].message ? d.choices[0].message.content : "";
+  const data = await res.json();
+  const parsed = OpenAIResponseSchema.parse(data);
+  return parsed.choices && parsed.choices[0] && parsed.choices[0].message ? (parsed.choices[0].message.content || "") : "";
 }
 
 export async function chat(messages: {role: string, content: string}[], system?: string) {
@@ -122,5 +151,5 @@ export async function chat(messages: {role: string, content: string}[], system?:
     }
   }
 
-  throw new Error("Todos los proveedores fallaron. Error final: " + (lastError?.message || "Desconocido"));
+  throw new Error("Todos los proveedores fallaron. Error final: " + ((lastError as any)?.message || "Desconocido"));
 }

@@ -11,6 +11,7 @@ import WritingView from './views/WritingView';
 import SpeakingView from './views/SpeakingView';
 import TutorView from './views/TutorView';
 import SettingsView from './views/SettingsView';
+import AmbientGlow from './components/ui/AmbientGlow';
 
 function App() {
   const { activeTab, setActiveTab } = useAppStore();
@@ -30,10 +31,8 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-[#02050A] font-inter text-gray-200 flex flex-col md:flex-row">
-      {/* Background Orbs */}
-      <div className="ambient-orb orb-1"></div>
-      <div className="ambient-orb orb-2"></div>
+    <div className="min-h-screen relative bg-[var(--background)] font-inter text-[var(--foreground)] flex flex-col md:flex-row">
+      <AmbientGlow />
 
       {/* Sidebar (Desktop) */}
       <aside className="hidden md:flex flex-col w-64 h-screen border-r border-border/30 bg-[#0A101C]/80 backdrop-blur-xl z-50 p-6">

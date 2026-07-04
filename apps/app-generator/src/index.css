@@ -1,123 +1,174 @@
-:root {
-  --bg-primary: #030712;
-  --bg-secondary: rgba(255, 255, 255, 0.03);
-  --bg-tertiary: rgba(255, 255, 255, 0.05);
-  --border: rgba(255, 255, 255, 0.06);
-  --text-primary: #f8fafc;
-  --text-secondary: #64748b;
-  --accent: #f472b6;
-  --accent-glow: rgba(244, 114, 182, 0.5);
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-display: 'Outfit', 'Inter', system-ui, sans-serif;
+  
+  --color-brand-50: #ecfeff;
+  --color-brand-100: #cffafe;
+  --color-brand-400: #22d3ee;
+  --color-brand-500: #06b6d4;
+  --color-brand-600: #0891b2;
+  --color-brand-900: #164e63;
+  --color-brand-950: #083344;
+
+  --color-accent-50: #fdf4ff;
+  --color-accent-400: #e879f9;
+  --color-accent-500: #d946ef;
+  --color-accent-600: #c026d3;
+  --color-accent-950: #4a044e;
+  
+  --color-background: #02040a;
+  --color-foreground: #fafafa;
+  --color-card: #0a0e17;
+  --color-card-foreground: #fafafa;
+  --color-border: #1e293b;
+  --color-muted: #1e293b;
+  --color-muted-foreground: #94a3b8;
+  
+  --radius-lg: 1.5rem;
+  --radius-md: 1rem;
+  --radius-sm: 0.5rem;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@layer base {
+  :root {
+    --background: var(--color-background);
+    --foreground: var(--color-foreground);
+    --border: var(--color-border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
 }
 
-body {
-  font-family: 'Inter', -apple-system, sans-serif;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  height: 100vh;
-  overflow: hidden;
+@property --border-angle {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0turn;
 }
 
-/* Custom Scrollbar */
+@layer utilities {
+  .bento-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 50vh 50vh;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  @media (min-width: 1024px) {
+    .bento-layout {
+      grid-template-columns: 400px 1fr;
+      grid-template-rows: 1fr;
+    }
+  }
+
+  .portal-card {
+    position: relative;
+    border-radius: var(--radius-lg);
+    background: var(--color-card);
+    padding: 2px;
+  }
+
+  .portal-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--border-angle),
+      transparent 20%,
+      var(--color-brand-500),
+      var(--color-accent-500)
+    );
+    animation: rotate-border 4s linear infinite;
+    z-index: 0;
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
+  }
+  
+  .portal-card:hover::before {
+    opacity: 0.9;
+  }
+
+  .portal-card-inner {
+    position: relative;
+    background: var(--color-card);
+    border-radius: calc(var(--radius-lg) - 2px);
+    z-index: 1;
+    height: 100%;
+    width: 100%;
+  }
+
+  .bg-orbs-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    background: var(--background);
+  }
+
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.3;
+    animation: float 20s infinite ease-in-out alternate;
+  }
+
+  .orb-1 {
+    top: -10%;
+    left: -10%;
+    width: 50vw;
+    height: 50vw;
+    background: radial-gradient(circle, var(--color-brand-900) 0%, transparent 70%);
+    animation-delay: 0s;
+  }
+
+  .orb-2 {
+    bottom: -10%;
+    right: -10%;
+    width: 60vw;
+    height: 60vw;
+    background: radial-gradient(circle, var(--color-accent-950) 0%, transparent 70%);
+    animation-delay: -5s;
+  }
+}
+
+@keyframes rotate-border {
+  to { --border-angle: 1turn; }
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(5%, 5%) scale(1.05); }
+  100% { transform: translate(-5%, 10%) scale(0.95); }
+}
+
+/* Global scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: var(--color-background);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--bg-tertiary);
+  background: var(--color-muted);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--border);
+  background: var(--color-muted-foreground);
 }
-
-/* Base animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease forwards;
-}
-
-/* Responsive Layout App Generator */
-.app-layout {
-  display: flex;
-  flex-direction: row;
-  height: 100%;
-  width: 100%;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  overflow: hidden;
-}
-
-.panel-sidebar {
-  width: 400px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  z-index: 10;
-}
-
-.panel-preview {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-@media (max-width: 768px) {
-  .app-layout {
-    flex-direction: column;
-  }
-  .panel-sidebar {
-    width: 100%;
-    height: 50vh;
-  }
-  .panel-preview {
-    height: 50vh;
-  }
-}
-
-/* ═══ PREMIUM PORTAL STYLES ═══ */
-.portal-card {
-  position: relative;
-  background: rgba(255,255,255,0.02);
-  border-radius: 20px;
-  padding: 2px;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-  height: 100%;
-}
-
-.portal-card::before {
-  content: ''; position: absolute; inset: 0; border-radius: 20px; padding: 2px;
-  background: linear-gradient(var(--border-angle, 0deg), var(--accent), transparent 40%, transparent 60%, var(--accent));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor; mask-composite: exclude;
-  animation: borderSpin 4s linear infinite; opacity: 0.7; transition: opacity 0.4s;
-}
-
-.portal-card:hover::before { opacity: 1; box-shadow: 0 0 30px var(--accent-glow); }
-
-.portal-card-inner {
-  background: rgba(8,12,24,0.85);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border-radius: 18px;
-  display: flex; flex-direction: column;
-  position: relative; overflow: hidden; height: 100%; width: 100%;
-}
-
-@keyframes borderSpin { to { --border-angle: 360deg; } }
-@property --border-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
-

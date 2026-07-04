@@ -748,5 +748,6 @@ if __name__ == "__main__":
             agent_name="msb-assistant",
             entrypoint_fnc=entrypoint,
             prewarm_fnc=prewarm,
+            port=8085,
         ),
     )

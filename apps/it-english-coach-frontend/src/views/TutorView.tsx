@@ -27,7 +27,7 @@ export default function TutorView() {
       const res = await chatLLM(newMsgs, system);
       setMessages([...newMsgs, {role:'assistant', content:res}]);
     } catch (e) {
-      setMessages([...newMsgs, {role:'assistant', content:`⚠️ Error: ${e.message}`}]);
+      setMessages(prev => [...prev, { role: 'assistant', content: `Error: ${(e as any).message}` }]);
     } finally {
       setLoading(false);
     }

@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  taskflow-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taskflow-frontend-prod
+    restart: unless-stopped
+    networks:
+      - msbross_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.taskflow.rule=Host(`taskflow.manuelalvarez.dev`)"
+      - "traefik.http.routers.taskflow.entrypoints=websecure"
+      - "traefik.http.routers.taskflow.tls.certresolver=myresolver"
+      - "traefik.http.routers.taskflow.priority=999"
+      - "traefik.http.services.taskflow.loadbalancer.server.port=80"
+      - "traefik.docker.network=msbross_net"
+
+networks:
+  msbross_net:
+    external: true

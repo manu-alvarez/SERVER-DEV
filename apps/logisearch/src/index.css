@@ -1,6 +1,18 @@
 /* LogiSearch AI — Minimal Global Styles */
 /* MUI handles all component styling via theme.ts */
 
+@import "tailwindcss";
+
+@theme {
+  --color-brand-500: #ec4899;
+  --color-accent-400: #38bdf8;
+  --color-accent-500: #0ea5e9;
+}
+
+:root {
+  --primary-color: #00E5FF;
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 /* Override any remaining defaults */

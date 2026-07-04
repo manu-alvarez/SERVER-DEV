@@ -18,8 +18,8 @@ import { AdminDashboard } from './components/views/AdminDashboard';
 type TabType = 'assistant' | 'menu' | 'reservations' | 'calls' | 'admin';
 
 const LIVEKIT_URL = (import.meta as any).env.VITE_LIVEKIT_URL || 
-  (typeof window !== 'undefined' && window.location.protocol === 'https:'
-    ? `wss://${window.location.host}/rtc`
+  (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'
+    ? 'wss://nikolina-1jg7t00i.livekit.cloud'
     : (typeof window !== 'undefined' ? `ws://${window.location.hostname}:7880` : 'ws://127.0.0.1:7880'));
 
 export default function App() {

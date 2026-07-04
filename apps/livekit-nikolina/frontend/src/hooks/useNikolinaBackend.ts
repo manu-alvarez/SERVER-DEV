@@ -81,7 +81,7 @@ export function useNikolinaBackend() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         room_name: 'nikolina-room',
-        participant_name: participantName
+        participant_identity: participantName
       })
     });
     if (!res.ok) throw new Error('Error al generar token');

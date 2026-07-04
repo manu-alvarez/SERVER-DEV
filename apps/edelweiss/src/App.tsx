@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-
-// ============================================
-// EDELWEISS — Vision Therapy Games for Kids
-// ============================================
+import { motion, AnimatePresence } from 'framer-motion';
+import { Eye, ChevronLeft, Star, Clock, Trophy, Target, Palette, Box, Activity, Search } from 'lucide-react';
 
 interface Game {
   id: string;
   name: string;
-  icon: string;
+  icon: React.ReactNode;
   color: string;
   description: string;
   component: React.FC;
@@ -20,7 +18,6 @@ const FollowTheStar: React.FC = () => {
   const [level, setLevel] = useState(1);
   const [showConfetti, setShowConfetti] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
-  const gameRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -52,70 +49,45 @@ const FollowTheStar: React.FC = () => {
   };
 
   return (
-    <div style={{ textAlign: 'center' }}>
-      <h2 style={{ fontFamily: 'Fredoka One', fontSize: '2rem', color: 'var(--app-accent)', marginBottom: '0.5rem' }}>
-        ⭐ ¡Sigue la Estrella!
+    <div className="text-center w-full max-w-2xl mx-auto">
+      <h2 className="font-display text-gradient text-3xl font-black mb-2 flex justify-center items-center gap-3">
+        <Star className="text-brand-400" size={32} /> ¡Sigue la Estrella!
       </h2>
-      <p style={{ fontSize: '1rem', color: '#666', marginBottom: '1rem' }}>
-        ¡Toca la estrella antes de que se mueva!
-      </p>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '1rem' }}>
-        <span style={{ fontSize: '1.2rem', fontWeight: 700 }}>⭐ {score} puntos</span>
-        <span style={{ fontSize: '1.2rem', fontWeight: 700 }}>🏆 Nivel {level}</span>
-        <span style={{ fontSize: '1.2rem', fontWeight: 700 }}>⏱️ {timeLeft}s</span>
+      <p className="text-muted-foreground mb-6 font-medium">¡Toca la estrella antes de que se mueva!</p>
+      
+      <div className="flex justify-center gap-6 mb-6">
+        <div className="glass-panel px-4 py-2 font-bold text-brand-300 flex items-center gap-2"><Star size={18}/> {score} puntos</div>
+        <div className="glass-panel px-4 py-2 font-bold text-accent-300 flex items-center gap-2"><Trophy size={18}/> Nivel {level}</div>
+        <div className="glass-panel px-4 py-2 font-bold text-rose-300 flex items-center gap-2"><Clock size={18}/> {timeLeft}s</div>
       </div>
-      <div
-        ref={gameRef}
-        style={{
-          position: 'relative',
-          width: '100%',
-          height: '400px',
-          background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
-          borderRadius: '20px',
-          overflow: 'hidden',
-          cursor: 'pointer',
-        }}
-        onClick={handleClick}
-      >
+      
+      <div className="relative w-full h-[400px] glass-panel overflow-hidden cursor-crosshair border-brand-500/20" onClick={handleClick}>
         {/* Stars background */}
         {[...Array(20)].map((_, i) => (
-          <div key={i} style={{
-            position: 'absolute',
-            width: '3px',
-            height: '3px',
-            background: 'rgba(255,255,255,0.06)',
-            borderRadius: '50%',
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            opacity: 0.5,
-          }} />
+          <div key={i} className="absolute w-1 h-1 bg-white/20 rounded-full" style={{ left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }} />
         ))}
+        
         {/* Main star */}
-        <div style={{
-          position: 'absolute',
-          left: `${starPos.x}%`,
-          top: `${starPos.y}%`,
-          transform: 'translate(-50%, -50%)',
-          fontSize: `${3 + level * 0.5}rem`,
-          transition: 'all 0.3s ease',
-          filter: 'drop-shadow(0 0 20px gold)',
-          animation: 'sparkle 0.5s ease infinite',
-        }}>
-          ⭐
-        </div>
-        {showConfetti && (
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '3rem',
-            background: 'rgba(0,0,0,0.5)',
-          }}>
-            🎉 ¡Genial! 🎉
-          </div>
-        )}
+        <motion.div 
+          animate={{ left: `${starPos.x}%`, top: `${starPos.y}%` }}
+          transition={{ type: "spring", stiffness: 100 }}
+          className="absolute transform -translate-x-1/2 -translate-y-1/2"
+        >
+          <div className="text-[3rem] filter drop-shadow-[0_0_20px_gold] animate-[sparkle_0.5s_ease_infinite]">⭐</div>
+        </motion.div>
+
+        <AnimatePresence>
+          {showConfetti && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-10"
+            >
+              <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-500">
+                🎉 ¡Genial! 🎉
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
@@ -124,14 +96,10 @@ const FollowTheStar: React.FC = () => {
 // ---- GAME: Color Match ----
 const ColorMatch: React.FC = () => {
   const colors = [
-    { name: 'Rojo', emoji: '🔴', hex: '#c06060' },
-    { name: 'Azul', emoji: '🔵', hex: '#5e8eb8' },
-    { name: 'Verde', emoji: '🟢', hex: '#4da88a' },
-    { name: 'Amarillo', emoji: '🟡', hex: '#b8982e' },
-    { name: 'Morado', emoji: '🟣', hex: '#9876c0' },
-    { name: 'Naranja', emoji: '🟠', hex: '#c08050' },
+    { name: 'Rojo', hex: '#ef4444' }, { name: 'Azul', hex: '#3b82f6' },
+    { name: 'Verde', hex: '#10b981' }, { name: 'Amarillo', hex: '#eab308' },
+    { name: 'Morado', hex: '#8b5cf6' }, { name: 'Naranja', hex: '#f97316' },
   ];
-
   const [targetColor, setTargetColor] = useState(colors[0]);
   const [score, setScore] = useState(0);
   const [feedback, setFeedback] = useState('');
@@ -140,7 +108,6 @@ const ColorMatch: React.FC = () => {
     setTargetColor(colors[Math.floor(Math.random() * colors.length)]);
     setFeedback('');
   };
-
   useEffect(() => { newRound(); }, []);
 
   const handleClick = (color: typeof colors[0]) => {
@@ -155,59 +122,30 @@ const ColorMatch: React.FC = () => {
   };
 
   return (
-    <div style={{ textAlign: 'center' }}>
-      <h2 style={{ fontFamily: 'Fredoka One', fontSize: '2rem', color: 'var(--app-accent)', marginBottom: '0.5rem' }}>
-        🎨 ¡Encuentra el Color!
+    <div className="text-center w-full max-w-md mx-auto">
+      <h2 className="font-display text-gradient text-3xl font-black mb-2 flex justify-center items-center gap-3">
+        <Palette className="text-brand-400" size={32} /> ¡Encuentra el Color!
       </h2>
-      <p style={{ fontSize: '1rem', color: '#666', marginBottom: '1rem' }}>
-        ¿Cuál es el color {targetColor.name} {targetColor.emoji}?
+      <p className="text-muted-foreground mb-6 font-medium text-lg">
+        ¿Cuál es el color <span className="font-bold text-white px-2 py-1 rounded-lg bg-white/10">{targetColor.name}</span>?
       </p>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '1rem' }}>
-        <span style={{ fontSize: '1.2rem', fontWeight: 700 }}>⭐ {score} aciertos</span>
+      <div className="flex justify-center gap-6 mb-6">
+        <div className="glass-panel px-4 py-2 font-bold text-emerald-300 flex items-center gap-2"><Trophy size={18}/> {score} aciertos</div>
       </div>
-      {feedback && (
-        <div style={{
-          fontSize: '1.5rem',
-          fontWeight: 700,
-          padding: '0.5rem',
-          marginBottom: '1rem',
-          animation: 'pop 0.3s ease',
-        }}>
-          {feedback}
-        </div>
-      )}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '1rem',
-        maxWidth: '400px',
-        margin: '0 auto',
-      }}>
+      
+      <div className="h-12 mb-4">
+        {feedback && <div className="text-2xl font-bold animate-[bounce_0.5s_ease]">{feedback}</div>}
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
         {colors.map(color => (
-          <button
+          <motion.button
             key={color.name}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
             onClick={() => handleClick(color)}
-            style={{
-              width: '100%',
-              aspectRatio: '1',
-              borderRadius: '20px',
-              border: '4px solid rgba(255,255,255,0.08)',
-              background: color.hex,
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              fontSize: '2rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            onMouseEnter={e => {
-              (e.target as HTMLElement).style.transform = 'scale(1.1)';
-              (e.target as HTMLElement).style.boxShadow = `0 0 20px ${color.hex}`;
-            }}
-            onMouseLeave={e => {
-              (e.target as HTMLElement).style.transform = 'scale(1)';
-              (e.target as HTMLElement).style.boxShadow = 'none';
-            }}
+            className="w-full aspect-square rounded-2xl border-4 border-white/10 shadow-lg cursor-pointer"
+            style={{ backgroundColor: color.hex }}
           />
         ))}
       </div>
@@ -227,15 +165,13 @@ const ShapeFinder: React.FC = () => {
     const t = shapes[Math.floor(Math.random() * shapes.length)];
     setTarget(t);
     const g = [...Array(12)].map(() => shapes[Math.floor(Math.random() * shapes.length)]);
-    // Ensure at least one target exists
     g[Math.floor(Math.random() * g.length)] = t;
     setGrid(g);
     setFeedback('');
   };
-
   useEffect(() => { newRound(); }, []);
 
-  const handleClick = (shape: string, index: number) => {
+  const handleClick = (shape: string) => {
     if (shape === target) {
       setScore(s => s + 1);
       setFeedback('🎉 ¡Lo encontraste!');
@@ -247,50 +183,33 @@ const ShapeFinder: React.FC = () => {
   };
 
   return (
-    <div style={{ textAlign: 'center' }}>
-      <h2 style={{ fontFamily: 'Fredoka One', fontSize: '2rem', color: 'var(--app-accent)', marginBottom: '0.5rem' }}>
-        🔍 ¡Encuentra la Forma!
+    <div className="text-center w-full max-w-md mx-auto">
+      <h2 className="font-display text-gradient text-3xl font-black mb-2 flex justify-center items-center gap-3">
+        <Box className="text-accent-400" size={32} /> ¡Encuentra la Forma!
       </h2>
-      <p style={{ fontSize: '1rem', color: '#666', marginBottom: '1rem' }}>
-        ¿Dónde está {target}?
+      <p className="text-muted-foreground mb-6 font-medium text-lg">
+        ¿Dónde está <span className="text-3xl align-middle mx-2">{target}</span>?
       </p>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '1rem' }}>
-        <span style={{ fontSize: '1.2rem', fontWeight: 700 }}>⭐ {score} aciertos</span>
+      
+      <div className="flex justify-center gap-6 mb-6">
+        <div className="glass-panel px-4 py-2 font-bold text-accent-300 flex items-center gap-2"><Trophy size={18}/> {score} aciertos</div>
       </div>
-      {feedback && (
-        <div style={{ fontSize: '1.5rem', fontWeight: 700, padding: '0.5rem', marginBottom: '1rem', animation: 'pop 0.3s ease' }}>
-          {feedback}
-        </div>
-      )}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: '0.75rem',
-        maxWidth: '350px',
-        margin: '0 auto',
-      }}>
+      
+      <div className="h-12 mb-4">
+        {feedback && <div className="text-2xl font-bold animate-[bounce_0.5s_ease]">{feedback}</div>}
+      </div>
+
+      <div className="grid grid-cols-4 gap-3">
         {grid.map((shape, i) => (
-          <button
+          <motion.button
             key={i}
-            onClick={() => handleClick(shape, i)}
-            style={{
-              width: '100%',
-              aspectRatio: '1',
-              borderRadius: '15px',
-              border: '3px solid rgba(255,255,255,0.08)',
-              background: '#2a2a30',
-              cursor: 'pointer',
-              fontSize: '2.5rem',
-              transition: 'all 0.2s',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            onMouseEnter={e => (e.target as HTMLElement).style.transform = 'scale(1.1)'}
-            onMouseLeave={e => (e.target as HTMLElement).style.transform = 'scale(1)'}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => handleClick(shape)}
+            className="w-full aspect-square glass-panel glass-panel-hover flex items-center justify-center text-4xl cursor-pointer"
           >
             {shape}
-          </button>
+          </motion.button>
         ))}
       </div>
     </div>
@@ -301,53 +220,42 @@ const ShapeFinder: React.FC = () => {
 const HighContrast: React.FC = () => {
   const [pattern, setPattern] = useState(0);
   const patterns = [
-    { bg: '#1a1a1a', fg: '#c0c0c0', emoji: '⚫⚪⚫⚪' },
-    { bg: '#c0c0c0', fg: '#1a1a1a', emoji: '⬛⬜⬛⬜' },
-    { bg: '#1a1a1a', fg: '#b8982e', emoji: '🟡⚫🟡⚫' },
-    { bg: '#1a1a1a', fg: '#c06060', emoji: '🔴⚫🔴⚫' },
-    { bg: '#c0c0c0', fg: '#4060a0', emoji: '🔵⬜🔵⬜' },
+    { bg: '#000000', fg: '#ffffff', emoji: '⚫⚪⚫⚪' },
+    { bg: '#ffffff', fg: '#000000', emoji: '⬛⬜⬛⬜' },
+    { bg: '#000000', fg: '#eab308', emoji: '🟡⚫🟡⚫' },
+    { bg: '#000000', fg: '#ef4444', emoji: '🔴⚫🔴⚫' },
+    { bg: '#ffffff', fg: '#3b82f6', emoji: '🔵⬜🔵⬜' },
   ];
 
   useEffect(() => {
     const timer = setInterval(() => setPattern(p => (p + 1) % patterns.length), 3000);
     return () => clearInterval(timer);
   }, []);
-
   const p = patterns[pattern];
 
   return (
-    <div style={{ textAlign: 'center' }}>
-      <h2 style={{ fontFamily: 'Fredoka One', fontSize: '2rem', color: 'var(--app-accent)', marginBottom: '0.5rem' }}>
-        👁️ Alto Contraste
+    <div className="text-center w-full max-w-md mx-auto">
+      <h2 className="font-display text-gradient text-3xl font-black mb-2 flex justify-center items-center gap-3">
+        <Activity className="text-brand-400" size={32} /> Alto Contraste
       </h2>
-      <p style={{ fontSize: '1rem', color: '#666', marginBottom: '1rem' }}>
-        Observa los patrones que cambian
-      </p>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(8, 1fr)',
-        gap: '4px',
-        maxWidth: '400px',
-        margin: '0 auto',
-        padding: '1rem',
-        background: p.bg,
-        borderRadius: '20px',
-        transition: 'background 1s ease',
-      }}>
+      <p className="text-muted-foreground mb-6 font-medium">Observa los patrones que cambian</p>
+      
+      <div 
+        className="grid grid-cols-8 gap-1 p-4 rounded-3xl transition-colors duration-1000 shadow-2xl" 
+        style={{ backgroundColor: p.bg }}
+      >
         {[...Array(64)].map((_, i) => (
-          <div key={i} style={{
-            width: '100%',
-            aspectRatio: '1',
-            borderRadius: '8px',
-            background: i % 2 === 0 ? p.fg : p.bg,
-            border: `2px solid ${i % 2 === 0 ? p.bg : p.fg}`,
-            transition: 'all 1s ease',
-          }} />
+          <div 
+            key={i} 
+            className="w-full aspect-square rounded-md transition-all duration-1000 border-2"
+            style={{ 
+              backgroundColor: i % 2 === 0 ? p.fg : p.bg,
+              borderColor: i % 2 === 0 ? p.bg : p.fg 
+            }} 
+          />
         ))}
       </div>
-      <div style={{ fontSize: '2rem', marginTop: '1rem', animation: 'wiggle 1s ease infinite' }}>
-        {p.emoji}
-      </div>
+      <div className="text-4xl mt-8 animate-[bounce_2s_ease_infinite]">{p.emoji}</div>
     </div>
   );
 };
@@ -382,43 +290,18 @@ const EyePatchTimer: React.FC = () => {
   const displaySeconds = totalSeconds % 60;
 
   const selectPreset = (m: number) => {
-    setSelectedMinutes(m);
-    setTotalSeconds(m * 60);
-    setIsRunning(false);
-    setDone(false);
+    setSelectedMinutes(m); setTotalSeconds(m * 60); setIsRunning(false); setDone(false);
   };
-
-  const startTimer = () => {
-    if (totalSeconds > 0) setIsRunning(true);
-  };
-
-  const resetTimer = () => {
-    setIsRunning(false);
-    setDone(false);
-    setTotalSeconds(selectedMinutes * 60);
-  };
+  const startTimer = () => { if (totalSeconds > 0) setIsRunning(true); };
+  const resetTimer = () => { setIsRunning(false); setDone(false); setTotalSeconds(selectedMinutes * 60); };
 
   if (done) {
     return (
-      <div style={{ textAlign: 'center' }}>
-        <h2 style={{ fontFamily: 'Fredoka One', fontSize: '2rem', color: 'var(--app-accent)', marginBottom: '1rem' }}>
-          🎉 ¡Tiempo cumplido!
-        </h2>
-        <div style={{ fontSize: '5rem', animation: 'bounce 1s ease infinite' }}>👏</div>
-        <p style={{ fontSize: '1.2rem', color: '#666', marginTop: '1rem' }}>
-          ¡Muy bien! ¡Has completado tu ejercicio!
-        </p>
-        <button onClick={resetTimer} style={{
-          marginTop: '1rem',
-          padding: '1rem 2rem',
-          fontSize: '1.2rem',
-          fontWeight: 700,
-          background: 'linear-gradient(135deg, #4da88a, #5e8eb8)',
-          border: 'none',
-          borderRadius: '15px',
-          color: '#e8e8e0',
-          cursor: 'pointer',
-        }}>
+      <div className="text-center">
+        <h2 className="font-display text-emerald-400 text-4xl font-black mb-6">🎉 ¡Tiempo cumplido!</h2>
+        <div className="text-8xl animate-[bounce_1s_ease_infinite] mb-6">👏</div>
+        <p className="text-xl text-white/80 font-bold mb-8">¡Muy bien! ¡Has completado tu ejercicio!</p>
+        <button onClick={resetTimer} className="btn-premium px-8 py-4 rounded-xl text-xl font-bold">
           🔄 Jugar otra vez
         </button>
       </div>
@@ -426,61 +309,31 @@ const EyePatchTimer: React.FC = () => {
   }
 
   return (
-    <div style={{ textAlign: 'center' }}>
-      <h2 style={{ fontFamily: 'Fredoka One', fontSize: '2rem', color: 'var(--app-accent)', marginBottom: '0.5rem' }}>
-        ⏱️ Tiempo del Parche
+    <div className="text-center w-full max-w-md mx-auto">
+      <h2 className="font-display text-gradient text-3xl font-black mb-2 flex justify-center items-center gap-3">
+        <Clock className="text-accent-400" size={32} /> Tiempo del Parche
       </h2>
-      <p style={{ fontSize: '1rem', color: '#666', marginBottom: '1rem' }}>
-        ¡Cuenta regresiva para tu ejercicio!
-      </p>
-      <div style={{
-        fontSize: '5rem',
-        fontWeight: 900,
-        fontFamily: 'Fredoka One',
-        color: isRunning ? '#5fbf9e' : '#888',
-        marginBottom: '1rem',
-        animation: isRunning ? 'pulse 1s ease infinite' : 'none',
-      }}>
+      <p className="text-muted-foreground mb-8 font-medium">¡Cuenta regresiva para tu ejercicio!</p>
+      
+      <div className={`text-7xl font-black font-display mb-10 transition-colors ${isRunning ? 'text-emerald-400 animate-pulse drop-shadow-[0_0_20px_rgba(52,211,153,0.5)]' : 'text-white/40'}`}>
         {String(displayMinutes).padStart(2, '0')}:{String(displaySeconds).padStart(2, '0')}
       </div>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '1rem' }}>
-        <button onClick={startTimer} disabled={isRunning} style={{
-          padding: '1rem 2rem',
-          fontSize: '1.2rem',
-          fontWeight: 700,
-          background: isRunning ? '#444' : 'linear-gradient(135deg, #4da88a, #5e8eb8)',
-          border: 'none',
-          borderRadius: '15px',
-          color: '#e8e8e0',
-          cursor: isRunning ? 'not-allowed' : 'pointer',
-        }}>
+      
+      <div className="flex justify-center gap-4 mb-8">
+        <button onClick={startTimer} disabled={isRunning} className={`px-8 py-4 rounded-xl text-xl font-bold transition-all ${isRunning ? 'bg-white/5 text-white/20 cursor-not-allowed' : 'btn-premium'}`}>
           ▶️ Empezar
         </button>
-        <button onClick={resetTimer} style={{
-          padding: '1rem 2rem',
-          fontSize: '1.2rem',
-          fontWeight: 700,
-          background: 'linear-gradient(135deg, #c08080, #c09060)',
-          border: 'none',
-          borderRadius: '15px',
-          color: '#e8e8e0',
-          cursor: 'pointer',
-        }}>
+        <button onClick={resetTimer} className="px-8 py-4 rounded-xl text-xl font-bold bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 transition-all">
           🔄 Reiniciar
         </button>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+      
+      <div className="flex justify-center gap-3 flex-wrap">
         {[5, 10, 15, 20, 30].map(m => (
-          <button key={m} onClick={() => selectPreset(m)} style={{
-            padding: '0.5rem 1rem',
-            fontSize: '1rem',
-            fontWeight: 700,
-            background: selectedMinutes === m ? '#4da88a' : '#2a2a30',
-            border: '2px solid #4da88a',
-            borderRadius: '10px',
-            color: selectedMinutes === m ? '#e8e8e0' : '#5fbf9e',
-            cursor: 'pointer',
-          }}>
+          <button 
+            key={m} onClick={() => selectPreset(m)} 
+            className={`px-4 py-2 rounded-xl font-bold transition-all border-2 ${selectedMinutes === m ? 'bg-accent-500 border-accent-400 text-white shadow-[0_0_15px_rgba(14,165,233,0.4)]' : 'glass-panel border-transparent text-white/60 hover:text-white'}`}
+          >
             {m} min
           </button>
         ))}
@@ -494,7 +347,6 @@ const FindDifference: React.FC = () => {
   const [score, setScore] = useState(0);
   const [round, setRound] = useState(1);
   const [found, setFound] = useState(false);
-
   const emojis = ['🐶', '🐱', '🐰', '🐻', '🐼', '🐨', '🦊', '🐸'];
 
   const generateGrid = () => {
@@ -504,67 +356,46 @@ const FindDifference: React.FC = () => {
     grid[Math.floor(Math.random() * grid.length)] = diff;
     return { grid, main, diff };
   };
-
   const [state, setState] = useState(generateGrid);
 
-  const handleClick = (emoji: string, index: number) => {
+  const handleClick = (emoji: string) => {
     if (emoji === state.diff && !found) {
-      setFound(true);
-      setScore(s => s + 1);
+      setFound(true); setScore(s => s + 1);
       setTimeout(() => {
-        setRound(r => r + 1);
-        setFound(false);
-        setState(generateGrid());
+        setRound(r => r + 1); setFound(false); setState(generateGrid());
       }, 1000);
     }
   };
 
   return (
-    <div style={{ textAlign: 'center' }}>
-      <h2 style={{ fontFamily: 'Fredoka One', fontSize: '2rem', color: 'var(--app-accent)', marginBottom: '0.5rem' }}>
-        🔎 ¡Encuentra el Diferente!
+    <div className="text-center w-full max-w-md mx-auto">
+      <h2 className="font-display text-gradient text-3xl font-black mb-2 flex justify-center items-center gap-3">
+        <Search className="text-brand-400" size={32} /> ¡Encuentra el Diferente!
       </h2>
-      <p style={{ fontSize: '1rem', color: '#666', marginBottom: '1rem' }}>
-        ¿Cuál es diferente? Busca el {state.diff} entre los {state.main}
+      <p className="text-muted-foreground mb-6 font-medium text-lg">
+        Busca el <span className="text-2xl align-middle mx-1">{state.diff}</span> entre los <span className="text-2xl align-middle mx-1">{state.main}</span>
       </p>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '1rem' }}>
-        <span style={{ fontSize: '1.2rem', fontWeight: 700 }}>⭐ {score} encontrados</span>
-        <span style={{ fontSize: '1.2rem', fontWeight: 700 }}>🎯 Ronda {round}</span>
+      
+      <div className="flex justify-center gap-6 mb-4">
+        <div className="glass-panel px-4 py-2 font-bold text-amber-300 flex items-center gap-2"><Trophy size={18}/> {score} puntos</div>
+        <div className="glass-panel px-4 py-2 font-bold text-brand-300 flex items-center gap-2"><Target size={18}/> Ronda {round}</div>
       </div>
-      {found && (
-        <div style={{ fontSize: '2rem', fontWeight: 700, padding: '0.5rem', marginBottom: '1rem', animation: 'pop 0.3s ease' }}>
-          🎉 ¡Lo encontraste!
-        </div>
-      )}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: '0.5rem',
-        maxWidth: '300px',
-        margin: '0 auto',
-      }}>
+      
+      <div className="h-12 mb-2">
+        {found && <div className="text-2xl font-bold text-emerald-400 animate-[bounce_0.5s_ease]">🎉 ¡Lo encontraste!</div>}
+      </div>
+
+      <div className="grid grid-cols-4 gap-3">
         {state.grid.map((emoji, i) => (
-          <button
+          <motion.button
             key={i}
-            onClick={() => handleClick(emoji, i)}
-            style={{
-              width: '100%',
-              aspectRatio: '1',
-              borderRadius: '15px',
-              border: '3px solid rgba(255,255,255,0.08)',
-              background: found && emoji === state.diff ? '#4da88a' : '#2a2a30',
-              cursor: 'pointer',
-              fontSize: '2.5rem',
-              transition: 'all 0.2s',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            onMouseEnter={e => (e.target as HTMLElement).style.transform = 'scale(1.1)'}
-            onMouseLeave={e => (e.target as HTMLElement).style.transform = 'scale(1)'}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => handleClick(emoji)}
+            className={`w-full aspect-square flex items-center justify-center text-4xl rounded-2xl cursor-pointer transition-all ${found && emoji === state.diff ? 'bg-emerald-500 shadow-[0_0_20px_#10b981] border-2 border-emerald-300' : 'glass-panel glass-panel-hover'}`}
           >
             {emoji}
-          </button>
+          </motion.button>
         ))}
       </div>
     </div>
@@ -573,180 +404,94 @@ const FindDifference: React.FC = () => {
 
 // ---- MAIN APP ----
 const games: Game[] = [
-  { id: 'star', name: 'Sigue la Estrella', icon: '⭐', color: '#C084FC', description: '¡Toca la estrella!', component: FollowTheStar },
-  { id: 'color', name: 'Encuentra el Color', icon: '🎨', color: '#c09060', description: '¿Cuál es el color?', component: ColorMatch },
-  { id: 'shape', name: 'Encuentra la Forma', icon: '🔍', color: '#7eaed4', description: '¡Busca la forma!', component: ShapeFinder },
-  { id: 'contrast', name: 'Alto Contraste', icon: '👁️', color: '#c08080', description: 'Observa los patrones', component: HighContrast },
-  { id: 'timer', name: 'Tiempo del Parche', icon: '⏱️', color: '#5fbf9e', description: '¡Cuenta regresiva!', component: EyePatchTimer },
-  { id: 'diff', name: 'Encuentra el Diferente', icon: '🔎', color: '#c0a040', description: '¿Cuál es diferente?', component: FindDifference },
+  { id: 'star', name: 'Sigue la Estrella', icon: <Star size={24} />, color: 'from-purple-500 to-indigo-500', description: 'Atrapa la estrella escurridiza', component: FollowTheStar },
+  { id: 'color', name: 'Encuentra el Color', icon: <Palette size={24} />, color: 'from-amber-500 to-orange-500', description: 'Identifica el color correcto', component: ColorMatch },
+  { id: 'shape', name: 'Encuentra la Forma', icon: <Box size={24} />, color: 'from-cyan-500 to-blue-500', description: 'Busca la forma geométrica', component: ShapeFinder },
+  { id: 'contrast', name: 'Alto Contraste', icon: <Activity size={24} />, color: 'from-rose-500 to-red-500', description: 'Observa patrones de contraste', component: HighContrast },
+  { id: 'timer', name: 'Tiempo del Parche', icon: <Clock size={24} />, color: 'from-emerald-500 to-teal-500', description: 'Cuenta regresiva para tu terapia', component: EyePatchTimer },
+  { id: 'diff', name: 'El Diferente', icon: <Search size={24} />, color: 'from-pink-500 to-rose-500', description: 'Encuentra el emoji intruso', component: FindDifference },
 ];
 
 export default function App() {
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg, #030712)', color: 'var(--text, #f8fafc)', position: 'relative', overflowX: 'hidden' }}>
-      <style>{`
-        :root {
-          --app-accent: #ec4899;
-        }
-        @property --border-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
-        @keyframes borderSpin { to { --border-angle: 360deg; } }
-        .portal-card {
-          position: relative;
-          background: rgba(255,255,255,0.02);
-          border-radius: 20px;
-          padding: 2px;
-          color: var(--text, #f8fafc);
-          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-          transform-style: preserve-3d;
-        }
-        .portal-card::before {
-          content: ''; position: absolute; inset: 0; border-radius: 20px; padding: 1.5px;
-          background: linear-gradient(var(--border-angle, 0deg), var(--app-accent), transparent 40%, transparent 60%, var(--app-accent));
-          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-          -webkit-mask-composite: xor; mask-composite: exclude;
-          animation: borderSpin 4s linear infinite; opacity: 0.5; transition: opacity 0.4s;
-        }
-        .portal-card:hover::before { opacity: 1; }
-        .portal-card-inner {
-          background: rgba(8,12,24,0.85);
-          backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-          border-radius: 19px; padding: 1.8rem;
-          display: flex; flex-direction: column; gap: 0.8rem;
-          position: relative; overflow: hidden; height: 100%;
-          transform-style: preserve-3d; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .portal-card:hover .portal-card-inner { transform: translateZ(20px); }
-        .portal-card:hover { transform: translateY(-10px) scale(1.03); }
-        
-        .header-portal {
-          position: relative;
-          background: rgba(8,12,24,0.85);
-          backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-          border-bottom: 1px solid rgba(255,255,255,0.05);
-          padding: 1.5rem 2rem;
-          display: flex; align-items: center; justify-content: space-between;
-          z-index: 10;
-        }
-        .header-portal::after {
-          content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1.5px;
-          background: linear-gradient(90deg, transparent, var(--app-accent), transparent);
-          animation: borderSpin 4s linear infinite; /* Reuse animation logic or static glow */
-          box-shadow: 0 0 15px var(--app-accent);
-        }
-      `}</style>
+    <div className="min-h-screen relative overflow-x-hidden font-sans pb-16">
+      <div className="bg-orbs-container">
+        <div className="orb orb-1"></div><div className="orb orb-2"></div><div className="orb orb-3"></div>
+      </div>
       
-      {/* Header */}
-      <header className="header-portal">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{
-            width: 54, height: 54, borderRadius: '14px',
-            background: 'linear-gradient(135deg, var(--app-accent), transparent)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '1.6rem',
-            boxShadow: '0 0 20px rgba(236, 72, 153, 0.3)',
-          }}>
-            👁️
+      <header className="sticky top-0 z-50 glass-panel rounded-none border-t-0 border-x-0 border-b-white/10 px-6 py-4 flex items-center justify-between shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-500 to-accent-500 flex items-center justify-center shadow-[0_0_15px_rgba(236,72,153,0.4)]">
+            <Eye className="text-white" size={24} />
           </div>
           <div>
-            <h1 style={{ fontFamily: 'Inter', fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--app-accent)' }}>
-              Edelweiss
-            </h1>
-            <p style={{ fontSize: '0.8rem', color: 'var(--app-accent)' }}>Juegos para mis ojitos ✨</p>
+            <h1 className="font-display text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70 tracking-tight">Edelweiss</h1>
+            <p className="text-xs font-bold text-brand-400 tracking-widest uppercase">Vision Play</p>
           </div>
         </div>
+        
         {selectedGame && (
-          <button onClick={() => setSelectedGame(null)} style={{
-            padding: '0.5rem 1rem',
-            background: 'rgba(244, 114, 182, 0.1)',
-            border: '1px solid rgba(244, 114, 182, 0.3)',
-            borderRadius: '10px',
-            color: '#f472b6',
-            fontWeight: 700,
-            cursor: 'pointer',
-            fontSize: '0.9rem',
-            transition: 'all 0.2s',
-          }}>
-            ← Volver
+          <button 
+            onClick={() => setSelectedGame(null)} 
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/80 hover:text-white transition-colors font-bold"
+          >
+            <ChevronLeft size={18} /> Volver
           </button>
         )}
       </header>
 
-      {/* Main Content */}
-      <main style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem' }}>
-        {selectedGame ? (
-          <div className="portal-card" style={{ maxWidth: '800px', margin: '0 auto', animation: 'slideIn 0.5s ease' }}>
-            <div className="portal-card-inner">
+      <main className="max-w-5xl mx-auto p-6 mt-8">
+        <AnimatePresence mode="wait">
+          {selectedGame ? (
+            <motion.div 
+              key="game"
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              className="glass-panel p-8 min-h-[600px] flex items-center justify-center relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-500 to-accent-500 opacity-50"></div>
               <selectedGame.component />
-            </div>
-          </div>
-        ) : (
-          <>
-            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-              <h2 style={{ fontFamily: 'Fredoka One', fontSize: '2rem', color: 'var(--app-accent)', marginBottom: '0.5rem' }}>
-                ¡Elige tu juego! 🎮
-              </h2>
-              <p style={{ color: '#9ca3af', fontSize: '1.1rem' }}>
-                Toca un juego para empezar a jugar
-              </p>
-            </div>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-              gap: '1rem',
-            }}>
-              {games.map((game, i) => (
-                <button
-                  key={game.id}
-                  onClick={() => setSelectedGame(game)}
-                  className="portal-card"
-                  style={{
-                    cursor: 'pointer',
-                    animation: `slideIn 0.5s ease ${i * 0.1}s both`,
-                    textAlign: 'left',
-                    border: 'none',
-                    display: 'block',
-                    width: '100%',
-                  }}
-                >
-                  <div className="portal-card-inner">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.8rem' }}>
-                      <div style={{
-                        width: 44, height: 44, borderRadius: '12px',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem',
-                        background: 'linear-gradient(135deg, var(--app-accent), transparent)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        boxShadow: '0 0 15px rgba(236, 72, 153, 0.2)',
-                      }}>
-                        {game.icon}
-                      </div>
-                      <div style={{ fontFamily: 'Inter', fontWeight: 800, fontSize: '1.1rem', color: 'var(--app-accent)' }}>
-                        {game.name}
-                      </div>
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="menu"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="text-center mb-12">
+                <h2 className="font-display text-5xl font-black text-white mb-4">¿A qué jugamos hoy?</h2>
+                <p className="text-xl text-muted-foreground font-medium">Terapia visual divertida e interactiva</p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {games.map((game, i) => (
+                  <motion.button
+                    key={game.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    whileHover={{ scale: 1.03, translateY: -5 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setSelectedGame(game)}
+                    className="glass-panel text-left p-6 relative overflow-hidden group cursor-pointer border-transparent hover:border-white/20 transition-all duration-300"
+                  >
+                    <div className={`absolute inset-0 bg-gradient-to-br ${game.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+                    <div className={`w-14 h-14 rounded-2xl mb-6 flex items-center justify-center text-white bg-gradient-to-br ${game.color} shadow-lg shadow-black/20`}>
+                      {game.icon}
                     </div>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted, #64748b)', lineHeight: 1.6 }}>
-                      {game.description}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </>
-        )}
+                    <h3 className="font-display text-xl font-bold text-white mb-2">{game.name}</h3>
+                    <p className="text-sm text-muted-foreground font-medium">{game.description}</p>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
-
-      {/* Footer */}
-      <footer style={{
-        textAlign: 'center',
-        padding: '1.5rem',
-        color: '#71717a',
-        fontSize: '0.8rem',
-      }}>
-        Edelweiss VisionPlay © 2026 — Juegos de terapia visual para niños ✨
-      </footer>
     </div>
   );
 }

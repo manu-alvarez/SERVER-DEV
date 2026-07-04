@@ -1,3 +1,10 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-500: #ec4899;
+  --color-accent-400: #38bdf8;
+}
+
 /* ============================================
    IAPUTA OS v10 — GOD-TIER (VERCEL/LINEAR STYLE)
    ============================================ */

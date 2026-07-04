@@ -1,19 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Grid, Card, CardContent, Typography, Box, Chip, CircularProgress } from '@mui/material';
 import { motion } from 'framer-motion';
-import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import TimerIcon from '@mui/icons-material/Timer';
-import InventoryIcon from '@mui/icons-material/Inventory';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import { Factory, CheckCircle2, Timer, PlayCircle } from 'lucide-react';
 import api from '../api/client';
+import { Card, Badge } from './ui';
+import { useStore } from '../store';
 
 interface Props {
-  user: any;
   onNavigate: (view: string) => void;
 }
 
-export default function Dashboard({ user, onNavigate }: Props) {
+export default function Dashboard({ onNavigate }: Props) {
+  const { user } = useStore();
   const [stats, setStats] = useState<any>({});
   const [recentOps, setRecentOps] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,70 +26,85 @@ export default function Dashboard({ user, onNavigate }: Props) {
   }, []);
 
   const cards = [
-    { title: 'Operaciones', icon: <PrecisionManufacturingIcon sx={{ fontSize: 40 }} />, color: '#3b82f6', value: stats.total_operations || 0, desc: 'Totales', onClick: () => onNavigate('operations') },
-    { title: 'Activas', icon: <PlayArrowIcon sx={{ fontSize: 40 }} />, color: '#10b981', value: stats.running_operations || 0, desc: 'En curso', onClick: () => onNavigate('operations') },
-    { title: 'Completadas', icon: <CheckCircleIcon sx={{ fontSize: 40 }} />, color: '#6366f1', value: stats.completed_operations || 0, desc: 'Historial', onClick: () => onNavigate('history') },
-    { title: 'Temporizadores', icon: <TimerIcon sx={{ fontSize: 40 }} />, color: '#f59e0b', value: stats.active_timers || 0, desc: stats.total_timers ? `de ${stats.total_timers} activos` : 'Sin timers', onClick: () => onNavigate('operations') },
+    { title: 'Operaciones Totales', icon: <Factory size={32} />, color: 'text-msb-primary', bg: 'bg-msb-primary/10', border: 'border-msb-primary/20', value: stats.total_operations || 0, desc: 'Histórico', onClick: () => onNavigate('operations') },
+    { title: 'Operaciones Activas', icon: <PlayCircle size={32} />, color: 'text-msb-success', bg: 'bg-msb-success/10', border: 'border-msb-success/20', value: stats.running_operations || 0, desc: 'En curso', onClick: () => onNavigate('operations') },
+    { title: 'Completadas', icon: <CheckCircle2 size={32} />, color: 'text-indigo-400', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20', value: stats.completed_operations || 0, desc: 'Exitosas', onClick: () => onNavigate('history') },
+    { title: 'Temporizadores', icon: <Timer size={32} />, color: 'text-msb-accent', bg: 'bg-msb-accent/10', border: 'border-msb-accent/20', value: stats.active_timers || 0, desc: stats.total_timers ? `de ${stats.total_timers} activos` : 'Ninguno activo', onClick: () => onNavigate('operations') },
   ];
 
-  if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Box>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin w-8 h-8 border-4 border-msb-primary border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
 
   return (
-    <Box>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4">Bienvenido, {user?.name}</Typography>
-        <Typography variant="body2" color="text.secondary">Panel de Control IndustrialPro</Typography>
-      </Box>
+    <div className="space-y-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-white mb-2">Bienvenido, {user?.name}</h1>
+        <p className="text-slate-400">Panel de Control IndustrialPro</p>
+      </div>
 
-      <Grid container spacing={2} sx={{ mb: 3 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((card, i) => (
-          <Grid size={{ xs: 6, md: 3 }} key={i}>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
-              <Box className="portal-card" sx={{ cursor: 'pointer', '&:hover': { transform: 'translateY(-2px)', transition: 'all 0.2s' } }} onClick={card.onClick}>
-                <Card className="portal-card-inner" sx={{ border: 'none', background: 'transparent', boxShadow: 'none' }}>
-                  <CardContent sx={{ textAlign: 'center', py: 2 }}>
-                    <Box sx={{ color: card.color, mb: 1 }}>{card.icon}</Box>
-                    <Typography variant="h4" fontWeight={700}>{card.value}</Typography>
-                    <Typography variant="body2" fontWeight={600}>{card.title}</Typography>
-                    <Typography variant="caption" color="text.secondary">{card.desc}</Typography>
-                  </CardContent>
-                </Card>
-              </Box>
-            </motion.div>
-          </Grid>
+          <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
+            <Card 
+              portal
+              onClick={card.onClick}
+              className={`p-6 cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${card.bg.replace('10', '5')} ${card.border}`}
+            >
+              <div className={`${card.color} mb-4`}>{card.icon}</div>
+              <div className="text-4xl font-bold text-white mb-1">{card.value}</div>
+              <div className="text-sm font-semibold text-slate-300">{card.title}</div>
+              <div className="text-xs text-slate-500 mt-2">{card.desc}</div>
+            </Card>
+          </motion.div>
         ))}
-      </Grid>
+      </div>
 
-      <Typography variant="h6" sx={{ mb: 2 }}>Operaciones Recientes</Typography>
-      <Grid container spacing={2}>
-        {recentOps.map((op, i) => {
-          const isRunning = op.status === 'running';
-          return (
-            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={op.id}>
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }}>
-                <Box className="portal-card" sx={{ cursor: 'pointer' }}>
-                <Card className="portal-card-inner" sx={{ border: 'none', background: 'transparent', boxShadow: 'none' }} onClick={() => onNavigate('operations')}>
-                  <CardContent>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                      <Typography variant="subtitle1" fontWeight={700}>{op.name}</Typography>
-                      <Chip size="small" label={isRunning ? 'Activa' : 'Completada'} color={isRunning ? 'success' : 'default'} />
-                    </Box>
-                    <Typography variant="body2" color="text.secondary">
-                      Producto: {op.product_name || '-'} | {new Date(op.created_at).toLocaleDateString('es-ES')}
-                    </Typography>
-                  </CardContent>
-                </Card>
-                </Box>
-              </motion.div>
-            </Grid>
-          );
-        })}
-        {recentOps.length === 0 && (
-          <Grid size={{ xs: 12 }}>
-            <Card><CardContent><Typography color="text.secondary" textAlign="center">No hay operaciones. Crea una nueva.</Typography></CardContent></Card>
-          </Grid>
+      <div className="mt-8">
+        <h2 className="text-xl font-bold text-white mb-4">Operaciones Recientes</h2>
+        
+        {recentOps.length === 0 ? (
+          <Card className="p-8 text-center text-slate-400 border-dashed border-2 border-slate-800">
+            No hay operaciones recientes. Ve a la pestaña de operaciones para crear una nueva.
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {recentOps.map((op, i) => {
+              const isRunning = op.status === 'running';
+              return (
+                <motion.div key={op.id} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }}>
+                  <Card 
+                    portal={isRunning} 
+                    className={`p-5 cursor-pointer transition-colors hover:border-msb-primary/50 ${isRunning ? 'border-msb-success/30 bg-msb-success/5 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : ''}`}
+                    onClick={() => onNavigate('operations')}
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="font-semibold text-lg text-white truncate pr-2">{op.name}</h3>
+                      <Badge variant={isRunning ? 'success' : 'outline'}>
+                        {isRunning ? 'Activa' : 'Completada'}
+                      </Badge>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 text-sm text-slate-400 mt-4">
+                      <Package size={14} className="text-msb-primary" />
+                      <span className="truncate">{op.product_name || 'Sin producto'}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 text-sm text-slate-500 mt-2">
+                      <Timer size={14} />
+                      <span>{new Date(op.created_at).toLocaleDateString('es-ES')}</span>
+                    </div>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
         )}
-      </Grid>
-    </Box>
+      </div>
+    </div>
   );
 }

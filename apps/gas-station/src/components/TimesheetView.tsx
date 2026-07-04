@@ -1,10 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Box, Card, CardContent, Typography, Table, TableHead, TableRow, TableCell, TableBody, Chip, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Select, MenuItem, InputLabel, FormControl, IconButton, CircularProgress, Alert } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { motion } from 'framer-motion';
+import { 
+  Clock, 
+  Plus, 
+  Edit3, 
+  Trash2, 
+  Calendar,
+  Euro,
+  RefreshCcw,
+  Briefcase
+} from 'lucide-react';
 import { api } from '../api/client';
+import { Card, Button, Input, Modal, Select, Badge, cn } from './ui';
 
 const entryTypes = ['mañana', 'tarde', 'noche', 'descanso', 'vacaciones', 'baja', 'formacion', 'especial'];
 
@@ -16,6 +23,7 @@ export default function TimesheetView() {
   const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  
   const [dialog, setDialog] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const [form, setForm] = useState<any>({});
@@ -37,7 +45,7 @@ export default function TimesheetView() {
 
   const openNew = () => {
     setEditItem(null);
-    setForm({ date: new Date().toISOString().split('T')[0], shift_type: 'turno', start_time: '', end_time: '', break_minutes: 0, notes: '' });
+    setForm({ date: new Date().toISOString().split('T')[0], shift_type: 'mañana', start_time: '', end_time: '', break_minutes: 0, notes: '' });
     setDialog(true);
   };
 
@@ -61,130 +69,190 @@ export default function TimesheetView() {
     await load();
   };
 
-  if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Box>;
-
-  const totalHours = entries.reduce((acc, e) => {
-    if (e.start_time && e.end_time) {
-      const [sh, sm] = e.start_time.split(':').map(Number);
-      const [eh, em] = e.end_time.split(':').map(Number);
-      const mins = (eh * 60 + em) - (sh * 60 + sm) - (e.break_minutes || 0);
-      return acc + Math.max(0, mins);
-    }
-    return acc;
-  }, 0);
-
   const workedDays = entries.filter(e => !['descanso', 'vacaciones', 'baja'].includes(e.shift_type)).length;
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
-        <Typography variant="h4">Timesheet</Typography>
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          <TextField type="number" label="Mes" value={month} onChange={e => setMonth(parseInt(e.target.value) || 1)} sx={{ width: 80 }} size="small" />
-          <TextField type="number" label="Año" value={year} onChange={e => setYear(parseInt(e.target.value) || now.getFullYear())} sx={{ width: 90 }} size="small" />
-          <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openNew}>Nuevo</Button>
-        </Box>
-      </Box>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Timesheet</h1>
+          <p className="text-muted-foreground mt-1">Control horario y turnos</p>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <div className="flex bg-black/40 rounded-lg p-1 border border-white/5">
+            <Input 
+              type="number" 
+              value={month} 
+              onChange={e => setMonth(parseInt(e.target.value) || 1)} 
+              className="w-20 h-9 border-none bg-transparent focus:ring-0 text-center"
+              min="1" max="12"
+            />
+            <div className="w-px bg-white/10 my-1 mx-1" />
+            <Input 
+              type="number" 
+              value={year} 
+              onChange={e => setYear(parseInt(e.target.value) || now.getFullYear())} 
+              className="w-24 h-9 border-none bg-transparent focus:ring-0 text-center"
+            />
+          </div>
+          <Button variant="primary" onClick={openNew}>
+            <Plus size={18} className="mr-2" /> Turno
+          </Button>
+        </div>
+      </div>
 
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-
-      {summary && summary.salary && (
-        <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', sm: 'repeat(4, 1fr)' }, gap: 2, mb: 2 }}>
-            <Card sx={{ bgcolor: summary.difference >= 0 ? '#ecfdf5' : '#fef2f2', border: `1px solid ${summary.difference >= 0 ? '#10b981' : '#ef4444'}` }}>
-              <CardContent sx={{ textAlign: 'center', py: 1.5 }}>
-                <Typography variant="h5" fontWeight={700} color={summary.difference >= 0 ? '#059669' : '#dc2626'}>
-                  {summary.difference > 0 ? '+' : ''}{summary.difference?.toFixed(1)}h
-                </Typography>
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>Diferencia Contrato</Typography>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent sx={{ textAlign: 'center', py: 1.5 }}>
-                <Typography variant="h5" fontWeight={700}>{summary.totalWorked?.toFixed(1)}</Typography>
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>Horas Trabajadas</Typography>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent sx={{ textAlign: 'center', py: 1.5 }}>
-                <Typography variant="h5" fontWeight={700}>{workedDays} / {summary.expectedWorkDays}</Typography>
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>Días (Reales / Previstos)</Typography>
-              </CardContent>
-            </Card>
-            <Card sx={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(59,130,246,0.1) 100%)', border: '1px solid rgba(16,185,129,0.2)' }}>
-              <CardContent sx={{ textAlign: 'center', py: 1.5 }}>
-                <Typography variant="h5" fontWeight={700} color="success.main">{summary.salary.estimated?.toFixed(2)}€</Typography>
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>Salario Estimado</Typography>
-              </CardContent>
-            </Card>
-          </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 1, typography: 'caption', color: 'text.secondary' }}>
-            <Typography variant="caption">☀️ Mañana: {summary.shifts?.morning?.count}</Typography>
-            <Typography variant="caption">🌅 Tarde: {summary.shifts?.afternoon?.count}</Typography>
-            <Typography variant="caption">⭐ Especial: {summary.shifts?.special?.count}</Typography>
-            <Typography variant="caption">🏖️ Descanso: {summary.shifts?.descanso?.count}</Typography>
-            <Typography variant="caption">💰 Base: {summary.salary.hourlyRate}€/h</Typography>
-          </Box>
-        </Box>
+      {error && (
+        <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          {error}
+        </div>
       )}
 
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>Fecha</TableCell>
-            <TableCell>Tipo</TableCell>
-            <TableCell>Entrada</TableCell>
-            <TableCell>Salida</TableCell>
-            <TableCell>Pausa</TableCell>
-            <TableCell>Horas</TableCell>
-            <TableCell align="right">Acciones</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {entries.map((e, i) => {
-            const [sh, sm] = (e.start_time || '0:0').split(':').map(Number);
-            const [eh, em] = (e.end_time || '0:0').split(':').map(Number);
-            const mins = e.start_time && e.end_time ? (eh * 60 + em) - (sh * 60 + sm) - (e.break_minutes || 0) : 0;
-            const hours = Math.max(0, mins / 60);
-            return (
-              <motion.tr key={e.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}>
-                <TableCell>{e.date?.split('T')[0] || e.date}</TableCell>
-                <TableCell><Chip size="small" label={e.shift_type} variant="outlined" /></TableCell>
-                <TableCell>{e.start_time || '-'}</TableCell>
-                <TableCell>{e.end_time || '-'}</TableCell>
-                <TableCell>{e.break_minutes ? `${e.break_minutes}min` : '-'}</TableCell>
-                <TableCell><Typography fontWeight={600}>{hours > 0 ? hours.toFixed(1) : '-'}</Typography></TableCell>
-                <TableCell align="right">
-                  <IconButton size="small" onClick={() => openEdit(e)}><EditIcon fontSize="small" /></IconButton>
-                  <IconButton size="small" color="error" onClick={() => remove(e.id)}><DeleteIcon fontSize="small" /></IconButton>
-                </TableCell>
-              </motion.tr>
-            );
-          })}
-          {entries.length === 0 && <TableRow><TableCell colSpan={7} align="center"><Typography color="text.secondary">Sin registros</Typography></TableCell></TableRow>}
-        </TableBody>
-      </Table>
+      {summary && summary.salary && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className={cn(
+              "flex flex-col items-center justify-center p-4",
+              summary.difference >= 0 ? "border-emerald-500/30 bg-emerald-500/5 shadow-[0_0_20px_rgba(16,185,129,0.05)]" : "border-red-500/30 bg-red-500/5 shadow-[0_0_20px_rgba(239,68,68,0.05)]"
+            )}>
+              <span className={cn(
+                "text-3xl font-bold tracking-tight",
+                summary.difference >= 0 ? "text-emerald-400" : "text-red-400"
+              )}>
+                {summary.difference > 0 ? '+' : ''}{summary.difference?.toFixed(1)}h
+              </span>
+              <span className="text-sm text-muted-foreground mt-1">Desviación Contrato</span>
+            </Card>
 
-      <Dialog open={dialog} onClose={() => setDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editItem ? 'Editar Registro' : 'Nuevo Registro'}</DialogTitle>
-        <DialogContent>
-          <TextField fullWidth label="Fecha" type="date" value={form.date || ''} onChange={e => setForm({...form, date: e.target.value})} sx={{ mt: 2 }} InputLabelProps={{ shrink: true }} />
-          <FormControl fullWidth sx={{ mt: 2 }}>
-            <InputLabel>Tipo</InputLabel>
-            <Select value={form.shift_type || 'mañana'} onChange={e => setForm({...form, shift_type: e.target.value})} label="Tipo">
-              {entryTypes.map(t => <MenuItem key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</MenuItem>)}
+            <Card className="flex flex-col items-center justify-center p-4">
+              <span className="text-3xl font-bold tracking-tight text-foreground">
+                {summary.totalWorked?.toFixed(1)}
+              </span>
+              <span className="text-sm text-muted-foreground mt-1">Horas Totales</span>
+            </Card>
+
+            <Card className="flex flex-col items-center justify-center p-4">
+              <span className="text-3xl font-bold tracking-tight text-foreground">
+                {workedDays} / {summary.expectedWorkDays}
+              </span>
+              <span className="text-sm text-muted-foreground mt-1">Días Trabajados</span>
+            </Card>
+
+            <Card className="flex flex-col items-center justify-center p-4 border-brand-500/30 bg-brand-500/5 shadow-[0_0_30px_rgba(249,115,22,0.1)]">
+              <span className="text-3xl font-bold tracking-tight text-brand-400 flex items-center">
+                {summary.salary.estimated?.toFixed(2)}<Euro size={24} className="ml-1" />
+              </span>
+              <span className="text-sm text-brand-500/70 mt-1 font-medium">Salario Estimado</span>
+            </Card>
+          </div>
+          
+          <div className="flex flex-wrap gap-4 px-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5"><Badge variant="outline" className="bg-brand-500/10 text-brand-400 border-brand-500/20">M</Badge> Mañana: {summary.shifts?.morning?.count}</div>
+            <div className="flex items-center gap-1.5"><Badge variant="outline" className="bg-indigo-500/10 text-indigo-400 border-indigo-500/20">T</Badge> Tarde: {summary.shifts?.afternoon?.count}</div>
+            <div className="flex items-center gap-1.5"><Badge variant="outline" className="bg-purple-500/10 text-purple-400 border-purple-500/20">E</Badge> Especial: {summary.shifts?.special?.count}</div>
+            <div className="flex items-center gap-1.5"><Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">D</Badge> Descanso: {summary.shifts?.descanso?.count}</div>
+            <div className="flex items-center gap-1.5 ml-auto border border-white/10 rounded-full px-3 py-1 bg-black/40"><Briefcase size={12} className="mr-1" /> Base: {summary.salary.hourlyRate}€/h</div>
+          </div>
+        </div>
+      )}
+
+      <Card className="p-0 overflow-hidden border-white/10">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="text-xs text-muted-foreground uppercase bg-black/40 border-b border-white/10">
+              <tr>
+                <th className="px-6 py-4 font-semibold"><div className="flex items-center gap-2"><Calendar size={14} /> Fecha</div></th>
+                <th className="px-6 py-4 font-semibold text-center">Tipo</th>
+                <th className="px-6 py-4 font-semibold text-center">Entrada</th>
+                <th className="px-6 py-4 font-semibold text-center">Salida</th>
+                <th className="px-6 py-4 font-semibold text-center">Pausa</th>
+                <th className="px-6 py-4 font-semibold text-center">Horas</th>
+                <th className="px-6 py-4 font-semibold text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr><td colSpan={7} className="px-6 py-12 text-center"><div className="inline-block animate-spin text-brand-500"><RefreshCcw size={24} /></div></td></tr>
+              ) : entries.length > 0 ? (
+                entries.map((e, i) => {
+                  const [sh, sm] = (e.start_time || '0:0').split(':').map(Number);
+                  const [eh, em] = (e.end_time || '0:0').split(':').map(Number);
+                  const mins = e.start_time && e.end_time ? (eh * 60 + em) - (sh * 60 + sm) - (e.break_minutes || 0) : 0;
+                  const hours = Math.max(0, mins / 60);
+                  return (
+                    <motion.tr key={e.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                      <td className="px-6 py-4 font-medium text-foreground">{e.date?.split('T')[0] || e.date}</td>
+                      <td className="px-6 py-4 text-center">
+                        <Badge variant={['descanso', 'vacaciones', 'baja'].includes(e.shift_type) ? 'default' : 'outline'}>
+                          {e.shift_type}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4 text-center text-muted-foreground font-mono">{e.start_time || '-'}</td>
+                      <td className="px-6 py-4 text-center text-muted-foreground font-mono">{e.end_time || '-'}</td>
+                      <td className="px-6 py-4 text-center text-muted-foreground">{e.break_minutes ? `${e.break_minutes}m` : '-'}</td>
+                      <td className="px-6 py-4 text-center">
+                        <span className={cn("font-bold", hours > 0 ? "text-emerald-400" : "text-muted-foreground")}>
+                          {hours > 0 ? hours.toFixed(1) : '-'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button size="icon" variant="ghost" onClick={() => openEdit(e)}><Edit3 size={16} /></Button>
+                          <Button size="icon" variant="ghost" onClick={() => remove(e.id)} className="text-red-400 hover:text-red-300 hover:bg-red-500/10"><Trash2 size={16} /></Button>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  );
+                })
+              ) : (
+                <tr><td colSpan={7} className="px-6 py-8 text-center text-muted-foreground">Sin registros este mes</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      <Modal isOpen={dialog} onClose={() => setDialog(false)} title={editItem ? 'Editar Turno' : 'Registrar Turno'}>
+        <div className="space-y-4 mt-2">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-muted-foreground">Fecha</label>
+            <Input type="date" value={form.date || ''} onChange={e => setForm({...form, date: e.target.value})} autoFocus />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-muted-foreground">Tipo de Turno</label>
+            <Select value={form.shift_type || 'mañana'} onChange={e => setForm({...form, shift_type: e.target.value})}>
+              {entryTypes.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
             </Select>
-          </FormControl>
-          <TextField fullWidth label="Hora Entrada" type="time" value={form.start_time || ''} onChange={e => setForm({...form, start_time: e.target.value})} sx={{ mt: 2 }} InputLabelProps={{ shrink: true }} />
-          <TextField fullWidth label="Hora Salida" type="time" value={form.end_time || ''} onChange={e => setForm({...form, end_time: e.target.value})} sx={{ mt: 2 }} InputLabelProps={{ shrink: true }} />
-          <TextField fullWidth label="Pausa (minutos)" type="number" value={form.break_minutes || 0} onChange={e => setForm({...form, break_minutes: parseInt(e.target.value) || 0})} sx={{ mt: 2 }} />
-          <TextField fullWidth label="Notas" value={form.notes || ''} onChange={e => setForm({...form, notes: e.target.value})} sx={{ mt: 2 }} multiline rows={2} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialog(false)}>Cancelar</Button>
-          <Button variant="contained" onClick={save}>{editItem ? 'Guardar' : 'Crear'}</Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-muted-foreground">Entrada</label>
+              <Input type="time" value={form.start_time || ''} onChange={e => setForm({...form, start_time: e.target.value})} />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-muted-foreground">Salida</label>
+              <Input type="time" value={form.end_time || ''} onChange={e => setForm({...form, end_time: e.target.value})} />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-muted-foreground">Descanso (Minutos)</label>
+            <Input type="number" value={form.break_minutes || 0} onChange={e => setForm({...form, break_minutes: parseInt(e.target.value) || 0})} />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-muted-foreground">Notas</label>
+            <textarea 
+              className="flex w-full rounded-lg border border-border bg-background/50 px-3 py-2 text-sm text-foreground shadow-inner backdrop-blur-sm transition-all focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 min-h-[80px] resize-y"
+              value={form.notes || ''} 
+              onChange={e => setForm({...form, notes: e.target.value})}
+            />
+          </div>
+          
+          <div className="flex justify-end gap-3 mt-6">
+            <Button variant="ghost" onClick={() => setDialog(false)}>Cancelar</Button>
+            <Button variant="primary" onClick={save}>{editItem ? 'Guardar Cambios' : 'Registrar Turno'}</Button>
+          </div>
+        </div>
+      </Modal>
+    </div>
   );
 }

@@ -297,11 +297,11 @@ class RestaurantDB:
                             "Gemini 2.5 Flash Stable",
                             "realtime",
                             "gemini",
-                            "gemini-3.1-flash-live-preview",
+                            "gemini-2.0-flash-exp",
                             None,
                             0.7,
                             "google-stt",
-                            "gemini-3.1-flash-live-preview",
+                            "gemini-2.0-flash-exp",
                             "es",
                             None,
                             "google-tts",
@@ -309,9 +309,9 @@ class RestaurantDB:
                             1.0,
                             None,
                             "gemini",
-                            "gemini-3.1-flash-live-preview",
+                            "gemini-2.0-flash-exp",
                             "Aoede",
-                            "gemini-3.1-flash-live-preview",
+                            "gemini-2.0-flash-exp",
                             "Aoede",
                             1
                         ),
@@ -319,11 +319,11 @@ class RestaurantDB:
                             "Gemini 2.5 Flash Native Audio",
                             "realtime",
                             "gemini",
-                            "gemini-3.1-flash-live-preview",
+                            "gemini-2.0-flash-exp",
                             None,
                             0.7,
                             "google-stt",
-                            "gemini-3.1-flash-live-preview",
+                            "gemini-2.0-flash-exp",
                             "es",
                             None,
                             "google-tts",
@@ -331,9 +331,9 @@ class RestaurantDB:
                             1.0,
                             None,
                             "gemini",
-                            "gemini-3.1-flash-live-preview",
+                            "gemini-2.0-flash-exp",
                             "Aoede",
-                            "gemini-3.1-flash-live-preview",
+                            "gemini-2.0-flash-exp",
                             "Aoede",
                             0,
                         ),
@@ -407,44 +407,6 @@ class RestaurantDB:
                 )
                 logger.info("Seeded default pipeline profiles")
 
-            # Migration: Add Gemini 2.5 to EXISTING databases that don't have it yet
-            existing_25 = conn.execute(
-                "SELECT 1 FROM pipeline_configs WHERE realtime_model = 'gemini-3.1-flash-live-preview'"
-            ).fetchone()
-            if not existing_25:
-                conn.execute(
-                    """
-                    INSERT INTO pipeline_configs (
-                        name, architecture, llm_provider, llm_model, llm_base_url, llm_temperature,
-                        stt_provider, stt_model, stt_language, stt_server_url,
-                        tts_provider, tts_voice, tts_speed, tts_server_url,
-                        realtime_provider, realtime_model, realtime_voice,
-                        google_stt_model, google_tts_voice, is_active
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """,
-                    (
-                        "Gemini 2.5 Flash Native Audio",
-                        "realtime",
-                        "gemini",
-                        "gemini-3.1-flash-live-preview",
-                        None,
-                        0.7,
-                        "google-stt",
-                        "gemini-3.1-flash-live-preview",
-                        "es",
-                        None,
-                        "google-tts",
-                        "Aoede",
-                        1.0,
-                        None,
-                        "gemini",
-                        "gemini-3.1-flash-live-preview",
-                        "Aoede",
-                        "gemini-3.1-flash-live-preview",
-                        "Aoede",
-                        0,
-                    ),
-                )
                 logger.info("Migration: Added Gemini 2.5 Flash Native Audio pipeline")
 
             # Seed knowledge base (RAG replacement)

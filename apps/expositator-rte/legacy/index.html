@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expositator RTE — MSBross</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="./manifest.json">
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', system-ui, sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+        /* ═══ PREMIUM PORTAL STYLES ═══ */
+        .portal-card {
+            position: relative;
+            background: rgba(255,255,255,0.02);
+            border-radius: 20px;
+            padding: 2px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-style: preserve-3d;
+        }
+        .portal-card::before {
+            content: ''; position: absolute; inset: 0; border-radius: 20px; padding: 2px;
+            background: linear-gradient(var(--border-angle, 0deg), #10b981, transparent 40%, transparent 60%, #10b981);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+            animation: borderSpin 4s linear infinite; opacity: 0.5; transition: opacity 0.4s;
+        }
+        .portal-card:hover::before { opacity: 1; box-shadow: 0 0 30px rgba(16, 185, 129, 0.5); }
+        .portal-card-inner {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 18px;
+            position: relative; overflow: hidden; height: 100%; width: 100%;
+        }
+        @keyframes borderSpin { to { --border-angle: 360deg; } }
+        @property --border-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+        @keyframes cardGlitch {
+            0% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+            20% { clip-path: inset(80% 0 10% 0); transform: translate(2px, -2px); filter: hue-rotate(-90deg); }
+            40% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, -2px); filter: hue-rotate(45deg); }
+            60% { clip-path: inset(60% 0 20% 0); transform: translate(2px, 2px); filter: hue-rotate(-45deg); }
+            80% { clip-path: inset(20% 0 60% 0); transform: translate(-1px, 1px); filter: hue-rotate(20deg); }
+            100% { clip-path: inset(0 0 0 0); transform: translate(0); filter: hue-rotate(0); }
+        }
+        .portal-card:hover::after {
+            content: ''; position: absolute; inset: 0; background: inherit;
+            border-radius: inherit; z-index: 10; pointer-events: none;
+            animation: cardGlitch 0.3s cubic-bezier(.25, .46, .45, .94) both;
+            opacity: 0.15; mix-blend-mode: overlay;
+        }
+    </style>
+  <link rel="icon" type="image/png" href="/logo-icon.png" />
+</head>
+<body class="h-screen w-screen flex p-4 gap-4 overflow-hidden">
+    <main class="flex-1 flex flex-col gap-4">
+        <header class="glass p-4 rounded-xl flex justify-between items-center shadow-lg">
+            <h1 class="text-2xl font-bold text-emerald-500 tracking-tight flex items-center gap-3">
+                <div id="status-dot" class="w-3 h-3 rounded-full bg-slate-500"></div>
+                EXPOSITATOR <span class="text-sm text-slate-400 font-mono">v2026.3 (RAG)</span>
+            </h1>
+            <div class="flex gap-2 items-center bg-slate-800 p-1 rounded-lg border border-slate-700">
+                <input type="password" id="gemini-api-key" placeholder="Pegar Gemini API Key..." class="bg-transparent border-none px-3 py-1 text-xs font-mono text-emerald-400 focus:outline-none w-56">
+                <button id="btn-save-api" class="bg-slate-700 hover:bg-slate-600 text-slate-300 px-4 py-1.5 rounded text-xs font-bold transition-colors">AÑADIR API</button>
+                <div class="w-px h-6 bg-slate-600 mx-1"></div>
+                <div class="portal-card" style="padding: 2px; border-radius: 8px;">
+                    <button id="btn-start" class="portal-card-inner bg-transparent hover:bg-emerald-500/20 px-6 py-1.5 rounded font-bold transition-colors shadow-lg text-sm text-white" style="border-radius: 6px;">INICIAR SESIÓN</button>
+                </div>
+            </div>
+        </header>
+        
+        <div class="portal-card" style="flex: 1; display: flex; flex-direction: column;">
+        <section class="flex-1 portal-card-inner glass rounded-xl relative overflow-hidden flex flex-col shadow-xl">
+            <video id="webcam-viewport" class="w-full h-1/2 object-cover bg-black" autoplay playsinline muted></video>
+            
+            <div id="dropzone" class="flex-1 border-t border-slate-700 p-4 flex flex-col justify-center items-center text-slate-400 border-2 border-dashed border-slate-600 m-4 rounded-xl bg-slate-800/30 relative overflow-hidden">
+                <p class="z-10 font-mono text-sm pointer-events-none">ARRASTRA AQUÍ LA DIAPOSITIVA ACTIVA</p>
+                <img id="current-capture" class="absolute inset-0 w-full h-full object-contain hidden z-20 bg-slate-900/90" />
+            </div>
+            
+            <div class="h-24 bg-slate-900 border-t border-slate-700 p-3 overflow-hidden">
+                 <p id="live-transcript" class="text-slate-300 font-mono text-sm leading-relaxed"></p>
+            </div>
+        </section>
+        </div>
+    </main>
+    <div class="portal-card w-1/3 flex flex-col">
+    <aside class="portal-card-inner glass rounded-xl flex flex-col p-4 font-mono text-sm shadow-xl flex-1">
+        <div class="flex justify-between items-center border-b border-slate-700 pb-3 mb-4">
+            <h2 class="text-rose-500 font-bold tracking-widest">TRIBUNAL LOGS</h2>
+            <div class="text-right">
+                <div class="text-slate-400 text-[10px]">SCORE ACTUAL</div>
+                <div id="live-score" class="text-3xl text-emerald-400 font-bold">10.0</div>
+            </div>
+        </div>
+
+        <div class="bg-slate-800 p-3 rounded border border-slate-700 mb-4 flex flex-col gap-2">
+            <div class="text-[10px] text-slate-400 font-bold">BASE DE CONOCIMIENTO (.TXT / .MD)</div>
+            <input type="file" id="knowledge-upload" accept=".txt,.md" class="text-xs text-slate-300 file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-slate-700 file:text-emerald-400 hover:file:bg-slate-600">
+            <div id="knowledge-status" class="text-[10px] text-amber-500">Documento no cargado. Evaluación genérica activa.</div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 mb-4 text-center">
+            <div class="bg-slate-800 rounded p-2 border border-slate-700">
+                <div class="text-[10px] text-slate-400">WPM</div>
+                <div id="metric-wpm" class="text-white font-bold">0</div>
+            </div>
+            <div class="bg-slate-800 rounded p-2 border border-slate-700">
+                <div class="text-[10px] text-slate-400">MULETILLAS</div>
+                <div id="metric-fillers" class="text-amber-400 font-bold">0</div>
+            </div>
+            <div class="bg-slate-800 rounded p-2 border border-slate-700">
+                <div class="text-[10px] text-slate-400">DESVIACIONES</div>
+                <div id="metric-deviations" class="text-red-400 font-bold">0</div>
+            </div>
+        </div>
+        
+        <div id="logs-container" class="flex-1 overflow-y-auto space-y-2 text-slate-300 pr-2"></div>
+    </aside>
+    </div>
+    <script type="module" src="./main.js"></script>
+</body>
+</html>

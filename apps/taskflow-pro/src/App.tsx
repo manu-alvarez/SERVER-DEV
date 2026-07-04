@@ -21,7 +21,14 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: '#00F5FF' }}>⚡</div>}>
+    <Suspense fallback={
+      <div className="flex justify-center items-center h-screen w-full bg-background text-brand-400">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <span className="text-4xl">⚡</span>
+          <span className="text-sm tracking-widest font-bold">INITIALIZING CORE...</span>
+        </div>
+      </div>
+    }>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />

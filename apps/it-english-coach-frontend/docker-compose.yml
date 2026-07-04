@@ -1,0 +1,19 @@
+services:
+  coach-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: coach-frontend
+    restart: unless-stopped
+    networks:
+      - msbross_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.coach.rule=Host(`coach.manuelalvarez.dev`)"
+      - "traefik.http.routers.coach.entrypoints=websecure"
+      - "traefik.http.routers.coach.tls.certresolver=production"
+      - "traefik.http.services.coach.loadbalancer.server.port=80"
+
+networks:
+  msbross_net:
+    external: true

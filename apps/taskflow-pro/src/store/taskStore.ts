@@ -36,6 +36,8 @@ export const playNotificationSound = () => {
   }
 };
 
+import { z } from 'zod';
+
 export type Priority = 'low' | 'medium' | 'high';
 export type TaskStatus = 'pending' | 'in_progress' | 'completed';
 
@@ -46,20 +48,22 @@ export interface Category {
   icon: string;
 }
 
-export interface Task {
-  id: string;
-  title: string;
-  description: string;
-  categoryId: string;
-  priority: Priority;
-  status: TaskStatus;
-  createdAt: string;
-  updatedAt: string;
-  dueDate?: string;
-  reminderTime?: string;
-  reminderSent?: boolean;
-  order: number;
-}
+export const TaskSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string().min(1),
+  description: z.string(),
+  categoryId: z.string(),
+  priority: z.enum(['low', 'medium', 'high']),
+  status: z.enum(['pending', 'in_progress', 'completed']),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  dueDate: z.string().optional(),
+  reminderTime: z.string().optional(),
+  reminderSent: z.boolean().optional(),
+  order: z.number(),
+});
+
+export type Task = z.infer<typeof TaskSchema>;
 
 export interface AppSettings {
   soundEnabled: boolean;

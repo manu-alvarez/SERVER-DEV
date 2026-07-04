@@ -1,10 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { z } from 'zod';
 import { SPEAKING, CATS } from '../lib/data';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, CheckCircle2, Circle, Loader2 } from 'lucide-react';
 import SkillsRadar from '../components/SkillsRadar';
 import { LiveKitRoom, RoomAudioRenderer, VoiceAssistantControlBar } from '@livekit/components-react';
 import '@livekit/components-styles';
+
+const TokenResponseSchema = z.object({
+  accessToken: z.string(),
+});
+
+const ConfigResponseSchema = z.object({
+  livekitUrl: z.string().optional(),
+}).catch({});
 
 export default function SpeakingView() {
   const [activeTimer, setActiveTimer] = useState<string | null>(null);
@@ -13,23 +23,23 @@ export default function SpeakingView() {
   
   // LiveKit State
   const [lkToken, setLkToken] = useState<string | null>(null);
-  const [lkUrl, setLkUrl] = useState<string | null>(null);
-  const [connecting, setConnecting] = useState(false);
 
-  // Fetch Proxy config on mount to know the LiveKit URL
-  useEffect(() => {
-    fetch('/__config')
-      .then(r => r.json())
-      .then(cfg => {
-        if (cfg.livekitUrl) setLkUrl(cfg.livekitUrl);
-      })
-      .catch(() => setLkUrl('wss://nikolina-1jg7t00i.livekit.cloud')); // fallback
-  }, []);
+  // Fetch Proxy config via React Query
+  const { data: config } = useQuery({
+    queryKey: ['config'],
+    queryFn: async () => {
+      const res = await fetch('/__config');
+      if (!res.ok) return {};
+      const data = await res.json();
+      return ConfigResponseSchema.parse(data);
+    },
+    staleTime: Infinity,
+  });
 
-  const startLiveKit = async (id: string) => {
-    setConnecting(true);
-    setActiveTimer(id);
-    try {
+  const lkUrl = config?.livekitUrl || 'wss://nikolina-1jg7t00i.livekit.cloud';
+
+  const tokenMutation = useMutation({
+    mutationFn: async (id: string) => {
       const roomName = `coach-${id}-${Math.floor(Math.random() * 10000)}`;
       const res = await fetch('/_nikolina/api/token', {
         method: 'POST',
@@ -41,12 +51,20 @@ export default function SpeakingView() {
       });
       if (!res.ok) throw new Error('Error fetching token');
       const data = await res.json();
+      return TokenResponseSchema.parse(data);
+    },
+    onSuccess: (data) => {
       setLkToken(data.accessToken);
-    } catch (e) {
-      console.error(e);
+    },
+    onError: (error) => {
+      console.error(error);
       setActiveTimer(null);
     }
-    setConnecting(false);
+  });
+
+  const startLiveKit = (id: string) => {
+    setActiveTimer(id);
+    tokenMutation.mutate(id);
   };
 
   const handleComplete = (id: string) => {
@@ -57,6 +75,7 @@ export default function SpeakingView() {
       setChecklistState(prev => ({ ...prev, [id]: SPEAKING.find(s => s.id === id)?.checklist.map(() => false) || [] }));
     }
   };
+
 
   const toggleCheck = (id: string, idx: number) => {
     setChecklistState(prev => {
@@ -111,11 +130,11 @@ export default function SpeakingView() {
                       {!completed[item.id] && activeTimer !== item.id && (
                         <button 
                           onClick={() => startLiveKit(item.id)}
-                          disabled={connecting || !lkUrl}
+                          disabled={tokenMutation.isPending || !lkUrl}
                           className="bg-neon-cyan/10 hover:bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/50 px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all hover:scale-105 disabled:opacity-50"
                         >
-                          {connecting ? <Loader2 size={20} className="animate-spin" /> : <Mic size={20} />} 
-                          {connecting ? 'Conectando al Tutor...' : 'Llamar al Tutor IA'}
+                          {tokenMutation.isPending ? <Loader2 size={20} className="animate-spin" /> : <Mic size={20} />} 
+                          {tokenMutation.isPending ? 'Conectando al Tutor...' : 'Llamar al Tutor IA'}
                         </button>
                       )}
 
