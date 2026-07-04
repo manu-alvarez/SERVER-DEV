@@ -8,6 +8,10 @@ import Contact from './pages/Contact';
 import Profile from './pages/Profile';
 
 function App() {
+  if (window.location.hostname === 'maya.manuelalvarez.dev') {
+    window.location.href = 'https://manu-alvarez.github.io/TuEnergiaMaya/';
+    return null;
+  }
   return (
     <BrowserRouter>
       <Routes>

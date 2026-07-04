@@ -264,7 +264,8 @@ app.use((req, res, next) => {
     return res.redirect(302, 'https://play.google.com/store/apps/details?id=com.manoelectricaazul.app');
   }
 
-  // Tu Energía Maya redirect to official page
+
+    // Tu Energía Maya redirect to official page
   if (host === 'maya.manuelalvarez.dev') {
     return res.redirect(302, 'https://manu-alvarez.github.io/TuEnergiaMaya/');
   }
