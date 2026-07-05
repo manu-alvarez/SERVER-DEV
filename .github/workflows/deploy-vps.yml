@@ -63,6 +63,8 @@ jobs:
         key: ${{ secrets.VPS_SSH_KEY }}
         script: |
           cd /home/ubuntu/MSBrossAI
+          echo "Reconstruyendo imagen local para TxaFitness..."
+          docker build -t msbross-fitness:latest apps/txa-fitness-pro || echo "Fallo el build de txafitness, omitiendo..."
           echo "Reiniciando contenedores Docker..."
           docker compose up -d --build
           echo "Recargando PM2..."
