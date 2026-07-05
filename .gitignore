@@ -18,3 +18,14 @@ apps/*/logs/
 apps/**/*.log
 infrastructure/**/*.log
 logs/
+
+# Database files (SQLite)
+*.db
+*.db-shm
+*.db-wal
+
+# Build outputs (Next.js static export)
+www/app/*/out/
+
+# Binary artifact (build output copy)
+www/app/**/harry_potter.mp3
