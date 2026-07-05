@@ -65,6 +65,10 @@ jobs:
           cd /home/ubuntu/MSBrossAI
           echo "Reconstruyendo imagen local para TxaFitness..."
           docker build -t msbross-fitness:latest apps/txa-fitness-pro || echo "Fallo el build de txafitness, omitiendo..."
+          echo "Reconstruyendo imagen local para Mapfre..."
+          docker build -t msbross-mapfre:latest apps/mapfre/frontend || echo "Fallo el build de mapfre, omitiendo..."
+          echo "Reconstruyendo imagen local para Perfume Trading..."
+          docker build -t msbross-perfume:latest apps/perfume-trading/erp || echo "Fallo el build de perfume-trading, omitiendo..."
           echo "Reiniciando contenedores Docker..."
           docker compose up -d --build
           echo "Recargando PM2..."
