@@ -30,6 +30,11 @@ jobs:
         echo "Sincronizando código fuente (apps/)..."
         rsync -avz --exclude 'node_modules' --exclude 'dist' --exclude '.git' --exclude '__pycache__' --exclude 'venv' --exclude '.env' -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./apps/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/apps/ || exit 1
 
+    - name: Deploy Static WWW via Rsync
+      run: |
+        echo "Sincronizando SPAs estaticas compiladas (www/)..."
+        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./www/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/www/ || exit 1
+
     - name: Deploy Infrastructure via Rsync
       run: |
         rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/docker-compose.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/docker-compose.yml || exit 1
@@ -45,7 +50,7 @@ jobs:
           cd /home/ubuntu/MSBrossAI
           echo "Limpiando archivos obsoletos en el servidor remoto que rsync no borra..."
           rm -f apps/txa-fitness-pro/src/middleware.ts
-          rm -rf archive/ www/ apps/msbross/ apps/msbross-os/
+          rm -rf archive/ apps/msbross/ apps/msbross-os/
           rm -f update_app.js update_proxy.js package.json package-lock.json
 
     - name: Reload PM2 and Docker
