@@ -16,10 +16,7 @@ const WWW  = path.join(__dirname, 'www');
 // ── Compression (gzip/brotli for all text responses) ──
 app.use(compression({ level: 6, threshold: 1024 }));
 
-// Fallback global routes for favicons
-app.get(/\/(favicon\.ico|favicon\.svg|vite\.svg|logo\.png|logo\.svg|apple-touch-icon\.png)$/, (req, res) => {
-  res.sendFile(path.join(__dirname, 'favicon.png'));
-});
+
 
 // ── Security Headers ──
 app.use((req, res, next) => {
@@ -385,6 +382,11 @@ app.use(express.static(WWW, {
     }
   }
 }));
+
+// Fallback global routes for favicons (served ONLY if static file not found in WWW)
+app.get(/\/(favicon\.ico|favicon\.svg|vite\.svg|logo\.png|logo\.svg|apple-touch-icon\.png)$/, (req, res) => {
+  res.sendFile(path.join(__dirname, 'favicon.png'));
+});
 app.use((req, res) => {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
   res.status(404).sendFile(path.join(WWW, 'index.html'));
