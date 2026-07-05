@@ -8,7 +8,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup SSH
         run: |
@@ -24,7 +24,7 @@ jobs:
 
       - name: Deploy Apps
         run: |
-          rsync -avz --delete \
+          rsync -avz --delete --no-perms \
             --exclude 'node_modules' --exclude 'dist' --exclude '.next' \
             --exclude '.git' --exclude '__pycache__' --exclude 'venv' --exclude '.venv' \
             --exclude '.env' --exclude '*.log' --exclude '*.error.log' \
@@ -33,7 +33,7 @@ jobs:
 
       - name: Deploy Static WWW
         run: |
-          rsync -avz --delete \
+          rsync -avz --delete --no-perms \
             -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
             ./www/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/www/
 

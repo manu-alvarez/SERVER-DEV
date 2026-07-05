@@ -119,25 +119,28 @@ function checkPort(port, host = 'host.docker.internal', timeout = 500) {
   });
 }
 
+// [host, port] — Docker containers resolved by name on msbross_net
 const BACKEND_MAP = {
-  'nikolina-api-hub': 8001,
-  'elitescout-server': 8003,
-  'traductor-pro': 8004,
-  'msbross-backend': 8005,
-  'iaputa-backend': 8006,
-  'cuentos-magicos': 8007,
-  'web-restaurante-atenea': 8009,
-  'jartosdto-backend': 8010,
-  'gas-station': 3005,
-  'perfume-trading': 3011,
-  'mapfre': 3333,
-  'txa-fitness-pro': 3456,
+  'nikolina-api-hub':       ['nikolina-api-hub',          8001],
+  'industrialpro-backend':  ['industrialpro-backend',     8002],
+  'elitescout-backend':     ['elitescout-backend',        8003],
+  'traductor-backend':      ['traductor-backend',         8004],
+  'msbross-backend':        ['msbross-backend',           8005],
+  'iaputa-backend':         ['iaputa-backend',            8006],
+  'cuentos-magicos':        ['cuentos-magicos-backend',   8007],
+  'web-restaurante-atenea': ['host.docker.internal',      8009],
+  'jartosdto-backend':      ['jartosdto-backend',         8010],
+  'gas-station':            ['gas-station-backend',       3005],
+  'perfume-trading':        ['perfume-trading',           3000],
+  'mapfre':                 ['mapfre',                    3333],
+  'txa-fitness-pro':        ['txa-fitness-pro',           3000],
+  'it-english-backend':     ['it-english-backend',        8787],
 };
 
 app.get('/__health', requireAdminAuth, async (req, res) => {
   const checks = await Promise.all(
-    Object.entries(BACKEND_MAP).map(async ([name, port]) => ({
-      name, port, online: await checkPort(port, name),
+    Object.entries(BACKEND_MAP).map(async ([name, [host, port]]) => ({
+      name, port, online: await checkPort(port, host),
     }))
   );
   const online = checks.filter(c => c.online).length;
