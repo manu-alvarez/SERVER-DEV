@@ -39,6 +39,8 @@ jobs:
       run: |
         rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/docker-compose.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/docker-compose.yml || exit 1
         rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./ecosystem.config.js ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/ecosystem.config.js || exit 1
+        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/msbross-proxy/proxy_server.js ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/proxy_server.js || exit 1
+        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/msbross-proxy/favicon.png ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/favicon.png || exit 1
 
     - name: Cleanup Obsolete VPS Files
       uses: appleboy/ssh-action@v1.0.0
