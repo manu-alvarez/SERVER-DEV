@@ -1,77 +1,83 @@
-name: Deploy VPS Apps
-
+name: Deploy VPS
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-    - name: Ensure target directory exists
-      run: |
-        ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "mkdir -p /home/ubuntu/MSBrossAI/apps /home/ubuntu/MSBrossAI/infrastructure"
+      - name: Ensure directories
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            "mkdir -p /home/ubuntu/MSBrossAI/apps /home/ubuntu/MSBrossAI/infrastructure /home/ubuntu/MSBrossAI/logs"
 
-    - name: Deploy Apps via Rsync
-      run: |
-        echo "Sincronizando código fuente (apps/)..."
-        rsync -avz --exclude 'node_modules' --exclude 'dist' --exclude '.git' --exclude '__pycache__' --exclude 'venv' --exclude '.env' -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./apps/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/apps/ || exit 1
+      - name: Deploy Apps
+        run: |
+          rsync -avz --delete \
+            --exclude 'node_modules' --exclude 'dist' --exclude '.next' \
+            --exclude '.git' --exclude '__pycache__' --exclude 'venv' --exclude '.venv' \
+            --exclude '.env' --exclude '*.log' --exclude '*.error.log' \
+            -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
+            ./apps/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/apps/
 
-    - name: Deploy Static WWW via Rsync
-      run: |
-        echo "Sincronizando SPAs estaticas compiladas (www/)..."
-        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./www/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/www/ || exit 1
+      - name: Deploy Static WWW
+        run: |
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
+            ./www/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/www/
 
-    - name: Deploy Infrastructure via Rsync
-      run: |
-        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/docker-compose.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/docker-compose.yml || exit 1
-        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./ecosystem.config.js ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/ecosystem.config.js || exit 1
-        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/msbross-proxy/proxy_server.js ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/proxy_server.js || exit 1
-        rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" ./infrastructure/msbross-proxy/favicon.png ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/favicon.png || exit 1
+      - name: Deploy Infrastructure
+        run: |
+          rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
+            ./infrastructure/docker-compose.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/docker-compose.yml
+          rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
+            ./ecosystem.config.js ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/ecosystem.config.js
+          rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
+            ./infrastructure/msbross-proxy/proxy_server.js ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/proxy_server.js
+          rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
+            ./infrastructure/msbross-proxy/favicon.png ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/favicon.png
 
-    - name: Cleanup Obsolete VPS Files
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.VPS_SSH_KEY }}
-        script: |
-          cd /home/ubuntu/MSBrossAI
-          echo "Limpiando archivos obsoletos en el servidor remoto que rsync no borra..."
-          rm -f apps/txa-fitness-pro/src/middleware.ts
-          rm -rf archive/ apps/msbross/ apps/msbross-os/
-          rm -f update_app.js update_proxy.js package.json package-lock.json
+      - name: Deploy Traefik Config
+        run: |
+          rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
+            ./infrastructure/traefik/docker-compose.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/infrastructure/traefik/docker-compose.yml
 
-    - name: Reload PM2 and Docker
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.VPS_SSH_KEY }}
-        script: |
-          cd /home/ubuntu/MSBrossAI
-          echo "Reconstruyendo imagen local para TxaFitness..."
-          docker build -t msbross-fitness:latest apps/txa-fitness-pro || echo "Fallo el build de txafitness, omitiendo..."
-          echo "Reconstruyendo imagen local para Mapfre..."
-          docker build -t msbross-mapfre:latest apps/mapfre/frontend || echo "Fallo el build de mapfre, omitiendo..."
-          echo "Reconstruyendo imagen local para Perfume Trading..."
-          docker build -t msbross-perfume:latest apps/perfume-trading/erp || echo "Fallo el build de perfume-trading, omitiendo..."
-          echo "Reiniciando contenedores Docker..."
-          docker compose up -d --build
-          echo "Recargando PM2..."
-          pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js
-          pm2 save
-          echo "✅ ¡Despliegue finalizado exitosamente en el servidor!"
+      - name: Reload Services
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/MSBrossAI
+
+            echo "=== Rebuilding Docker images ==="
+            docker build -t msbross-fitness:latest apps/txa-fitness-pro || echo "Build skipped: txa-fitness-pro"
+            docker build -t msbross-mapfre:latest apps/mapfre/frontend || echo "Build skipped: mapfre"
+            docker build -t msbross-perfume:latest apps/perfume-trading/erp || echo "Build skipped: perfume-trading"
+
+            echo "=== Deploying Traefik ==="
+            cd infrastructure/traefik && docker compose up -d && cd /home/ubuntu/MSBrossAI
+
+            echo "=== Deploying Docker services ==="
+            docker compose up -d --build
+
+            echo "=== Reloading PM2 ==="
+            pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js
+            pm2 save
+
+            echo "=== Cleanup old images ==="
+            docker image prune -f
+
+            echo "=== Deploy complete ==="

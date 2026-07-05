@@ -139,7 +139,7 @@ class RestaurantDB:
                     realtime_provider TEXT NOT NULL DEFAULT 'gemini',
                     realtime_model TEXT,
                     realtime_voice TEXT DEFAULT 'Aoede',
-                    google_stt_model TEXT DEFAULT 'gemini-1.5-flash',
+                    google_stt_model TEXT DEFAULT 'gemini-3.5-flash',
                     google_tts_voice TEXT DEFAULT 'Aoede',
                     is_active BOOLEAN DEFAULT 0,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -187,7 +187,7 @@ class RestaurantDB:
             # Backward compatible migrations for pipeline_configs
             self._safe_add_column(conn, "pipeline_configs", "stt_server_url", "TEXT")
             self._safe_add_column(conn, "pipeline_configs", "realtime_voice", "TEXT DEFAULT 'Aoede'")
-            self._safe_add_column(conn, "pipeline_configs", "google_stt_model", "TEXT DEFAULT 'gemini-1.5-flash'")
+            self._safe_add_column(conn, "pipeline_configs", "google_stt_model", "TEXT DEFAULT 'gemini-3.5-flash'")
             self._safe_add_column(conn, "pipeline_configs", "google_tts_voice", "TEXT DEFAULT 'Aoede'")
             # Backward compatible migrations for menu_items
             self._safe_add_column(conn, "menu_items", "image_url", "TEXT DEFAULT ''")
@@ -244,7 +244,7 @@ class RestaurantDB:
                         id, model_name, voice, temperature, system_prompt,
                         enable_internet_search, vad_sensitivity, turn_detection_mode, max_call_duration_minutes
                     )
-                    VALUES (1, 'gemini-1.5-flash', 'Aoede', 0.7, ?, 0, 0.5, 'normal', 30)
+                    VALUES (1, 'gemini-3.5-flash', 'Aoede', 0.7, ?, 0, 0.5, 'normal', 30)
                     """,
                     (default_prompt,),
                 )
@@ -294,14 +294,14 @@ class RestaurantDB:
                     """,
                     [
                         (
-                            "Gemini 2.5 Flash Stable",
+                            "Gemini 3.5 Flash Stable",
                             "realtime",
                             "gemini",
-                            "gemini-2.0-flash-exp",
+                            "gemini-omni",
                             None,
                             0.7,
                             "google-stt",
-                            "gemini-2.0-flash-exp",
+                            "gemini-omni",
                             "es",
                             None,
                             "google-tts",
@@ -309,21 +309,21 @@ class RestaurantDB:
                             1.0,
                             None,
                             "gemini",
-                            "gemini-2.0-flash-exp",
+                            "gemini-omni",
                             "Aoede",
-                            "gemini-2.0-flash-exp",
+                            "gemini-omni",
                             "Aoede",
                             1
                         ),
                         (
-                            "Gemini 2.5 Flash Native Audio",
+                            "Gemini Omni Native Audio",
                             "realtime",
                             "gemini",
-                            "gemini-2.0-flash-exp",
+                            "gemini-omni",
                             None,
                             0.7,
                             "google-stt",
-                            "gemini-2.0-flash-exp",
+                            "gemini-omni",
                             "es",
                             None,
                             "google-tts",
@@ -331,21 +331,21 @@ class RestaurantDB:
                             1.0,
                             None,
                             "gemini",
-                            "gemini-2.0-flash-exp",
+                            "gemini-omni",
                             "Aoede",
-                            "gemini-2.0-flash-exp",
+                            "gemini-omni",
                             "Aoede",
                             0,
                         ),
                         (
-                            "Gemini 1.5 Native Realtime (Flash-8B)",
+                            "Gemini 3.1 Native Realtime (Flash-8B)",
                             "realtime",
                             "gemini",
-                            "gemini-1.5-flash-8b",
+                            "gemini-3.1-flash-lite",
                             None,
                             0.7,
                             "google-stt",
-                            "gemini-1.5-flash-8b",
+                            "gemini-3.1-flash-lite",
                             "es",
                             None,
                             "google-tts",
@@ -353,21 +353,21 @@ class RestaurantDB:
                             1.0,
                             None,
                             "gemini",
-                            "gemini-1.5-flash-8b",
+                            "gemini-3.1-flash-lite",
                             "Puck",
-                            "gemini-1.5-flash-8b",
+                            "gemini-3.1-flash-lite",
                             "Puck",
                             0,
                         ),
                         (
-                            "Gemini 1.5 Realtime (Flash)",
+                            "Gemini 3.1 Realtime (Flash)",
                             "realtime",
                             "gemini",
-                            "gemini-1.5-flash",
+                            "gemini-3.5-flash",
                             None,
                             0.7,
                             "google-stt",
-                            "gemini-1.5-flash",
+                            "gemini-3.5-flash",
                             "es",
                             None,
                             "google-tts",
@@ -375,9 +375,9 @@ class RestaurantDB:
                             1.0,
                             None,
                             "gemini",
-                            "gemini-1.5-flash",
+                            "gemini-3.5-flash",
                             "Puck",
-                            "gemini-1.5-flash",
+                            "gemini-3.5-flash",
                             "Puck",
                             0,
                         ),
@@ -385,7 +385,7 @@ class RestaurantDB:
                             "Local Modular",
                             "modular",
                             "gemini",
-                            "gemini-1.5-flash",
+                            "gemini-3.5-flash",
                             None,
                             0.7,
                             "faster-whisper",
@@ -397,9 +397,9 @@ class RestaurantDB:
                             1.0,
                             "http://localhost:8880",
                             "gemini",
-                            "gemini-1.5-flash",
+                            "gemini-3.5-flash",
                             "Aoede",
-                            "gemini-1.5-flash",
+                            "gemini-3.5-flash",
                             "Aoede",
                             0,
                         ),
@@ -407,7 +407,7 @@ class RestaurantDB:
                 )
                 logger.info("Seeded default pipeline profiles")
 
-                logger.info("Migration: Added Gemini 2.5 Flash Native Audio pipeline")
+                logger.info("Migration: Added Gemini Omni Native Audio pipeline")
 
             # Seed knowledge base (RAG replacement)
             if conn.execute("SELECT COUNT(*) AS c FROM knowledge_base").fetchone()["c"] == 0:

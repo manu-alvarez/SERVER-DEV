@@ -2,7 +2,7 @@
 
 ## Descripción
 Asistente de voz especializado en gestión de reservas para restaurantes, con arquitectura dual:
-- **Realtime Pipeline**: Gemini 2.5 Flash Native Audio (STT+LLM+TTS en un solo paso)
+- **Realtime Pipeline**: Gemini Omni Native Audio (STT+LLM+TTS en un solo paso)
 - **Modular Pipeline**: Ollama (LLM) + Faster-Whisper (STT) + Kokoro (TTS)
 
 ## Arquitectura
@@ -60,7 +60,7 @@ Ver `.env.example` en server/
 - ✅ Docker Compose con healthchecks y named volumes
 
 ## Arquitectura Dual
-1. **Realtime (Default)**: Gemini 2.5 Flash Native Audio → Baja latencia, alta calidad
+1. **Realtime (Default)**: Gemini Omni Native Audio → Baja latencia, alta calidad
 2. **Modular**: Ollama + Faster-Whisper + Kokoro → Privado, sin rate limits
 
 ## Herramientas del Agent

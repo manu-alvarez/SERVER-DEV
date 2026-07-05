@@ -1,7 +1,7 @@
 """
 MSB LiveKit Voice Assistant — Restaurant Reservation Agent
 
-Multimodal voice agent powered by Gemini 2.5 Flash (Native Audio) OR
+Multimodal voice agent powered by Gemini Omni (Native Audio) OR
 Modular Pipeline (Ollama + Faster-Whisper + Kokoro) specialized in restaurant table reservation management.
 
 Architecture:
@@ -534,7 +534,7 @@ async def entrypoint(ctx: JobContext) -> None:
                 logger.error("GOOGLE_API_KEY is not set")
                 return
 
-            # Gemini 2.5 Flash Native Audio - The proven high-reliability voice engine
+            # Gemini Omni Native Audio - The proven high-reliability voice engine
             model = RealtimeModel(
                 model=pipeline_cfg.get("realtime_model", "gemini-3.1-flash-live-preview"),
                 api_key=api_key,

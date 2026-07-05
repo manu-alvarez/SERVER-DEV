@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { useExpositatorStore } from '../store/expositatorStore';
 
-const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent";
 
 export const useEvaluator = () => {
   const { addLog, updateMetrics } = useExpositatorStore();

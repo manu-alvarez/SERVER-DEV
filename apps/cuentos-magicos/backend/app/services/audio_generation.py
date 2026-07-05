@@ -151,7 +151,7 @@ async def _generate_openai_tts(text: str, voice_name: str | None = None, speed: 
 
 
 async def _generate_gemini_tts(text: str, voice_name: str | None = None) -> bytes:
-    """Generate audio using Gemini 2.5 Flash TTS (native audio model via Gemini API).
+    """Generate audio using Gemini 3.5 Flash TTS (native audio model via Gemini API).
 
     Returns MP3 bytes converted from raw PCM (24kHz, 16-bit, mono).
 

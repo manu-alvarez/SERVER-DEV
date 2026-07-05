@@ -27,6 +27,7 @@ services:
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http.tls.certResolver=myresolver
       - --certificatesresolvers.myresolver.acme.tlschallenge=true
       - --certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}
       - --certificatesresolvers.myresolver.acme.storage=/acme.json
@@ -34,10 +35,22 @@ services:
       - traefik.enable=true
       - traefik.http.routers.traefik.rule=Host(`traefik.manuelalvarez.dev`)
       - traefik.http.routers.traefik.service=api@internal
-      - traefik.http.routers.traefik.middlewares=auth
+      - traefik.http.routers.traefik.middlewares=auth,sec-headers
       - traefik.http.routers.traefik.entrypoints=websecure
       - traefik.http.routers.traefik.tls.certresolver=myresolver
       - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_AUTH}
+
+      # Global security headers middleware
+      - traefik.http.middlewares.sec-headers.headers.customFrameOptionsValue=SAMEORIGIN
+      - traefik.http.middlewares.sec-headers.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.sec-headers.headers.browserXssFilter=true
+      - traefik.http.middlewares.sec-headers.headers.referrerPolicy=strict-origin-when-cross-origin
+      - traefik.http.middlewares.sec-headers.headers.permissionsPolicy=camera=(self), microphone=(self), geolocation=()
+      - traefik.http.middlewares.sec-headers.headers.stsSeconds=31536000
+      - traefik.http.middlewares.sec-headers.headers.stsIncludeSubdomains=true
+      - traefik.http.middlewares.sec-headers.headers.stsPreload=true
+      - traefik.http.middlewares.sec-headers.headers.forceSTSHeader=true
+
 networks:
   msbross_net:
     external: true

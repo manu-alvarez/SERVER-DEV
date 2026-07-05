@@ -1,88 +1,23 @@
 /**
- * MSBrossAI — Unified PM2 Ecosystem Configuration (Hardened HA Release)
- * 
- * Manages all backend services for the ecosystem dynamically resolved:
- * - LiveKit Server (WebRTC engine)
- * - Nikolina API Hub (FastAPI token server + dashboard)
- * - Nikolina Agent (LiveKit voice agent)
- * - IndustrialPro Backend (FastAPI task manager)
- * - IAPuta OS Backend (FastAPI AI assistant)
- * - Arantxa Translate Server (Express translation proxy)
- * - MSBrOSs Backend (Adele voice server)
- * - Cuentos Mágicos Backend (Story teller FastAPI)
- * - MSBross Reverse Proxy (Unified portal & port-based routing)
- * 
- * Hardening:
- * - max_memory_restart: Prevents memory leaks from killing the OS (OOM Killer mitigation).
- * - exp_backoff_delay: Exponential backoff delay starting at 1000ms.
- * - min_uptime: Process must be up for 15s to be considered running.
- * - max_restarts: Cap at 15 restarts before triggering operator alert/stable sleep.
+ * MSBrossAI — PM2 Ecosystem Configuration (Hardened)
+ *
+ * Manages backend services NOT running in Docker.
+ * Docker-managed services removed to avoid port/process conflicts.
  */
 const path = require('path');
 
 module.exports = {
   apps: [
     // ──────────────────────────────────────────────
-    // LIVEKIT NIKOLINA (Voice AI)
+    // LIVEKIT NIKOLINA
     // ──────────────────────────────────────────────
     {
       name: 'nikolina-livekit-server',
       script: 'livekit-server',
       args: '--dev --bind 127.0.0.1 --node-ip 127.0.0.1',
       cwd: __dirname,
-      out_file: path.join(__dirname, 'apps/livekit-nikolina/logs/livekit.log'),
-      error_file: path.join(__dirname, 'apps/livekit-nikolina/logs/livekit.error.log'),
-      autorestart: true,
-      max_restarts: 15,
-      exp_backoff_delay: 1000,
-      min_uptime: '15s',
-      max_memory_restart: '1G'
-    },
-    {
-      name: 'nikolina-api-hub',
-      script: path.join(__dirname, 'apps/livekit-nikolina/venv/bin/python3'),
-      args: '-m uvicorn main:app --host 127.0.0.1 --port 8001',
-      cwd: path.join(__dirname, 'apps/livekit-nikolina/server'),
-      env: {
-        PYTHONPATH: path.join(__dirname, 'apps/livekit-nikolina/agent/src') + ':' + path.join(__dirname, 'apps/livekit-nikolina/server/src') + ':' + path.join(__dirname, 'apps/livekit-nikolina/server'),
-        PORT: '8001'
-      },
-      out_file: path.join(__dirname, 'apps/livekit-nikolina/logs/api.log'),
-      error_file: path.join(__dirname, 'apps/livekit-nikolina/logs/api.error.log'),
-      autorestart: true,
-      max_restarts: 15,
-      exp_backoff_delay: 1000,
-      min_uptime: '15s',
-      max_memory_restart: '500M'
-    },
-    {
-      name: 'nikolina-agent',
-      script: path.join(__dirname, 'apps/livekit-nikolina/venv/bin/python3'),
-      args: 'src/agent.py start',
-      cwd: path.join(__dirname, 'apps/livekit-nikolina/agent'),
-      env: {
-        PYTHONPATH: './agent/src:./server/src',
-        LIVEKIT_WORKER_PORT: 8083
-      },
-      out_file: path.join(__dirname, 'apps/livekit-nikolina/logs/agent.log'),
-      error_file: path.join(__dirname, 'apps/livekit-nikolina/logs/agent.error.log'),
-      autorestart: true,
-      max_restarts: 15,
-      exp_backoff_delay: 1000,
-      min_uptime: '15s',
-      max_memory_restart: '1G'
-    },
-    {
-      name: 'it-coach-agent',
-      script: path.join(__dirname, 'apps/livekit-nikolina/venv/bin/python3'),
-      args: 'src/coach_agent.py start',
-      cwd: path.join(__dirname, 'apps/livekit-nikolina/agent'),
-      env: {
-        PYTHONPATH: './agent/src:./server/src',
-        LIVEKIT_WORKER_PORT: 8082
-      },
-      out_file: path.join(__dirname, 'apps/livekit-nikolina/logs/coach_agent.log'),
-      error_file: path.join(__dirname, 'apps/livekit-nikolina/logs/coach_agent.error.log'),
+      out_file: path.join(__dirname, 'logs/livekit.log'),
+      error_file: path.join(__dirname, 'logs/livekit.error.log'),
       autorestart: true,
       max_restarts: 15,
       exp_backoff_delay: 1000,
@@ -91,165 +26,7 @@ module.exports = {
     },
 
     // ──────────────────────────────────────────────
-    // Gas Station (Checklist & Inventory Backend)
-    // ──────────────────────────────────────────────
-    {
-      name: 'gas-station-backend',
-      script: path.join(__dirname, 'apps/gas-station/backend/venv/bin/python3'),
-      args: '-m uvicorn main:app --host 127.0.0.1 --port 3005',
-      cwd: path.join(__dirname, 'apps/gas-station/backend'),
-      env: {
-        PORT: '3005'
-      },
-      out_file: path.join(__dirname, 'apps/gas-station/backend/gas-station.log'),
-      error_file: path.join(__dirname, 'apps/gas-station/backend/gas-station.error.log'),
-      autorestart: true,
-      max_restarts: 15,
-      exp_backoff_delay: 1000,
-      min_uptime: '15s',
-      max_memory_restart: '500M'
-    },
-
-    // ──────────────────────────────────────────────
-    // IndustrialPro (Task Manager Backend)
-    // ──────────────────────────────────────────────
-    {
-      name: 'industrialpro-backend',
-      script: path.join(__dirname, 'apps/industrialpro/backend/venv/bin/python3'),
-      args: '-m uvicorn app:app --host 127.0.0.1 --port 8002',
-      cwd: path.join(__dirname, 'apps/industrialpro/backend'),
-      out_file: path.join(__dirname, 'apps/industrialpro/backend/industrialpro.log'),
-      error_file: path.join(__dirname, 'apps/industrialpro/backend/industrialpro.error.log'),
-      autorestart: true,
-      max_restarts: 15,
-      exp_backoff_delay: 1000,
-      min_uptime: '15s',
-      max_memory_restart: '500M'
-    },
-
-    // ──────────────────────────────────────────────
-    // IAPUTA OS (AI Assistant Backend)
-    // ──────────────────────────────────────────────
-    {
-      name: 'iaputa-backend',
-      script: path.join(__dirname, 'apps/iaputa-os/backend/venv/bin/python3'),
-      args: '-m uvicorn main:app --host 127.0.0.1 --port 8006',
-      cwd: path.join(__dirname, 'apps/iaputa-os/backend'),
-      out_file: path.join(__dirname, 'apps/iaputa-os/backend/iaputa.log'),
-      error_file: path.join(__dirname, 'apps/iaputa-os/backend/iaputa.error.log'),
-      autorestart: true,
-      max_restarts: 15,
-      exp_backoff_delay: 1000,
-      min_uptime: '15s',
-      max_memory_restart: '800M'
-    },
-
-    // ──────────────────────────────────────────────
-    // ARANTXA TRANSLATE (Translation Server)
-    // ──────────────────────────────────────────────
-    {
-      name: 'traductor-pro-server',
-      script: 'node',
-      args: 'dist/index.js',
-      cwd: path.join(__dirname, 'apps/traductor-pro/server'),
-      env: {
-        PORT: '8004'
-      },
-      out_file: path.join(__dirname, 'apps/traductor-pro/server/arantxa.log'),
-      error_file: path.join(__dirname, 'apps/traductor-pro/server/arantxa.error.log'),
-      autorestart: true,
-      max_restarts: 15,
-      exp_backoff_delay: 1000,
-      min_uptime: '15s',
-      max_memory_restart: '300M'
-    },
-
-    // ──────────────────────────────────────────────
-    // MSBROSS ACTIVE ADELE VOICE SERVER
-    // ──────────────────────────────────────────────
-    {
-      name: 'msbross-backend',
-      script: path.join(__dirname, 'apps/msbross/venv/bin/python3'),
-      args: 'server.py',
-      cwd: path.join(__dirname, 'apps/msbross'),
-      out_file: path.join(__dirname, 'apps/msbross/msbross.log'),
-      error_file: path.join(__dirname, 'apps/msbross/msbross.error.log'),
-      autorestart: true,
-      max_restarts: 15,
-      exp_backoff_delay: 1000,
-      min_uptime: '15s',
-      max_memory_restart: '500M'
-    },
-
-    // ──────────────────────────────────────────────
-    // CUENTOSMÁGICOS AI — MANAGED BY DOCKER COMPOSE
-    // (Removed from PM2 to avoid port conflict with Docker container)
-    // ──────────────────────────────────────────────
-
-    {
-      name: 'cuentos-magicos-celery',
-      script: 'start-celery.sh',
-      interpreter: '/bin/bash',
-      cwd: path.join(__dirname, 'apps/cuentos-magicos/backend'),
-      out_file: path.join(__dirname, 'apps/cuentos-magicos/backend/celery.log'),
-      error_file: path.join(__dirname, 'apps/cuentos-magicos/backend/celery.error.log'),
-      autorestart: true,
-      max_restarts: 15,
-      exp_backoff_delay: 1000,
-      min_uptime: '15s',
-      max_memory_restart: '800M'
-    },
-
-    // ──────────────────────────────────────────────
-    // ELITESCOUT — MANAGED BY DOCKER COMPOSE
-    // (Removed from PM2 to avoid port/SWC conflict with Docker container)
-    // ──────────────────────────────────────────────
-
-    // ──────────────────────────────────────────────
-    // ATENEA RESTAURANT BACKEND (Port 8009)
-    // ──────────────────────────────────────────────
-    {
-      name: 'web-restaurante-atenea-backend',
-      script: path.join(__dirname, 'apps/web-restaurante-atenea/venv/bin/python3'),
-      args: '-m uvicorn main:app --host 127.0.0.1 --port 8009',
-      cwd: path.join(__dirname, 'apps/web-restaurante-atenea'),
-      env: {
-        PYTHONPATH: '.',
-        PORT: '8009'
-      },
-      out_file: path.join(__dirname, 'apps/web-restaurante-atenea/atenea.log'),
-      error_file: path.join(__dirname, 'apps/web-restaurante-atenea/atenea.error.log'),
-      autorestart: true,
-      max_restarts: 15,
-      exp_backoff_delay: 1000,
-      min_uptime: '15s',
-      max_memory_restart: '300M'
-    },
-
-    // ──────────────────────────────────────────────
-    // JARTOSDTO BACKEND (RAG & Multi-LLM, Port 8010)
-    // ──────────────────────────────────────────────
-    {
-      name: 'jartosdto-backend',
-      script: path.join(__dirname, 'apps/jartosdto/server/.venv/bin/python3'),
-      args: '-m uvicorn app.main:app --host 127.0.0.1 --port 8010',
-      cwd: path.join(__dirname, 'apps/jartosdto/server'),
-      env: {
-        PYTHONPATH: '.',
-        PORT: '8010'
-      },
-      out_file: path.join(__dirname, 'apps/jartosdto/server/jartosdto.log'),
-      error_file: path.join(__dirname, 'apps/jartosdto/server/jartosdto.error.log'),
-      autorestart: true,
-      max_restarts: 15,
-      exp_backoff_delay: 1000,
-      min_uptime: '60s',
-      kill_timeout: 10000,
-      max_memory_restart: '800M'
-    },
-
-    // ──────────────────────────────────────────────
-    // TXA FITNESS PRO (Behavioral Change Coaching, Next.js SSR, Port 3456)
+    // TXA FITNESS PRO (Next.js SSR, Port 3456)
     // ──────────────────────────────────────────────
     {
       name: 'txa-fitness-pro',
@@ -260,8 +37,9 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: '3456'
       },
-      out_file: path.join(__dirname, 'apps/txa-fitness-pro/txa-fitness.log'),
-      error_file: path.join(__dirname, 'apps/txa-fitness-pro/txa-fitness.error.log'),
+      out_file: path.join(__dirname, 'logs/txa-fitness.log'),
+      error_file: path.join(__dirname, 'logs/txa-fitness.error.log'),
+      time: true,
       autorestart: true,
       max_restarts: 15,
       exp_backoff_delay: 1000,
@@ -270,7 +48,7 @@ module.exports = {
     },
 
     // ──────────────────────────────────────────────
-    // MAPFRE INFOCOL (Insurance Claim Automation Dashboard, Next.js SSR, Port 3333)
+    // MAPFRE INFOCOL (Next.js SSR, Port 3333)
     // ──────────────────────────────────────────────
     {
       name: 'mapfre',
@@ -281,8 +59,8 @@ module.exports = {
         PORT: 3333,
         NODE_ENV: 'production'
       },
-      out_file: path.join(__dirname, 'apps/mapfre/frontend/mapfre.log'),
-      error_file: path.join(__dirname, 'apps/mapfre/frontend/mapfre.error.log'),
+      out_file: path.join(__dirname, 'logs/mapfre.log'),
+      error_file: path.join(__dirname, 'logs/mapfre.error.log'),
       time: true,
       autorestart: true,
       max_restarts: 15,
@@ -290,38 +68,6 @@ module.exports = {
       min_uptime: '15s',
       max_memory_restart: '500M'
     },
-
-    // ──────────────────────────────────────────────
-    // REVERSE PROXY (Unified Portal & Routing, Port 8080)
-    // ──────────────────────────────────────────────
-    {
-      name: 'msbross-proxy',
-      script: 'proxy_server.js',
-      cwd: __dirname,
-      out_file: path.join(__dirname, 'logs/proxy.log'),
-      error_file: path.join(__dirname, 'logs/proxy.error.log'),
-      autorestart: true,
-      max_restarts: 15,
-      exp_backoff_delay: 1000,
-      min_uptime: '15s',
-      max_memory_restart: '400M'
-    },
-
-    // ──────────────────────────────────────────────
-    // IT ENGLISH COACH (CORS Proxy & Backend)
-    // ──────────────────────────────────────────────
-    {
-      name: 'it-english-backend',
-      script: 'server.js',
-      cwd: path.join(__dirname, 'apps/it-english-coach'),
-      autorestart: true,
-      max_restarts: 15,
-      exp_backoff_delay: 1000,
-      min_uptime: '15s',
-      max_memory_restart: '300M'
-    },
-
-
 
     // ──────────────────────────────────────────────
     // PERFUME TRADING ERP (Next.js SSR, Port 3011)
@@ -335,13 +81,50 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: '3011'
       },
-      out_file: path.join(__dirname, 'apps/perfume-trading/erp/perfume.log'),
-      error_file: path.join(__dirname, 'apps/perfume-trading/erp/perfume.error.log'),
+      out_file: path.join(__dirname, 'logs/perfume.log'),
+      error_file: path.join(__dirname, 'logs/perfume.error.log'),
+      time: true,
       autorestart: true,
       max_restarts: 15,
       exp_backoff_delay: 1000,
       min_uptime: '15s',
       max_memory_restart: '500M'
+    },
+
+    // ──────────────────────────────────────────────
+    // CUENTOS MAGICOS CELERY WORKER
+    // ──────────────────────────────────────────────
+    {
+      name: 'cuentos-magicos-celery',
+      script: 'start-celery.sh',
+      interpreter: '/bin/bash',
+      cwd: path.join(__dirname, 'apps/cuentos-magicos/backend'),
+      out_file: path.join(__dirname, 'logs/celery.log'),
+      error_file: path.join(__dirname, 'logs/celery.error.log'),
+      autorestart: true,
+      max_restarts: 15,
+      exp_backoff_delay: 1000,
+      min_uptime: '15s',
+      max_memory_restart: '800M'
+    },
+
+    // ──────────────────────────────────────────────
+    // MSBROSS REVERSE PROXY (Port 8080)
+    // ──────────────────────────────────────────────
+    {
+      name: 'msbross-proxy',
+      script: 'proxy_server.js',
+      cwd: __dirname,
+      env: {
+        ADMIN_API_TOKEN: process.env.ADMIN_API_TOKEN || ''
+      },
+      out_file: path.join(__dirname, 'logs/proxy.log'),
+      error_file: path.join(__dirname, 'logs/proxy.error.log'),
+      autorestart: true,
+      max_restarts: 15,
+      exp_backoff_delay: 1000,
+      min_uptime: '15s',
+      max_memory_restart: '400M'
     },
   ]
 };

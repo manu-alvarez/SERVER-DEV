@@ -13,24 +13,38 @@ app.disable('x-powered-by');
 const PORT = 8080;
 const WWW  = path.join(__dirname, 'www');
 
-// ── Compression (gzip/brotli for all text responses) ──
+// ── Compression ──
 app.use(compression({ level: 6, threshold: 1024 }));
-
-
 
 // ── Security Headers ──
 app.use((req, res, next) => {
-  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  const csp = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' data:",
+    "connect-src 'self' https: wss:",
+    "media-src 'self' https:",
+    "frame-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ];
+
+  res.setHeader('Content-Security-Policy', csp.join('; '));
+  res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(self), microphone=(self), geolocation=()');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
   if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
-    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   }
   next();
 });
 
-// ── Rate Limiting (100 req / min) ──
+// ── Rate Limiting ──
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000,
   max: 200,
@@ -40,45 +54,51 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// ── CORS: Restricted in Production ──
+// ── CORS ──
+const ALLOWED_ORIGINS = [
+  'https://manuelalvarez.dev',
+  'https://msbross.me',
+  'https://www.msbross.me',
+];
+
+const ALLOWED_ORIGIN_PATTERNS = [
+  /^https:\/\/.*\.manuelalvarez\.dev$/,
+  /^https:\/\/.*\.msbross\.me$/,
+];
+
 app.use((req, res, next) => {
   const origin = req.headers.origin || '';
-  const isDev = process.env.NODE_ENV === 'development';
-  const allowedOrigins = [
-    'https://msbross.me', 
-    'https://www.msbross.me', 
-    'http://localhost:8080', 
-    'http://host.docker.internal:8080'
-  ];
 
-  let allowOrigin = origin || 'https://msbross.me'; // Allow current origin if valid, else fallback
-  
-  const isAllowedDomain = origin && (
-    origin.endsWith('.manuelalvarez.dev') || 
-    origin.endsWith('.msbross.me') || 
-    origin === 'https://manuelalvarez.dev' || 
-    origin === 'https://msbross.me'
-  );
+  const isAllowed = ALLOWED_ORIGINS.includes(origin) ||
+    ALLOWED_ORIGIN_PATTERNS.some(p => p.test(origin));
 
-  if (allowedOrigins.includes(origin) || isAllowedDomain) {
-    allowOrigin = origin;
-  } else if (isDev && origin && (origin.startsWith('http://192.168.') || origin.startsWith('http://10.') || origin.startsWith('http://localhost:'))) {
-    allowOrigin = origin;
-  } else if (origin) {
-    // If not allowed, send fallback
-    allowOrigin = 'https://msbross.me';
+  if (origin && isAllowed) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Vary', 'Origin');
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', 'https://manuelalvarez.dev');
   }
 
-  res.setHeader('Access-Control-Allow-Origin', allowOrigin);
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
 });
 
-// ── Runtime config endpoint (so static HTML can learn the tunnel URL) ──
-app.get('/__config', (req, res) => {
+// ── Auth middleware for admin endpoints ──
+function requireAdminAuth(req, res, next) {
+  const ADMIN_TOKEN = process.env.ADMIN_API_TOKEN;
+  if (!ADMIN_TOKEN) return next();
+  const token = req.headers['x-admin-token'];
+  if (token !== ADMIN_TOKEN) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+}
+
+// ── Runtime config endpoint ──
+app.get('/__config', requireAdminAuth, (req, res) => {
   res.json({
     livekitUrl: process.env.LIVEKIT_URL || 'wss://nikolina-1jg7t00i.livekit.cloud',
     nikolinaApi: '/_nikolina/api',
@@ -86,43 +106,7 @@ app.get('/__config', (req, res) => {
   });
 });
 
-// ── IT English Coach AI Endpoint ──
-app.post('/_coach/api/evaluate', express.json(), async (req, res) => {
-  try {
-    const vault = require('./api_keys_vault.json');
-    const geminiKey = vault?.LLM_PROVIDERS?.GOOGLE_GEMINI?.[0]?.key;
-    if (!geminiKey) return res.status(500).json({ error: 'Gemini Key missing' });
-
-    const { messages = [], system } = req.body;
-    const contents = [];
-    if (system) {
-      contents.push({ role: 'user', parts: [{ text: `SYSTEM INSTRUCTION: ${system}` }] });
-      contents.push({ role: 'model', parts: [{ text: 'Understood.' }] });
-    }
-    for (const msg of messages) {
-      contents.push({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }]
-      });
-    }
-
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${geminiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents })
-    });
-    
-    if (!response.ok) throw new Error(`Gemini API error: ${response.status}`);
-    const data = await response.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    res.json({ text });
-  } catch (error) {
-    console.error('Coach API Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-// ── Health check (comprehensive — pings all backends) ──
+// ── Health check ──
 const net = require('net');
 function checkPort(port, host = 'host.docker.internal', timeout = 500) {
   return new Promise(resolve => {
@@ -150,7 +134,7 @@ const BACKEND_MAP = {
   'txa-fitness-pro': 3456,
 };
 
-app.get('/__health', async (req, res) => {
+app.get('/__health', requireAdminAuth, async (req, res) => {
   const checks = await Promise.all(
     Object.entries(BACKEND_MAP).map(async ([name, port]) => ({
       name, port, online: await checkPort(port, name),
@@ -170,7 +154,7 @@ app.get('/__health', async (req, res) => {
 const visitsFile = path.join(__dirname, 'data', 'visits.json');
 let visitsData = { total: 0, today: 0, lastDate: new Date().toDateString() };
 if (fs.existsSync(visitsFile)) {
-  try { visitsData = JSON.parse(fs.readFileSync(visitsFile, 'utf8')); } catch(e){}
+  try { visitsData = JSON.parse(fs.readFileSync(visitsFile, 'utf8')); } catch(e) {}
 }
 function updateVisits() {
   const now = new Date().toDateString();
@@ -180,7 +164,11 @@ function updateVisits() {
   }
   visitsData.total++;
   visitsData.today++;
-  fs.writeFileSync(visitsFile, JSON.stringify(visitsData));
+  try {
+    const dir = path.dirname(visitsFile);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(visitsFile, JSON.stringify(visitsData));
+  } catch(e) {}
 }
 
 app.get('/api/track-visit', (req, res) => {
@@ -237,7 +225,6 @@ const DOMAIN_APP_MAP = {
   'elitescout.manuelalvarez.dev': 'elitescout',
   'nikolina.manuelalvarez.dev': 'livekit-nikolina',
   'appgenerator.manuelalvarez.dev': 'app-generator',
-
   'expositator.manuelalvarez.dev': 'expositator-rte',
   'itenglish.manuelalvarez.dev': 'it-english-coach',
   'logisearch.manuelalvarez.dev': 'logisearch',
@@ -245,7 +232,7 @@ const DOMAIN_APP_MAP = {
   'mano.manuelalvarez.dev': 'msbross',
   'mokotools.manuelalvarez.dev': 'moko-tools',
   'assistant.manuelalvarez.dev': 'assistant',
-  'assitant.manuelalvarez.dev': 'assistant',
+  'manuelalvarez.dev': 'assistant',
   'maya.manuelalvarez.dev': 'maya',
   'atenea.manuelalvarez.dev': 'web-restaurante-atenea',
   'taskflow.manuelalvarez.dev': 'taskflow',
@@ -255,14 +242,11 @@ const DOMAIN_APP_MAP = {
 
 app.use((req, res, next) => {
   const host = req.hostname;
-  
-  // Mano Eléctrica Azul redirect to Play Store
+
   if (host === 'mano.manuelalvarez.dev') {
     return res.redirect(302, 'https://play.google.com/store/apps/details?id=com.manoelectricaazul.app');
   }
 
-
-    // Tu Energía Maya redirect to official page
   if (host === 'maya.manuelalvarez.dev') {
     return res.redirect(302, 'https://manu-alvarez.github.io/TuEnergiaMaya/');
   }
@@ -289,13 +273,13 @@ for (const name of NEXT_APPS) {
     next();
   });
 
-  app.use(prefix, express.static(appDir, { 
+  app.use(prefix, express.static(appDir, {
     index: false,
     setHeaders: (res, path) => {
       if (path.endsWith('.html') || path.endsWith('sw.js')) {
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
       } else {
-        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable'); // Cache assets for a year
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
       }
       if (path.endsWith('opengraph-image')) {
         res.setHeader('Content-Type', 'image/png');
@@ -303,13 +287,14 @@ for (const name of NEXT_APPS) {
       }
     }
   }));
+
   app.get(new RegExp(`^/app/${name}/(.*)$`), (req, res, next) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     const indexFile = path.join(appDir, 'index.html');
-    res.sendFile(indexFile, err => { 
+    res.sendFile(indexFile, err => {
       if (err) {
         console.error(`Error serving ${indexFile}:`, err.message);
-        next(); 
+        next();
       }
     });
   });
@@ -332,10 +317,11 @@ const proxyOpts = (target, stripPrefix, ws = false) => ({
   },
 });
 
-// ── API routes ──
+// ── API Proxy Routes ──
 app.use('/_nikolina',      createProxyMiddleware(proxyOpts('http://nikolina-api-hub:8001', '/_nikolina', true)));
-app.use('/_gas-station',        createProxyMiddleware(proxyOpts('http://gas-station-backend:3005', '/_gas-station')));
-app.use('/_industrialpro',        createProxyMiddleware(proxyOpts('http://industrialpro-backend:8002', '/_industrialpro')));
+app.use('/_gas-station',   createProxyMiddleware(proxyOpts('http://gas-station-backend:3005', '/_gas-station')));
+app.use('/_industrialpro', createProxyMiddleware(proxyOpts('http://industrialpro-backend:8002', '/_industrialpro')));
+
 app.use('/app/elitescout', createProxyMiddleware({
   target: 'http://elitescout-backend:8003/app/elitescout',
   changeOrigin: true,
@@ -347,9 +333,6 @@ app.use('/app/elitescout', createProxyMiddleware({
   }
 }));
 
-
-
-
 app.use('/_traductor',     createProxyMiddleware(proxyOpts('http://traductor-backend:8004', '/_traductor')));
 app.use('/_msbross',       createProxyMiddleware(proxyOpts('http://msbross-backend:8005', '/_msbross')));
 app.use('/_iaputa',        createProxyMiddleware(proxyOpts('http://iaputa-backend:8006', '/_iaputa')));
@@ -358,7 +341,43 @@ app.use('/_cuentosmagicos',createProxyMiddleware(proxyOpts('http://cuentos-magic
 app.use('/_jartosdto',     createProxyMiddleware(proxyOpts('http://jartosdto-backend:8010', '/_jartosdto')));
 app.use('/_atenea',        createProxyMiddleware(proxyOpts('http://host.docker.internal:8009', '/_atenea')));
 
-// ── LiveKit WebSocket proxy (for self-hosted LiveKit) ──
+// ── IT English Coach AI Proxy ──
+app.post('/_coach/api/evaluate', express.json(), async (req, res) => {
+  try {
+    const vault = require('./api_keys_vault.json');
+    const geminiKey = vault?.LLM_PROVIDERS?.GOOGLE_GEMINI?.[0]?.key;
+    if (!geminiKey) return res.status(500).json({ error: 'Gemini Key missing' });
+
+    const { messages = [], system } = req.body;
+    const contents = [];
+    if (system) {
+      contents.push({ role: 'user', parts: [{ text: `SYSTEM INSTRUCTION: ${system}` }] });
+      contents.push({ role: 'model', parts: [{ text: 'Understood.' }] });
+    }
+    for (const msg of messages) {
+      contents.push({
+        role: msg.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: msg.content }]
+      });
+    }
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${geminiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents })
+    });
+
+    if (!response.ok) throw new Error(`Gemini API error: ${response.status}`);
+    const data = await response.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    res.json({ text });
+  } catch (error) {
+    console.error('Coach API Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// ── LiveKit WebSocket proxy ──
 app.use('/rtc', createProxyMiddleware({
   target: 'http://host.docker.internal:7880',
   changeOrigin: true,
@@ -383,10 +402,10 @@ app.use(express.static(WWW, {
   }
 }));
 
-// Fallback global routes for favicons (served ONLY if static file not found in WWW)
 app.get(/\/(favicon\.ico|favicon\.svg|vite\.svg|logo\.png|logo\.svg|apple-touch-icon\.png)$/, (req, res) => {
   res.sendFile(path.join(__dirname, 'favicon.png'));
 });
+
 app.use((req, res) => {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
   res.status(404).sendFile(path.join(WWW, 'index.html'));
@@ -410,17 +429,3 @@ const httpServer = app.listen(PORT, '0.0.0.0', () => {
   console.log(`   APIs:   /_nikolina /_atenea /_elitescout /_cuentosmagicos /rtc (LiveKit WS)`);
   console.log(`   Config: /__config   Health: /__health`);
 });
-
-// ── Start HTTPS (self-signed for LAN) ──
-try {
-  const https = require('https');
-  const selfsigned = require('selfsigned');
-  const attrs = [{ name: 'commonName', value: 'msbross-local' }];
-  const pems = selfsigned.generate(attrs, { days: 365, keySize: 2048 });
-  const httpsServer = https.createServer({ key: pems.private, cert: pems.cert }, app);
-  httpsServer.listen(8443, '0.0.0.0', () => {
-    console.log(`   SSL:     https://0.0.0.0:8443/ (self-signed, LAN only)`);
-  });
-} catch (e) {
-  console.log(`[!] SSL en 8443 no disponible: ${e.message}`);
-}

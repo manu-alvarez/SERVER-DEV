@@ -37,7 +37,7 @@ const defaultSettings: Settings = {
   provider: "anthropic",
   customBase: "http://localhost:1234/v1",
   keys: { openai:"", anthropic:"", gemini:"", groq:"", openrouter:"", custom:"" },
-  models: { openai:"gpt-4o", anthropic:"claude-3-5-sonnet-20240620", gemini:"gemini-1.5-pro", groq:"llama3-8b-8192", openrouter:"openai/gpt-4o", custom:"lmstudio-community/Meta-Llama-3-8B-Instruct-GGUF" },
+  models: { openai:"gpt-4o", anthropic:"claude-3-5-sonnet-20240620", gemini:"gemini-3.1-pro", groq:"llama3-8b-8192", openrouter:"openai/gpt-4o", custom:"lmstudio-community/Meta-Llama-3-8B-Instruct-GGUF" },
   proxyUrl: "https://msbross.me/_itenglish/proxy"
 };
 

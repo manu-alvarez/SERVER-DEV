@@ -39,7 +39,7 @@ function save_vault($data) {
 }
 
 /**
- * Call Gemini 2.5 Flash API for LLM processing
+ * Call Gemini 3.5 Flash API for LLM processing
  */
 function call_gemini($system_prompt, $user_text, $base64_image = null) {
     global $GEMINI_API_KEY;

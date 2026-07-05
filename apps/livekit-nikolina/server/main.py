@@ -210,17 +210,17 @@ AVAILABLE_MODELS = [
     "llama3.2:1b",
     "llama3.2:3b",
     # Gemini models
-    "gemini-2.0-flash-exp",
-    "gemini-1.5-flash",
-    "gemini-1.5-flash-8b",
+    "gemini-omni",
+    "gemini-3.5-flash",
+    "gemini-3.1-flash-lite",
 ]
 
 PIPELINE_CATALOG = {
     "llm": {
         "providers": ["gemini", "ollama"],
         "models": [
-            "gemini-1.5-flash",
-            "gemini-1.5-flash-8b",
+            "gemini-3.5-flash",
+            "gemini-3.1-flash-lite",
             "llama3.2:3b",
             "llama3.2:1b",
         ],
@@ -246,9 +246,9 @@ PIPELINE_CATALOG = {
             "gemini",
         ],
         "models": [
-            "gemini-2.0-flash-exp",
-            "gemini-1.5-flash",
-            "gemini-1.5-flash-8b",
+            "gemini-omni",
+            "gemini-3.5-flash",
+            "gemini-3.1-flash-lite",
         ],
     },
 }
@@ -341,7 +341,7 @@ def _sync_llm_config_with_active_pipeline() -> None:
 
     if architecture == "realtime" and realtime_provider in {"gemini", "google"}:
         update["model_name"] = (
-            pipeline.get("realtime_model") or "gemini-2.0-flash-exp"
+            pipeline.get("realtime_model") or "gemini-omni"
         )
         update["voice"] = (
             pipeline.get("realtime_voice")
@@ -349,7 +349,7 @@ def _sync_llm_config_with_active_pipeline() -> None:
             or "Aoede"
         )
     elif architecture == "modular" and llm_provider == "gemini":
-        update["model_name"] = pipeline.get("llm_model") or "gemini-1.5-flash"
+        update["model_name"] = pipeline.get("llm_model") or "gemini-3.5-flash"
 
     db.update_llm_config(**update)
 

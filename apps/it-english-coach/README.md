@@ -38,7 +38,7 @@ En **Ajustes** puedes configurar y elegir uno:
 | Proveedor       | Formato          | Base URL por defecto            | Modelo por defecto (editable) |
 |-----------------|------------------|---------------------------------|-------------------------------|
 | Anthropic       | Claude Messages  | api.anthropic.com               | `claude-sonnet-4-6`           |
-| Google Gemini   | Gemini           | generativelanguage.googleapis…  | `gemini-2.5-flash`            |
+| Google Gemini   | Gemini           | generativelanguage.googleapis…  | `gemini-3.5-flash`            |
 | OpenRouter      | OpenAI-compatible| openrouter.ai/api/v1            | `openai/gpt-4o-mini`          |
 | Mistral         | OpenAI-compatible| api.mistral.ai/v1              | `mistral-small-latest`        |
 | Perplexity      | OpenAI-compatible| api.perplexity.ai              | `sonar`                       |
