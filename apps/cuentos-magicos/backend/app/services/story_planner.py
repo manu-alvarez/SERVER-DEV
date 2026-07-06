@@ -145,6 +145,12 @@ def _get_llm_client(provider: str, model: str) -> tuple:
     elif provider == "openai":
         client = OpenAI(api_key=settings.OPENAI_API_KEY)
         api_model = model or settings.OPENAI_MODEL_STORY
+    elif provider == "ollama":
+        client = OpenAI(
+            api_key="ollama",
+            base_url=settings.OLLAMA_BASE_URL,
+        )
+        api_model = model or settings.OLLAMA_MODEL
     else:
         raise ValueError(f"Unsupported LLM provider: {provider}")
 

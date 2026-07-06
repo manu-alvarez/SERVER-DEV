@@ -21,6 +21,7 @@ DB_PATH = os.getenv("ATENEA_DB_PATH", DEFAULT_DB_PATH)
 class AteneaDB:
     def __init__(self, db_path: str = DB_PATH):
         self.db_path = db_path
+        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
         self._init_db()
 
     def _get_conn(self) -> sqlite3.Connection:

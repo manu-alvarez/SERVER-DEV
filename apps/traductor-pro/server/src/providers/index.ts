@@ -80,6 +80,25 @@ export class OpenRouterProvider implements AIProvider {
   }
 }
 
+export class OllamaProvider implements AIProvider {
+  private client: OpenAI;
+
+  constructor() {
+    this.client = new OpenAI({
+      apiKey: 'ollama',
+      baseURL: process.env.OLLAMA_BASE_URL || 'http://172.20.0.1:11434/v1',
+    });
+  }
+
+  get chat() {
+    return this.client.chat;
+  }
+
+  getDefaultModel(): string {
+    return process.env.OLLAMA_MODEL || 'gemma3:4b';
+  }
+}
+
 export class ProviderFactory {
   static create(provider: string): AIProvider {
     switch (provider) {
@@ -89,6 +108,8 @@ export class ProviderFactory {
         return new GeminiProvider();
       case 'openrouter':
         return new OpenRouterProvider();
+      case 'ollama':
+        return new OllamaProvider();
       case 'groq':
       default:
         return new GroqProvider();

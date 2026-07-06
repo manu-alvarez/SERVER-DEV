@@ -3,7 +3,7 @@
  *
  * Only services NOT managed by Docker.
  * Docker handles all app backends + proxy.
- * PM2 handles: LiveKit server, Celery worker, and non-Dockerized apps.
+ * PM2 handles: LiveKit server and non-Dockerized apps.
  */
 const path = require('path');
 
@@ -23,19 +23,6 @@ module.exports = {
       max_memory_restart: '1G'
     },
 
-    {
-      name: 'cuentos-magicos-celery',
-      script: 'start-celery.sh',
-      interpreter: '/bin/bash',
-      cwd: path.join(__dirname, 'apps/cuentos-magicos/backend'),
-      out_file: path.join(__dirname, 'logs/celery.log'),
-      error_file: path.join(__dirname, 'logs/celery.error.log'),
-      autorestart: true,
-      max_restarts: 15,
-      exp_backoff_delay: 1000,
-      min_uptime: '15s',
-      max_memory_restart: '800M'
-    },
     {
       name: 'web-restaurante-atenea-backend',
       script: 'venv/bin/python3',

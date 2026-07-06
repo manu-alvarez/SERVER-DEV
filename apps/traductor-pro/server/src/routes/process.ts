@@ -73,7 +73,7 @@ Instrucción específica: ${systemPrompt}
 - No añadas explicaciones fuera del JSON.
     `.trim();
 
-    const providersToTry = ['groq', 'gemini', 'openrouter', 'openai'];
+    const providersToTry = ['groq', 'gemini', 'ollama', 'openrouter', 'openai'];
     let lastError: Error | null = null;
     let successfulProvider = '';
     let parsed: Record<string, string> | null = null;

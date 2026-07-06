@@ -23,7 +23,7 @@ router.post('/extras', async (req, res) => {
       return res.status(400).json({ error: 'Herramienta no válida' });
     }
 
-    const providersToTry = ['groq', 'gemini', 'openrouter', 'openai'];
+    const providersToTry = ['groq', 'gemini', 'ollama', 'openrouter', 'openai'];
     let lastError: Error | null = null;
     let successfulProvider = '';
     let content = '';

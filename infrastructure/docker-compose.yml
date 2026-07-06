@@ -121,9 +121,12 @@ services:
     depends_on:
       msbross-cuentos-db:
         condition: service_healthy
+    env_file:
+      - /home/ubuntu/MSBrossAI/apps/cuentos-magicos/.env
     environment:
       - PORT=8007
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@msbross-cuentos-db:5432/cuentos_magicos
+      - REDIS_URL=redis://jartosdto-redis:6379/0
     volumes:
       - /home/ubuntu/MSBrossAI/apps/cuentos-magicos/backend:/app
     healthcheck:
@@ -131,6 +134,24 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+
+  cuentos-magicos-celery:
+    <<: *backend
+    container_name: cuentos-magicos-celery
+    image: msbross-cuentos-magicos-backend:latest
+    command: python -m celery -A app.core.celery_app worker --loglevel=info --queues=stories,images,audio,video --concurrency=2
+    depends_on:
+      jartosdto-redis:
+        condition: service_healthy
+      msbross-cuentos-db:
+        condition: service_healthy
+    env_file:
+      - /home/ubuntu/MSBrossAI/apps/cuentos-magicos/.env
+    environment:
+      - REDIS_URL=redis://jartosdto-redis:6379/0
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@msbross-cuentos-db:5432/cuentos_magicos
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/cuentos-magicos/backend:/app
 
   elitescout-backend:
     <<: *backend
@@ -161,6 +182,8 @@ services:
     container_name: iaputa-backend
     image: msbross-iaputa-backend:latest
     command: python -m uvicorn main:app --host 0.0.0.0 --port 8006
+    env_file:
+      - /home/ubuntu/MSBrossAI/apps/iaputa-os/.env
     environment:
       - PORT=8006
     volumes:

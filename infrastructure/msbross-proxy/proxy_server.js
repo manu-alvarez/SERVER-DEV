@@ -235,7 +235,7 @@ const DOMAIN_APP_MAP = {
   'mano.manuelalvarez.dev': 'msbross',
   'mokotools.manuelalvarez.dev': 'moko-tools',
   'assistant.manuelalvarez.dev': 'assistant',
-  'manuelalvarez.dev': 'assistant',
+  // 'manuelalvarez.dev': 'assistant', // root serves static from www/
   'maya.manuelalvarez.dev': 'maya',
   'atenea.manuelalvarez.dev': 'web-restaurante-atenea',
   'taskflow.manuelalvarez.dev': 'taskflow',
