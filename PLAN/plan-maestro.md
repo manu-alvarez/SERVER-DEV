@@ -120,8 +120,8 @@ apps/NOMBRE/
 | 1.5c | Actualizar iaputa a Granian (Uvicorn -> Granian) | ✅ HECHO | - |
 | 1.5d | Actualizar jartosdto a Granian (Uvicorn -> Granian) | ✅ HECHO | - |
 | 1.5e | Actualizar nikolina-api-hub a Granian (Uvicorn -> Granian) | ✅ HECHO | - |
-| 1.6 | Benchmark de rendimiento (antes/despues) | ⬜ | Fase 1.1-1.5 |
-| 1.7 | Git commit: "feat(backend): migrated to FastAPI+Granian" | ⬜ | |
+| 1.6 | Benchmark de rendimiento (antes/despues) | ✅ HECHO | Fase 1.1-1.5 |
+| 1.7 | Git commit: "feat(backend): migrated to FastAPI+Granian" | ✅ HECHO b5bc688 | |
 
 ### FASE 2: FRONTEND GODMODE (Sprint 2 - Proxima semana)
 **Objetivo: Todos los frontends en Astro 5 + Bun.**
@@ -309,7 +309,7 @@ SERVER-DEV/
 
 ```
 FASE 0: LIMPIEZA      [████████████] 100%  ✅ c7c8f3b
-FASE 1: BACKEND HYPER [████████████]  85%  ✅ d1e965d + 862d967 (pendiente: benchmark + commit final)
+FASE 1: BACKEND HYPER [████████████] 100%  ✅ b5bc688
 FASE 2: FRONTEND GOD  [░░░░░░░░░░░░]   0%
 FASE 3: DOCKER UNIFIC [░░░░░░░░░░░░]   0%
 FASE 4: INFRA MONITOR [░░░░░░░░░░░░]   0%
