@@ -219,15 +219,22 @@ services:
   msbross-backend:
     <<: *backend
     container_name: msbross-backend
-    image: msbross-msbross:latest
-    command: python server.py
+    image: msbross-msbross:granian
+    command: python -m granian app.main:app --host 0.0.0.0 --port 8005 --interface asgi
     environment:
       - PORT=8005
     volumes:
-      - /home/ubuntu/MSBrossAI/apps/msbross-backend:/app
+      - /home/ubuntu/MSBrossAI/apps/msbross-backend/server-fastapi:/app
       - /home/ubuntu/MSBrossAI/api_keys_vault.json:/api_keys_vault.json:ro
     labels:
+      - traefik.enable=true
+      - traefik.http.routers.msbross-api.rule=Host(`assistant.manuelalvarez.dev`) && PathPrefix(`/_msbross`)
+      - traefik.http.routers.msbross-api.entrypoints=websecure
+      - traefik.http.routers.msbross-api.tls.certresolver=myresolver
+      - traefik.http.routers.msbross-api.middlewares=strip-msbross
+      - traefik.http.middlewares.strip-msbross.stripprefix.prefixes=/_msbross
       - traefik.http.services.msbross-backend.loadbalancer.server.port=8005
+      - traefik.http.routers.msbross-api.service=msbross-backend
 
   nikolina-api-hub:
     <<: *backend

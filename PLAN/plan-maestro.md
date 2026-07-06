@@ -110,12 +110,16 @@ apps/NOMBRE/
 **Objetivo: Todos los backends en FastAPI + Granian.**
 
 | # | Tarea | Estado | Dependencias |
-|---|-------|--------|-------------|
-| 1.1 | Migrar traductor-pro (Express -> FastAPI + Granian) | ⬜ | Fase 0.8 |
-| 1.2 | Actualizar industrialpro a Granian (Uvicorn -> Granian) | ⬜ | - |
-| 1.3 | Actualizar cuentos-magicos a Granian | ⬜ | - |
-| 1.4 | Actualizar atenea a Granian | ⬜ | Fase 0.7 |
-| 1.5 | Actualizar msbross-backend a Granian | ⬜ | - |
+|   |-------|--------|-------------|
+| 1.1 | Migrar traductor-pro (Express -> FastAPI + Granian) | ✅ HECHO | Fase 0.8 |
+| 1.2 | Actualizar industrialpro a Granian (Uvicorn -> Granian) | ✅ HECHO | - |
+| 1.3 | Actualizar cuentos-magicos a Granian | ✅ HECHO | - |
+| 1.4 | Actualizar atenea a Granian | ✅ HECHO | Fase 0.7 |
+| 1.5 | Actualizar msbross-backend (http.server nativo -> FastAPI + Granian) | ✅ HECHO | - |
+| 1.5b | Actualizar gas-station a Granian (Uvicorn -> Granian) | ✅ HECHO | - |
+| 1.5c | Actualizar iaputa a Granian (Uvicorn -> Granian) | ✅ HECHO | - |
+| 1.5d | Actualizar jartosdto a Granian (Uvicorn -> Granian) | ✅ HECHO | - |
+| 1.5e | Actualizar nikolina-api-hub a Granian (Uvicorn -> Granian) | ✅ HECHO | - |
 | 1.6 | Benchmark de rendimiento (antes/despues) | ⬜ | Fase 1.1-1.5 |
 | 1.7 | Git commit: "feat(backend): migrated to FastAPI+Granian" | ⬜ | |
 
@@ -177,17 +181,17 @@ apps/NOMBRE/
 | # | App | Dominio | Tipo actual | Backend | Frontend | Dockerfile |
 |---|-----|---------|-------------|---------|----------|------------|
 | 1 | App Generator | appgen.manuelalvarez.dev | estatica | No | React+Vite | ⬜ |
-| 2 | MSBross Assistant | assistant.manuelalvarez.dev | estatica | msbross-backend (/_msbross) | React+Vite | ⬜ |
-| 3 | Atenea | atenea.manuelalvarez.dev | backend+frontend | FastAPI (Docker) | HTML vanilla | ✅ |
+| 2 | MSBross Assistant | assistant.manuelalvarez.dev | estatica | msbross-backend (FastAPI+Granian) | React+Vite | ⬜ |
+| 3 | Atenea | atenea.manuelalvarez.dev | backend+frontend | FastAPI+Granian | HTML vanilla | ✅ |
 | 4 | CombiPro | combipro.manuelalvarez.dev | estatica | No | React | ⬜ |
-| 5 | Cuentos Magicos | cuentos.manuelalvarez.dev | backend+frontend | FastAPI+Celery | React | ✅ |
+| 5 | Cuentos Magicos | cuentos.manuelalvarez.dev | backend+frontend | FastAPI+Granian+Celery | React | ✅ |
 | 6 | CV Portfolio | cv.manuelalvarez.dev | estatica | No | React | ⬜ |
 | 7 | Edelweiss | edelweiss.manuelalvarez.dev | estatica | No | React | ⬜ |
 | 8 | EliteScout | elitescout.manuelalvarez.dev | estatica | No | React+Vite | ⬜ |
 | 9 | Expositator RTE | expositator.manuelalvarez.dev | estatica | No | PWA (?) | ⬜ |
 | 10 | Gas Station | gasstation.manuelalvarez.dev | estatica | No | PWA (?) | ⬜ |
 | 11 | IAPuta OS | iaputa.manuelalvarez.dev | estatica | No | React | ⬜ |
-| 12 | Industrial Pro | industrial.manuelalvarez.dev | backend+frontend | FastAPI | React | ✅ |
+| 12 | Industrial Pro | industrial.manuelalvarez.dev | backend+frontend | FastAPI+Granian | React | ✅ |
 | 13 | IT English Coach | itenglish.manuelalvarez.dev | estatica | No | React | ⬜ |
 | 14 | JartosDTo | jartosdto.manuelalvarez.dev | estatica | No | Next.js (static) | ⬜ |
 | 15 | LogiSearch | logisearch.manuelalvarez.dev | estatica | No | React | ⬜ |
@@ -199,9 +203,9 @@ apps/NOMBRE/
 | 21 | Nikolina | nikolina.manuelalvarez.dev | estatica | No | React | ⬜ |
 | 22 | Perfume Trading | perfume.manuelalvarez.dev | backend+frontend | Next.js SSR | Next.js SSR | ✅ |
 | 23 | TaskFlowPro | taskflow.manuelalvarez.dev | estatica | No | React | ⬜ |
-| 24 | Traductor PRO | traductor.manuelalvarez.dev | backend+frontend | Express | React+Vite | ⬜ |
+| 24 | Traductor PRO | traductor.manuelalvarez.dev | backend+frontend | FastAPI+Granian | React+Vite | ✅ |
 | 25 | TxaFitnessPro | txafitness.manuelalvarez.dev | backend+frontend | Next.js SSR | Next.js SSR | ✅ |
-| 26 | msbross-backend | (sin dominio) | solo API | Python AI | No | ✅ |
+| 26 | msbross-backend | assistant.manuelalvarez.dev/_msbross | solo API | FastAPI+Granian | No | ✅ |
 
 ---
 
@@ -305,7 +309,7 @@ SERVER-DEV/
 
 ```
 FASE 0: LIMPIEZA      [████████████] 100%  ✅ c7c8f3b
-FASE 1: BACKEND HYPER [░░░░░░░░░░░░]   0%
+FASE 1: BACKEND HYPER [████████████]  85%  ✅ d1e965d + 862d967 (pendiente: benchmark + commit final)
 FASE 2: FRONTEND GOD  [░░░░░░░░░░░░]   0%
 FASE 3: DOCKER UNIFIC [░░░░░░░░░░░░]   0%
 FASE 4: INFRA MONITOR [░░░░░░░░░░░░]   0%

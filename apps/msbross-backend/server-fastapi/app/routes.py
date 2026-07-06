@@ -1,0 +1,148 @@
+import time, json
+from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
+from app.db import get_conversations, get_conversation, create_conversation
+from app.models import AVAILABLE_MODELS
+from app.chat import chat_stream
+from app.tools import calculator
+
+router = APIRouter()
+
+
+@router.get("/health")
+async def health():
+    return {"status": "ok", "service": "msbross-backend"}
+
+
+@router.get("/api/models")
+async def get_models():
+    return AVAILABLE_MODELS
+
+
+@router.get("/api/conversations")
+async def list_conversations():
+    return get_conversations()
+
+
+@router.get("/api/conversations/{cid}")
+async def get_conv(cid: str):
+    conv = get_conversation(cid)
+    if not conv:
+        raise HTTPException(404, "not found")
+    return conv
+
+
+class NewChatPayload(BaseModel):
+    pass
+
+
+@router.post("/api/chat/new")
+async def new_chat(body: NewChatPayload):
+    cid = str(time.time())
+    create_conversation(cid, "New Chat")
+    return get_conversation(cid)
+
+
+class ChatPayload(BaseModel):
+    model: str = "or/deepseek/deepseek-chat:free"
+    message: str = ""
+    conversation_id: str = "default"
+    history: list[dict] = []
+    audio: str | None = None
+
+
+@router.post("/api/chat")
+async def chat(body: ChatPayload):
+    if not body.message and not body.audio:
+        raise HTTPException(400, "message or audio required")
+
+    async def generate():
+        async for event in chat_stream(body.model, body.message, body.history, body.conversation_id, body.audio):
+            yield f"data: {json.dumps(event)}\n\n"
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(generate(), media_type="text/event-stream")
+
+
+class CalculatorPayload(BaseModel):
+    expression: str
+
+
+tools_state = {"notes": [], "todos": [], "calculator_history": []}
+
+
+@router.post("/api/tools/calculator")
+async def tool_calc(body: CalculatorPayload):
+    try:
+        result = calculator(body.expression)
+        entry = {"expression": body.expression, "result": result, "time": time.time()}
+        tools_state["calculator_history"].append(entry)
+        return entry
+    except Exception as e:
+        raise HTTPException(400, str(e))
+
+
+class NotesPayload(BaseModel):
+    action: str = "list"
+    id: str | None = None
+    title: str | None = None
+    content: str | None = None
+
+
+@router.post("/api/tools/notes")
+async def tool_notes(body: NotesPayload):
+    if body.action == "list":
+        return tools_state["notes"]
+    elif body.action == "create":
+        note = {"id": str(time.time()), "title": body.title or "", "content": body.content or "", "created": time.time()}
+        tools_state["notes"].append(note)
+        return note
+    elif body.action == "delete":
+        tools_state["notes"] = [n for n in tools_state["notes"] if n["id"] != body.id]
+        return {"deleted": body.id}
+    raise HTTPException(400, "unknown action")
+
+
+class TodosPayload(BaseModel):
+    action: str = "list"
+    id: str | None = None
+    text: str | None = None
+
+
+@router.post("/api/tools/todos")
+async def tool_todos(body: TodosPayload):
+    if body.action == "list":
+        return tools_state["todos"]
+    elif body.action == "create":
+        todo = {"id": str(time.time()), "text": body.text or "", "done": False, "created": time.time()}
+        tools_state["todos"].append(todo)
+        return todo
+    elif body.action == "toggle":
+        for t in tools_state["todos"]:
+            if t["id"] == body.id:
+                t["done"] = not t["done"]
+                return t
+        raise HTTPException(404, "not found")
+    elif body.action == "delete":
+        tools_state["todos"] = [t for t in tools_state["todos"] if t["id"] != body.id]
+        return {"deleted": body.id}
+    raise HTTPException(400, "unknown action")
+
+
+class WeatherPayload(BaseModel):
+    city: str
+
+
+@router.post("/api/tools/weather")
+async def tool_weather(body: WeatherPayload):
+    if not body.city:
+        raise HTTPException(400, "city required")
+    return {
+        "city": body.city,
+        "temperature": 22,
+        "condition": "Sunny",
+        "humidity": 45,
+        "wind": "12 km/h",
+        "note": "Local fallback data - connect OpenWeatherMap API for live real-time metrics",
+    }

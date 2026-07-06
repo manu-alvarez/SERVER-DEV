@@ -57,13 +57,9 @@ app.use(limiter);
 // ── CORS ──
 const ALLOWED_ORIGINS = [
   'https://manuelalvarez.dev',
-  'https://msbross.me',
-  'https://www.msbross.me',
 ];
-
 const ALLOWED_ORIGIN_PATTERNS = [
   /^https:\/\/.*\.manuelalvarez\.dev$/,
-  /^https:\/\/.*\.msbross\.me$/,
 ];
 
 app.use((req, res, next) => {
@@ -125,7 +121,7 @@ const BACKEND_MAP = {
   'industrialpro-backend':  ['industrialpro-backend',     8002],
   'elitescout-backend':     ['elitescout-backend',        8003],
   'traductor-backend':      ['traductor-backend',         8004],
-  'msbross-backend':        ['msbross-backend',           8005],
+
   'iaputa-backend':         ['iaputa-backend',            8006],
   'cuentos-magicos':        ['cuentos-magicos-backend',   8007],
   'web-restaurante-atenea': ['host.docker.internal',      8009],
@@ -336,7 +332,6 @@ app.use('/app/elitescout', createProxyMiddleware({
   }
 }));
 
-app.use('/_msbross',       createProxyMiddleware(proxyOpts('http://msbross-backend:8005', '/_msbross')));
 app.use('/_iaputa',        createProxyMiddleware(proxyOpts('http://iaputa-backend:8006', '/_iaputa')));
 app.use('/_itenglish',     createProxyMiddleware(proxyOpts('http://it-english-backend:8787', '/_itenglish')));
 app.use('/_cuentosmagicos',createProxyMiddleware(proxyOpts('http://cuentos-magicos-backend:8007', '/_cuentosmagicos')));
