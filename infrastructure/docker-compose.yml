@@ -116,8 +116,8 @@ services:
   cuentos-magicos-backend:
     <<: *backend
     container_name: cuentos-magicos-backend
-    image: msbross-cuentos-magicos-backend:latest
-    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8007
+    image: msbross-cuentos-magicos-backend:granian
+    command: python -m granian app.main:app --host 0.0.0.0 --port 8007 --interface asgi
     depends_on:
       msbross-cuentos-db:
         condition: service_healthy
@@ -138,7 +138,7 @@ services:
   cuentos-magicos-celery:
     <<: *backend
     container_name: cuentos-magicos-celery
-    image: msbross-cuentos-magicos-backend:latest
+    image: msbross-cuentos-magicos-backend:granian
     command: python -m celery -A app.core.celery_app worker --loglevel=info --queues=stories,images,audio,video --concurrency=2
     depends_on:
       jartosdto-redis:
@@ -170,8 +170,8 @@ services:
   gas-station-backend:
     <<: *backend
     container_name: gas-station-backend
-    image: msbross-gas-station-backend:latest
-    command: python -m uvicorn main:app --host 0.0.0.0 --port 3005
+    image: msbross-gas-station-backend:granian
+    command: python -m granian main:app --host 0.0.0.0 --port 3005 --interface asgi
     environment:
       - PORT=3005
     volumes:
@@ -180,8 +180,8 @@ services:
   iaputa-backend:
     <<: *backend
     container_name: iaputa-backend
-    image: msbross-iaputa-backend:latest
-    command: python -m uvicorn main:app --host 0.0.0.0 --port 8006
+    image: msbross-iaputa-backend:granian
+    command: python -m granian main:app --host 0.0.0.0 --port 8006 --interface asgi
     env_file:
       - /home/ubuntu/MSBrossAI/apps/iaputa-os/.env
     environment:
@@ -192,8 +192,8 @@ services:
   industrialpro-backend:
     <<: *backend
     container_name: industrialpro-backend
-    image: msbross-industrial-backend:latest
-    command: python -m uvicorn app:app --host 0.0.0.0 --port 8002
+    image: msbross-industrial-backend:granian
+    command: python -m granian app:app --host 0.0.0.0 --port 8002 --interface asgi
     environment:
       - PORT=8002
     volumes:
@@ -202,8 +202,8 @@ services:
   jartosdto-backend:
     <<: *backend
     container_name: jartosdto-backend
-    image: msbross-jartosdto-backend:latest
-    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8010
+    image: msbross-jartosdto-backend:granian
+    command: python -m granian app.main:app --host 0.0.0.0 --port 8010 --interface asgi
     depends_on:
       jartosdto-postgres:
         condition: service_healthy
@@ -232,8 +232,8 @@ services:
   nikolina-api-hub:
     <<: *backend
     container_name: nikolina-api-hub
-    image: msbross-nikolina-backend:latest
-    command: python -m uvicorn main:app --host 0.0.0.0 --port 8001
+    image: msbross-nikolina-backend:granian
+    command: python -m granian main:app --host 0.0.0.0 --port 8001 --interface asgi
     env_file:
       - /home/ubuntu/MSBrossAI/apps/livekit-nikolina/.env
     environment:
@@ -568,8 +568,8 @@ services:
   atenea-backend:
     <<: *backend
     container_name: atenea-backend
-    image: msbross-atenea-backend:latest
-    command: python -m uvicorn main:app --host 0.0.0.0 --port 8009
+    image: msbross-atenea-backend:granian
+    command: python -m granian main:app --host 0.0.0.0 --port 8009 --interface asgi
     environment:
       - PORT=8009
     volumes:
