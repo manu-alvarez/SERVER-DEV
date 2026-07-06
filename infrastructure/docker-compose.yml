@@ -337,6 +337,7 @@ services:
       - traefik.http.routers.msbross-proxy-root.rule=Host(`manuelalvarez.dev`)
       - traefik.http.routers.msbross-proxy-root.entrypoints=websecure
       - traefik.http.routers.msbross-proxy-root.tls.certresolver=myresolver
+      - traefik.http.routers.msbross-proxy-root.service=msbross-proxy-svc
       - traefik.http.routers.msbross-proxy-elitescout.rule=Host(`elitescout.manuelalvarez.dev`)
       - traefik.http.routers.msbross-proxy-elitescout.entrypoints=websecure
       - traefik.http.routers.msbross-proxy-elitescout.tls.certresolver=myresolver
