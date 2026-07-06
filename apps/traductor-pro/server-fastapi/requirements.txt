@@ -1,0 +1,8 @@
+granian
+fastapi
+pydantic
+pydantic-settings
+python-multipart
+openai
+pypdf
+python-docx
