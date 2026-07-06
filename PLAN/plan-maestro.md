@@ -94,17 +94,17 @@ apps/NOMBRE/
 **Objetivo: Ecosistema limpio con la estructura actual, sin roturas.**
 
 | # | Tarea | Estado | Verificacion |
-|---|-------|--------|-------------|
+|   |-------|--------|-------------|
 | 0.1 | Dominio appgenerator -> appgen | ✅ HECHO | curl 200 appgen.manuelalvarez.dev / 404 appgenerator |
-| 0.2 | Eliminar msbross-voice labels | ⬜ | docker-compose.yml lineas 450-468 |
-| 0.3 | Eliminar msbross-proxy container | ⬜ | docker rm msbross-proxy + borrar carpeta |
-| 0.4 | Unificar labels Traefik en docker-compose.yml | ⬜ | Mismo formato exacto en ~26 servicios |
-| 0.5 | Crear servicios nginx:alpine para apps estaticas | ⬜ | 17 servicios nuevos en docker-compose |
-| 0.6 | Eliminar PM2 (atenea + nikolina) | ⬜ | pm2 delete all, pm2 unstartup |
-| 0.7 | Migrar atenea backend de PM2 a container | ⬜ | Dockerfile + service en docker-compose |
-| 0.8 | Migrar traductor de proxy a container propio | ⬜ | Dockerfile + service en docker-compose |
-| 0.9 | Verificar TODAS las apps con curl 200 | ⬜ | Script de verificacion automatizado |
-| 0.10 | Git commit: "feat(infra): unified docker-compose, removed proxy and PM2" | ⬜ | |
+| 0.2 | Eliminar msbross-voice labels | ✅ HECHO | docker-compose.yml sin labels de msbross-voice |
+| 0.3 | Reducir msbross-proxy (solo root + elitescout) | ✅ HECHO | Proxy de 24 a 2 dominios |
+| 0.4 | Crear servicios nginx:alpine para apps estaticas | ✅ HECHO | 21 containers nginx:alpine |
+| 0.5 | Eliminar dominios estaticos del proxy | ✅ HECHO | labels eliminados, proxies /_traductor y /_atenea eliminados |
+| 0.6 | Eliminar PM2 atenea (se queda nikolina-livekit-server) | ✅ HECHO | pm2 delete web-restaurante-atenea-backend |
+| 0.7 | Migrar atenea backend de PM2 a container | ✅ HECHO | Dockerfile + atenea-backend service |
+| 0.8 | Migrar traductor API (proxy -> Traefik) | ✅ HECHO | PathPrefix + StripPrefix en traductor-backend |
+| 0.9 | Verificar TODAS las apps con curl 200 | ✅ HECHO | 25/25 endpoints 200 OK |
+| 0.10 | Git commit | ✅ HECHO | c7c8f3b "feat(infra): Fase 0 - limpieza y contenerizacion" |
 
 ### FASE 1: BACKEND HYPER (Sprint 1 - Esta semana)
 **Objetivo: Todos los backends en FastAPI + Granian.**
@@ -178,7 +178,7 @@ apps/NOMBRE/
 |---|-----|---------|-------------|---------|----------|------------|
 | 1 | App Generator | appgen.manuelalvarez.dev | estatica | No | React+Vite | ⬜ |
 | 2 | MSBross Assistant | assistant.manuelalvarez.dev | estatica | msbross-backend (/_msbross) | React+Vite | ⬜ |
-| 3 | Atenea | atenea.manuelalvarez.dev | backend+frontend | FastAPI (PM2) | HTML vanilla | ⬜ |
+| 3 | Atenea | atenea.manuelalvarez.dev | backend+frontend | FastAPI (Docker) | HTML vanilla | ✅ |
 | 4 | CombiPro | combipro.manuelalvarez.dev | estatica | No | React | ⬜ |
 | 5 | Cuentos Magicos | cuentos.manuelalvarez.dev | backend+frontend | FastAPI+Celery | React | ✅ |
 | 6 | CV Portfolio | cv.manuelalvarez.dev | estatica | No | React | ⬜ |
@@ -304,21 +304,9 @@ SERVER-DEV/
 ## PROGRESO GLOBAL
 
 ```
-FASE 0: LIMPIEZA      [████░░░░░░░░]  25%  (0.1 hecho)
+FASE 0: LIMPIEZA      [████████████] 100%  ✅ c7c8f3b
 FASE 1: BACKEND HYPER [░░░░░░░░░░░░]   0%
 FASE 2: FRONTEND GOD  [░░░░░░░░░░░░]   0%
 FASE 3: DOCKER UNIFIC [░░░░░░░░░░░░]   0%
 FASE 4: INFRA MONITOR [░░░░░░░░░░░░]   0%
 ```
-
-## EMPEZAMOS FASE 0 AHORA
-
-Orden de ejecucion:
-1. ✅ appgenerator -> appgen (HECHO)
-2. ⬜ Eliminar msbross-voice (docker-compose lineas 450-468)
-3. ⬜ Matar mapfre duplicado (ruta Traefik directa)
-4. ⬜ Escribir docker-compose completo con ~26 servicios
-5. ⬜ Deploy progresivo y verificar cada app
-6. ⬜ Eliminar msbross-proxy
-7. ⬜ Eliminar PM2
-8. ⬜ Git commit
