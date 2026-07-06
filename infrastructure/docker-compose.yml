@@ -509,7 +509,7 @@ services:
     container_name: app-mano
     image: nginx:alpine
     volumes:
-      - /home/ubuntu/MSBrossAI/www/app/msbross:/usr/share/nginx/html:ro
+      - /home/ubuntu/MSBrossAI/apps/mano-redirect/nginx.conf:/etc/nginx/nginx.conf:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.mano.rule=Host(`mano.manuelalvarez.dev`)
