@@ -196,9 +196,9 @@ apps/NOMBRE/
 | 14 | JartosDTo | jartosdto.manuelalvarez.dev | estatica | No | Next.js (static) | ⬜ |
 | 15 | LogiSearch | logisearch.manuelalvarez.dev | estatica | No | React | ⬜ |
 | 16 | LogiTrack | logitrack.manuelalvarez.dev | estatica | No | React | ⬜ |
-| 17 | Mano Electrica Azul | mano.manuelalvarez.dev | estatica | No | React Native (app) | ⬜ |
+| 17 | Mano Electrica Azul | mano.manuelalvarez.dev | redirect | No | 301 → Google Play | - |
 | 18 | Mapfre | mapfre.manuelalvarez.dev | backend+frontend | Next.js SSR | Next.js SSR | ✅ |
-| 19 | Tu Energia Maya | maya.manuelalvarez.dev | estatica | No | React+Vite | ⬜ |
+| 19 | Tu Energia Maya | maya.manuelalvarez.dev | redirect | No | 302 → GitHub Pages | - |
 | 20 | Moko-Tools | mokotools.manuelalvarez.dev | estatica | No | Vanilla JS | ⬜ |
 | 21 | Nikolina | nikolina.manuelalvarez.dev | estatica | No | React | ⬜ |
 | 22 | Perfume Trading | perfume.manuelalvarez.dev | backend+frontend | Next.js SSR | Next.js SSR | ✅ |
@@ -292,6 +292,155 @@ SERVER-DEV/
 └── LOGS/
 ```
 
+## AUDITORIA COMPLETA DEL ECOSISTEMA (2026-07-06)
+
+### MAPA DE RUTEO ACTUAL
+
+```
+INTERNET :443
+  │
+  ▼ Traefik v3 (Let's Encrypt TLS)
+  │
+  ├──► manuelalvarez.dev ──────────► msbross-proxy:8080 (Node.js Express)
+  │     └── Sirve www/index.html (portfolio)
+  │     └── DOMAIN_APP_MAP reescribe a /app/{app}/
+  │     └── APIs proxy: /_nikolina, /_gas-station, /_industrialpro,
+  │                      /app/elitescout, /_iaputa, /_itenglish,
+  │                      /_cuentosmagicos, /_jartosdto, /_coach, /rtc (WS)
+  │
+  ├──► elitescout.manuelalvarez.dev ──► msbross-proxy:8080
+  │     └── Sirve app elitescout + proxy a elitescout-backend:8003
+  │
+  ├──► *.manuelalvarez.dev ───────────► nginx:alpine (21 apps estaticas)
+  │     appgen, assistant, combipro, cv, edelweiss, expositator,
+  │     gasstation, iaputa, industrial, itenglish, jartosdto,
+  │     logisearch, logitrack, mano, maya, mokotools, nikolina,
+  │     taskflow, traductor, cuentos, atenea
+  │
+  ├──► traductor.manuelalvarez.dev ───► traductor-backend:8004 (FastAPI+Granian)
+  │     └── /_traductor/* (StripPrefix)
+  │
+  ├──► assistant.manuelalvarez.dev ───► msbross-backend:8005 (FastAPI+Granian)
+  │     └── /_msbross/* (StripPrefix)
+  │
+  ├──► atenea.manuelalvarez.dev ──────► atenea-backend:8009 (FastAPI+Granian)
+  │
+  ├──► itcoach.manuelalvarez.dev ─────► it-coach-agent:8082
+  │
+  ├──► mapfre.manuelalvarez.dev ──────► mapfre:3333 (Next.js SSR)
+  ├──► perfume.manuelalvarez.dev ─────► perfume-trading:3000 (Next.js SSR)
+  ├──► txafitness.manuelalvarez.dev ──► txa-fitness-pro:3000 (Next.js SSR)
+  │
+  ├──► portainer.manuelalvarez.dev ───► portainer:9000
+  ├──► monitor.manuelalvarez.dev ─────► uptime-kuma:3001
+  └──► traefik.manuelalvarez.dev ─────► Traefik dashboard (api@internal)
+```
+
+### INVENTARIO DETALLADO (26 APPS + 3 INFRA + ROOT)
+
+#### A. Root domain
+| Dominio | Contenido | Tecnologia | Sirve desde |
+|---------|-----------|------------|-------------|
+| manuelalvarez.dev/ | Portfolio del ecosistema | React (msbross-frontend) | www/index.html (proxy src) |
+
+#### B. Static SPAs (21) — nginx:alpine + proxy fallback
+| # | App | Dominio | Stack | Backend asociado | Dockerfile |
+|---|-----|---------|-------|-----------------|------------|
+| 1 | App Generator | appgen.manuelalvarez.dev | React+Vite | - | ⬜ |
+| 2 | Assistant | assistant.manuelalvarez.dev | React+Vite | msbross-backend (FastAPI+Granian) | ⬜ |
+| 3 | Combipro | combipro.manuelalvarez.dev | React | - | ⬜ |
+| 4 | CV Portfolio | cv.manuelalvarez.dev | React | - | ⬜ |
+| 5 | Edelweiss | edelweiss.manuelalvarez.dev | React | - | ⬜ |
+| 6 | Expositator RTE | expositator.manuelalvarez.dev | PWA (React) | - | ⬜ |
+| 7 | Gas Station | gasstation.manuelalvarez.dev | PWA (React) | gas-station-backend (FastAPI+Granian) | ⬜ |
+| 8 | IAPuta OS | iaputa.manuelalvarez.dev | React | iaputa-backend (FastAPI+Granian) | ⬜ |
+| 9 | Industrial Pro | industrial.manuelalvarez.dev | React | industrialpro-backend (FastAPI+Granian) | ⬜ |
+| 10 | IT English Coach | itenglish.manuelalvarez.dev | React | it-english-backend (Node.js) | ⬜ |
+| 11 | JartosDTo | jartosdto.manuelalvarez.dev | Next.js (static) | jartosdto-backend (FastAPI+Granian) | ⬜ |
+| 12 | LogiSearch | logisearch.manuelalvarez.dev | React | - | ⬜ |
+| 13 | LogiTrack | logitrack.manuelalvarez.dev | React | - | ⬜ |
+| 14 | Moko-Tools | mokotools.manuelalvarez.dev | Vanilla JS | - | ⬜ |
+| 15 | Maya | maya.manuelalvarez.dev | React+Vite | - (redirect GitHub Pages) | ⬜ |
+| 16 | Nikolina | nikolina.manuelalvarez.dev | React | nikolina-api-hub (FastAPI+Granian) | ⬜ |
+| 17 | TaskFlowPro | taskflow.manuelalvarez.dev | React | - | ⬜ |
+| 18 | Traductor PRO | traductor.manuelalvarez.dev | React+Vite | traductor-backend (FastAPI+Granian) | ⬜ |
+| 19 | Cuentos Magicos | cuentos.manuelalvarez.dev | React | cuentos-magicos-backend (FastAPI+Granian+Celery) | ⬜ |
+| 20 | Atenea | atenea.manuelalvarez.dev | HTML vanilla | atenea-backend (FastAPI+Granian) | ⬜ |
+| 21 | EliteScout | elitescout.manuelalvarez.dev | React+Vite | elitescout-backend (Node.js) | ⬜ |
+
+#### C. Backend-only services
+| # | App | Ruta | Stack | Dependencias |
+|---|-----|------|-------|-------------|
+| 22 | msbross-backend | assistant.manuelalvarez.dev/_msbross | FastAPI+Granian | ninguno |
+| 23 | nikolina-api-hub | nikolina.manuelalvarez.dev (via proxy) | FastAPI+Granian | ninguno |
+| 24 | it-english-backend | itenglish.manuelalvarez.dev (via proxy) | Node.js (Express?) | ninguno |
+| 25 | elitescout-backend | elitescout.manuelalvarez.dev (via proxy) | Node.js (Next.js?) | elitescout-db (Postgres) |
+| 26 | cuentos-magicos-celery | (interno) | Celery workers | cuentos-db + redis |
+
+#### D. Full-stack SSR (Next.js)
+| # | App | Dominio | Stack | Dockerfile |
+|---|-----|---------|-------|------------|
+| 27 | Mapfre | mapfre.manuelalvarez.dev | Next.js SSR | ✅ |
+| 28 | Perfume Trading | perfume.manuelalvarez.dev | Next.js SSR | ✅ |
+| 29 | TxaFitnessPro | txafitness.manuelalvarez.dev | Next.js SSR | ✅ |
+
+#### E. Redirects
+| Dominio | Destino | Tipo |
+|---------|---------|------|
+| mano.manuelalvarez.dev | Google Play Store | nginx 301 |
+| maya.manuelalvarez.dev | GitHub Pages (TuEnergiaMaya) | nginx ? |
+
+#### F. Infraestructura
+| Servicio | Dominio | Funcion |
+|----------|---------|---------|
+| Traefik | traefik.manuelalvarez.dev | Dashboard (con basic auth) |
+| Portainer | portainer.manuelalvarez.dev | Gestion de contenedores |
+| Uptime Kuma | monitor.manuelalvarez.dev | Monitoreo de uptime |
+
+### SUBPAGINAS / RUTAS DE CADA APP
+
+Basado en el codigo del proxy y las apps desplegadas:
+- **Portfolio (manuelalvarez.dev)**: /, /apps, /architecture, /profile, /contact
+- **Assistant**: / (SPA con routing interno React)
+- **Traductor**: / (SPA con formulario de traduccion)
+- **Industrial Pro**: / (SPA con dashboard de control procesos)
+- **Cuentos Magicos**: /, /create, /stories/detail/ (Next.js static export)
+- **JartosDTo**: /, /_not-found, /404 (Next.js static export)
+- **Resto de SPAs**: / (single page apps con routing interno)
+
+### ISSUES DETECTADOS
+
+| # | Tipo | Descripcion | Impacto | Solucion |
+|---|------|-------------|---------|----------|
+| F1-001 | Bug | Docker images atenea:latest y :granian tenian main.py con sintaxis rota | BAJO - containers activos usan bind mounts | ✅ RECONSTRUIDO |
+| F1-002 | Bug | www/index.html no existia (root domain 500) | ALTO - manuelalvarez.dev caido | ✅ RESTAURADO |
+| F1-003 | Bug | mano.manuelalvarez.dev servia portfolio en vez de redirect Google Play | ALTO - pagina incorrecta | ✅ CORREGIDO |
+| F1-004 | Bug | Faltaba label service=msbross-proxy-svc en router root de Traefik | MEDIO - ruteo implicito | ✅ CORREGIDO |
+| F1-005 | Legacy | Proxy Node.js tiene DOMAIN_APP_MAP con 21 apps que ya no usa (nginx bypass) | BAJO - codigo muerto | Limpiar en Fase 2/3 |
+| F1-006 | Legacy | it-english-backend usa node:22-bookworm-slim (Debian pesado) | BAJO | Migrar a alpine |
+| F1-007 | Legacy | elitescout-backend sin imagen Docker propia (usa node:22-alpine directo) | BAJO | Crear Dockerfile |
+| F1-008 | API | GROQ API key expirada (401), Gemini keys formato AQ. invalido, OpenRouter :free deprecados | MEDIO - afecta traductor y msbross-backend | Conseguir keys validas |
+| F1-009 | Nota | msbross-proxy es segunda puerta (viola regla #3 del plan) | ESTRUCTURAL | Se resuelve en Fase 3 |
+| F1-010 | Nota | www/ es build artifact no commitado inicialmente | PROCESO | ✅ YA EN GIT |
+
+### RESUMEN EJECUTIVO
+
+| Metrica | Valor |
+|---------|-------|
+| Apps totales | 29 (26 apps + 3 infra) |
+| Backends en Granian | 9/9 (100%) ✅ |
+| Backends en Node.js legacy | 2 (elitescout, it-english) |
+| Contenedores activos | ~35 |
+| Dominios .manuelalvarez.dev | 26 |
+| PM2 residual | 1 (nikolina-livekit-server) |
+| Fase 0 completada | ✅ 100% |
+| Fase 1 completada | ✅ 100% |
+| Fase 2 (Frontend Godmode) | ⬜ 0% — 23 apps por migrar |
+| Bugs activos | 0 (todos corregidos) |
+| Issues legacy | 4 (F1-005 a F1-008) |
+
+---
+
 ## REGLAS FIJAS (NO NEGOCIABLES)
 
 1. **Cada app = su propio contenedor** - Sin excepciones
@@ -310,6 +459,7 @@ SERVER-DEV/
 ```
 FASE 0: LIMPIEZA      [████████████] 100%  ✅ c7c8f3b
 FASE 1: BACKEND HYPER [████████████] 100%  ✅ b5bc688
+FASE 1.5: HOTFIXES   [████████████] 100%  ✅ 36a9449 (mano redirect + root fix)
 FASE 2: FRONTEND GOD  [░░░░░░░░░░░░]   0%
 FASE 3: DOCKER UNIFIC [░░░░░░░░░░░░]   0%
 FASE 4: INFRA MONITOR [░░░░░░░░░░░░]   0%
