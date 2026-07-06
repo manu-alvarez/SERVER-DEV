@@ -130,9 +130,9 @@ services:
     volumes:
       - /home/ubuntu/MSBrossAI/apps/cuentos-magicos/backend:/app
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8007/health"]
+      test: ["CMD", "python3", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8007/health').status == 200 else 1)"]
       interval: 30s
-      timeout: 5s
+      timeout: 10s
       retries: 3
 
   cuentos-magicos-celery:
@@ -227,10 +227,6 @@ services:
       - /home/ubuntu/MSBrossAI/apps/msbross-backend:/app
       - /home/ubuntu/MSBrossAI/api_keys_vault.json:/api_keys_vault.json:ro
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.msbross-backend.rule=Host(`msbross-voice.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-backend.entrypoints=websecure
-      - traefik.http.routers.msbross-backend.tls.certresolver=myresolver
       - traefik.http.services.msbross-backend.loadbalancer.server.port=8005
 
   nikolina-api-hub:
@@ -288,6 +284,15 @@ services:
       - PORT=8004
     volumes:
       - /home/ubuntu/MSBrossAI/apps/traductor-pro/server:/app
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traductor-api.rule=Host(`traductor.manuelalvarez.dev`) && PathPrefix(`/_traductor`)
+      - traefik.http.routers.traductor-api.entrypoints=websecure
+      - traefik.http.routers.traductor-api.tls.certresolver=myresolver
+      - traefik.http.routers.traductor-api.middlewares=strip-traductor
+      - traefik.http.middlewares.strip-traductor.stripprefix.prefixes=/_traductor
+      - traefik.http.services.traductor-api.loadbalancer.server.port=8004
+      - traefik.http.routers.traductor-api.service=traductor-api
 
   it-english-backend:
     <<: *backend
@@ -322,96 +327,272 @@ services:
       - traefik.http.routers.msbross-proxy-root.rule=Host(`manuelalvarez.dev`)
       - traefik.http.routers.msbross-proxy-root.entrypoints=websecure
       - traefik.http.routers.msbross-proxy-root.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-root.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-assistant.rule=Host(`assistant.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-assistant.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-assistant.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-assistant.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-appgenerator.rule=Host(`appgenerator.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-appgenerator.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-appgenerator.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-appgenerator.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-atenea.rule=Host(`atenea.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-atenea.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-atenea.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-atenea.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-combipro.rule=Host(`combipro.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-combipro.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-combipro.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-combipro.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-cuentos.rule=Host(`cuentos.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-cuentos.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-cuentos.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-cuentos.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-cv.rule=Host(`cv.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-cv.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-cv.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-cv.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-edelweiss.rule=Host(`edelweiss.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-edelweiss.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-edelweiss.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-edelweiss.service=msbross-proxy-svc
       - traefik.http.routers.msbross-proxy-elitescout.rule=Host(`elitescout.manuelalvarez.dev`)
       - traefik.http.routers.msbross-proxy-elitescout.entrypoints=websecure
       - traefik.http.routers.msbross-proxy-elitescout.tls.certresolver=myresolver
       - traefik.http.routers.msbross-proxy-elitescout.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-expositator.rule=Host(`expositator.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-expositator.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-expositator.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-expositator.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-gasstation.rule=Host(`gasstation.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-gasstation.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-gasstation.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-gasstation.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-iaputa.rule=Host(`iaputa.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-iaputa.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-iaputa.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-iaputa.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-industrial.rule=Host(`industrial.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-industrial.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-industrial.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-industrial.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-itenglish.rule=Host(`itenglish.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-itenglish.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-itenglish.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-itenglish.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-jartosdto.rule=Host(`jartosdto.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-jartosdto.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-jartosdto.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-jartosdto.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-logisearch.rule=Host(`logisearch.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-logisearch.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-logisearch.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-logisearch.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-logitrack.rule=Host(`logitrack.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-logitrack.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-logitrack.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-logitrack.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-mano.rule=Host(`mano.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-mano.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-mano.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-mano.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-maya.rule=Host(`maya.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-maya.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-maya.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-maya.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-mokotools.rule=Host(`mokotools.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-mokotools.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-mokotools.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-mokotools.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-nikolina.rule=Host(`nikolina.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-nikolina.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-nikolina.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-nikolina.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-taskflow.rule=Host(`taskflow.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-taskflow.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-taskflow.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-taskflow.service=msbross-proxy-svc
-      - traefik.http.routers.msbross-proxy-traductor.rule=Host(`traductor.manuelalvarez.dev`)
-      - traefik.http.routers.msbross-proxy-traductor.entrypoints=websecure
-      - traefik.http.routers.msbross-proxy-traductor.tls.certresolver=myresolver
-      - traefik.http.routers.msbross-proxy-traductor.service=msbross-proxy-svc
       - traefik.http.services.msbross-proxy-svc.loadbalancer.server.port=8080
+
+  # ──────────────────────────────────────────────
+  # STATIC APPS (nginx:alpine) — FASE 0
+  # ──────────────────────────────────────────────
+
+  app-appgen:
+    <<: *common
+    container_name: app-appgen
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/app-generator:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.appgen.rule=Host(`appgen.manuelalvarez.dev`)
+      - traefik.http.routers.appgen.entrypoints=websecure
+      - traefik.http.routers.appgen.tls.certresolver=myresolver
+
+  app-assistant:
+    <<: *common
+    container_name: app-assistant
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/assistant:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.assistant.rule=Host(`assistant.manuelalvarez.dev`)
+      - traefik.http.routers.assistant.entrypoints=websecure
+      - traefik.http.routers.assistant.tls.certresolver=myresolver
+
+  app-combipro:
+    <<: *common
+    container_name: app-combipro
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/combipro:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.combipro.rule=Host(`combipro.manuelalvarez.dev`)
+      - traefik.http.routers.combipro.entrypoints=websecure
+      - traefik.http.routers.combipro.tls.certresolver=myresolver
+
+  app-cv:
+    <<: *common
+    container_name: app-cv
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/cv:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.cv.rule=Host(`cv.manuelalvarez.dev`)
+      - traefik.http.routers.cv.entrypoints=websecure
+      - traefik.http.routers.cv.tls.certresolver=myresolver
+
+  app-edelweiss:
+    <<: *common
+    container_name: app-edelweiss
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/edelweiss:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.edelweiss.rule=Host(`edelweiss.manuelalvarez.dev`)
+      - traefik.http.routers.edelweiss.entrypoints=websecure
+      - traefik.http.routers.edelweiss.tls.certresolver=myresolver
+
+  app-expositator:
+    <<: *common
+    container_name: app-expositator
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/expositator-rte:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.expositator.rule=Host(`expositator.manuelalvarez.dev`)
+      - traefik.http.routers.expositator.entrypoints=websecure
+      - traefik.http.routers.expositator.tls.certresolver=myresolver
+
+  app-gasstation:
+    <<: *common
+    container_name: app-gasstation
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/gas-station:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.gasstation.rule=Host(`gasstation.manuelalvarez.dev`)
+      - traefik.http.routers.gasstation.entrypoints=websecure
+      - traefik.http.routers.gasstation.tls.certresolver=myresolver
+
+  app-iaputa:
+    <<: *common
+    container_name: app-iaputa
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/iaputa-os:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.iaputa.rule=Host(`iaputa.manuelalvarez.dev`)
+      - traefik.http.routers.iaputa.entrypoints=websecure
+      - traefik.http.routers.iaputa.tls.certresolver=myresolver
+
+  app-industrial:
+    <<: *common
+    container_name: app-industrial
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/industrialpro:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.industrial.rule=Host(`industrial.manuelalvarez.dev`)
+      - traefik.http.routers.industrial.entrypoints=websecure
+      - traefik.http.routers.industrial.tls.certresolver=myresolver
+
+  app-itenglish:
+    <<: *common
+    container_name: app-itenglish
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/it-english-coach:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.itenglish.rule=Host(`itenglish.manuelalvarez.dev`)
+      - traefik.http.routers.itenglish.entrypoints=websecure
+      - traefik.http.routers.itenglish.tls.certresolver=myresolver
+
+  app-jartosdto:
+    <<: *common
+    container_name: app-jartosdto
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/jartosdto:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jartosdto.rule=Host(`jartosdto.manuelalvarez.dev`)
+      - traefik.http.routers.jartosdto.entrypoints=websecure
+      - traefik.http.routers.jartosdto.tls.certresolver=myresolver
+
+  app-logisearch:
+    <<: *common
+    container_name: app-logisearch
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/logisearch:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.logisearch.rule=Host(`logisearch.manuelalvarez.dev`)
+      - traefik.http.routers.logisearch.entrypoints=websecure
+      - traefik.http.routers.logisearch.tls.certresolver=myresolver
+
+  app-logitrack:
+    <<: *common
+    container_name: app-logitrack
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/logitrack:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.logitrack.rule=Host(`logitrack.manuelalvarez.dev`)
+      - traefik.http.routers.logitrack.entrypoints=websecure
+      - traefik.http.routers.logitrack.tls.certresolver=myresolver
+
+  app-mano:
+    <<: *common
+    container_name: app-mano
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/msbross:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mano.rule=Host(`mano.manuelalvarez.dev`)
+      - traefik.http.routers.mano.entrypoints=websecure
+      - traefik.http.routers.mano.tls.certresolver=myresolver
+
+  app-maya:
+    <<: *common
+    container_name: app-maya
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/maya:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.maya.rule=Host(`maya.manuelalvarez.dev`)
+      - traefik.http.routers.maya.entrypoints=websecure
+      - traefik.http.routers.maya.tls.certresolver=myresolver
+
+  app-mokotools:
+    <<: *common
+    container_name: app-mokotools
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/moko-tools:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mokotools.rule=Host(`mokotools.manuelalvarez.dev`)
+      - traefik.http.routers.mokotools.entrypoints=websecure
+      - traefik.http.routers.mokotools.tls.certresolver=myresolver
+
+  app-nikolina:
+    <<: *common
+    container_name: app-nikolina
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/livekit-nikolina:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.nikolina.rule=Host(`nikolina.manuelalvarez.dev`)
+      - traefik.http.routers.nikolina.entrypoints=websecure
+      - traefik.http.routers.nikolina.tls.certresolver=myresolver
+
+  app-taskflow:
+    <<: *common
+    container_name: app-taskflow
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/taskflow:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.taskflow.rule=Host(`taskflow.manuelalvarez.dev`)
+      - traefik.http.routers.taskflow.entrypoints=websecure
+      - traefik.http.routers.taskflow.tls.certresolver=myresolver
+
+  app-traductor:
+    <<: *common
+    container_name: app-traductor
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/traductor-pro:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traductor.rule=Host(`traductor.manuelalvarez.dev`)
+      - traefik.http.routers.traductor.entrypoints=websecure
+      - traefik.http.routers.traductor.tls.certresolver=myresolver
+
+  atenea-backend:
+    <<: *backend
+    container_name: atenea-backend
+    image: msbross-atenea-backend:latest
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 8009
+    environment:
+      - PORT=8009
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/web-restaurante-atenea:/app
+      - /home/ubuntu/MSBrossAI/apps/web-restaurante-atenea/data:/app/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.atenea.rule=Host(`atenea.manuelalvarez.dev`)
+      - traefik.http.routers.atenea.entrypoints=websecure
+      - traefik.http.routers.atenea.tls.certresolver=myresolver
+      - traefik.http.services.atenea.loadbalancer.server.port=8009
+
+  app-cuentos:
+    <<: *common
+    container_name: app-cuentos
+    image: nginx:alpine
+    volumes:
+      - /home/ubuntu/MSBrossAI/www/app/cuentos-magicos:/usr/share/nginx/html:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.cuentos.rule=Host(`cuentos.manuelalvarez.dev`)
+      - traefik.http.routers.cuentos.entrypoints=websecure
+      - traefik.http.routers.cuentos.tls.certresolver=myresolver
 
   # ──────────────────────────────────────────────
   # SSR APPS (Next.js / Direct Docker)

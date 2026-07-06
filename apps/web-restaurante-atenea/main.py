@@ -115,32 +115,17 @@ async def get_public_token(request: Request):
     if not livekit_url:
         raise HTTPException(status_code=500, detail="LIVEKIT_URL not configured")
 
-    from livekit.api import AccessToken, VideoGrants
-    import asyncio
 
-    identity = f"atenea-web-{datetime.now().timestamp():.0f}"
-    token = AccessToken(api_key, api_secret)
-    token.with_identity(identity)
-    token.with_name(f"Atenea {identity}")
-    token.with_grants(VideoGrants(
-        room="atenea-room",
-        room_join=True,
-        can_publish=True,
-        can_publish_data=True,
-        can_subscribe=True,
-    ))
-    
-    asyncio.create_task(_dispatch_agent(livekit_url, api_key, api_secret, "atenea-room"))
+from fastapi.staticfiles import StaticFiles
 
-    return {
-        "accessToken": token.to_jwt(),
-        "livekitUrl": livekit_url,
-    }
-
-
-@app.get("/api/stats")
-def get_stats():
-    return db.get_stats()
+SERVE_FRONTEND = os.getenv("SERVE_FRONTEND", "true").lower() == "true"
+if SERVE_FRONTEND:
+    frontend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend")
+    if os.path.isdir(frontend_dir):
+        app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
+        logger.info("Serving frontend from %s", frontend_dir)
+    else:
+        logger.warning("Frontend directory not found at %s", frontend_dir)
 
 
 if __name__ == "__main__":

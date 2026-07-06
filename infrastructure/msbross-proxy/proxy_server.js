@@ -20,13 +20,13 @@ app.use(compression({ level: 6, threshold: 1024 }));
 app.use((req, res, next) => {
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-    "style-src 'self' 'unsafe-inline'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: blob: https:",
-    "font-src 'self' data:",
+    "font-src 'self' data: https://fonts.gstatic.com",
     "connect-src 'self' https: wss:",
     "media-src 'self' https:",
-    "frame-src 'self'",
+    "frame-src 'self' https://trello.com https://www.google.com",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
@@ -227,7 +227,7 @@ const DOMAIN_APP_MAP = {
   'gasstation.manuelalvarez.dev': 'gas-station',
   'elitescout.manuelalvarez.dev': 'elitescout',
   'nikolina.manuelalvarez.dev': 'livekit-nikolina',
-  'appgenerator.manuelalvarez.dev': 'app-generator',
+  'appgen.manuelalvarez.dev': 'app-generator',
   'expositator.manuelalvarez.dev': 'expositator-rte',
   'itenglish.manuelalvarez.dev': 'it-english-coach',
   'logisearch.manuelalvarez.dev': 'logisearch',
@@ -336,13 +336,12 @@ app.use('/app/elitescout', createProxyMiddleware({
   }
 }));
 
-app.use('/_traductor',     createProxyMiddleware(proxyOpts('http://traductor-backend:8004', '/_traductor')));
 app.use('/_msbross',       createProxyMiddleware(proxyOpts('http://msbross-backend:8005', '/_msbross')));
 app.use('/_iaputa',        createProxyMiddleware(proxyOpts('http://iaputa-backend:8006', '/_iaputa')));
 app.use('/_itenglish',     createProxyMiddleware(proxyOpts('http://it-english-backend:8787', '/_itenglish')));
 app.use('/_cuentosmagicos',createProxyMiddleware(proxyOpts('http://cuentos-magicos-backend:8007', '/_cuentosmagicos')));
 app.use('/_jartosdto',     createProxyMiddleware(proxyOpts('http://jartosdto-backend:8010', '/_jartosdto')));
-app.use('/_atenea',        createProxyMiddleware(proxyOpts('http://host.docker.internal:8009', '/_atenea')));
+
 
 // ── IT English Coach AI Proxy ──
 app.post('/_coach/api/evaluate', express.json(), async (req, res) => {
