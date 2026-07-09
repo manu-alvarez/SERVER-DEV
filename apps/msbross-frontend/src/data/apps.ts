@@ -5,7 +5,7 @@ export const APPS_DATA = [
     name: 'App Generator',
     desc: 'Generador de páginas web simples utilizando inteligencia artificial.',
     tech: 'React 19, Vite, Gemini API',
-    url: 'https://appgenerator.manuelalvarez.dev',
+    url: 'https://appgen.manuelalvarez.dev',
     icon: Activity,
     color: 'from-[#f472b6] to-[#ec4899]',
     glow: 'shadow-[0_0_30px_rgba(244,114,182,0.3)]',

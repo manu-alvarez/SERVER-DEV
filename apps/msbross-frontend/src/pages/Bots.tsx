@@ -37,7 +37,7 @@ export default function Agents() {
       name: 'App Generator',
       desc: 'Herramienta para generar páginas web simples utilizando inteligencia artificial.',
       tech: 'React 19, Vite, Gemini API',
-      url: 'https://appgenerator.manuelalvarez.dev',
+      url: 'https://appgen.manuelalvarez.dev',
       icon: Activity,
       color: 'from-amber-400 to-orange-600',
       glow: 'shadow-[0_0_30px_rgba(245,158,11,0.3)]',
