@@ -19,7 +19,7 @@ export const ProductsService = {
         orderBy: { createdAt: 'desc' }
       });
 
-      const products = data.map((p) => ({
+      const products = data.map((p: any) => ({
         id: p.id,
         brand_id: p.brandId,
         brand_name: p.brand?.name ?? '',

@@ -29,7 +29,7 @@ export const InventoryService = {
         orderBy: { expiryDate: 'asc' }
       });
 
-      const items = data.map((inv) => ({
+      const items = data.map((inv: any) => ({
         id: inv.id,
         product_id: inv.productId,
         product_name: inv.product?.name ?? '',
