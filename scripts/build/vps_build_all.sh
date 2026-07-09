@@ -7,9 +7,6 @@ export PATH=$PATH:/home/ubuntu/.bun/bin:/usr/local/bin
 ROOT_DIR="/home/ubuntu/MSBrossAI"
 cd "$ROOT_DIR"
 
-echo "📦 Installing root dependencies..."
-bun install || npm install
-
 # Helper function to build an app
 build_app() {
   local app_path=$1
