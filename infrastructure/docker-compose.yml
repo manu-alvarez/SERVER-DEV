@@ -340,7 +340,24 @@ services:
       - traefik.http.routers.msbross-proxy-root.service=msbross-proxy-svc
       - traefik.http.services.msbross-proxy-svc.loadbalancer.server.port=8080
 
-  # ──────────────────────────────────────────────
+    atenea-backend:
+    <<: *backend
+    container_name: atenea-backend
+    image: msbross-atenea-backend:granian
+    command: python -m granian main:app --host 0.0.0.0 --port 8009 --interface asgi
+    environment:
+      - PORT=8009
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/web-restaurante-atenea:/app
+      - /home/ubuntu/MSBrossAI/apps/web-restaurante-atenea/data:/app/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.atenea.rule=Host(`atenea.manuelalvarez.dev`)
+      - traefik.http.routers.atenea.entrypoints=websecure
+      - traefik.http.routers.atenea.tls.certresolver=myresolver
+      - traefik.http.services.atenea.loadbalancer.server.port=8009
+
+# ──────────────────────────────────────────────
   # SSR APPS (Next.js / Direct Docker)
   # ──────────────────────────────────────────────
 
