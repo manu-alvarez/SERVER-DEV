@@ -123,7 +123,7 @@ export const ProductsService = {
         include: { product: { include: { brand: true } } }
       });
       
-      const items = data.map(item => ({
+      const items = data.map((item: any) => ({
         ...item.product,
         stock_qty: item.quantity,
       })) as unknown as (Product & { stock_qty: number })[];

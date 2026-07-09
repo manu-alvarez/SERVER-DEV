@@ -28,7 +28,7 @@ export const TradingService = {
         take: 100
       });
 
-      const items = data.map(item => ({
+      const items = data.map((item: any) => ({
         id: item.id,
         type: item.type as TradingItem['type'],
         partner_id: item.partnerId,

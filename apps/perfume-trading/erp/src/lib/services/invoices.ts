@@ -30,7 +30,7 @@ export const InvoicesService = {
         take: 100
       });
 
-      const invoices = data.map(inv => ({
+      const invoices = data.map((inv: any) => ({
         id: inv.id,
         partner_id: inv.partnerId,
         partner_name: inv.partner?.name ?? '',
@@ -70,7 +70,7 @@ export const InvoicesService = {
           dueDate: input.due_date ? new Date(input.due_date) : undefined,
           notes: input.notes,
           items: input.items ? {
-            create: input.items.map(item => ({
+            create: input.items.map((item: any) => ({
               productId: item.product_id,
               description: item.description,
               quantity: item.quantity,

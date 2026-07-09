@@ -19,7 +19,7 @@ export const PartnersService = {
         orderBy: { name: 'asc' }
       });
 
-      const partners = data.map(p => ({
+      const partners = data.map((p: any) => ({
         id: p.id,
         name: p.name,
         type: p.type as Partner['type'],
