@@ -51,7 +51,7 @@ export async function getDashboardKpis() {
   const recentInvoices = await prisma.invoice.findMany({
     where: { status: { in: ['Paid', 'Shipped'] }, createdAt: { gte: thirtyDaysAgo } }
   });
-  const totalSales = recentInvoices.reduce((sum: number, inv) => sum + inv.totalGross, 0);
+  const totalSales = recentInvoices.reduce((sum: number, inv: any) => sum + inv.totalGross, 0);
 
   // We return the dashboard KPI object
   return {
