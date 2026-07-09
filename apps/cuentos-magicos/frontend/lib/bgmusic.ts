@@ -31,7 +31,7 @@ function clearFade() {
 function ensureAudio(): HTMLAudioElement | null {
   if (typeof window === "undefined") return null;
   if (!audio) {
-    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "/app/cuentos-magicos";
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
     audio = new Audio(`${basePath}/harry_potter.mp3`);
     audio.loop = true;
     audio.volume = 0;

@@ -549,7 +549,7 @@ export default function StoryPlayer({ story, chapters }: StoryPlayerProps) {
             {printOpen && (
               <div className="absolute right-0 top-full mt-2 w-48 rounded-2xl border border-amber-500/20 bg-slate-900/95 backdrop-blur-xl shadow-2xl z-50 overflow-hidden">
                 <a
-                  href={`${process.env.NEXT_PUBLIC_BASE_PATH || "/app/cuentos-magicos"}/stories/print/?id=${story.id}`}
+                  href={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/stories/print/?id=${story.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => {
@@ -561,7 +561,7 @@ export default function StoryPlayer({ story, chapters }: StoryPlayerProps) {
                   🖼️ Texto + Dibujos
                 </a>
                 <a
-                  href={`${process.env.NEXT_PUBLIC_BASE_PATH || "/app/cuentos-magicos"}/stories/print/?id=${story.id}&mode=text`}
+                  href={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/stories/print/?id=${story.id}&mode=text`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => {
