@@ -24,7 +24,8 @@ fi
 echo "🛠️ 3. Compilando frontends en el host..."
 bash scripts/build/vps_build_all.sh
 
-echo "🐳 4. Reconstruyendo imágenes personalizadas de Docker..."
+echo "🐳 4. Reconstruyendo imágenes de backend y personalizadas de Docker..."
+bash scripts/build/vps_build_backends.sh
 docker build -t msbross-fitness:latest apps/txa-fitness-pro || echo "⚠️ Build skipped: txa-fitness-pro"
 docker build -t msbross-mapfre:latest apps/mapfre/frontend || echo "⚠️ Build skipped: mapfre"
 docker build -t msbross-perfume:latest apps/perfume-trading/erp || echo "⚠️ Build skipped: perfume-trading"
