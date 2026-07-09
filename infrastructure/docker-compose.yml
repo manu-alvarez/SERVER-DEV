@@ -340,7 +340,7 @@ services:
       - traefik.http.routers.msbross-proxy-root.service=msbross-proxy-svc
       - traefik.http.services.msbross-proxy-svc.loadbalancer.server.port=8080
 
-    atenea-backend:
+  atenea-backend:
     <<: *backend
     container_name: atenea-backend
     image: msbross-atenea-backend:granian
