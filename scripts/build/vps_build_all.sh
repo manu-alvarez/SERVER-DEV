@@ -15,13 +15,18 @@ build_app() {
   if [ -d "$ROOT_DIR/$app_path" ]; then
     cd "$ROOT_DIR/$app_path"
     if [ -f "package.json" ]; then
-      # Use bun if available
+      # Use bun if available, with npm fallback
       if command -v bun &> /dev/null; then
-        echo "Running: bun install && bun run build"
-        bun install
-        bun run build
+        echo "Trying Bun: bun install && bun run build"
+        if bun install && bun run build; then
+          echo "✅ Built successfully with Bun!"
+        else
+          echo "⚠️ Bun failed. Falling back to NPM..."
+          npm install
+          npm run build
+        fi
       else
-        echo "Running: npm install && npm run build"
+        echo "Running with NPM: npm install && npm run build"
         npm install
         npm run build
       fi
