@@ -1,9 +1,10 @@
 name: Deploy CV Portfolio
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'apps/cv-portfolio/**'
+  # push trigger DISABLED — deployment runs on VPS via vps_deploy.sh
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - 'apps/cv-portfolio/**'
   workflow_dispatch:
 
 jobs:
