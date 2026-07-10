@@ -109,8 +109,15 @@ function checkPort(port, host = 'host.docker.internal', timeout = 3000) {
     const sock = new net.Socket();
     sock.setTimeout(timeout);
     sock.on('connect', () => { sock.destroy(); resolve(true); });
-    sock.on('error', () => resolve(false));
-    sock.on('timeout', () => { sock.destroy(); resolve(false); });
+    sock.on('error', (e) => {
+      console.error(`[CheckPort Error] ${host}:${port} ->`, e.message);
+      resolve(false);
+    });
+    sock.on('timeout', () => {
+      console.error(`[CheckPort Timeout] ${host}:${port}`);
+      sock.destroy();
+      resolve(false);
+    });
     sock.connect(port, host);
   });
 }

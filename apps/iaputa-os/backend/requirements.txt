@@ -8,6 +8,7 @@ python-dotenv
 
 # AI / LLM
 groq
+google-genai
 
 # Tools
 duckduckgo-search
