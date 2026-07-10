@@ -417,15 +417,11 @@ services:
     <<: *common
     container_name: portainer
     image: portainer/portainer-ce:lts
+    ports:
+      - "127.0.0.1:9000:9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.portainer.rule=Host(`portainer.manuelalvarez.dev`)
-      - traefik.http.routers.portainer.entrypoints=websecure
-      - traefik.http.routers.portainer.tls.certresolver=myresolver
-      - traefik.http.services.portainer.loadbalancer.server.port=9000
 
   uptime-kuma:
     <<: *common
