@@ -11,7 +11,7 @@ const app  = express();
 app.set('trust proxy', 1);
 app.disable('x-powered-by');
 const PORT = 8080;
-const WWW  = path.join(__dirname, 'www');
+const WWW  = path.join(__dirname, '../../www');
 
 // ── Compression ──
 app.use(compression({ level: 6, threshold: 1024 }));

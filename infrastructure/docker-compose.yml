@@ -321,7 +321,7 @@ services:
     <<: *common
     container_name: msbross-proxy
     image: node:22-alpine
-    command: node proxy_server.js
+    command: node infrastructure/msbross-proxy/proxy_server.js
     working_dir: /app
     environment:
       - NODE_ENV=production

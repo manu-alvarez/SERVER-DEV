@@ -178,9 +178,9 @@ export const APPS_DATA = [
     tag: 'CV'
   },
   {
-    name: 'MAPFRE Infocol',
-    desc: 'Portal interno para empleados de Mapfre.',
-    tech: 'Angular, .NET',
+    name: 'MAPFRE Gestión',
+    desc: 'Portal de gestión y automatización de partes MAPFRE.',
+    tech: 'Next.js, Python',
     url: 'https://mapfre.manuelalvarez.dev',
     icon: Shield,
     color: 'from-[#e60028] to-[#b3001f]',
