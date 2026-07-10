@@ -104,7 +104,7 @@ app.get('/__config', requireAdminAuth, (req, res) => {
 
 // ── Health check ──
 const net = require('net');
-function checkPort(port, host = 'host.docker.internal', timeout = 500) {
+function checkPort(port, host = 'host.docker.internal', timeout = 3000) {
   return new Promise(resolve => {
     const sock = new net.Socket();
     sock.setTimeout(timeout);
