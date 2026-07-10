@@ -11,6 +11,7 @@ dependencies = [
     "pydantic>=2.10.0",
     "pydantic-settings>=2.6.0",
     "python-multipart>=0.0.18",
+    "aiofiles>=23.2.1",
 
     # ── Database ──
     "sqlalchemy[asyncio]>=2.0.36",
@@ -32,6 +33,8 @@ dependencies = [
     "langchain-openai>=0.3.0",
     "langchain-google-genai>=2.0.0",
     "langchain-anthropic>=0.3.0",
+    "langchain-huggingface>=0.0.3",
+    "sentence-transformers>=3.0.0",
 
     # ── Embeddings & Vector ──
     "openai>=1.58.0",

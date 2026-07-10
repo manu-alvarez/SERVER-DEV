@@ -18,14 +18,22 @@ export function useNikolinaBackend() {
   useEffect(() => {
     fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(3000) })
       .then(r => {
-        if (r.ok) setIsConnectedBackend(true);
+        if (r.ok) {
+          setIsConnectedBackend(true);
+          const authEnabled = import.meta.env.VITE_AUTH_ENABLED !== 'false';
+          if (!authEnabled) {
+            setIsLoggedIn(true);
+          }
+        }
       })
       .catch(() => setIsConnectedBackend(false));
   }, []);
 
   const fetchData = useCallback(async () => {
-    if (!token) return;
-    const headers = { 'Authorization': `Bearer ${token}` };
+    const authEnabled = import.meta.env.VITE_AUTH_ENABLED !== 'false';
+    if (authEnabled && !token) return;
+    
+    const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
     try {
       const p1 = fetch(`${API_BASE}/restaurant`, { headers }).then(r => r.json());
       const p2 = fetch(`${API_BASE}/menu`, { headers }).then(r => r.json());

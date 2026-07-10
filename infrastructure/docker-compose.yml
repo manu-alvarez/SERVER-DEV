@@ -117,7 +117,7 @@ services:
     <<: *backend
     container_name: cuentos-magicos-backend
     image: msbross-cuentos-magicos-backend:granian
-    command: python -m granian app.main:app --host 0.0.0.0 --port 8007 --interface asgi
+    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8007
     depends_on:
       msbross-cuentos-db:
         condition: service_healthy
@@ -171,7 +171,7 @@ services:
     <<: *backend
     container_name: gas-station-backend
     image: msbross-gas-station-backend:granian
-    command: python -m granian main:app --host 0.0.0.0 --port 3005 --interface asgi
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 3005
     environment:
       - PORT=3005
     volumes:
@@ -181,7 +181,7 @@ services:
     <<: *backend
     container_name: iaputa-backend
     image: msbross-iaputa-backend:granian
-    command: python -m granian main:app --host 0.0.0.0 --port 8006 --interface asgi
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 8006
     env_file:
       - /home/ubuntu/MSBrossAI/apps/iaputa-os/.env
     environment:
@@ -193,7 +193,7 @@ services:
     <<: *backend
     container_name: industrialpro-backend
     image: msbross-industrial-backend:granian
-    command: python -m granian app:app --host 0.0.0.0 --port 8002 --interface asgi
+    command: python -m uvicorn app:app --host 0.0.0.0 --port 8002
     environment:
       - PORT=8002
     volumes:
@@ -240,7 +240,7 @@ services:
     <<: *backend
     container_name: nikolina-api-hub
     image: msbross-nikolina-backend:granian
-    command: python -m granian main:app --host 0.0.0.0 --port 8001 --interface asgi
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 8001
     env_file:
       - /home/ubuntu/MSBrossAI/apps/livekit-nikolina/.env
     environment:
@@ -334,7 +334,7 @@ services:
       - /home/ubuntu/MSBrossAI:/app
     labels:
       - traefik.enable=true
-      - traefik.http.routers.msbross-proxy-root.rule=Host(`manuelalvarez.dev`) || Host(`appgen.manuelalvarez.dev`) || Host(`assistant.manuelalvarez.dev`) || Host(`combipro.manuelalvarez.dev`) || Host(`cv.manuelalvarez.dev`) || Host(`edelweiss.manuelalvarez.dev`) || Host(`expositator.manuelalvarez.dev`) || Host(`gasstation.manuelalvarez.dev`) || Host(`iaputa.manuelalvarez.dev`) || Host(`industrial.manuelalvarez.dev`) || Host(`itenglish.manuelalvarez.dev`) || Host(`jartosdto.manuelalvarez.dev`) || Host(`logisearch.manuelalvarez.dev`) || Host(`logitrack.manuelalvarez.dev`) || Host(`mano.manuelalvarez.dev`) || Host(`maya.manuelalvarez.dev`) || Host(`mokotools.manuelalvarez.dev`) || Host(`nikolina.manuelalvarez.dev`) || Host(`taskflow.manuelalvarez.dev`) || Host(`traductor.manuelalvarez.dev`) || Host(`cuentos.manuelalvarez.dev`) || Host(`elitescout.manuelalvarez.dev`)
+      - traefik.http.routers.msbross-proxy-root.rule=Host(`manuelalvarez.dev`) || Host(`appgen.manuelalvarez.dev`) || Host(`assistant.manuelalvarez.dev`) || Host(`combipro.manuelalvarez.dev`) || Host(`cv.manuelalvarez.dev`) || Host(`edelweiss.manuelalvarez.dev`) || Host(`expositator.manuelalvarez.dev`) || Host(`gasstation.manuelalvarez.dev`) || Host(`iaputa.manuelalvarez.dev`) || Host(`industrial.manuelalvarez.dev`) || Host(`itenglish.manuelalvarez.dev`) || Host(`jartosdto.manuelalvarez.dev`) || Host(`logisearch.manuelalvarez.dev`) || Host(`logitrack.manuelalvarez.dev`) || Host(`mano.manuelalvarez.dev`) || Host(`maya.manuelalvarez.dev`) || Host(`mokotools.manuelalvarez.dev`) || Host(`nikolina.manuelalvarez.dev`) || Host(`taskflow.manuelalvarez.dev`) || Host(`traductor.manuelalvarez.dev`) || Host(`cuentos.manuelalvarez.dev`) || Host(`elitescout.manuelalvarez.dev`) || Host(`atenea.manuelalvarez.dev`)
       - traefik.http.routers.msbross-proxy-root.entrypoints=websecure
       - traefik.http.routers.msbross-proxy-root.tls.certresolver=myresolver
       - traefik.http.routers.msbross-proxy-root.service=msbross-proxy-svc
@@ -344,18 +344,13 @@ services:
     <<: *backend
     container_name: atenea-backend
     image: msbross-atenea-backend:granian
-    command: python -m granian main:app --host 0.0.0.0 --port 8009 --interface asgi
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 8009
     environment:
       - PORT=8009
     volumes:
       - /home/ubuntu/MSBrossAI/apps/web-restaurante-atenea:/app
       - /home/ubuntu/MSBrossAI/apps/web-restaurante-atenea/data:/app/data
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.atenea.rule=Host(`atenea.manuelalvarez.dev`)
-      - traefik.http.routers.atenea.entrypoints=websecure
-      - traefik.http.routers.atenea.tls.certresolver=myresolver
-      - traefik.http.services.atenea.loadbalancer.server.port=8009
+
 
 # ──────────────────────────────────────────────
   # SSR APPS (Next.js / Direct Docker)

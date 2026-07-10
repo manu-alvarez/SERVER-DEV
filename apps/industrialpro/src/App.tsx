@@ -26,6 +26,13 @@ export default function App() {
 
   useEffect(() => {
     // We already persist the user in zustand, but we still check the token validitiy
+    const authEnabled = import.meta.env.VITE_AUTH_ENABLED !== 'false';
+    if (!authEnabled) {
+      setUser({ id: 1, name: 'Admin', role: 'admin', created_at: '' });
+      setChecking(false);
+      return;
+    }
+    
     api.get('/auth/me')
       .then(r => setUser(r.data))
       .catch(() => { setToken(null); logout(); })

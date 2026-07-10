@@ -124,7 +124,7 @@ const BACKEND_MAP = {
 
   'iaputa-backend':         ['iaputa-backend',            8006],
   'cuentos-magicos':        ['cuentos-magicos-backend',   8007],
-  'web-restaurante-atenea': ['host.docker.internal',      8009],
+  'web-restaurante-atenea': ['atenea-backend',            8009],
   'jartosdto-backend':      ['jartosdto-backend',         8010],
   'gas-station':            ['gas-station-backend',       3005],
   'perfume-trading':        ['perfume-trading',           3000],
@@ -250,6 +250,10 @@ app.use((req, res, next) => {
     return res.redirect(302, 'https://manu-alvarez.github.io/TuEnergiaMaya/');
   }
 
+  if (host === 'logitrack.manuelalvarez.dev') {
+    return res.redirect(302, 'https://trello.com/b/IRVpzuUt/logitrack-operaciones-de-almacen');
+  }
+
   const mappedApp = DOMAIN_APP_MAP[host];
   if (mappedApp && !req.url.startsWith('/api') && !req.url.startsWith('/_')) {
     if (req.url === '/') {
@@ -336,6 +340,8 @@ app.use('/_iaputa',        createProxyMiddleware(proxyOpts('http://iaputa-backen
 app.use('/_itenglish',     createProxyMiddleware(proxyOpts('http://it-english-backend:8787', '/_itenglish')));
 app.use('/_cuentosmagicos',createProxyMiddleware(proxyOpts('http://cuentos-magicos-backend:8007', '/_cuentosmagicos')));
 app.use('/_jartosdto',     createProxyMiddleware(proxyOpts('http://jartosdto-backend:8010', '/_jartosdto')));
+app.use('/_atenea',        createProxyMiddleware(proxyOpts('http://atenea-backend:8009', '/_atenea')));
+app.use('/_traductor',     createProxyMiddleware(proxyOpts('http://traductor-backend:8004', '/_traductor')));
 
 
 // ── IT English Coach AI Proxy ──

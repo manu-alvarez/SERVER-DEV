@@ -38,6 +38,13 @@ export default function App() {
 
   useEffect(() => {
     const token = getToken();
+    const authEnabled = import.meta.env.VITE_AUTH_ENABLED !== 'false';
+    if (!authEnabled) {
+      setUser({ id: '1', name: 'Admin', role: 'encargado', pin: '0000', created_at: '' });
+      setChecking(false);
+      return;
+    }
+    
     if (token) {
       api.me().then(u => setUser(u)).catch(() => { setToken(null); setUser(null); }).finally(() => setChecking(false));
     } else {
