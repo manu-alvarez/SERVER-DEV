@@ -344,7 +344,7 @@ services:
     <<: *backend
     container_name: llm-admin-proxy
     image: oven/bun:alpine
-    command: bun run index.ts
+    command: sh -c "bun install && bun run index.ts"
     working_dir: /app
     env_file:
       - ../apps/llm-admin-proxy/.env
