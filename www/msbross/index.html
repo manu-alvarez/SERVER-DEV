@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/logo-icon.png" />
+    <link rel="apple-touch-icon" href="/logo192.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSBross Ecosystem — MSBross</title>
+    <script type="module" crossorigin src="/assets/index-B3HfAzRF.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-ClKTuT0d.css">
+  <link rel="manifest" href="/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script></head>
+  <body>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+            console.log('Service Worker unregistered to force update');
+          }
+        }).catch(function(err) {
+          console.log('Service Worker unregistration failed: ', err);
+        });
+      }
+      
+      // Also clear caches
+      if ('caches' in window) {
+        caches.keys().then(function(names) {
+          for (let name of names)
+            caches.delete(name);
+        });
+      }
+    </script>
+    <div id="root"></div>
+  </body>
+</html>
