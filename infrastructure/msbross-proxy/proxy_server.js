@@ -135,9 +135,11 @@ const BACKEND_MAP = {
 
 app.get('/__health', requireAdminAuth, async (req, res) => {
   const checks = await Promise.all(
-    Object.entries(BACKEND_MAP).map(async ([name, [host, port]]) => ({
-      name, port, online: await checkPort(port, host),
-    }))
+    Object.entries(BACKEND_MAP).map(async ([name, [host, port]]) => {
+      const online = await checkPort(port, host);
+      console.log(`[Health] Check ${name} (${host}:${port}) -> ${online ? 'UP' : 'DOWN'}`);
+      return { name, port, online };
+    })
   );
   const online = checks.filter(c => c.online).length;
   const total = checks.length;
