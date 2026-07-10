@@ -12,10 +12,10 @@ export default function App() {
       </div>
       
       {/* Components have z-10 for interactivity over background */}
-      <div className="z-10 relative">
+      <div className="z-10 relative bento-chat-wrapper w-full">
         <ChatPanel />
       </div>
-      <div className="z-10 relative h-full w-full">
+      <div className="z-10 relative bento-sandbox-wrapper w-full">
         <SandboxPortal />
       </div>
     </div>

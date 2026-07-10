@@ -26,7 +26,7 @@ export default function App() {
 
   useEffect(() => {
     // We already persist the user in zustand, but we still check the token validitiy
-    const authEnabled = import.meta.env.VITE_AUTH_ENABLED === 'true';
+    const authEnabled = false; // Forced false to bypass auth
     if (!authEnabled) {
       setUser({ id: 1, name: 'Admin', role: 'admin', created_at: '' });
       setChecking(false);

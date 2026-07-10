@@ -67,9 +67,9 @@ function App() {
         <div className="orb orb-3"></div>
       </div>
 
-      <div className="h-screen w-screen flex flex-col lg:flex-row p-2 lg:p-4 gap-4 lg:gap-6 overflow-y-auto lg:overflow-hidden">
+      <div className="min-h-dvh w-full flex flex-col lg:flex-row p-2 lg:p-4 gap-4 lg:gap-6 lg:h-screen lg:overflow-hidden">
         {/* Main Content Area */}
-        <main className="flex-1 flex flex-col gap-4 lg:gap-6 min-h-[600px] lg:min-h-0">
+        <main className="flex-1 flex flex-col gap-4 lg:gap-6 lg:min-h-0">
           
           {/* Header */}
           <header className="glass-panel p-4 rounded-2xl flex flex-col lg:flex-row justify-between items-center gap-4 shadow-xl">
@@ -122,7 +122,7 @@ function App() {
         </main>
 
         {/* Sidebar Tribunal */}
-        <div className="portal-card w-full lg:w-1/3 flex flex-col min-h-[600px] lg:min-h-0 shrink-0">
+        <div className="portal-card w-full lg:w-1/3 flex flex-col lg:min-h-0 shrink-0">
           <aside className="portal-card-inner flex flex-col p-5 shadow-2xl">
             <MetricsPanel />
 

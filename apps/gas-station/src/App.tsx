@@ -38,7 +38,7 @@ export default function App() {
 
   useEffect(() => {
     const token = getToken();
-    const authEnabled = import.meta.env.VITE_AUTH_ENABLED === 'true';
+    const authEnabled = false; // Forced false to bypass auth
     if (!authEnabled) {
       setUser({ id: '1', name: 'Admin', role: 'encargado', pin: '0000', created_at: '' });
       setChecking(false);

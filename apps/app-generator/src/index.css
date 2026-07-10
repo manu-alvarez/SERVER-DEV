@@ -55,19 +55,36 @@
 
 @layer utilities {
   .bento-layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 50dvh 50dvh;
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
-    padding: 1rem;
-    height: 100dvh;
+    padding: 0.5rem;
+    min-height: 100dvh;
     width: 100vw;
+  }
+
+  .bento-chat-wrapper {
+    height: 60vh;
+    min-height: 400px;
+  }
+
+  .bento-sandbox-wrapper {
+    height: 80vh;
+    min-height: 500px;
   }
 
   @media (min-width: 1024px) {
     .bento-layout {
+      display: grid;
       grid-template-columns: 400px 1fr;
       grid-template-rows: 1fr;
+      padding: 1rem;
+      height: 100dvh;
+      overflow: hidden;
+    }
+    .bento-chat-wrapper, .bento-sandbox-wrapper {
+      height: 100%;
+      min-height: 0;
     }
   }
 
