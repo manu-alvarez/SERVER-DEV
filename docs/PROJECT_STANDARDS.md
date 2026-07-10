@@ -28,4 +28,6 @@ Las siguientes aplicaciones son de **ACCESO LIBRE Y DIRECTO**. Queda terminantem
 ## 5. Procedimiento de Modificación
 1. **Verificar antes de actuar**: Antes de escribir código, leer este documento.
 2. **Commit por acción garantizada**: No se acumulan docenas de cambios para un commit basura. Se comitea cada funcionalidad probada y garantizada al 100%.
-3. **Despliegue a producción**: El servidor VPS no usa los `dist` antiguos. Todo pasa por `sync_www.sh` usando los comandos limpios para no anidar carpetas. Si se altera el código, se re-construye el `dist` y se empaqueta sin ensuciar la raíz `www`.
+3. **Despliegue a producción**: El servidor VPS no usa los `dist` antiguos. Si se altera el código de un frontend, debe compilarse de nuevo. 
+   - Ejecuta `./scripts/build/build_all.sh` para recompilar **todos** los proyectos que tienen package.json y volcarlos automáticamente usando `sync_www.sh`.
+   - Esto empaqueta los archivos limpios en `www/app` sin ensuciar la raíz `www` con carpetas anidadas.
