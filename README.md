@@ -24,7 +24,7 @@ El ecosistema alberga actualmente **24 aplicaciones funcionales**, categorizadas
 | **JartosDTO** | `jartosdto` | Docker (Node) + PostgreSQL + MinIO |
 | **Cuentos Mágicos** | `cuentos` | Docker (Node) + PostgreSQL |
 | **Gas Station** | `gasstation` | Docker (Node) |
-| **IAputa OS** | `iaputa` | Docker (Node) |
+| **IAprod OS** | `iaprod` | Docker (Node) |
 | **Mapfre Gestión** | `mapfre` | Traefik Direct Proxy (Puerto 3333) |
 | **Perfume Trading** | `perfume` | Traefik Direct Proxy (Puerto 3011) |
 | **EliteScout** | `elitescout` | Docker (Node) |

@@ -39,7 +39,7 @@ Para replicar el entorno, el nuevo servidor debe tener instalados los siguientes
 | **elitescout-server** | `8003` | Node (Next.js SSR) |
 | **traductor-pro-server** | `8004` | Node.js (Express) |
 | **msbross-backend** | `8005` | Python 3.14 |
-| **iaputa-backend** | `8006` | Python 3.14 (Uvicorn) |
+| **iaprod-backend** | `8006` | Python 3.14 (Uvicorn) |
 | **cuentos-magicos-backend** | `8007` | Python 3.14 (Uvicorn) |
 | **web-restaurante-atenea** | `8009` | Python 3.14 (Uvicorn) |
 | **jartosdto-backend** | `8010` | Python 3.14 (Uvicorn) |
@@ -96,7 +96,7 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
-*(Debes repetir esto para: `gas-station`, `industrialpro`, `iaputa-os`, `msbross`, `cuentos-magicos`, `web-restaurante-atenea`, `jartosdto`)*.
+*(Debes repetir esto para: `gas-station`, `industrialpro`, `iaprod-os`, `msbross`, `cuentos-magicos`, `web-restaurante-atenea`, `jartosdto`)*.
 
 ### Paso 3: Compilar los Next.js (SSR)
 A diferencia de los estáticos (React/Vite que ya están en `/www`), las apps Next.js requieren compilarse en el servidor:

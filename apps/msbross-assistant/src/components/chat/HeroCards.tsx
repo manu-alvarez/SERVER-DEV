@@ -26,8 +26,8 @@ export function HeroCards() {
         transition={{ delay: 0.2, duration: 0.8 }}
         className="text-center text-white/60 text-base md:text-lg font-medium max-w-xl mb-20 leading-relaxed"
       >
-        <span className="text-white">Plataforma de Inteligencia Holográfica Multimodelo.</span><br/>
-        La convergencia total entre pensamiento lógico, voz viva y herramientas dinámicas.
+        <span className="text-white">Plataforma Centralizada de Asistencia Inteligente.</span><br/>
+        Integración de IA, herramientas de desarrollo y comunicación por voz.
       </motion.div>
 
       {/* 3 Cards Grid - Glassmorphism Godmode */}
@@ -45,9 +45,9 @@ export function HeroCards() {
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#00ffcc]/20 to-transparent flex items-center justify-center mb-6 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] border border-[#00ffcc]/20 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
                 <span className="w-5 h-5 rounded-full bg-[#00ffcc] shadow-[0_0_15px_#00ffcc] animate-pulse"></span>
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">Modelos Cuánticos</h3>
+              <h3 className="text-xl font-bold text-white mb-3">Modelos de Lenguaje</h3>
               <p className="text-sm text-white/40 mb-8 leading-relaxed">
-                Selecciona la mente maestra: Gemini, Groq, Ollama, Llama 3 o Claude. Sincronización instantánea.
+                Selecciona entre diferentes proveedores como OpenAI, Anthropic, Google, o modelos locales de Ollama en el servidor.
               </p>
             </div>
             <ModelSelector />
@@ -63,7 +63,7 @@ export function HeroCards() {
             </div>
             <h3 className="text-xl font-bold text-white mb-3">Stitch & Tools</h3>
             <p className="text-sm text-white/40 leading-relaxed">
-              Ejecución de código en tiempo real. Previsualiza React, dibuja en Canvas y delega tareas automáticas en un entorno aislado.
+              Ejecución de código en tiempo real. Previsualiza React, visualiza componentes y delega tareas en un entorno aislado.
             </p>
           </div>
         </div>
@@ -75,9 +75,9 @@ export function HeroCards() {
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#aa3bff]/20 to-transparent flex items-center justify-center mb-6 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)] border border-[#aa3bff]/20 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500">
               <AudioLines className="w-6 h-6 text-[#aa3bff]" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-3">Voz Viva</h3>
+            <h3 className="text-xl font-bold text-white mb-3">Interacción por Voz</h3>
             <p className="text-sm text-white/40 leading-relaxed">
-              Habla directamente con Adele. Síntesis neuronal natural con respuestas instantáneas y detección de interrupciones.
+              Comunícate directamente por voz. Respuestas instantáneas y soporte para detección de interrupciones.
             </p>
           </div>
         </div>

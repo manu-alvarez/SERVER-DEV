@@ -50,7 +50,7 @@ build_backend_image() {
 
 build_backend_image "msbross-cuentos-magicos-backend:granian" "apps/cuentos-magicos/backend"
 build_backend_image "msbross-gas-station-backend:granian" "apps/gas-station/backend"
-build_backend_image "msbross-iaputa-backend:granian" "apps/iaputa-os/backend"
+build_backend_image "msbross-iaprod-backend:granian" "apps/iaprod-os/backend"
 build_backend_image "msbross-industrial-backend:granian" "apps/industrialpro/backend"
 build_backend_image "msbross-jartosdto-backend:granian" "apps/jartosdto/server"
 build_backend_image "msbross-msbross:granian" "apps/msbross-backend/server-fastapi"

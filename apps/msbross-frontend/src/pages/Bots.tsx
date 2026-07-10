@@ -4,10 +4,10 @@ import { motion, type Variants } from 'framer-motion';
 export default function Agents() {
   const agents = [
     {
-      name: 'IAPuta OS',
+      name: 'IAProd OS',
       desc: 'Asistente IA personal con modelo 3D y conexión a herramientas del servidor.',
       tech: 'FastAPI, React 19, Three.js',
-      url: 'https://iaputa.manuelalvarez.dev',
+      url: 'https://iaprod.manuelalvarez.dev',
       icon: Brain,
       color: 'from-cyan-400 to-blue-600',
       glow: 'shadow-[0_0_40px_rgba(6,182,212,0.4)]',

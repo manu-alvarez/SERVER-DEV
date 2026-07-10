@@ -15,10 +15,10 @@ git clean -ffd
 echo "⚙️ 2. Copiando configuración limpia de docker-compose..."
 cp infrastructure/docker-compose.yml docker-compose.yml
 
-# Check and copy iaputa-os .env if needed
-if [ -f "iaputa-os/.env" ] && [ ! -f "apps/iaputa-os/.env" ]; then
-  echo "🔑 Copiando iaputa-os .env desde el directorio de respaldo..."
-  cp iaputa-os/.env apps/iaputa-os/.env
+# Check and copy iaprod-os .env if needed
+if [ -f "iaprod-os/.env" ] && [ ! -f "apps/iaprod-os/.env" ]; then
+  echo "🔑 Copiando iaprod-os .env desde el directorio de respaldo..."
+  cp iaprod-os/.env apps/iaprod-os/.env
 fi
 
 echo "🛠️ 3. Compilando frontends en el host..."

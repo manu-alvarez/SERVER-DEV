@@ -4,7 +4,7 @@ set -e
 
 export PATH=$PATH:/home/ubuntu/.bun/bin:/usr/local/bin
 
-ROOT_DIR="/home/ubuntu/MSBrossAI"
+ROOT_DIR="$(pwd)"
 cd "$ROOT_DIR"
 
 # Helper function to build an app
@@ -45,7 +45,7 @@ build_app "apps/combipro"
 build_app "apps/industrialpro"
 build_app "apps/edelweiss"
 build_app "apps/expositator-rte"
-build_app "apps/iaputa-os/frontend"
+build_app "apps/iaprod-os/frontend"
 build_app "apps/jartosdto/client"
 build_app "apps/logisearch"
 build_app "apps/moko-tools"

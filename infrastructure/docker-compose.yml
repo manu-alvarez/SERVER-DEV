@@ -177,17 +177,17 @@ services:
     volumes:
       - /home/ubuntu/MSBrossAI/apps/gas-station/backend:/app
 
-  iaputa-backend:
+  iaprod-backend:
     <<: *backend
-    container_name: iaputa-backend
-    image: msbross-iaputa-backend:granian
+    container_name: iaprod-backend
+    image: msbross-iaprod-backend:granian
     command: python -m uvicorn main:app --host 0.0.0.0 --port 8006
     env_file:
-      - /home/ubuntu/MSBrossAI/apps/iaputa-os/.env
+      - /home/ubuntu/MSBrossAI/apps/iaprod-os/.env
     environment:
       - PORT=8006
     volumes:
-      - /home/ubuntu/MSBrossAI/apps/iaputa-os/backend:/app
+      - /home/ubuntu/MSBrossAI/apps/iaprod-os/backend:/app
 
   industrialpro-backend:
     <<: *backend
@@ -334,7 +334,7 @@ services:
       - /home/ubuntu/MSBrossAI:/app
     labels:
       - traefik.enable=true
-      - traefik.http.routers.msbross-proxy-root.rule=Host(`manuelalvarez.dev`) || Host(`appgen.manuelalvarez.dev`) || Host(`assistant.manuelalvarez.dev`) || Host(`combipro.manuelalvarez.dev`) || Host(`cv.manuelalvarez.dev`) || Host(`edelweiss.manuelalvarez.dev`) || Host(`expositator.manuelalvarez.dev`) || Host(`gasstation.manuelalvarez.dev`) || Host(`iaputa.manuelalvarez.dev`) || Host(`industrial.manuelalvarez.dev`) || Host(`itenglish.manuelalvarez.dev`) || Host(`jartosdto.manuelalvarez.dev`) || Host(`logisearch.manuelalvarez.dev`) || Host(`logitrack.manuelalvarez.dev`) || Host(`mano.manuelalvarez.dev`) || Host(`maya.manuelalvarez.dev`) || Host(`mokotools.manuelalvarez.dev`) || Host(`nikolina.manuelalvarez.dev`) || Host(`taskflow.manuelalvarez.dev`) || Host(`traductor.manuelalvarez.dev`) || Host(`cuentos.manuelalvarez.dev`) || Host(`elitescout.manuelalvarez.dev`) || Host(`atenea.manuelalvarez.dev`)
+      - traefik.http.routers.msbross-proxy-root.rule=Host(`manuelalvarez.dev`) || Host(`appgen.manuelalvarez.dev`) || Host(`assistant.manuelalvarez.dev`) || Host(`combipro.manuelalvarez.dev`) || Host(`cv.manuelalvarez.dev`) || Host(`edelweiss.manuelalvarez.dev`) || Host(`expositator.manuelalvarez.dev`) || Host(`gasstation.manuelalvarez.dev`) || Host(`iaprod.manuelalvarez.dev`) || Host(`industrial.manuelalvarez.dev`) || Host(`itenglish.manuelalvarez.dev`) || Host(`jartosdto.manuelalvarez.dev`) || Host(`logisearch.manuelalvarez.dev`) || Host(`logitrack.manuelalvarez.dev`) || Host(`mano.manuelalvarez.dev`) || Host(`maya.manuelalvarez.dev`) || Host(`mokotools.manuelalvarez.dev`) || Host(`nikolina.manuelalvarez.dev`) || Host(`taskflow.manuelalvarez.dev`) || Host(`traductor.manuelalvarez.dev`) || Host(`cuentos.manuelalvarez.dev`) || Host(`elitescout.manuelalvarez.dev`) || Host(`atenea.manuelalvarez.dev`)
       - traefik.http.routers.msbross-proxy-root.entrypoints=websecure
       - traefik.http.routers.msbross-proxy-root.tls.certresolver=myresolver
       - traefik.http.routers.msbross-proxy-root.service=msbross-proxy-svc

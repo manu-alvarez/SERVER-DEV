@@ -57,10 +57,10 @@
   .bento-layout {
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 50vh 50vh;
-    gap: 1.5rem;
-    padding: 1.5rem;
-    height: 100vh;
+    grid-template-rows: 50dvh 50dvh;
+    gap: 1rem;
+    padding: 1rem;
+    height: 100dvh;
     width: 100vw;
   }
 

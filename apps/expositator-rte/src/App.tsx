@@ -67,34 +67,34 @@ function App() {
         <div className="orb orb-3"></div>
       </div>
 
-      <div className="h-screen w-screen flex p-4 gap-6 overflow-hidden">
+      <div className="h-screen w-screen flex flex-col lg:flex-row p-2 lg:p-4 gap-4 lg:gap-6 overflow-y-auto lg:overflow-hidden">
         {/* Main Content Area */}
-        <main className="flex-1 flex flex-col gap-6">
+        <main className="flex-1 flex flex-col gap-4 lg:gap-6 min-h-[600px] lg:min-h-0">
           
           {/* Header */}
-          <header className="glass-panel p-4 rounded-2xl flex justify-between items-center shadow-xl">
-            <h1 className="text-2xl font-display font-black tracking-tight text-white flex items-center gap-4">
+          <header className="glass-panel p-4 rounded-2xl flex flex-col lg:flex-row justify-between items-center gap-4 shadow-xl">
+            <h1 className="text-xl lg:text-2xl font-display font-black tracking-tight text-white flex items-center gap-4">
               <div className={`w-3 h-3 rounded-full shadow-lg ${isRunning ? 'bg-red-500 animate-pulse shadow-red-500/50' : 'bg-slate-500'}`}></div>
               EXPOSITATOR <span className="text-gradient">RTE</span>
             </h1>
             
-            <div className="flex gap-3 items-center bg-black/40 p-1.5 rounded-xl border border-white/10">
+            <div className="flex flex-col sm:flex-row gap-3 items-center bg-black/40 p-1.5 rounded-xl border border-white/10 w-full lg:w-auto">
               <input 
                 ref={apiKeyInputRef}
                 type="password" 
                 defaultValue={apiKey}
                 placeholder="Gemini API Key..." 
-                className="bg-transparent border-none px-4 py-2 text-sm font-mono text-brand-400 focus:outline-none w-64 placeholder-slate-500"
+                className="bg-transparent border-none px-4 py-2 text-sm font-mono text-brand-400 focus:outline-none w-full sm:w-64 placeholder-slate-500"
               />
               <button 
                 onClick={handleSaveApi}
-                className="bg-white/5 hover:bg-white/10 text-slate-300 px-4 py-2 rounded-lg text-xs font-bold transition-colors"
+                className="bg-white/5 hover:bg-white/10 text-slate-300 px-4 py-2 rounded-lg text-xs font-bold transition-colors w-full sm:w-auto"
               >
                 {apiKey ? '✓ GUARDADA' : 'GUARDAR API'}
               </button>
-              <div className="w-px h-8 bg-white/10 mx-1"></div>
+              <div className="hidden sm:block w-px h-8 bg-white/10 mx-1"></div>
               
-              <div className="portal-card h-[38px] w-[160px]">
+              <div className="portal-card h-[38px] w-full sm:w-[160px] shrink-0">
                 <button 
                   onClick={toggleSession}
                   className="portal-card-inner btn-premium text-sm font-bold flex items-center justify-center w-full shadow-lg"
@@ -122,7 +122,7 @@ function App() {
         </main>
 
         {/* Sidebar Tribunal */}
-        <div className="portal-card w-1/3 flex flex-col">
+        <div className="portal-card w-full lg:w-1/3 flex flex-col min-h-[600px] lg:min-h-0 shrink-0">
           <aside className="portal-card-inner flex flex-col p-5 shadow-2xl">
             <MetricsPanel />
 

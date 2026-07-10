@@ -79,10 +79,10 @@ export const APPS_DATA = [
     tag: 'OPS PWA'
   },
   {
-    name: 'IAPuta OS',
+    name: 'IAProd OS',
     desc: 'Bot para ayuda en tareas de gestión de servidor por terminal.',
     tech: 'FastAPI, Python, LLM',
-    url: 'https://iaputa.manuelalvarez.dev',
+    url: 'https://iaprod.manuelalvarez.dev',
     icon: Shield,
     color: 'from-[#8b5cf6] to-[#7c3aed]',
     glow: 'shadow-[0_0_30px_rgba(139,92,246,0.3)]',

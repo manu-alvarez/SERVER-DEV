@@ -98,14 +98,21 @@ export function ModelSelector() {
                             setIsOpen(false);
                           }}
                           className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-all flex items-center justify-between
-                            ${selectedModel === model.id ? 'bg-[#00ffcc]/10 text-[#00ffcc]' : 'text-white/70 hover:bg-white/5 hover:text-white'}
-                          `}
+                            ${selectedModel === model.id 
+                              ? 'bg-[#00ffcc]/10 text-[#00ffcc] font-medium' 
+                              : 'text-white/70 hover:bg-white/5 hover:text-white'
+                            }`}
                         >
-                          <span>{model.name}</span>
-                          {model.free && (
-                            <span className="text-[9px] uppercase tracking-wider text-[#ffcc00] bg-[#ffcc00]/10 px-2 py-0.5 rounded-full border border-[#ffcc00]/20">
-                              + gratis
-                            </span>
+                          <div className="flex items-center gap-2">
+                            {model.name}
+                            {model.free && (
+                              <span className="px-1.5 py-0.5 rounded-md bg-[#00ffcc]/10 text-[#00ffcc] text-[9px] uppercase tracking-wider font-bold">
+                                Free
+                              </span>
+                            )}
+                          </div>
+                          {selectedModel === model.id && (
+                            <motion.div layoutId="active-model-indicator" className="w-1.5 h-1.5 rounded-full bg-[#00ffcc]" />
                           )}
                         </button>
                       ))}

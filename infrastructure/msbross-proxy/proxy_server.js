@@ -129,7 +129,7 @@ const BACKEND_MAP = {
   'elitescout-backend':     ['elitescout-backend',        8003],
   'traductor-backend':      ['traductor-backend',         8004],
 
-  'iaputa-backend':         ['iaputa-backend',            8006],
+  'iaprod-backend':         ['iaprod-backend',            8006],
   'cuentos-magicos':        ['cuentos-magicos-backend',   8007],
   'web-restaurante-atenea': ['atenea-backend',            8009],
   'jartosdto-backend':      ['jartosdto-backend',         8010],
@@ -216,14 +216,14 @@ app.get('/api/visits-badge', (req, res) => {
 // ── Static SPAs ──
 const NEXT_APPS = [
   'app-generator', 'cuentos-magicos', 'combipro', 'industrialpro',
-  'edelweiss', 'expositator-rte', 'iaputa-os', 'jartosdto',
+  'edelweiss', 'expositator-rte', 'iaprod-os', 'jartosdto',
   'logisearch', 'moko-tools', 'msbross', 'gas-station', 'livekit-nikolina',
   'taskflow', 'traductor-pro', 'web-restaurante-atenea', 'it-english-coach',
   'cv', 'logitrack', 'maya', 'assistant'
 ];
 
 const DOMAIN_APP_MAP = {
-  'iaputa.manuelalvarez.dev': 'iaputa-os',
+  'iaprod.manuelalvarez.dev': 'iaprod-os',
   'jartosdto.manuelalvarez.dev': 'jartosdto',
   'traductor.manuelalvarez.dev': 'traductor-pro',
   'industrial.manuelalvarez.dev': 'industrialpro',
@@ -346,7 +346,7 @@ app.use('/app/elitescout', createProxyMiddleware({
   }
 }));
 
-app.use('/_iaputa',        createProxyMiddleware(proxyOpts('http://iaputa-backend:8006', '/_iaputa')));
+app.use('/_iaprod',        createProxyMiddleware(proxyOpts('http://iaprod-backend:8006', '/_iaprod')));
 app.use('/_itenglish',     createProxyMiddleware(proxyOpts('http://it-english-backend:8787', '/_itenglish')));
 app.use('/_cuentosmagicos',createProxyMiddleware(proxyOpts('http://cuentos-magicos-backend:8007', '/_cuentosmagicos')));
 app.use('/_jartosdto',     createProxyMiddleware(proxyOpts('http://jartosdto-backend:8010', '/_jartosdto')));
