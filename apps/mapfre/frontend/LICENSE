@@ -24,16 +24,16 @@ SOFTWARE.
 ADDITIONAL TERMS - MAPFRE INTEGRATION
 ------------------------------------
 
-This software is designed to interact with the MAPFRE InfoCol web portal. The
+This software is designed to interact with the MAPFRE Gestión web portal. The
 following terms apply when integrating with MAPFRE systems:
 
-1. Credentials for MAPFRE InfoCol must never be hard-coded, shared or
+1. Credentials for MAPFRE Gestión must never be hard-coded, shared or
    committed to version control. Use the OS keychain or encrypted local
    storage (see config/settings.yaml).
 
-2. Personal data obtained from InfoCol (DNI, policy numbers, addresses) must
+2. Personal data obtained from Gestión (DNI, policy numbers, addresses) must
    be sanitized before being sent to any external AI service (Claude API).
-   The sanitizer module (src/infocol/security.py) handles this automatically.
+   The sanitizer module (src/gestion/security.py) handles this automatically.
 
 3. Compliance with RGPD/LOPD is mandatory. The user is responsible for
    informing their data protection officer about the use of this tool.

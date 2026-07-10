@@ -1,4 +1,4 @@
-# Architecture Document: INFOCOL Automation
+# Architecture Document: GESTION Automation
 
 **Architecture v1.0.0 | Status: ACTIVE | 2026-06-04**
 
@@ -8,14 +8,14 @@
 
 ```
 ┌─────────────┐     HTTPS      ┌──────────────────┐
-│  Tradesperson │ ──────────▶ │  InfoCol Portal   │
+│  Tradesperson │ ──────────▶ │  Gestión Portal   │
 │  (User)       │ ◀────────── │  (MAPFRE Web App) │
 └──────┬───────┘              └──────────────────┘
        │
        │ local execution
        ▼
 ┌─────────────────────────────────────────────┐
-│         INFOCOL Automation Script           │
+│         GESTION Automation Script           │
 │  Python + Playwright + Claude API           │
 └──────┬──────────────────────────┬───────────┘
        │                          │
@@ -31,7 +31,7 @@
 
 ```
 ┌─────────────────────────────────────────────────┐
-│                  infocol/                         │
+│                  gestion/                         │
 ├─────────────────────────────────────────────────┤
 │  main.py          CLI entry point + orchestration│
 │  browser.py       Playwright page controller     │
@@ -49,7 +49,7 @@
 
 ```
 1. START ──▶ Load config → Read encrypted credentials → Decrypt
-2. LOGIN ──▶ Launch Chromium → Navigate to InfoCol → Authenticate
+2. LOGIN ──▶ Launch Chromium → Navigate to Gestión → Authenticate
 3. SCAN ───▶ Navigate to FIN queue → Extract expediente list
 4. LOOP ───▶ For each expediente:
    a. Read description + notes from DOM

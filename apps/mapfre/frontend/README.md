@@ -1,4 +1,4 @@
-# INFOCOL - Automatización Inteligente de Partes MAPFRE
+# GESTION - Automatización Inteligente de Partes MAPFRE
 
 > **Versión Beta** · Sistema inteligente de descuento de expedientes
 > *Pedro González · Fontanero · Logroño, La Rioja · Junio 2026*
@@ -13,14 +13,14 @@
 
 | Issue | Impacto |
 |-------|---------|
-| Proceso lento | ~2 min por expediente en el portal InfoCol |
+| Proceso lento | ~2 min por expediente en el portal Gestión |
 | Errores frecuentes | Códigos de tarifa incorrectos → facturación errónea |
 | Proceso repetitivo | Mismo flujo para decenas de expedientes/semana |
 | Pérdida económica | Códigos incorrectos → ingresos perdidos |
 
 ## La Solución
 
-**Stack completo** que automatiza el ciclo de descuento de expedientes en InfoCol:
+**Stack completo** que automatiza el ciclo de descuento de expedientes en Gestión:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -34,7 +34,7 @@
 └──────────────────────────┬──────────────────────────────────┘
                            │ Chromium headless
 ┌──────────────────────────┴──────────────────────────────────┐
-│  MAPFRE InfoCol (portal real)                                │
+│  MAPFRE Gestión (portal real)                                │
 │  https://app.mapfre.com/...                                  │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -80,13 +80,13 @@ npm install
 
 ```bash
 # Genera config/settings.local.yaml con valores predeterminados
-infocol config init
+gestion config init
 
 # Verifica que todo funciona
-infocol status
+gestion status
 
 # Ejecuta un análisis de expedientes reales sin guardar los datos (modo seguro)
-infocol run --dry-run
+gestion run --dry-run
 ```
 
 ### 4. Lanzar el frontend
@@ -131,12 +131,12 @@ MAPFRE/
 ├── PRESENTATION/                      # Mockups y assets
 │   └── design/
 │
-├── src/infocol/                       # Paquete Python principal
+├── src/gestion/                       # Paquete Python principal
 │   ├── __init__.py
 │   ├── main.py                        # CLI entry point
 │   ├── browser.py                     # Playwright automation
 │   ├── analyzer.py                    # Claude API integration
-│   ├── form_filler.py                 # Relleno de formularios InfoCol
+│   ├── form_filler.py                 # Relleno de formularios Gestión
 │   ├── tariff.py                      # Base de datos códigos MAPFRE
 │   ├── displacement.py                # Cálculo de distancias
 │   ├── security.py                    # Keychain + sanitización
@@ -154,7 +154,7 @@ MAPFRE/
 │
 ├── docs/                              # Guías detalladas
 │   ├── GUIA_COMPLETA.md               # Manual exhaustivo
-│   ├── INTEGRACION_DATOS_REALES.md    # Cómo conectar con InfoCol real
+│   ├── INTEGRACION_DATOS_REALES.md    # Cómo conectar con Gestión real
 │   ├── ARQUITECTURA.md                # Detalles técnicos
 │   └── DEPLOY.md                      # Despliegue
 │
@@ -234,7 +234,7 @@ pytest tests/ -v --tb=short
 |------|--------|-------------|
 | **MVP** | ✅ Completado | 8 módulos Python, 15 tests, CLI funcional, dry-run mode |
 | **Frontend** | ✅ Completado | 5 páginas, MAPFRE brand, Motion, shadcn-style UI |
-| **Real data** | 🟡 Listo para activar | Solo requiere credenciales InfoCol reales |
+| **Real data** | 🟡 Listo para activar | Solo requiere credenciales Gestión reales |
 | **Multi-usuario** | 📅 Q3 2026 | Roles, permisos, base de datos central |
 | **Móvil** | 📅 Q4 2026 | PWA con cámara para fotos del parte |
 
@@ -244,12 +244,12 @@ pytest tests/ -v --tb=short
 
 ```bash
 # Backend
-infocol run                        # Procesa todos los pendientes
-infocol run --id V67391281         # Procesa uno específico
-infocol status                     # Estado del sistema
-infocol config show                # Muestra config actual
-infocol run --dry-run              # Modo dry-run (análisis real sin guardado)
-infocol logs                       # Ver logs recientes
+gestion run                        # Procesa todos los pendientes
+gestion run --id V67391281         # Procesa uno específico
+gestion status                     # Estado del sistema
+gestion config show                # Muestra config actual
+gestion run --dry-run              # Modo dry-run (análisis real sin guardado)
+gestion logs                       # Ver logs recientes
 
 # Frontend
 cd frontend
@@ -276,6 +276,6 @@ MIT + términos MAPFRE (ver [LICENSE](LICENSE)).
 **Creador y desarrollador**: [Manu Alvarez](https://linkedin.com/in/manu-alvarez)
 
 **Usuario piloto**: Pedro González Martínez · Fontanero profesional · La Rioja
-`pedro@infocol.local`
+`pedro@gestion.local`
 
 Sistema diseñado y desarrollado por Manu Alvarez con asistencia de IA (Claude) bajo metodología OSDD y STCO.

@@ -1,4 +1,4 @@
-# PRD: INFOCOL - Automated Claim Form Assistant
+# PRD: GESTION - Automated Claim Form Assistant
 
 **Product Requirements Document**
 Version: 1.0.0 | Status: ACTIVE | Last Updated: 2026-06-04
@@ -8,18 +8,18 @@ Version: 1.0.0 | Status: ACTIVE | Last Updated: 2026-06-04
 ## 1. Product Overview
 
 ### 1.1 Vision
-Eliminate manual data entry errors in MAPFRE InfoCol claim form submission by integrating AI-powered code selection, reducing processing time from ~2 minutes to <30 seconds per expediente while maintaining 100% human supervisory control.
+Eliminate manual data entry errors in MAPFRE Gestión claim form submission by integrating AI-powered code selection, reducing processing time from ~2 minutes to <30 seconds per expediente while maintaining 100% human supervisory control.
 
 ### 1.2 Target Audience
 Primary: Pedro González — Professional plumber, Logroño, La Rioja
 Secondary: MAPFRE authorized tradespeople (fontaneros, electricians, general repairs) across Spain
 
 ### 1.3 Problem Statement
-Tradespeople managing MAPFRE insurance claims via the InfoCol portal spend 2+ minutes per expediente navigating dropdown menus, selecting correct tariff codes, and filling repetitive form fields. Incorrect code selection causes billing errors, revenue loss, and claim rejections. The process is repetitive, error-prone, and scales poorly across multiple daily expedientes.
+Tradespeople managing MAPFRE insurance claims via the Gestión portal spend 2+ minutes per expediente navigating dropdown menus, selecting correct tariff codes, and filling repetitive form fields. Incorrect code selection causes billing errors, revenue loss, and claim rejections. The process is repetitive, error-prone, and scales poorly across multiple daily expedientes.
 
 ### 1.4 Solution
 A local Python + Playwright automation script that:
-- Authenticates securely into InfoCol
+- Authenticates securely into Gestión
 - Detects pending FIN expedientes
 - Analyzes work descriptions via AI (Claude API)
 - Selects correct MAPFRE 2026 Rioja tariff codes

@@ -25,7 +25,7 @@ El ecosistema alberga actualmente **24 aplicaciones funcionales**, categorizadas
 | **Cuentos Mágicos** | `cuentos` | Docker (Node) + PostgreSQL |
 | **Gas Station** | `gasstation` | Docker (Node) |
 | **IAputa OS** | `iaputa` | Docker (Node) |
-| **Mapfre InfoCol** | `mapfre` | Traefik Direct Proxy (Puerto 3333) |
+| **Mapfre Gestión** | `mapfre` | Traefik Direct Proxy (Puerto 3333) |
 | **Perfume Trading** | `perfume` | Traefik Direct Proxy (Puerto 3011) |
 | **EliteScout** | `elitescout` | Docker (Node) |
 | **CombiPro** | `combipro` | App Estática (Servida por Node) |

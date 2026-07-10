@@ -377,7 +377,7 @@ export default function DashboardPage() {
                 {
                   icon: Activity,
                   color: "text-info",
-                  text: "Sincronización InfoCol completada",
+                  text: "Sincronización Gestión completada",
                   time: "hace 2 min",
                 },
                 {

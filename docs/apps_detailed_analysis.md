@@ -55,7 +55,7 @@ Estas aplicaciones comparten un patrón arquitectónico similar, fuertemente apo
 - ⛽ **`gas-station`**: React/Vite + MUI. Sistema de gestión de gasolineras/estaciones de servicio.
 - 📦 **`logisearch`**: React/Vite + MUI. Logística y búsqueda de paquetería/inventario.
 - 📊 **`taskflow-pro`**: React/Vite + MUI + Framer Motion. Gestor de tareas empresariales.
-- 📈 **`mapfre-infocol`**: App activa en PM2, presumiblemente frontend/backend para informes o gestión de pólizas/datos vinculada a sector seguros.
+- 📈 **`mapfre-gestion`**: App activa en PM2, presumiblemente frontend/backend para informes o gestión de pólizas/datos vinculada a sector seguros.
 
 ---
 

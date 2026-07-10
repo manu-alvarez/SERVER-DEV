@@ -177,7 +177,7 @@ export default function AjustesPage() {
                       defaultValue="Pedro González Martínez"
                       icon={User}
                     />
-                    <Field label="Email" defaultValue="pedro@infocol.local" icon={Mail} />
+                    <Field label="Email" defaultValue="pedro@gestion.local" icon={Mail} />
                     <Field label="Teléfono" defaultValue="+34 600 000 000" icon={MapPin} />
                     <Field label="NIF / CIF" defaultValue="***4567**" icon={Shield} />
                   </div>
@@ -258,7 +258,7 @@ export default function AjustesPage() {
                 <CardHeader className="p-0 pb-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle>Credenciales de InfoCol</CardTitle>
+                      <CardTitle>Credenciales de Gestión</CardTitle>
                       <CardDescription>
                         Almacenadas en el llavero del sistema, nunca en texto plano
                       </CardDescription>
@@ -335,7 +335,7 @@ export default function AjustesPage() {
                       </div>
                     </div>
                     <Button variant="outline" size="sm" onClick={() => {
-                      if (window.confirm("¿Cerrar sesión de InfoCOL?")) {
+                      if (window.confirm("¿Cerrar sesión de Gestión?")) {
                         window.location.href = "/";
                       }
                     }}>

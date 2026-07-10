@@ -72,7 +72,7 @@ export default function MonitorPage() {
     { time: "13:15:10", level: "INFO", msg: "Códigos asignados: YYDDDYT + XADDD2T + SMDDDIT" },
     { time: "13:14:58", level: "INFO", msg: "Inicio procesamiento V67391281 · 3 descripciones" },
     { time: "13:14:42", level: "SUCCESS", msg: "Login portal FIN exitoso · sesión activa" },
-    { time: "13:14:30", level: "INFO", msg: "Browser Chromium iniciado · perfil InfoCol" },
+    { time: "13:14:30", level: "INFO", msg: "Browser Chromium iniciado · perfil Gestión" },
     { time: "13:14:12", level: "INFO", msg: "Llavero macOS: credenciales OK · expira en 23h" },
     { time: "13:13:58", level: "WARN", msg: "Latencia de red elevada (610ms)" },
     { time: "13:13:40", level: "SUCCESS", msg: "Sincronización local: 12 expedientes descargados" },
@@ -95,7 +95,7 @@ export default function MonitorPage() {
     if (processing) return;
     setProcessing(true);
     setProcessingMsg("Iniciando motor InfoCool...");
-    addLog("INFO", "Lanzando infocol run --dry-run (modo seguro)");
+    addLog("INFO", "Lanzando gestion run --dry-run (modo seguro)");
 
     try {
       const res = await fetch("/app/mapfre/api/run", { method: "POST" });

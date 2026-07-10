@@ -3,15 +3,15 @@ requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "infocol"
+name = "gestion"
 version = "1.0.0-beta"
-description = "MAPFRE InfoCol claim form automation - AI-powered expediente processing"
+description = "MAPFRE Gestión claim form automation - AI-powered expediente processing"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-keywords = ["mapfre", "infocol", "automation", "insurance", "claims"]
+keywords = ["mapfre", "gestion", "automation", "insurance", "claims"]
 authors = [
-    { name = "MAPFRE INFOCOL Team" },
+    { name = "MAPFRE GESTION Team" },
 ]
 
 dependencies = [
@@ -25,7 +25,7 @@ dependencies = [
 ]
 
 [project.scripts]
-infocol = "infocol.main:cli"
+gestion = "gestion.main:cli"
 
 [tool.setuptools.packages.find]
 where = ["src"]

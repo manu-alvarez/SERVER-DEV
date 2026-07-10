@@ -1,5 +1,5 @@
-# INFOCOL Configuration File
-# Managed automatically by `infocol config` commands.
+# GESTION Configuration File
+# Managed automatically by `gestion config` commands.
 
 province: "La Rioja"
 trade: "FONTANERIA"
@@ -25,11 +25,11 @@ displacement:
 
 logging:
   level: "INFO"
-  log_dir: "~/.infocol/logs"
+  log_dir: "~/.gestion/logs"
   max_log_files: 30
 
-infocol:
-  base_url: "https://infocol.mapfre.es"
+gestion:
+  base_url: "https://gestion.mapfre.es"
   login_path: "/login"
   fin_queue_path: "/servicios-pendientes"
   username: null

@@ -45,7 +45,7 @@ Para replicar el entorno, el nuevo servidor debe tener instalados los siguientes
 | **jartosdto-backend** | `8010` | Python 3.14 (Uvicorn) |
 | **gas-station-backend** | `3005` | Python 3.14 (Uvicorn) |
 | **perfume-trading** | `3011` | Node (Next.js SSR) |
-| **mapfre-infocol** | `3333` | Node (Next.js SSR) |
+| **mapfre-gestion** | `3333` | Node (Next.js SSR) |
 | **txa-fitness-pro** | `3456` | Node (Next.js SSR) |
 | **it-english-backend** | `8787` | Node.js |
 | **it-coach-agent** | `8082` | Python 3.14 (LiveKit Agent) |

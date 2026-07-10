@@ -5,7 +5,7 @@
 ```
 ┌────────────────────────────────────────────────────────┐
 │                  START SESSION                          │
-│  $ infocol run                                         │
+│  $ gestion run                                         │
 └─────────────────────┬──────────────────────────────────┘
                       │
                       ▼
@@ -20,7 +20,7 @@
                       │
                       ▼
 ┌────────────────────────────────────────────────────────┐
-│  ⏳ Iniciando sesión en InfoCol...                     │
+│  ⏳ Iniciando sesión en Gestión...                     │
 │  [████████████████░░░░░░░░░░] 65%                     │
 └─────────────────────┬──────────────────────────────────┘
                       │
@@ -54,7 +54,7 @@
 │                                                       │
 │  ⚠️  REVISA EL FORMULARIO ANTES DE ACEPTAR            │
 │                                                       │
-│  InfoCol - MAPFRE España                               │
+│  Gestión - MAPFRE España                               │
 │  📋 Expediente: V67391281                             │
 │  📍 Actividad: FONTANERÍA                             │
 │  ✅ Descripción: rellenada                             │
@@ -78,19 +78,19 @@
 │  Tiempo total:       4m 32s                            │
 │  Tiempo medio:       1m 31s                            │
 │                                                       │
-│  Gracias por usar INFOCOL.                             │
+│  Gracias por usar GESTION.                             │
 └────────────────────────────────────────────────────────┘
 ```
 
 ## CLI Commands
 
 ```bash
-infocol run              # Start automation session
-infocol config           # Configure credentials and settings
-infocol config --show    # Show current config (masked)
-infocol status           # Check system readiness
-infocol logs             # View recent logs
-infocol --help           # Show help
+gestion run              # Start automation session
+gestion config           # Configure credentials and settings
+gestion config --show    # Show current config (masked)
+gestion status           # Check system readiness
+gestion logs             # View recent logs
+gestion --help           # Show help
 ```
 
 ## Color Scheme (Rich Console)
