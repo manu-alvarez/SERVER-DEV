@@ -35,6 +35,6 @@ module.exports = {
       exp_backoff_delay: 1000,
       min_uptime: '15s',
       max_memory_restart: '500M'
-    },
+    }
   ]
 };

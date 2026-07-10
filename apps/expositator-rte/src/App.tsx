@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useExpositatorStore } from './store/expositatorStore';
 import { useSpeechEngine } from './hooks/useSpeechEngine';
 import { useEvaluator } from './hooks/useEvaluator';
@@ -14,6 +14,25 @@ function App() {
     isRunning, startSession, stopSession,
     addLog
   } = useExpositatorStore();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl + Shift + M
+      if (e.ctrlKey && e.shiftKey && e.key === 'M') {
+        e.preventDefault();
+        const token = window.prompt('MSBross Bóveda: Introduce el token maestro para activar el Modo Dios (LLM Proxy):');
+        if (token) {
+          localStorage.setItem('msbross_admin_token', token);
+          alert('Modo Dios activado. Tus peticiones usarán el proxy seguro.');
+        } else if (token === '') {
+          localStorage.removeItem('msbross_admin_token');
+          alert('Modo Dios desactivado. Usando claves públicas.');
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const { resetMetrics, processUtterance, processSilence } = useEvaluator();
   const { initSpeechEngine, stopSpeechEngine, transcript, handlePartial } = useSpeechEngine();

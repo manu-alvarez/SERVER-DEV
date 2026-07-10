@@ -340,6 +340,23 @@ services:
       - traefik.http.routers.msbross-proxy-root.service=msbross-proxy-svc
       - traefik.http.services.msbross-proxy-svc.loadbalancer.server.port=8080
 
+  llm-admin-proxy:
+    <<: *backend
+    container_name: llm-admin-proxy
+    image: oven/bun:alpine
+    command: bun run index.ts
+    working_dir: /app
+    env_file:
+      - /home/ubuntu/MSBrossAI/apps/llm-admin-proxy/.env
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/llm-admin-proxy:/app
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.llm-proxy.rule=Host(`llm.manuelalvarez.dev`)
+      - traefik.http.routers.llm-proxy.entrypoints=websecure
+      - traefik.http.routers.llm-proxy.tls.certresolver=myresolver
+      - traefik.http.services.llm-proxy.loadbalancer.server.port=8020
+
   atenea-backend:
     <<: *backend
     container_name: atenea-backend

@@ -58,8 +58,9 @@ export const useEvaluator = () => {
       utteranceBufferRef.current = []; 
 
       const { apiKey, knowledgeBase } = useExpositatorStore.getState();
+      const adminToken = localStorage.getItem('msbross_admin_token');
       
-      if (apiKey && knowledgeBase) {
+      if ((apiKey || adminToken) && knowledgeBase) {
         const prompt = `
         Actúa como Tribunal de Oposiciones.
         BASE DE CONOCIMIENTO OBLIGATORIA:
@@ -74,9 +75,17 @@ export const useEvaluator = () => {
         `;
 
         try {
-          const response = await fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
+          let targetUrl = `${GEMINI_ENDPOINT}?key=${apiKey}`;
+          let headers: Record<string, string> = { 'Content-Type': 'application/json' };
+          
+          if (adminToken) {
+            targetUrl = `https://llm.manuelalvarez.dev/api/gemini/v1beta/models/gemini-3.5-flash:generateContent`;
+            headers['x-msbross-admin-token'] = adminToken;
+          }
+
+          const response = await fetch(targetUrl, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
           });
           const apiData = await response.json();

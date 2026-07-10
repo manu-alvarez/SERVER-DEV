@@ -85,14 +85,27 @@ export const useGeminiApi = () => {
         generationConfig: { temperature: 1.0 }
       };
 
-      const maxAttempts = Math.min(API_KEYS.length * 2, 10);
+      const adminToken = localStorage.getItem('msbross_admin_token');
+      let maxAttempts = adminToken ? 1 : Math.min(API_KEYS.length * 2, 10);
       
       for (let i = 0; i < maxAttempts; i++) {
-        const key = getNextKey();
         try {
-          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${key}`, {
+          let targetUrl = '';
+          let headers: Record<string, string> = { 'Content-Type': 'application/json' };
+          
+          if (adminToken) {
+            // Modo Dios: Router privado
+            targetUrl = `https://llm.manuelalvarez.dev/api/gemini/v1beta/models/gemini-3.5-flash:generateContent`;
+            headers['x-msbross-admin-token'] = adminToken;
+          } else {
+            // Modo Público: Rotación de claves VITE
+            const key = getNextKey();
+            targetUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${key}`;
+          }
+
+          const response = await fetch(targetUrl, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify(payload)
           });
           
