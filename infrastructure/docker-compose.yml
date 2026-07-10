@@ -417,11 +417,17 @@ services:
     <<: *common
     container_name: portainer
     image: portainer/portainer-ce:lts
-    ports:
-      - "127.0.0.1:9000:9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.portainer.rule=Host(`portainer.manuelalvarez.dev`)
+      - traefik.http.routers.portainer.entrypoints=websecure
+      - traefik.http.routers.portainer.tls.certresolver=myresolver
+      - traefik.http.services.portainer.loadbalancer.server.port=9000
+      - traefik.http.routers.portainer.middlewares=admin-auth
+      - traefik.http.middlewares.admin-auth.basicauth.users=admin:$$2b$$10$$6XaD9BPOXxx6FBDA7QjxAOilVgVv4VUFQFDPg0ewmnIDB8U3wfzr6
 
   uptime-kuma:
     <<: *common
@@ -434,6 +440,7 @@ services:
       - traefik.http.routers.kuma.rule=Host(`monitor.manuelalvarez.dev`)
       - traefik.http.routers.kuma.entrypoints=websecure
       - traefik.http.routers.kuma.tls.certresolver=myresolver
+      - traefik.http.routers.kuma.middlewares=admin-auth
       - traefik.http.services.kuma.loadbalancer.server.port=3001
 
 version: '3.8'

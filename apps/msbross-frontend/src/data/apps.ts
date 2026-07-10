@@ -3,7 +3,7 @@ import { Rocket, Box, Globe, Shield, Activity, Target, Layout, MessageSquare, He
 export const APPS_DATA = [
   {
     name: 'App Generator',
-    desc: 'Generador de páginas web simples utilizando inteligencia artificial.',
+    desc: 'Herramienta sencilla para desplegar páginas web estáticas.',
     tech: 'React 19, Vite, Gemini API',
     url: 'https://appgen.manuelalvarez.dev',
     icon: Activity,
@@ -47,7 +47,7 @@ export const APPS_DATA = [
   },
   {
     name: 'EliteScout',
-    desc: 'Buscador de viajes y productos impulsado por IA.',
+    desc: 'Plataforma de búsqueda y filtrado de viajes y productos.',
     tech: 'Next.js 14, Tavily API',
     url: 'https://elitescout.manuelalvarez.dev',
     icon: Globe,
@@ -80,7 +80,7 @@ export const APPS_DATA = [
   },
   {
     name: 'IAProd OS',
-    desc: 'Bot para ayuda en tareas de gestión de servidor por terminal.',
+    desc: 'Script de automatización para tareas de mantenimiento de servidor.',
     tech: 'FastAPI, Python, LLM',
     url: 'https://iaprod.manuelalvarez.dev',
     icon: Shield,
@@ -135,7 +135,7 @@ export const APPS_DATA = [
   },
   {
     name: 'LogiSearch',
-    desc: 'Buscador y localizador de bultos por IA.',
+    desc: 'Buscador y localizador de bultos en almacén.',
     tech: 'React, Supabase',
     url: 'https://logisearch.manuelalvarez.dev',
     icon: Globe,
@@ -201,7 +201,7 @@ export const APPS_DATA = [
   },
   {
     name: 'MSBrOSs Assistant',
-    desc: 'Antiguo asistente personal virtual.',
+    desc: 'Panel de herramientas de asistencia y utilidades.',
     tech: 'React, Node.js',
     url: 'https://assistant.manuelalvarez.dev',
     icon: MessageSquare,

@@ -25,7 +25,7 @@ export default function Home() {
         >
           <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
           <span className="font-mono text-indigo-400 text-xs tracking-widest uppercase">
-            Mis Aplicaciones
+            Sistemas y Redes
           </span>
         </motion.div>
         
@@ -36,10 +36,10 @@ export default function Home() {
           className="text-6xl lg:text-[5.5rem] font-black tracking-tighter leading-[1.05]"
         >
           <span className="text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-500 block">
-            Mis Proyectos
+            Portfolio de
           </span>
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-violet-500 to-fuchsia-600 block pb-2 drop-shadow-[0_0_30px_rgba(99,102,241,0.4)]">
-            Personales
+            Proyectos
           </span>
         </motion.h1>
 
@@ -49,7 +49,7 @@ export default function Home() {
           transition={{ delay: 0.2 }}
           className="text-gray-400 text-xl lg:text-2xl max-w-xl leading-relaxed font-light"
         >
-          Una modesta colección de herramientas, pequeños scripts y aplicaciones web que voy programando para intentar solucionar problemas del día a día.
+          Aplicaciones y arquitecturas alojadas en mi propio servidor. Automatización, despliegues Docker y scripting para resolver problemas reales.
         </motion.p>
 
         <motion.div 
@@ -99,38 +99,7 @@ export default function Home() {
           </Link>
         </motion.div>
 
-        {/* Gestor del servidor - Quick Links */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="pt-6 grid grid-cols-1 sm:grid-cols-3 gap-4"
-        >
-          {[
-            { name: 'Traefik', url: 'https://traefik.manuelalvarez.dev', icon: Network, color: 'text-indigo-400', bg: 'hover:bg-indigo-500/10 hover:border-indigo-500/30' },
-            { name: 'Portainer', url: 'https://portainer.manuelalvarez.dev', icon: Box, color: 'text-cyan-400', bg: 'hover:bg-cyan-500/10 hover:border-cyan-500/30' },
-            { name: 'Kuma', url: 'https://monitor.manuelalvarez.dev', icon: Activity, color: 'text-emerald-400', bg: 'hover:bg-emerald-500/10 hover:border-emerald-500/30' }
-          ].map((service, idx) => {
-            const Icon = service.icon;
-            return (
-              <a 
-                key={idx}
-                href={service.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`group flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 transition-all duration-300 ${service.bg}`}
-              >
-                <div className={`p-2 rounded-lg bg-white/5 group-hover:bg-transparent transition-colors`}>
-                  <Icon className={`w-4 h-4 ${service.color}`} />
-                </div>
-                <div className="flex-1">
-                  <span className="block text-sm font-bold text-gray-300 group-hover:text-white transition-colors">{service.name}</span>
-                </div>
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]"></div>
-              </a>
-            );
-          })}
-        </motion.div>
+
       </div>
 
       {/* Right Column: Infinite Live Stream */}
