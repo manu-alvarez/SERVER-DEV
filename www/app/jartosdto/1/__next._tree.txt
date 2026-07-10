@@ -1,2 +1,2 @@
-:HL["/app/jartosdto/_next/static/chunks/0yzv9gj~bq2.m.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"(chat)","param":null,"prefetchHints":0,"slots":{"children":{"name":"id","param":{"type":"d","key":"1","siblings":null},"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"yvupu-h96dK4pNBBQzlMC"}
+:HL["/_next/static/chunks/0yzv9gj~bq2.m.css","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"(chat)","param":null,"prefetchHints":0,"slots":{"children":{"name":"id","param":{"type":"d","key":"1","siblings":null},"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"yqn3MMEG0OX3KptNH5YyL"}
