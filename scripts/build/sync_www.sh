@@ -16,6 +16,7 @@ cp -R apps/jartosdto/client/out www/app/jartosdto
 cp -R apps/logisearch/dist www/app/logisearch
 cp -R apps/moko-tools/dist www/app/moko-tools
 cp -R apps/msbross-frontend/dist www/app/msbross
+cp -R apps/msbross-frontend/dist/* www/
 cp -R apps/gas-station/dist www/app/gas-station
 cp -R apps/livekit-nikolina/frontend/dist www/app/livekit-nikolina
 cp -R apps/taskflow-pro/dist www/app/taskflow
@@ -29,8 +30,7 @@ rm -rf www/app/web-restaurante-atenea/*
 cp apps/web-restaurante-atenea/frontend/* www/app/web-restaurante-atenea/
 
 mkdir -p www/app/assistant
-cp -R apps/msbross-assistant/* www/app/assistant/
-rm -rf www/app/assistant/node_modules
+cp -R apps/msbross-assistant/dist/* www/app/assistant/
 
 mkdir -p www/app/logitrack
 echo "Logitrack coming soon" > www/app/logitrack/index.html
