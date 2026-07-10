@@ -5,8 +5,9 @@ echo "====================================="
 echo " MSBross - Build All Frontends"
 echo "====================================="
 
-# Base path for apps
-APPS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../apps" && pwd)"
+# Base paths
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+APPS_DIR="$(cd "$SCRIPT_DIR/../../apps" && pwd)"
 
 # Define apps that need standard npm/bun build
 # These should match the folders that actually require a build step
@@ -66,7 +67,8 @@ echo "====================================="
 echo " All builds complete. Executing sync_www.sh..."
 echo "====================================="
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Go back to workspace root to run sync_www.sh correctly
+cd "$SCRIPT_DIR/../.."
 bash "$SCRIPT_DIR/sync_www.sh"
 
 echo "====================================="

@@ -91,13 +91,13 @@ function App() {
         <main className="flex-1 flex flex-col gap-4 lg:gap-6 lg:min-h-0">
           
           {/* Header */}
-          <header className="glass-panel p-4 rounded-2xl flex flex-col lg:flex-row justify-between items-center gap-4 shadow-xl">
+          <header className="glass-panel p-4 rounded-2xl flex flex-col xl:flex-row justify-between items-center gap-4 shadow-xl">
             <h1 className="text-xl lg:text-2xl font-display font-black tracking-tight text-white flex items-center gap-4">
               <div className={`w-3 h-3 rounded-full shadow-lg ${isRunning ? 'bg-red-500 animate-pulse shadow-red-500/50' : 'bg-slate-500'}`}></div>
               EXPOSITATOR <span className="text-gradient">RTE</span>
             </h1>
             
-            <div className="flex flex-col sm:flex-row gap-3 items-center bg-black/40 p-1.5 rounded-xl border border-white/10 w-full lg:w-auto">
+            <div className="flex flex-col sm:flex-row gap-3 items-center bg-black/40 p-1.5 rounded-xl border border-white/10 w-full xl:w-auto">
               <input 
                 ref={apiKeyInputRef}
                 type="password" 

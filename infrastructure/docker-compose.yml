@@ -347,9 +347,9 @@ services:
     command: bun run index.ts
     working_dir: /app
     env_file:
-      - /home/ubuntu/MSBrossAI/apps/llm-admin-proxy/.env
+      - ../apps/llm-admin-proxy/.env
     volumes:
-      - /home/ubuntu/MSBrossAI/apps/llm-admin-proxy:/app
+      - ../apps/llm-admin-proxy:/app
     labels:
       - traefik.enable=true
       - traefik.http.routers.llm-proxy.rule=Host(`llm.manuelalvarez.dev`)
