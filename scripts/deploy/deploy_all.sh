@@ -2,7 +2,7 @@
 set -e
 
 VPS_USER="${VPS_USER:-ubuntu}"
-VPS_HOST="${VPS_HOST:-84.247.186.126}"
+VPS_HOST="${VPS_HOST:-100.100.1.10}"
 SSH_KEY="${SSH_KEY:-~/.ssh/contabo_key}"
 VPS_DIR="~/MSBrossAI"
 
