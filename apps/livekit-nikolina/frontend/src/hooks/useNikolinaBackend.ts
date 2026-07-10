@@ -20,7 +20,7 @@ export function useNikolinaBackend() {
       .then(r => {
         if (r.ok) {
           setIsConnectedBackend(true);
-          const authEnabled = import.meta.env.VITE_AUTH_ENABLED !== 'false';
+          const authEnabled = import.meta.env.VITE_AUTH_ENABLED === 'true';
           if (!authEnabled) {
             setIsLoggedIn(true);
           }
@@ -30,7 +30,7 @@ export function useNikolinaBackend() {
   }, []);
 
   const fetchData = useCallback(async () => {
-    const authEnabled = import.meta.env.VITE_AUTH_ENABLED !== 'false';
+    const authEnabled = import.meta.env.VITE_AUTH_ENABLED === 'true';
     if (authEnabled && !token) return;
     
     const headers = token ? { 'Authorization': `Bearer ${token}` } : {};

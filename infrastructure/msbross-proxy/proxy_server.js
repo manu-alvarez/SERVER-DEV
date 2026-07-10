@@ -227,7 +227,7 @@ const DOMAIN_APP_MAP = {
   'expositator.manuelalvarez.dev': 'expositator-rte',
   'itenglish.manuelalvarez.dev': 'it-english-coach',
   'logisearch.manuelalvarez.dev': 'logisearch',
-  'logitrack.manuelalvarez.dev': 'logitrack',
+  'logitrack.manuelalvarez.dev': 'logisearch',
   'mano.manuelalvarez.dev': 'msbross',
   'mokotools.manuelalvarez.dev': 'moko-tools',
   'assistant.manuelalvarez.dev': 'assistant',
@@ -250,9 +250,7 @@ app.use((req, res, next) => {
     return res.redirect(302, 'https://manu-alvarez.github.io/TuEnergiaMaya/');
   }
 
-  if (host === 'logitrack.manuelalvarez.dev') {
-    return res.redirect(302, 'https://trello.com/b/IRVpzuUt/logitrack-operaciones-de-almacen');
-  }
+
 
   const mappedApp = DOMAIN_APP_MAP[host];
   if (mappedApp && !req.url.startsWith('/api') && !req.url.startsWith('/_')) {
