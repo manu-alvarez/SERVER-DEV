@@ -60,7 +60,12 @@ async function providerChat(pid: string, messages: {role: string, content: strin
   const key = settings.keys[pid];
   const model = (settings.models[pid] || "").trim();
   
-  if (pid !== "custom" && !key) throw new Error("Missing Key");
+  if (pid !== "custom" && !key) {
+    const adminToken = typeof localStorage !== 'undefined' ? localStorage.getItem('msbross_admin_token') : null;
+    if (!(adminToken && pid === "gemini")) {
+      throw new Error("Missing Key");
+    }
+  }
   if (pid === "custom" && (!settings.customBase || !key)) throw new Error("Missing Custom Base or Key");
   if (!model) throw new Error("Missing Model");
 
@@ -82,7 +87,16 @@ async function providerChat(pid: string, messages: {role: string, content: strin
   }
 
   if (P.kind === "gemini") {
-    const url = `${P.url}/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`;
+    const adminToken = typeof localStorage !== 'undefined' ? localStorage.getItem('msbross_admin_token') : null;
+    let url = `${P.url}/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`;
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    
+    if (adminToken) {
+      // Modo Dios: Router privado
+      url = `https://llm.manuelalvarez.dev/api/gemini/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+      headers['x-msbross-admin-token'] = adminToken;
+    }
+
     const contents = messages.map(m => ({
       role: m.role === "assistant" ? "model" : "user",
       parts: [{ text: m.content }]
@@ -92,7 +106,7 @@ async function providerChat(pid: string, messages: {role: string, content: strin
     
     const res = await providerFetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(body)
     });
     if (!res.ok) throw new Error("HTTP " + res.status + " · " + await readErr(res));

@@ -198,6 +198,33 @@ async function sendWithRetry(
 // ─── Main export: send to AI with full fallback chain ───
 
 export async function sendToAI(prompt: string): Promise<string> {
+    const adminToken = typeof localStorage !== 'undefined' ? localStorage.getItem('msbross_admin_token') : null;
+
+    if (adminToken) {
+        // MODO DIOS: Use the secure private proxy instead of rotating public keys
+        console.log('🔮 Modo Dios activado: Usando MSBross Private Proxy');
+        try {
+            const response = await fetch('https://llm.manuelalvarez.dev/api/gemini/v1beta/models/gemini-3.5-flash:generateContent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-msbross-admin-token': adminToken
+                },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                })
+            });
+
+            if (!response.ok) throw new Error(`Proxy error: ${response.status}`);
+            const data = await response.json();
+            const result = GEMINI_CONFIG.parseResponse(data);
+            if (result) return result;
+        } catch (e) {
+            console.error('Proxy falló', e);
+            // Fallback to normal behavior if proxy fails
+        }
+    }
+
     const geminiKeys = getGeminiKeys()
     const openRouterKeys = getOpenRouterKeys()
     const groqKeys = getGroqKeys()

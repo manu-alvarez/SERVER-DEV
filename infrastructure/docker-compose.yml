@@ -347,9 +347,9 @@ services:
     command: sh -c "bun install && bun run index.ts"
     working_dir: /app
     env_file:
-      - ../apps/llm-admin-proxy/.env
+      - /home/ubuntu/MSBrossAI/apps/llm-admin-proxy/.env
     volumes:
-      - ../apps/llm-admin-proxy:/app
+      - /home/ubuntu/MSBrossAI/apps/llm-admin-proxy:/app
     labels:
       - traefik.enable=true
       - traefik.http.routers.llm-proxy.rule=Host(`llm.manuelalvarez.dev`)
@@ -444,7 +444,7 @@ services:
       - traefik.http.routers.portainer.tls.certresolver=myresolver
       - traefik.http.services.portainer.loadbalancer.server.port=9000
       - traefik.http.routers.portainer.middlewares=admin-auth
-      - traefik.http.middlewares.admin-auth.basicauth.users=admin:$$apr1$$QG9Wo8Et$$3npqQN9xJfIAtXVYQoOq1/
+      - traefik.http.middlewares.admin-auth.basicauth.users=admin:$$apr1$$tsube.dv$$ntEzPeXD8lwJK5E5SQbGF1
 
   uptime-kuma:
     <<: *common
@@ -452,6 +452,7 @@ services:
     image: louislam/uptime-kuma:1
     volumes:
       - uptime-kuma-data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - traefik.enable=true
       - traefik.http.routers.kuma.rule=Host(`monitor.manuelalvarez.dev`)

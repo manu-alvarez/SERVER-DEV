@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import {
   AppBar, Toolbar, Container, Box, Typography, TextField, Button,
   Chip, Card, Snackbar, Alert, Tooltip, Tabs, Tab, Fade, Stack,
@@ -74,6 +74,25 @@ const parseQuery = (text: string) => {
 }
 
 function App() {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl + Shift + M
+      if (e.ctrlKey && e.shiftKey && e.key === 'M') {
+        e.preventDefault();
+        const token = window.prompt('MSBross Bóveda: Introduce el token maestro para activar el Modo Dios (LLM Proxy):');
+        if (token) {
+          localStorage.setItem('msbross_admin_token', token);
+          alert('Modo Dios activado en LogiSearch. Tus peticiones usarán el proxy seguro.');
+        } else if (token === '') {
+          localStorage.removeItem('msbross_admin_token');
+          alert('Modo Dios desactivado. Usando claves públicas.');
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const [query, setQuery] = useState('')
   const [activeTool, setActiveTool] = useState<string | null>(null)
   const [searchMode, setSearchMode] = useState<'route' | 'expert' | 'general'>('route')

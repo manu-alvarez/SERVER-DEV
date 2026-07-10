@@ -2,3 +2,5 @@ fastapi
 uvicorn
 granian
 python-dotenv
+bcrypt
+PyJWT

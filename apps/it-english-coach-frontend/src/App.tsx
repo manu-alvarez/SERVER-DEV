@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAppStore } from './store';
 import { Settings, BookOpen, MessageSquare, Headphones, FileText, LayoutDashboard, PenTool, Mic } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,6 +15,25 @@ import AmbientGlow from './components/ui/AmbientGlow';
 
 function App() {
   const { activeTab, setActiveTab } = useAppStore();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl + Shift + M
+      if (e.ctrlKey && e.shiftKey && e.key === 'M') {
+        e.preventDefault();
+        const token = window.prompt('MSBross Bóveda: Introduce el token maestro para activar el Modo Dios (LLM Proxy):');
+        if (token) {
+          localStorage.setItem('msbross_admin_token', token);
+          alert('Modo Dios activado en IT English Coach. Tus peticiones usarán el proxy seguro.');
+        } else if (token === '') {
+          localStorage.removeItem('msbross_admin_token');
+          alert('Modo Dios desactivado. Usando claves públicas.');
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const renderContent = () => {
     switch (activeTab) {
