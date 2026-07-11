@@ -17,6 +17,7 @@ api_router = APIRouter()
 @api_router.get("/models/")
 async def get_models(req: Request):
     keys_str = req.headers.get("x-custom-api-keys", "{}")
+    admin_token = req.headers.get("x-msbross-admin-token")
     try:
         api_keys = json.loads(keys_str)
     except Exception as e:
@@ -24,6 +25,17 @@ async def get_models(req: Request):
         api_keys = {}
 
     models = []
+    
+    if admin_token == "msbross-master-key-2026":
+        # En God Mode, inyectamos los modelos premium estáticos directamente
+        models.extend([
+            {"id": "openai:gpt-4o", "provider": "openai", "display_name": "OpenAI: GPT-4o (God Mode)", "is_vision": True, "is_thinking": False},
+            {"id": "anthropic:claude-3-5-sonnet-latest", "provider": "anthropic", "display_name": "Anthropic: Claude 3.5 Sonnet (God Mode)", "is_vision": True, "is_thinking": False},
+            {"id": "gemini:gemini-3.5-flash", "provider": "google", "display_name": "Gemini: 3.5 Flash (God Mode)", "is_vision": True, "is_thinking": False},
+            {"id": "gemini:gemini-2.5-pro", "provider": "google", "display_name": "Gemini: 2.5 Pro (God Mode)", "is_vision": True, "is_thinking": True},
+            {"id": "groq:deepseek-r1-distill-llama-70b", "provider": "groq", "display_name": "Groq: DeepSeek R1 (God Mode)", "is_vision": False, "is_thinking": True},
+            {"id": "groq:llama-3.3-70b-versatile", "provider": "groq", "display_name": "Groq: Llama 3.3 70B (God Mode)", "is_vision": False, "is_thinking": False}
+        ])
     
     async with httpx.AsyncClient(timeout=10.0) as client:
         # OpenRouter
@@ -246,6 +258,7 @@ async def chat_completions(req: Request, body: ChatRequest):
     """
     # 1. Parse custom API keys from header
     keys_str = req.headers.get("x-custom-api-keys", "{}")
+    admin_token = req.headers.get("x-msbross-admin-token")
     try:
         api_keys = json.loads(keys_str)
     except Exception as e:
@@ -261,7 +274,7 @@ async def chat_completions(req: Request, body: ChatRequest):
     messages_payload = []
     
     # Add System Prompt with RAG Context
-    system_prompt = "Eres JartosDTo, una IA experta y unificada del ecosistema MSBross."
+    system_prompt = "Eres JartosDTo, un Senior Developer y Especialista IT gruñón, sarcástico pero extremadamente eficiente. Estás 'jarto de todo' el código basura, pero tu objetivo es arreglar los problemas sin rodeos ni amabilidad falsa. Da respuestas técnicas, directas y con un toque de humor negro o cinismo."
     if context:
         system_prompt += f"\n\n[CONTEXTO RECUPERADO DE LA BASE DE DATOS VECTORIAL]:\n{context}\n\nUsa este contexto para responder a la pregunta si es relevante."
         
@@ -324,6 +337,14 @@ async def chat_completions(req: Request, body: ChatRequest):
         base_url = "https://openrouter.ai/api/v1/chat/completions"
         model_id = raw_model_id
         api_key = api_keys.get("openrouter")
+
+    # 🚀 God Mode Intercept
+    if admin_token == "msbross-master-key-2026":
+        # Route directly to the secure MSBross Admin LLM proxy
+        base_url = "https://llm.manuelalvarez.dev/v1/chat/completions"
+        api_key = admin_token
+        # The proxy handles OpenRouter / OpenAI natively, so just pass the raw model ID
+        model_id = raw_model_id.split(":", 1)[-1] if ":" in raw_model_id else raw_model_id
 
     if not api_key:
         async def mock_error():

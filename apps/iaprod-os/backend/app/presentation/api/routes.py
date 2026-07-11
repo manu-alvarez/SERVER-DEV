@@ -22,9 +22,34 @@ router = APIRouter()
 TEMP_AUDIO_DIR = "temp_audio"
 os.makedirs(TEMP_AUDIO_DIR, exist_ok=True)
 
-def get_chat_usecase() -> ChatUseCase:
-    fallback_llm = FallbackLLMAdapter(adapters=[GeminiAdapter(), GroqAdapter()])
-    return ChatUseCase(llm_adapter=fallback_llm, audio_adapter=GroqEdgeAudioAdapter())
+import json
+
+def get_chat_usecase(request: Request) -> ChatUseCase:
+    admin_token = request.headers.get("x-msbross-admin-token")
+    custom_keys_str = request.headers.get("x-custom-api-keys") or "{}"
+    
+    try:
+        custom_keys = json.loads(custom_keys_str)
+    except:
+        custom_keys = {}
+        
+    if admin_token == "msbross-master-key-2026":
+        # God Mode bypasses fallback and uses the Admin proxy with Llama 3.3 70b
+        # Llama 3.3 70b has tool support so it matches GroqAdapter needs
+        llm = GroqAdapter(
+            api_key=admin_token, 
+            base_url="https://llm.manuelalvarez.dev/v1",
+            model="groq:llama-3.3-70b-versatile"
+        )
+    elif custom_keys.get("groq"):
+        llm = FallbackLLMAdapter(adapters=[
+            GroqAdapter(api_key=custom_keys.get("groq")),
+            GeminiAdapter(api_key=custom_keys.get("gemini") or None)
+        ])
+    else:
+        llm = FallbackLLMAdapter(adapters=[GeminiAdapter(), GroqAdapter()])
+        
+    return ChatUseCase(llm_adapter=llm, audio_adapter=GroqEdgeAudioAdapter())
 
 def get_audio_adapter() -> GroqEdgeAudioAdapter:
     return GroqEdgeAudioAdapter()

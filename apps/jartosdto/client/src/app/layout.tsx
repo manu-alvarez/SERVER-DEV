@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import GodModeListener from "@/components/GodModeListener";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://jartosdto.manuelalvarez.dev"),
   title: "JartosDTo — MSBross",
-  description: "Tu web de recetas y organización de comidas",
+  description: "Tu asistente Senior IT gruñón",
   icons: { icon: "/icon.png" },
 };
 
@@ -15,7 +16,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body>{children}</body>
+      <body>
+        <GodModeListener />
+        {children}
+      </body>
     </html>
   );
 }

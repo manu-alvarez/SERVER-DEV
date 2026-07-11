@@ -195,34 +195,51 @@ class MSBrOSsHandler(http.server.SimpleHTTPRequestHandler):
         self.wfile.write(b'data: [DONE]\n\n')
         self.wfile.flush()
 
-    def _get_api_keys(self):
+    def _get_api_keys(self, headers=None):
         keys = {}
-        # En Docker la montamos en /api_keys_vault.json
-        vault_path = "/api_keys_vault.json"
-        if not os.path.exists(vault_path):
-            # Fallback para entorno local sin docker
-            vault_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "api_keys_vault.json")
-        if os.path.exists(vault_path):
+        headers = headers or self.headers
+        
+        # 1. First, check if custom API keys are provided via headers
+        if headers and 'x-custom-api-keys' in headers:
             try:
-                with open(vault_path, "r", encoding="utf-8") as f:
-                    vault = json.load(f)
-                    llms = vault.get("LLM_PROVIDERS", {})
-                    # OpenRouter
-                    keys["or"] = [k["key"] for k in llms.get("OPENROUTER", []) if isinstance(k, dict) and k.get("key")]
-                    # Gemini
-                    keys["gm"] = [k["key"] for k in llms.get("GOOGLE_GEMINI", []) if isinstance(k, dict) and k.get("key")]
-                    # Groq
-                    keys["gr"] = [k["key"] for k in llms.get("GROQ", []) if isinstance(k, dict) and k.get("key")]
-                    # Mistral
-                    keys["mi"] = [llms.get("OTHER_LLMS", {}).get("MISTRAL")]
-                    # Ollama (if Cloud key exists)
-                    keys["ol"] = [llms.get("OTHER_LLMS", {}).get("OLLAMA_CLOUD", "")]
-                    # Together
-                    keys["tg"] = [llms.get("OTHER_LLMS", {}).get("TOGETHER", "")]
-                    # HuggingFace
-                    keys["hf"] = [vault.get("MULTIMEDIA_AND_VOICE", {}).get("HUGGINGFACE", "")]
+                custom_keys = json.loads(headers['x-custom-api-keys'])
+                keys["or"] = [custom_keys.get("openrouter", "")]
+                keys["gm"] = [custom_keys.get("gemini", "")]
+                keys["gr"] = [custom_keys.get("groq", "")]
+                keys["mi"] = [custom_keys.get("mistral", "")]
             except Exception as e:
-                print(f"[MSBrOSs] Error reading keys vault: {e}")
+                print(f"[MSBrOSs] Error parsing custom keys: {e}")
+                
+        # 2. Check for God Mode (Admin Token)
+        admin_token = headers.get('x-msbross-admin-token') if headers else None
+        if admin_token == 'msbross-master-key-2026':
+            # En Docker la montamos en /api_keys_vault.json
+            vault_path = "/api_keys_vault.json"
+            if not os.path.exists(vault_path):
+                # Fallback para entorno local sin docker
+                vault_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "api_keys_vault.json")
+            if os.path.exists(vault_path):
+                try:
+                    with open(vault_path, "r", encoding="utf-8") as f:
+                        vault = json.load(f)
+                        llms = vault.get("LLM_PROVIDERS", {})
+                        # OpenRouter
+                        keys["or"] = [k["key"] for k in llms.get("OPENROUTER", []) if isinstance(k, dict) and k.get("key")]
+                        # Gemini
+                        keys["gm"] = [k["key"] for k in llms.get("GOOGLE_GEMINI", []) if isinstance(k, dict) and k.get("key")]
+                        # Groq
+                        keys["gr"] = [k["key"] for k in llms.get("GROQ", []) if isinstance(k, dict) and k.get("key")]
+                        # Mistral
+                        keys["mi"] = [llms.get("OTHER_LLMS", {}).get("MISTRAL")]
+                        # Ollama (if Cloud key exists)
+                        keys["ol"] = [llms.get("OTHER_LLMS", {}).get("OLLAMA_CLOUD", "")]
+                        # Together
+                        keys["tg"] = [llms.get("OTHER_LLMS", {}).get("TOGETHER", "")]
+                        # HuggingFace
+                        keys["hf"] = [vault.get("MULTIMEDIA_AND_VOICE", {}).get("HUGGINGFACE", "")]
+                except Exception as e:
+                    print(f"[MSBrOSs] Error reading keys vault: {e}")
+                    
         return keys
 
     # ─── CHAT ──────────────────────────────────────────────────────────

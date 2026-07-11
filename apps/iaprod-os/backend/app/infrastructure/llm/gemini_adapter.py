@@ -8,10 +8,11 @@ from app.application.interfaces.ai_port import LLMPort
 logger = logging.getLogger(__name__)
 
 class GeminiAdapter(LLMPort):
-    def __init__(self):
-        if not settings.GOOGLE_STUDIO_API_KEY:
-            raise ValueError("GOOGLE_STUDIO_API_KEY not configured")
-        self.client = genai.Client(api_key=settings.GOOGLE_STUDIO_API_KEY)
+    def __init__(self, api_key: Optional[str] = None):
+        self.api_key = api_key or settings.GOOGLE_STUDIO_API_KEY
+        if not self.api_key:
+            raise ValueError("Google Studio API key not configured")
+        self.client = genai.Client(api_key=self.api_key)
 
     async def process_chat(self, user_text: str, history: list) -> Tuple[str, Optional[str], str]:
         try:

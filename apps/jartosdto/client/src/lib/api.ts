@@ -81,6 +81,8 @@ async function apiFetch(path: string, opts: RequestInit = {}): Promise<Response>
   if (!(opts.body instanceof FormData)) {
     headers["Content-Type"] = "application/json";
   }
+  const adminToken = typeof window !== "undefined" ? localStorage.getItem('msbross_admin_token') : null;
+  if (adminToken) headers["x-msbross-admin-token"] = adminToken;
   
   const baseUrl = typeof window !== "undefined" ? "" : API_URL;
   return fetch(`${baseUrl}/_jartosdto/api/v1${path}`, { ...opts, headers });
@@ -237,6 +239,8 @@ export async function streamChat(body: {
   });
   saveMessagesLocal(targetConvId, existingMsgs);
 
+  const adminToken = typeof window !== "undefined" ? localStorage.getItem('msbross_admin_token') : null;
+
   // 3. Fetch from backend
   const res = await fetch(`${baseUrl}/_jartosdto/api/v1/chat/completions`, {
     method: "POST",
@@ -244,6 +248,7 @@ export async function streamChat(body: {
       "Content-Type": "application/json",
       "x-custom-api-keys": JSON.stringify(keys),
       ...(t ? { Authorization: `Bearer ${t}` } : {}),
+      ...(adminToken ? { "x-msbross-admin-token": adminToken } : {}),
     },
     body: JSON.stringify({ ...body, stream: true }),
   });

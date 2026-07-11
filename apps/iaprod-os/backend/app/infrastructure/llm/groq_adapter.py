@@ -175,6 +175,52 @@ async def _call_groq_with_retry(messages: list, tools: list = None, model: str =
 
 
 class GroqAdapter(LLMPort):
+    def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None, model: Optional[str] = None):
+        self.api_key = api_key or settings.GROQ_API_KEY
+        self.override_model = model
+        if not self.api_key:
+            raise ValueError("Groq API key not configured")
+        
+        # Override the global groq_client if a custom key is provided
+        from groq import AsyncGroq
+        if base_url:
+            self.client = AsyncGroq(api_key=self.api_key, base_url=base_url)
+        else:
+            self.client = AsyncGroq(api_key=self.api_key)
+
+    async def _call_groq_with_retry_local(self, messages: list, tools: list = None, model: str = PRIMARY_MODEL):
+        current_model = self.override_model or model
+        for attempt in range(MAX_RETRIES):
+            try:
+                kwargs = {
+                    "model": current_model,
+                    "messages": messages,
+                    "max_tokens": 1024,
+                }
+                if tools and current_model == PRIMARY_MODEL:
+                    kwargs["tools"] = tools
+                    kwargs["tool_choice"] = "auto"
+                
+                if tools and current_model == FALLBACK_MODEL:
+                    kwargs["tools"] = tools
+
+                return await self.client.chat.completions.create(**kwargs), current_model
+            except Exception as e:
+                error_msg = str(e)
+                is_quota = "429" in error_msg and ("tokens" in error_msg.lower() or "limit" in error_msg.lower())
+                
+                if is_quota and current_model == PRIMARY_MODEL:
+                    logger.warning(f"Groq 70b over quota. Switching to Qwen 32b. Error: {e}")
+                    current_model = FALLBACK_MODEL
+                    continue
+
+                if attempt < MAX_RETRIES - 1:
+                    wait_time = 2 ** (attempt + 1)
+                    logger.warning(f"Groq API Error ({current_model}, attempt {attempt + 1}): {e}. Retrying in {wait_time}s...")
+                    await asyncio.sleep(wait_time)
+                else:
+                    logger.error(f"Groq API failed after {MAX_RETRIES} attempts: {e}")
+                    raise
 
     async def process_chat(self, user_text: str, history: list) -> Tuple[str, Optional[str], str]:
         from datetime import datetime
@@ -205,7 +251,7 @@ class GroqAdapter(LLMPort):
         # Fallback chain: Groq → Ollama (local) → OpenRouter (cloud)
         use_fallback = None  # None = Groq OK, 'ollama', 'openrouter'
         try:
-            chat, used_model = await _call_groq_with_retry(msgs, TOOLS_SCHEMA)
+            chat, used_model = await self._call_groq_with_retry_local(msgs, TOOLS_SCHEMA)
         except Exception as groq_err:
             logger.warning(f"Groq unavailable: {groq_err}. Trying Ollama local...")
             use_fallback = 'ollama'
@@ -274,7 +320,7 @@ class GroqAdapter(LLMPort):
                 msgs.append({"role": "tool", "tool_call_id": call.id, "name": tool_name, "content": str(res)})
 
             try:
-                final_chat, final_model = await _call_groq_with_retry(msgs, tools=None)
+                final_chat, final_model = await self._call_groq_with_retry_local(msgs, tools=None)
             except Exception:
                 # If Groq fails during synthesis, try OpenRouter
                 try:

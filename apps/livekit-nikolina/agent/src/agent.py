@@ -694,6 +694,22 @@ async def entrypoint(ctx: JobContext) -> None:
             logger.info(f"Participant connected: {participant.identity}")
             asyncio.create_task(send_initial_greeting())
 
+        @ctx.room.on("data_received")
+        def on_data_received(dp):
+            if dp.topic == "lk-chat":
+                try:
+                    payload = _json.loads(dp.data.decode("utf-8"))
+                    message = payload.get("message")
+                    if message and payload.get("isUser") is not False:
+                        logger.info(f"Received text message: {message}")
+                        messages_history.append({"isUser": True, "message": message})
+                        if hasattr(session, 'generate_reply'):
+                            asyncio.create_task(session.generate_reply(user_input=message))
+                        else:
+                            logger.warning("Session does not have generate_reply to handle text chat.")
+                except Exception as e:
+                    logger.warning(f"Error processing text chat: {e}")
+
         async def log_final_call():
             logger.info("Shutdown: logging call history with MSB Enhanced Tracking")
             try:

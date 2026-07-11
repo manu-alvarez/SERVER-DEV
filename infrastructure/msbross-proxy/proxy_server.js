@@ -265,7 +265,7 @@ app.use((req, res, next) => {
 
 
   const mappedApp = DOMAIN_APP_MAP[host];
-  if (mappedApp && !req.url.startsWith('/api') && !req.url.startsWith('/_')) {
+  if (mappedApp && !req.url.startsWith('/api') && (!req.url.startsWith('/_') || req.url.startsWith('/_next'))) {
     if (req.url === '/') {
       req.url = `/app/${mappedApp}/`;
     } else if (!req.url.startsWith(`/app/${mappedApp}`)) {

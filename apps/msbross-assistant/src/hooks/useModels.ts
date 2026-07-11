@@ -3,7 +3,14 @@ import { ModelConfigSchema } from '../lib/schemas';
 import { z } from 'zod';
 
 const fetchModels = async () => {
-  const response = await fetch('/_msbross/api/models');
+  const adminToken = localStorage.getItem('msbross_admin_token');
+  const customKeys = localStorage.getItem('msbross_assistant_custom_keys');
+  
+  const headers: Record<string, string> = {};
+  if (adminToken) headers['x-msbross-admin-token'] = adminToken;
+  if (customKeys) headers['x-custom-api-keys'] = customKeys;
+
+  const response = await fetch('/_msbross/api/models', { headers });
   if (!response.ok) {
     throw new Error('Failed to fetch models');
   }

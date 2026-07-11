@@ -67,7 +67,10 @@ class ProviderFactory:
         
         elif provider == "openai":
             from livekit.plugins import openai as lk_openai
-            return lk_openai.LLM(model=model, temperature=temperature)
+            kwargs = {"model": model, "temperature": temperature}
+            if base_url:
+                kwargs["base_url"] = base_url
+            return lk_openai.LLM(**kwargs)
         
         else:
             raise ValueError(f"Unknown LLM provider: {provider}")

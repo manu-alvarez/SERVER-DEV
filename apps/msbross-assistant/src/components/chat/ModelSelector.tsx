@@ -3,18 +3,14 @@ import { useChatStore } from '../../store/useChatStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Sparkles } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 
 /**
  * Model selection dropdown.
- * Uses a React portal to render the dropdown outside any overflow-hidden container,
- * preventing clipping on mobile devices.
  */
 export function ModelSelector() {
   const { data: models = [], isLoading } = useModels();
   const { selectedModel, setSelectedModel } = useChatStore();
   const [isOpen, setIsOpen] = useState(false);
-  const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const currentModel = models.find(m => m.id === selectedModel) || models[0];
@@ -30,10 +26,7 @@ export function ModelSelector() {
   useEffect(() => {
     if (!isOpen) return;
     const handleClick = (e: MouseEvent) => {
-      if (
-        triggerRef.current && !triggerRef.current.contains(e.target as Node) &&
-        dropdownRef.current && !dropdownRef.current.contains(e.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -41,24 +34,9 @@ export function ModelSelector() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [isOpen]);
 
-  // Calculate position for the portal dropdown
-  const getDropdownStyle = (): React.CSSProperties => {
-    if (!triggerRef.current) return {};
-    const rect = triggerRef.current.getBoundingClientRect();
-    return {
-      position: 'fixed',
-      top: rect.bottom + 8,
-      left: rect.left,
-      width: Math.max(rect.width, 320),
-      maxWidth: 'calc(100vw - 16px)',
-      zIndex: 9999,
-    };
-  };
-
   return (
-    <>
+    <div className="relative w-full" ref={dropdownRef}>
       <button 
-        ref={triggerRef}
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between bg-white/5 backdrop-blur-md border border-white/10 rounded-xl px-4 py-3 text-sm text-white/80 hover:text-white hover:bg-white/10 transition-all"
       >
@@ -70,14 +48,12 @@ export function ModelSelector() {
       </button>
 
       <AnimatePresence>
-        {isOpen && createPortal(
+        {isOpen && (
           <motion.div
-            ref={dropdownRef}
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            style={getDropdownStyle()}
-            className="bg-[#161a22]/95 backdrop-blur-xl border border-[#2d3342] rounded-2xl p-2 shadow-[0_10px_40px_rgba(0,0,0,0.5)]"
+            className="absolute top-[calc(100%+8px)] left-0 w-full z-[9999] bg-[#161a22]/95 backdrop-blur-xl border border-[#2d3342] rounded-2xl p-2 shadow-[0_10px_40px_rgba(0,0,0,0.5)]"
           >
             {isLoading ? (
               <div className="p-4 text-center text-white/50 text-sm">Cargando modelos...</div>
@@ -121,10 +97,9 @@ export function ModelSelector() {
                 ))}
               </div>
             )}
-          </motion.div>,
-          document.body
+          </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
 }
