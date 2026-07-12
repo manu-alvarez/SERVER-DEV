@@ -29,12 +29,27 @@ export function MessageBubble({ message }: { message: Message }) {
       </div>
       
       <div className="flex-1 min-w-0">
-        <div className="font-medium text-sm mb-1 opacity-50">
-          {isUser ? 'Tú' : 'Adele'}
+        <div className="font-medium text-sm mb-1 opacity-50 flex items-center justify-between">
+          <span>{isUser ? 'Tú' : 'MSBrOSs Assistant (Adele)'}</span>
+          {!isUser && (
+            <span className="text-[10px] bg-[#ffcc00]/10 text-[#ffcc00] px-2 py-0.5 rounded border border-[#ffcc00]/20 font-mono tracking-wider">
+              BYOK_ENV_ACTIVE
+            </span>
+          )}
         </div>
         <div className="text-white/90">
           {renderedContent}
         </div>
+        {!isUser && (
+          <div className="mt-3 pt-2 border-t border-white/5 flex gap-4 text-[10px] text-white/40 font-mono">
+            <span className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500/50"></span>
+              STATUS: OK
+            </span>
+            <span>MODEL: {message.model || 'auto-selected'}</span>
+            <span>CTX_TOKENS: ~{Math.floor(message.content.length / 4)}</span>
+          </div>
+        )}
       </div>
     </motion.div>
   );

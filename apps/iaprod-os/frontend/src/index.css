@@ -232,14 +232,16 @@ body {
 }
 
 .message-text {
-  font-size: 1rem;
+  font-size: 0.95rem;
   line-height: 1.6;
   color: var(--text-primary);
   word-wrap: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 .message-row--assistant .message-text {
-  color: #e4e4e7;
+  color: #34d399; /* Emerald 400 for terminal feel */
+  text-shadow: 0 0 10px rgba(52, 211, 153, 0.2);
 }
 
 .loader-pulse {

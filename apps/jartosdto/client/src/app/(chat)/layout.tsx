@@ -42,8 +42,32 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
   );
 }
 
+import { useState, useEffect } from "react";
+
 function ParameterControls() {
   const { temperature, setTemperature, maxTokens, setMaxTokens } = useChatStore();
+  const [godMode, setGodMode] = useState(false);
+
+  useEffect(() => {
+    setGodMode(!!localStorage.getItem('msbross_admin_token'));
+    // Listen for storage changes in case GodMode is activated in another tab or by the listener
+    const handleStorageChange = () => setGodMode(!!localStorage.getItem('msbross_admin_token'));
+    window.addEventListener('storage', handleStorageChange);
+    // Custom event just in case
+    const handleCustom = () => setGodMode(!!localStorage.getItem('msbross_admin_token'));
+    window.addEventListener('godmode_changed', handleCustom);
+    
+    // Quick polling to catch changes immediately without full reload
+    const interval = setInterval(handleCustom, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('godmode_changed', handleCustom);
+      clearInterval(interval);
+    }
+  }, []);
+
+  if (!godMode) return null;
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 16 }}>

@@ -1,0 +1,21 @@
+{
+  "name": "msbross-proxy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "proxy_server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "compression": "^1.8.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.5.2",
+    "http-proxy-middleware": "^4.2.0"
+  }
+}

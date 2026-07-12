@@ -188,6 +188,7 @@ services:
       - PORT=8006
     volumes:
       - /home/ubuntu/MSBrossAI/apps/iaprod-os/backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock
 
   industrialpro-backend:
     <<: *backend

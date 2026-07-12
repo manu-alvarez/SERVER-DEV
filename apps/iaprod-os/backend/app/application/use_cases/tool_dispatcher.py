@@ -21,6 +21,12 @@ async def handle_tool_call(call):
     elif name == "os_control": return await os_control_request(args.get("act"), args.get("val"), args.get("code"))
     elif name == "approve_and_run_script": return await approve_and_run_script(args.get("script_id"))
     elif name == "execute_python": return await execute_python(args.get("code"))
+    elif name == "docker_ps": 
+        from app.infrastructure.tools.toolbox import docker_ps
+        return await docker_ps()
+    elif name == "docker_logs": 
+        from app.infrastructure.tools.toolbox import docker_logs
+        return await docker_logs(args.get("container_name"), args.get("lines", 50))
     elif name == "get_current_time":
         from app.infrastructure.tools.toolbox import get_current_time
         return await get_current_time()

@@ -7,23 +7,23 @@
    ═══════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Core Palette ─────────────────────────────────── */
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #12121a;
-  --bg-tertiary: #1a1a28;
-  --bg-elevated: #22223a;
-  --bg-hover: #2a2a42;
+  /* ── Core Palette (JartosDTo B2C) ─────────────────── */
+  --bg-primary: #0f0a14;
+  --bg-secondary: #160e20;
+  --bg-tertiary: #20132f;
+  --bg-elevated: #29183d;
+  --bg-hover: #311c4a;
 
-  --text-primary: #f0f0f5;
-  --text-secondary: #a0a0b8;
-  --text-tertiary: #6b6b80;
-  --text-accent: #818cf8;
+  --text-primary: #f8f0ff;
+  --text-secondary: #b9a0cc;
+  --text-tertiary: #8b6b9e;
+  --text-accent: #f43f5e; /* Neon Pink */
 
   /* ── Accent Gradient ──────────────────────────────── */
-  --accent-start: #818cf8;
-  --accent-mid: #a78bfa;
-  --accent-end: #c084fc;
-  --accent-glow: rgba(129, 140, 248, 0.15);
+  --accent-start: #f43f5e;
+  --accent-mid: #d946ef;
+  --accent-end: #8b5cf6;
+  --accent-glow: rgba(244, 63, 94, 0.25);
 
   /* ── Surfaces ─────────────────────────────────────── */
   --border-subtle: rgba(255, 255, 255, 0.06);

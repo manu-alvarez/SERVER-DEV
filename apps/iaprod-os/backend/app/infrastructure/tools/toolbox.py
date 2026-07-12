@@ -239,6 +239,53 @@ async def get_current_time():
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return f"La fecha y hora actual es: {now}", None
 
+async def docker_ps():
+    """Lista los contenedores Docker usando la API del socket (HTTP sobre Unix Socket) o CLI."""
+    process = await asyncio.create_subprocess_exec(
+        "curl", "-s", "--unix-socket", "/var/run/docker.sock", "http://localhost/containers/json",
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
+    )
+    stdout, stderr = await process.communicate()
+    if stderr:
+        # Fallback to CLI
+        proc2 = await asyncio.create_subprocess_exec(
+            "docker", "ps", "--format", "table {{.Names}}\t{{.Status}}\t{{.Ports}}",
+            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+        )
+        stdout2, stderr2 = await proc2.communicate()
+        if stderr2: return f"Error leyendo contenedores: {stderr2.decode()}", None
+        return stdout2.decode(), None
+        
+    import json
+    try:
+        containers = json.loads(stdout.decode())
+        res = "Contenedores Activos:\n"
+        for c in containers:
+            names = ", ".join(c.get("Names", []))
+            state = c.get("State", "unknown")
+            status = c.get("Status", "")
+            res += f"- {names}: {state} ({status})\n"
+        return res, None
+    except Exception as e:
+        return f"Error parseando JSON de docker: {e}", None
+
+async def docker_logs(container_name: str, lines: int = 50):
+    """Obtiene los logs usando Docker CLI."""
+    process = await asyncio.create_subprocess_exec(
+        "docker", "logs", "--tail", str(lines), container_name,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
+    )
+    stdout, stderr = await process.communicate()
+    out = stdout.decode()
+    err = stderr.decode()
+    # docker logs usually prints to stderr as well, we combine them
+    res = (out + "\n" + err).strip()
+    if not res:
+        return f"No hay logs o el contenedor '{container_name}' no existe.", None
+    return res, None
+
 # Definición del esquema de herramientas para enviar al LLM
 TOOLS_SCHEMA = [
     {
@@ -387,6 +434,28 @@ TOOLS_SCHEMA = [
                     "code": {"type": "string"}
                 }, 
                 "required": ["code"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "docker_ps",
+            "description": "Lista los contenedores Docker en ejecución en el servidor VPS."
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "docker_logs",
+            "description": "Obtiene los últimos logs de un contenedor Docker específico.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "container_name": {"type": "string", "description": "Nombre del contenedor (ej. jartosdto-backend)"},
+                    "lines": {"type": "integer", "description": "Número de líneas a recuperar (por defecto 50)"}
+                },
+                "required": ["container_name"]
             }
         }
     }
