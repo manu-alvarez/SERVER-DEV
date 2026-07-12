@@ -94,7 +94,7 @@ export function useNikolinaBackend() {
     });
     if (!res.ok) throw new Error('Error al generar token');
     const data = await res.json();
-    return data.token;
+    return data.accessToken || data.token;
   };
 
   return {
