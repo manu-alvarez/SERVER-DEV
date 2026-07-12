@@ -12,6 +12,11 @@ router = APIRouter()
 
 @router.websocket("/ws/nodes/{node_id}")
 async def websocket_node_endpoint(websocket: WebSocket, node_id: str):
+    token = websocket.headers.get("x-godmode-token")
+    if token != "msbross-master-key-2026":
+        await websocket.close(code=1008)
+        return
+        
     await node_manager.connect(websocket, node_id)
     try:
         while True:

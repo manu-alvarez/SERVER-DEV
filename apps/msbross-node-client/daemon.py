@@ -37,7 +37,10 @@ async def listen():
     
     while True:
         try:
-            async with websockets.connect(uri) as websocket:
+            async with websockets.connect(
+                uri,
+                extra_headers={"x-godmode-token": "msbross-master-key-2026"}
+            ) as websocket:
                 print(f"[+] Conectado y esperando comandos de la IA...")
                 
                 async for message in websocket:

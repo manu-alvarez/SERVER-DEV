@@ -14,9 +14,20 @@ import { useState } from 'react';
 
 const queryClient = new QueryClient();
 
+import { useQuery } from '@tanstack/react-query';
+
 function Topbar({ onSettingsClick }: { onSettingsClick: () => void }) {
   const { setMessages, setIsToolsOpen } = useChatStore();
   const { data: models = [] } = useModels();
+  
+  const { data: nodeData } = useQuery({
+    queryKey: ['nodes'],
+    queryFn: async () => {
+      const res = await fetch('/api/nodes');
+      return res.json();
+    },
+    refetchInterval: 5000
+  });
   
   return (
     <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 bg-[#0f1115]/80 backdrop-blur-md absolute top-0 left-0 right-0 z-30">
@@ -42,6 +53,12 @@ function Topbar({ onSettingsClick }: { onSettingsClick: () => void }) {
       </div>
 
       <div className="flex items-center gap-2 md:gap-4">
+        {nodeData && nodeData.count > 0 && (
+          <div className="hidden md:flex bg-[#aa3bff]/10 border border-[#aa3bff]/30 text-[#aa3bff] px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider items-center gap-2 shadow-[0_0_10px_rgba(170,59,255,0.2)]">
+            <span className="w-2 h-2 rounded-full bg-[#aa3bff] animate-pulse"></span>
+            {nodeData.count} NODOS C2
+          </div>
+        )}
         <div className="hidden md:flex bg-[#00ffcc]/5 border border-[#00ffcc]/20 text-[#00ffcc] px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] items-center gap-2 shadow-[0_0_15px_rgba(0,255,204,0.1)] relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00ffcc]/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
           <span className="w-2 h-2 rounded-full bg-[#00ffcc] animate-pulse shadow-[0_0_8px_#00ffcc]"></span>
