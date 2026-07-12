@@ -153,13 +153,14 @@ async def get_models(req: Request):
             if not val: continue
             
             # If default_base is None, we expect the user to have provided the base URL
-            # If default_base exists, val is the API key. 
-            # If user provided a URL for Mistral/Minimax (unlikely), we'll handle it.
             if default_base:
                 base_url = default_base
                 headers = {"Authorization": f"Bearer {val}"}
             else:
                 base_url = val.rstrip('/')
+                # Auto-correct https to http for Tailscale/local IPs which rarely have valid SSL
+                if base_url.startswith("https://") and any(x in base_url for x in ["100.", "192.", "10.", "127.", "localhost"]):
+                    base_url = base_url.replace("https://", "http://")
                 headers = {}
                 
             try:
@@ -325,6 +326,8 @@ async def chat_completions(req: Request, body: ChatRequest):
         api_key = api_keys.get("minimax")
     elif prov in ["ollama", "llamacpp", "lmstudio", "vllm"]:
         custom_url = api_keys.get(prov, "").rstrip('/')
+        if custom_url.startswith("https://") and any(x in custom_url for x in ["100.", "192.", "10.", "127.", "localhost"]):
+            custom_url = custom_url.replace("https://", "http://")
         base_url = f"{custom_url}/v1/chat/completions" if custom_url else None
         api_key = "sk-local"
     elif "/" in raw_model_id:
