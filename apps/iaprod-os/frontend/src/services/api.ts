@@ -1,6 +1,6 @@
 import { ApiResponse } from '../types';
 
-const isProduction = window.location.hostname === 'msbross.me';
+const isProduction = window.location.hostname === 'msbross.me' || window.location.hostname === 'iaprod.manuelalvarez.dev';
 const API_BASE = isProduction
   ? '/_iaprod/api'
   : ((import.meta as any).env.VITE_API_BASE_URL || `http://${window.location.hostname}:8006/api`);
