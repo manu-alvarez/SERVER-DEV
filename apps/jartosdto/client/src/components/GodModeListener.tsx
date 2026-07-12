@@ -5,7 +5,7 @@ import { useEffect } from "react";
 export default function GodModeListener() {
   useEffect(() => {
     let tapCount = 0;
-    let tapTimeout: NodeJS.Timeout;
+    let tapTimeout: ReturnType<typeof setTimeout>;
 
     const triggerGodMode = () => {
       const pwd = prompt("🔐 Modo Dios (Introduce la clave maestra):\nSi cancelas o dejas en blanco, se desactivará.");
