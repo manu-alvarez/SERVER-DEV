@@ -527,75 +527,57 @@ async def entrypoint(ctx: JobContext) -> None:
             end_call,
         ]
 
-        if architecture == "realtime":
-            logger.info(f"Initializing Native Realtime Agent: {pipeline_cfg.get('name')}")
-            api_key = os.environ.get("GOOGLE_API_KEY")
-            if not api_key:
-                logger.error("GOOGLE_API_KEY is not set")
-                return
+        # -------------------------------------------------------------------------
+        # PIPELINE SELECTION OVERRIDE
+        # The Native Realtime API (Gemini Multimodal) is not supported by AgentSession without STT.
+        # This causes the microphone to never activate ("no escucha, ni activa micrófono").
+        # To fix this, we ALWAYS force the modular pipeline which explicitly initializes STT/TTS.
+        # -------------------------------------------------------------------------
+        logger.info(f"Initializing Modular Voice Pipeline: {pipeline_cfg.get('name', 'Fallback to Modular')}")
+        
+        # Load VAD
+        vad = None
+        try:
+            from livekit.plugins import silero
+            vad_sensitivity = float(pipeline_cfg.get("vad_sensitivity", 0.5))
+            # Ajuste Nivel Dios de SileroVAD para entorno de restaurante de fondo
+            vad = silero.VAD.load(
+                min_silence_duration=0.5,     # Pausas más naturales antes de que la IA responda
+                min_speech_duration=0.1,      # Ignorar ruidos breves de fondo
+                max_buffered_speech=60.0,
+                activation_threshold=vad_sensitivity
+            )
+        except ImportError:
+            logger.warning("Silero VAD not found. Modular pipeline may have degraded turn detection.")
 
-            # Gemini Omni Native Audio - The proven high-reliability voice engine
-            model = RealtimeModel(
-                model=pipeline_cfg.get("realtime_model", "gemini-2.0-flash-exp"),
-                api_key=api_key,
-                voice=pipeline_cfg.get("realtime_voice", "Aoede"),
-                instructions=system_prompt,
-                temperature=float(pipeline_cfg.get("llm_temperature", 0.7)),
-            )
-            
-            agent = Agent(
-                instructions=system_prompt,
-                tools=agent_tools,
-            )
-            session = AgentSession(
-                llm=model,
-            )
-            
-        else:
-            logger.info(f"Initializing Modular Voice Pipeline: {pipeline_cfg.get('name')}")
-            # Load VAD
-            vad = None
-            try:
-                from livekit.plugins import silero
-                vad_sensitivity = float(pipeline_cfg.get("vad_sensitivity", 0.5))
-                # Ajuste Nivel Dios de SileroVAD para entorno de restaurante de fondo
-                vad = silero.VAD.load(
-                    min_silence_duration=0.5,     # Pausas más naturales antes de que la IA responda
-                    min_speech_duration=0.1,      # Ignorar ruidos breves de fondo
-                    max_buffered_speech=60.0,
-                    activation_threshold=vad_sensitivity
-                )
-            except ImportError:
-                logger.warning("Silero VAD not found. Modular pipeline may have degraded turn detection.")
+        llm_instance = providers.ProviderFactory.create_llm(
+            provider=pipeline_cfg.get("llm_provider", "gemini"),
+            model=pipeline_cfg.get("llm_model", "gemini-2.0-flash"),
+            base_url=pipeline_cfg.get("llm_base_url"),
+            temperature=float(pipeline_cfg.get("llm_temperature", 0.7)),
+        )
+        stt_instance = providers.ProviderFactory.create_stt(
+            provider=pipeline_cfg.get("stt_provider", "google-stt"),
+            model=pipeline_cfg.get("stt_model", "small"),
+            language=pipeline_cfg.get("stt_language", "es"),
+        )
+        tts_instance = providers.ProviderFactory.create_tts(
+            provider=pipeline_cfg.get("tts_provider", "google-tts"),
+            voice=pipeline_cfg.get("tts_voice", "es-ES-Standard-A"),
+            server_url=pipeline_cfg.get("tts_server_url"),
+            speed=float(pipeline_cfg.get("tts_speed", 1.0)),
+        )
 
-            llm_instance = providers.ProviderFactory.create_llm(
-                provider=pipeline_cfg.get("llm_provider", "openai"),
-                model=pipeline_cfg.get("llm_model", "gpt-4o"),
-                base_url=pipeline_cfg.get("llm_base_url"),
-                temperature=float(pipeline_cfg.get("llm_temperature", 0.7)),
-            )
-            stt_instance = providers.ProviderFactory.create_stt(
-                provider=pipeline_cfg.get("stt_provider", "google-stt"),
-                model=pipeline_cfg.get("stt_model", "small"),
-                language=pipeline_cfg.get("stt_language", "es"),
-            )
-            tts_instance = providers.ProviderFactory.create_tts(
-                provider=pipeline_cfg.get("tts_provider", "kokoro"),
-                voice=pipeline_cfg.get("tts_voice", "ef_dora"),
-                server_url=pipeline_cfg.get("tts_server_url"),
-                speed=float(pipeline_cfg.get("tts_speed", 1.0)),
-            )
-
-            agent = Agent(
-                instructions=system_prompt,
-                tools=agent_tools,
-            )
-            session = AgentSession(
-                stt=stt_instance,
-                llm=llm_instance,
-                tts=tts_instance,
-                vad=vad,
-            )
+        agent = Agent(
+            instructions=system_prompt,
+            tools=agent_tools,
+        )
+        session = AgentSession(
+            stt=stt_instance,
+            llm=llm_instance,
+            tts=tts_instance,
+            vad=vad,
+        )
 
         # ---------------------------------------------------------------------------
         # Chat Transcript Hooks (registered BEFORE session.start)
