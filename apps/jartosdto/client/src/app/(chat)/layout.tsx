@@ -8,27 +8,33 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
   const { sidebarOpen, toggleSidebar } = useUIStore();
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
+    <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)]">
       <Sidebar />
 
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header style={{
-          height: "var(--header-height)", display: "flex", alignItems: "center",
-          justifyContent: "space-between", padding: "0 20px",
-          borderBottom: "1px solid var(--border-subtle)", background: "var(--bg-secondary)",
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <header className="h-[var(--header-height)] flex items-center justify-between px-4 sm:px-6 border-b border-[var(--border-subtle)] bg-[var(--bg-secondary)] shrink-0">
+          <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
             {!sidebarOpen && (
-              <button onClick={toggleSidebar} style={{ background: "none", border: "none", color: "var(--text-secondary)", cursor: "pointer", fontSize: 20 }}>☰</button>
+              <button 
+                onClick={toggleSidebar} 
+                className="bg-transparent border-none text-[var(--text-secondary)] cursor-pointer text-xl sm:text-2xl hover:text-[var(--text-primary)] transition-colors shrink-0"
+                aria-label="Abrir menú"
+              >
+                ☰
+              </button>
             )}
-            <ModelSelector />
+            <div className="min-w-0 truncate flex-1">
+              <ModelSelector />
+            </div>
           </div>
-          <ParameterControls />
+          <div className="hidden sm:block shrink-0 ml-4">
+            <ParameterControls />
+          </div>
         </header>
 
         {/* Page content */}
-        <main style={{ flex: 1, overflow: "hidden" }}>
+        <main className="flex-1 overflow-hidden relative">
           {children}
         </main>
       </div>

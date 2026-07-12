@@ -9,7 +9,7 @@ const API_KEY = (import.meta as any).env.VITE_API_KEY || '';
 export const ApiService = {
   async checkHealth(): Promise<boolean> {
     try {
-      const url = `${API_BASE}${isProduction ? 'status' : '/status'}`;
+      const url = `${API_BASE}/status`;
       const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
       return res.ok;
     } catch {
