@@ -6,9 +6,9 @@ export default function GodModeListener() {
       if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'm') {
         e.preventDefault();
         const pwd = prompt("🔐 Modo Dios (Introduce la clave maestra):\nSi cancelas o dejas en blanco, se desactivará.");
-        if (pwd === 'msbross-master-key-2026') {
+        if (pwd) {
           localStorage.setItem('msbross_admin_token', pwd);
-          alert("✅ ¡Modo Dios Activado! MSBrOSs Assistant usará el proxy seguro.");
+          alert("✅ Clave de Modo Dios guardada. Se usará el proxy de MSBrOSs si es válida.");
           window.location.reload();
         } else if (pwd !== null) {
           localStorage.removeItem('msbross_admin_token');
