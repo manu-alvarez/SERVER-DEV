@@ -77,3 +77,37 @@ def code_interpreter(code: str) -> str:
         return out if out else "Código ejecutado sin errores (sin salida por consola)."
     except Exception as e:
         return f"Error en ejecución Python: {e}"
+
+def list_connected_nodes() -> str:
+    from app.websocket_manager import node_manager
+    nodes = node_manager.get_connected_nodes()
+    if not nodes:
+        return "No hay Nodos Remotos (dispositivos) conectados actualmente."
+    return f"Nodos Conectados ({len(nodes)}): " + ", ".join(nodes)
+
+async def execute_remote_command(args_json: str) -> str:
+    import json
+    from app.websocket_manager import node_manager
+    try:
+        args = json.loads(args_json)
+        node_id = args.get("node_id")
+        command = args.get("command")
+        
+        if not node_id or not command:
+            return "Error: Faltan argumentos 'node_id' o 'command' en el JSON."
+        
+        response = await node_manager.send_command_to_node(
+            node_id=node_id,
+            action="execute_shell",
+            payload={"command": command}
+        )
+        
+        if response.get("status") == "success":
+            return f"[{node_id} SUCCESS]\n{response.get('result', '')}"
+        else:
+            return f"[{node_id} ERROR]\n{response.get('message', 'Unknown error')}"
+            
+    except json.JSONDecodeError:
+        return "Error: Los argumentos no son un JSON válido. Usa el formato exacto de la herramienta."
+    except Exception as e:
+        return f"Error inesperado al ejecutar comando remoto: {e}"

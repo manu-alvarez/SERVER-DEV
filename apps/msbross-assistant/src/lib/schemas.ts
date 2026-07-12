@@ -4,6 +4,7 @@ export const MessageSchema = z.object({
   id: z.string().optional(),
   role: z.enum(["user", "assistant", "system"]),
   content: z.string(),
+  model: z.string().optional(),
   timestamp: z.number().optional()
 });
 

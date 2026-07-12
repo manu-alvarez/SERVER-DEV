@@ -1,18 +1,41 @@
 import time, json
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from app.db import get_conversations, get_conversation, create_conversation
 from app.models import AVAILABLE_MODELS
 from app.chat import chat_stream
 from app.tools import calculator
+from app.websocket_manager import node_manager
 
 router = APIRouter()
+
+@router.websocket("/ws/nodes/{node_id}")
+async def websocket_node_endpoint(websocket: WebSocket, node_id: str):
+    await node_manager.connect(websocket, node_id)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            try:
+                # We expect nodes to return {"task_id": "...", "status": "success/error", "result": "..."}
+                parsed = json.loads(data)
+                if "task_id" in parsed:
+                    await node_manager.handle_node_response(parsed["task_id"], parsed)
+            except json.JSONDecodeError:
+                pass
+    except WebSocketDisconnect:
+        node_manager.disconnect(node_id)
 
 
 @router.get("/health")
 async def health():
     return {"status": "ok", "service": "msbross-backend"}
+
+
+@router.get("/api/nodes")
+async def get_nodes():
+    nodes = node_manager.get_connected_nodes()
+    return {"nodes": nodes, "count": len(nodes)}
 
 
 @router.get("/api/models")
