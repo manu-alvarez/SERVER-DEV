@@ -18,16 +18,17 @@ export default function GodModeListener() {
       }
     };
 
-    const handleTouch = () => {
-      tapCount++;
-      if (tapCount >= 5) {
-        tapCount = 0;
-        triggerGodMode();
+    const handleTouchStart = (e: TouchEvent) => {
+      // Require 2 fingers for GodMode long press to avoid accidental triggers while scrolling
+      if (e.touches.length === 2) {
+        tapTimeout = setTimeout(() => {
+          triggerGodMode();
+        }, 3000); // 3 seconds hold
       }
+    };
+
+    const handleTouchEnd = () => {
       clearTimeout(tapTimeout);
-      tapTimeout = setTimeout(() => {
-        tapCount = 0;
-      }, 1500); // 1.5 seconds window to tap 5 times
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -38,11 +39,15 @@ export default function GodModeListener() {
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('touchstart', handleTouch);
+    window.addEventListener('touchstart', handleTouchStart);
+    window.addEventListener('touchend', handleTouchEnd);
+    window.addEventListener('touchcancel', handleTouchEnd);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('touchstart', handleTouch);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('touchcancel', handleTouchEnd);
       clearTimeout(tapTimeout);
     };
   }, []);

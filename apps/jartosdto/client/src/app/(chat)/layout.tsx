@@ -8,10 +8,18 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
   const { sidebarOpen, toggleSidebar } = useUIStore();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)]">
+    <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)] relative">
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={toggleSidebar}
+          aria-hidden="true"
+        />
+      )}
       <Sidebar />
 
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 md:pl-0">
         {/* Header */}
         <header className="h-[var(--header-height)] flex items-center justify-between px-4 sm:px-6 border-b border-[var(--border-subtle)] bg-[var(--bg-secondary)] shrink-0">
           <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">

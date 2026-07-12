@@ -118,7 +118,7 @@ export default function App() {
               </button>
               <div className={`status-indicator ${offlineMode ? 'offline' : 'online'}`}>
                 <div className="status-dot"></div>
-                <span>{offlineMode ? 'Host Only' : 'Host + Local'}</span>
+                <span>{offlineMode ? 'Enterprise Core' : 'C2 Cluster'}</span>
               </div>
             </div>
           </div>
