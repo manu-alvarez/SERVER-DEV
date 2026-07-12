@@ -23,7 +23,7 @@ function Topbar({ onSettingsClick }: { onSettingsClick: () => void }) {
   const { data: nodeData } = useQuery({
     queryKey: ['nodes'],
     queryFn: async () => {
-      const res = await fetch('/api/nodes');
+      const res = await fetch('/_msbross/api/nodes');
       return res.json();
     },
     refetchInterval: 5000

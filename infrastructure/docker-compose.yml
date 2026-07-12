@@ -230,6 +230,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.msbross-api.rule=Host(`assistant.manuelalvarez.dev`) && PathPrefix(`/_msbross`)
+      - traefik.http.routers.msbross-api.priority=100
       - traefik.http.routers.msbross-api.entrypoints=websecure
       - traefik.http.routers.msbross-api.tls.certresolver=myresolver
       - traefik.http.routers.msbross-api.middlewares=strip-msbross

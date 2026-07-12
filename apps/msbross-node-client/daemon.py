@@ -7,7 +7,11 @@ import platform
 
 # Configuración del Nodo
 NODE_ID = platform.node()  # Usa el hostname por defecto, ej. "MacBook-Manu"
-SERVER_URL = "wss://api.manuelalvarez.dev/ws/nodes/"  # Cambiar a ws://localhost:8000 para dev local
+
+def get_ws_uri():
+    # En producción debería ser el dominio/IP del backend central
+    # ej: wss://assistant.manuelalvarez.dev/_msbross/ws/nodes/{NODE_ID}
+    return f"wss://assistant.manuelalvarez.dev/_msbross/ws/nodes/{NODE_ID}"  # Cambiar a ws://localhost:8000 para dev local
 
 async def execute_command(command: str) -> str:
     """Ejecuta un comando en el sistema local y devuelve la salida."""
@@ -32,7 +36,7 @@ async def execute_command(command: str) -> str:
         return f"Excepción al ejecutar comando: {e}"
 
 async def listen():
-    uri = f"{SERVER_URL}{NODE_ID}"
+    uri = get_ws_uri()
     print(f"[*] Conectando MSBrOSs Node [{NODE_ID}] a {uri}...")
     
     while True:
