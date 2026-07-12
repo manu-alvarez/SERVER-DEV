@@ -138,6 +138,7 @@ const BACKEND_MAP = {
   'mapfre':                 ['mapfre',                    3333],
   'txa-fitness-pro':        ['txa-fitness-pro',           3000],
   'it-english-backend':     ['it-english-backend',        8787],
+  'msbross-backend':        ['msbross-backend',           8000],
 };
 
 app.get('/__health', requireAdminAuth, async (req, res) => {
@@ -352,6 +353,7 @@ app.use('/_cuentosmagicos',createProxyMiddleware(proxyOpts('http://cuentos-magic
 app.use('/_jartosdto',     createProxyMiddleware(proxyOpts('http://jartosdto-backend:8010', '/_jartosdto')));
 app.use('/_atenea',        createProxyMiddleware(proxyOpts('http://atenea-backend:8009', '/_atenea')));
 app.use('/_traductor',     createProxyMiddleware(proxyOpts('http://traductor-backend:8004', '/_traductor')));
+app.use('/_msbross',       createProxyMiddleware(proxyOpts('http://msbross-backend:8000', '/_msbross')));
 
 
 // ── IT English Coach AI Proxy ──
