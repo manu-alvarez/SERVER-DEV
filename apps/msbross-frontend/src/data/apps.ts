@@ -3,7 +3,7 @@ import { Rocket, Box, Globe, Shield, Activity, Target, Layout, MessageSquare, He
 export const APPS_DATA = [
   {
     name: 'App Generator',
-    desc: 'Herramienta sencilla para desplegar páginas web estáticas.',
+    desc: 'Generador de páginas web estáticas mediante prompts de texto. Crea, visualiza y descarga el código fuente.',
     tech: 'React 19, Vite, Gemini API',
     url: 'https://appgen.manuelalvarez.dev',
     icon: Activity,
@@ -14,19 +14,19 @@ export const APPS_DATA = [
   },
   {
     name: 'CombiPro',
-    desc: 'Calculadora y generador de combinadas deportivas con probabilidad básica.',
-    tech: 'React 19, MUI 7',
+    desc: 'Herramienta de cálculo y simulación de combinadas deportivas basada en probabilidades básicas.',
+    tech: 'React 19, Material-UI (MUI)',
     url: 'https://combipro.manuelalvarez.dev',
     icon: Activity,
     color: 'from-[#f97316] to-[#f97316]',
     glow: 'shadow-[0_0_30px_rgba(249,115,22,0.3)]',
     category: 'industrial',
-    tag: 'SPORTS AI'
+    tag: 'SPORTS TOOL'
   },
   {
     name: 'Cuentos Mágicos',
-    desc: 'Pequeño generador de cuentos infantiles.',
-    tech: 'FastAPI, Celery, AI',
+    desc: 'Plataforma experimental para la generación de cuentos infantiles personalizados usando LLMs.',
+    tech: 'React, FastAPI, Celery, PostgreSQL',
     url: 'https://cuentos.manuelalvarez.dev',
     icon: Sparkles,
     color: 'from-[#fbbf24] to-[#f59e0b]',
@@ -36,41 +36,41 @@ export const APPS_DATA = [
   },
   {
     name: 'Edelweiss',
-    desc: 'Plataforma de gestión y reservas para refugio de montaña.',
-    tech: 'Next.js 14, Tailwind, Prisma',
+    desc: 'Sistema integral de reservas y gestión administrativa para refugios de montaña.',
+    tech: 'Next.js 14, Tailwind CSS, Prisma, Postgres',
     url: 'https://edelweiss.manuelalvarez.dev',
     icon: Globe,
     color: 'from-[#ec4899] to-[#db2777]',
     glow: 'shadow-[0_0_30px_rgba(236,72,153,0.3)]',
     category: 'frontend',
-    tag: 'VISION PLAY'
+    tag: 'MANAGEMENT B2B'
   },
   {
     name: 'EliteScout',
-    desc: 'Plataforma de búsqueda y filtrado de viajes y productos.',
-    tech: 'Next.js 14, Tavily API',
+    desc: 'Buscador inteligente para la consolidación y filtrado de datos de viajes y productos mediante agentes de búsqueda.',
+    tech: 'Next.js 14, Node.js, PostgreSQL, Tavily API',
     url: 'https://elitescout.manuelalvarez.dev',
     icon: Globe,
     color: 'from-[#D4AF37] to-[#b4952f]',
     glow: 'shadow-[0_0_30px_rgba(212,175,55,0.3)]',
     category: 'platforms',
-    tag: 'TRAVEL AI'
+    tag: 'SEARCH AI'
   },
   {
     name: 'EXPOSITATOR RTE',
-    desc: 'Herramienta de evaluación y feedback para exposiciones orales.',
-    tech: 'PWA, Speech API, Vision API',
+    desc: 'Aplicación web progresiva (PWA) para grabar, transcribir y evaluar exposiciones orales en tiempo real.',
+    tech: 'React PWA, Web Speech API, Tailwind',
     url: 'https://expositator.manuelalvarez.dev',
     icon: Target,
     color: 'from-[#10b981] to-[#059669]',
     glow: 'shadow-[0_0_30px_rgba(16,185,129,0.3)]',
     category: 'utilities',
-    tag: 'EVALUATOR AI'
+    tag: 'EVALUATOR'
   },
   {
     name: 'Gas Station',
-    desc: 'App PWA de gestión operativa para Estación de Servicio Repsol.',
-    tech: 'PWA, FastAPI, SQLite',
+    desc: 'Herramienta PWA de apoyo operativo para el control interno en Estaciones de Servicio.',
+    tech: 'React PWA, FastAPI, SQLite',
     url: 'https://gasstation.manuelalvarez.dev',
     icon: Rocket,
     color: 'from-[#f97316] to-[#ea580c]',
@@ -80,30 +80,30 @@ export const APPS_DATA = [
   },
   {
     name: 'IAProd OS',
-    desc: 'Script de automatización para tareas de mantenimiento de servidor.',
-    tech: 'FastAPI, Python, LLM',
+    desc: 'Sistema operativo web para la monitorización, orquestación y mantenimiento del servidor VPS central.',
+    tech: 'React, Vite, FastAPI, Python',
     url: 'https://iaprod.manuelalvarez.dev',
     icon: Shield,
     color: 'from-[#8b5cf6] to-[#7c3aed]',
     glow: 'shadow-[0_0_30px_rgba(139,92,246,0.3)]',
     category: 'platforms',
-    tag: 'CORE AI'
+    tag: 'INFRA OS'
   },
   {
     name: 'IndustrialPro',
-    desc: 'App de gestión para procesos de mantenimiento y producción.',
-    tech: 'FastAPI, React, Tailwind',
+    desc: 'Sistema B2B para la digitalización de procesos de mantenimiento preventivo y producción industrial.',
+    tech: 'React, Tailwind, FastAPI, PostgreSQL',
     url: 'https://industrial.manuelalvarez.dev',
     icon: Shield,
     color: 'from-[#3b82f6] to-[#2563eb]',
     glow: 'shadow-[0_0_30px_rgba(59,130,246,0.3)]',
     category: 'industrial',
-    tag: 'INDUSTRY'
+    tag: 'INDUSTRY B2B'
   },
   {
     name: 'IT English Coach',
-    desc: 'Coach de inglés conversacional con voz.',
-    tech: 'React, OpenAI API',
+    desc: 'Tutor conversacional de inglés enfocado en vocabulario técnico IT, impulsado por IA multimodal.',
+    tech: 'React, Tailwind, Express, OpenAI Audio API',
     url: 'https://itenglish.manuelalvarez.dev',
     icon: MessageSquare,
     color: 'from-[#00FFCC] to-[#00cca3]',
@@ -113,19 +113,19 @@ export const APPS_DATA = [
   },
   {
     name: 'JartosDTo',
-    desc: 'Chatbot gamberro y sarcástico.',
-    tech: 'Next.js, OpenAI',
+    desc: 'Compañero conversacional B2C diseñado con una personalidad sarcástica para interacciones de ocio.',
+    tech: 'Next.js 14, Tailwind, OpenAI GPT-4',
     url: 'https://jartosdto.manuelalvarez.dev',
     icon: Target,
     color: 'from-[#8b5cf6] to-[#7c3aed]',
     glow: 'shadow-[0_0_30px_rgba(139,92,246,0.3)]',
     category: 'utilities',
-    tag: 'AI CHAT'
+    tag: 'SOCIAL AI'
   },
   {
     name: 'LIVEKIT Nikolina',
-    desc: 'Asistente de voz en tiempo real con WebRTC.',
-    tech: 'LiveKit, Next.js',
+    desc: 'Asistente de voz en tiempo real con baja latencia para interacciones conversacionales fluidas.',
+    tech: 'LiveKit WebRTC, Next.js, Gemini 2.0',
     url: 'https://nikolina.manuelalvarez.dev',
     icon: MessageSquare,
     color: 'from-[#06b6d4] to-[#0891b2]',
@@ -135,30 +135,30 @@ export const APPS_DATA = [
   },
   {
     name: 'LogiSearch',
-    desc: 'Buscador y localizador de bultos en almacén.',
-    tech: 'React, Supabase',
+    desc: 'Motor de búsqueda interno para la localización rápida de bultos y referencias en almacén.',
+    tech: 'React, Tailwind, Supabase',
     url: 'https://logisearch.manuelalvarez.dev',
     icon: Globe,
     color: 'from-[#00E5FF] to-[#00b8cc]',
     glow: 'shadow-[0_0_30px_rgba(0,229,255,0.3)]',
     category: 'industrial',
-    tag: 'LOGISTICS AI'
+    tag: 'LOGISTICS'
   },
   {
     name: 'LogiTrack Almacén',
-    desc: 'Gestor de stock para almacén.',
-    tech: 'React, Firebase',
+    desc: 'Plataforma de gestión de inventarios y control de stock en tiempo real.',
+    tech: 'React, Tailwind, Firebase',
     url: 'https://logitrack.manuelalvarez.dev',
     icon: Box,
     color: 'from-[#0ea5e9] to-[#0284c7]',
     glow: 'shadow-[0_0_30px_rgba(14,165,233,0.3)]',
     category: 'industrial',
-    tag: 'LOGISTICS'
+    tag: 'LOGISTICS B2B'
   },
   {
     name: 'Mano Eléctrica Azul',
-    desc: 'Aplicación nativa móvil para gestión de energía.',
-    tech: 'React Native, Expo',
+    desc: 'Aplicación nativa móvil (Android/iOS) para la gestión personal de energía.',
+    tech: 'React Native, Expo, SQLite',
     url: 'https://mano.manuelalvarez.dev',
     icon: Activity,
     color: 'from-[#10b981] to-[#059669]',
@@ -168,30 +168,30 @@ export const APPS_DATA = [
   },
   {
     name: 'Manuel Álvarez',
-    desc: 'Mi portfolio personal y CV interactivo.',
-    tech: 'React, Tailwind CSS',
+    desc: 'Portfolio profesional interactivo y currículum vitae.',
+    tech: 'React, Tailwind CSS, Framer Motion',
     url: 'https://cv.manuelalvarez.dev',
     icon: Layout,
     color: 'from-[#3b82f6] to-[#2563eb]',
     glow: 'shadow-[0_0_30px_rgba(59,130,246,0.3)]',
     category: 'frontend',
-    tag: 'CV'
+    tag: 'PORTFOLIO'
   },
   {
     name: 'MAPFRE Gestión',
-    desc: 'Portal de gestión y automatización de partes MAPFRE.',
-    tech: 'Next.js, Python',
+    desc: 'Portal de pruebas de concepto para la automatización y gestión de partes de seguros.',
+    tech: 'Next.js 14, Tailwind, Python Backend',
     url: 'https://mapfre.manuelalvarez.dev',
     icon: Shield,
     color: 'from-[#e60028] to-[#b3001f]',
     glow: 'shadow-[0_0_30px_rgba(230,0,40,0.3)]',
     category: 'industrial',
-    tag: 'INSURANCE'
+    tag: 'INSURANCE POC'
   },
   {
     name: 'Moko-Tools',
-    desc: 'Herramientas de parseo y utilidades para devs.',
-    tech: 'Vanilla JS',
+    desc: 'Colección de utilidades web ligeras para el parseo de datos y tareas comunes de desarrollo.',
+    tech: 'Vanilla JavaScript, HTML5, CSS3',
     url: 'https://mokotools.manuelalvarez.dev',
     icon: Layout,
     color: 'from-[#14b8a6] to-[#0d9488]',
@@ -201,19 +201,19 @@ export const APPS_DATA = [
   },
   {
     name: 'MSBrOSs Assistant',
-    desc: 'Panel de herramientas de asistencia y utilidades.',
-    tech: 'React, Node.js',
+    desc: 'Consola técnica y laboratorio de pruebas B2B (BYOK) para inyección de contexto y experimentación con LLMs.',
+    tech: 'React, Node.js, Múltiples APIs LLM',
     url: 'https://assistant.manuelalvarez.dev',
     icon: MessageSquare,
     color: 'from-[#a855f7] to-[#9333ea]',
     glow: 'shadow-[0_0_30px_rgba(168,85,247,0.3)]',
     category: 'core',
-    tag: 'ASSISTANT'
+    tag: 'AI LAB'
   },
   {
     name: 'Perfume Trading',
-    desc: 'B2B Marketplace para traders de perfumes.',
-    tech: 'Next.js, Prisma',
+    desc: 'Prototipo de Marketplace B2B orientado a operaciones comerciales mayoristas de perfumería.',
+    tech: 'Next.js 14, Tailwind, Prisma, PostgreSQL',
     url: 'https://perfume.manuelalvarez.dev',
     icon: Box,
     color: 'from-[#f43f5e] to-[#e11d48]',
@@ -223,8 +223,8 @@ export const APPS_DATA = [
   },
   {
     name: 'TaskFlowPro',
-    desc: 'Gestor de tareas avanzado con sincronización real-time.',
-    tech: 'React, Firebase',
+    desc: 'Aplicación de gestión de tareas con sincronización en tiempo real y arquitectura orientada a eventos.',
+    tech: 'React, Tailwind, Firebase Realtime DB',
     url: 'https://taskflow.manuelalvarez.dev',
     icon: Layout,
     color: 'from-[#f59e0b] to-[#d97706]',
@@ -234,8 +234,8 @@ export const APPS_DATA = [
   },
   {
     name: 'Traductor PRO',
-    desc: 'Traductor neural con retención de formato.',
-    tech: 'React, DeepL API',
+    desc: 'Interfaz para traducción neural orientada a mantener formatos y estilos específicos.',
+    tech: 'React, Tailwind, DeepL API',
     url: 'https://traductor.manuelalvarez.dev',
     icon: Globe,
     color: 'from-[#10b981] to-[#059669]',
@@ -245,8 +245,8 @@ export const APPS_DATA = [
   },
   {
     name: 'Tu Energía Maya',
-    desc: 'Calculadora de calendarios Mayas Tzolkin.',
-    tech: 'React, Vite',
+    desc: 'Herramienta interactiva para calcular kines y sincronarios del calendario maya Tzolkin.',
+    tech: 'React, Vite, CSS Modules',
     url: 'https://manu-alvarez.github.io/TuEnergiaMaya/',
     icon: Sparkles,
     color: 'from-[#f59e0b] to-[#d97706]',
@@ -256,19 +256,19 @@ export const APPS_DATA = [
   },
   {
     name: 'TxaFitnessPro',
-    desc: 'Plataforma para monitorizar entrenamientos y nutrición.',
-    tech: 'Next.js 15, Prisma',
+    desc: 'Aplicación SaaS para monitorizar entrenamientos, dietas y progresión física.',
+    tech: 'Next.js 15, Tailwind, Prisma, PostgreSQL',
     url: 'https://txafitness.manuelalvarez.dev',
     icon: Heart,
     color: 'from-[#a855f7] to-[#9333ea]',
     glow: 'shadow-[0_0_30px_rgba(168,85,247,0.3)]',
     category: 'platforms',
-    tag: 'FITNESS AI'
+    tag: 'FITNESS SAAS'
   },
   {
     name: 'Web Atenea',
-    desc: 'Landing page para restaurante Atenea.',
-    tech: 'HTML, CSS',
+    desc: 'Página estática informativa (Landing Page) diseñada para un negocio local de restauración.',
+    tech: 'HTML5, CSS3, JavaScript',
     url: 'https://atenea.manuelalvarez.dev',
     icon: Layout,
     color: 'from-[#c4b5fd] to-[#a78bfa]',
