@@ -266,7 +266,7 @@ async def entrypoint(ctx: JobContext) -> None:
 
         fnc_ctx = RestaurantTools(ctx, session_state)
 
-        logger.info("Configuring RealtimeModel (Gemini 3.1 Live)...")
+        logger.info("Configuring RealtimeModel...")
 
         # Wait for participant before setting up the model
         participant = await ctx.wait_for_participant()
@@ -277,7 +277,7 @@ async def entrypoint(ctx: JobContext) -> None:
         # SDK auto-reads GOOGLE_API_KEY from env — do NOT pass api_key manually
         # Gemini Live uses a direct WebSocket to Google — do NOT proxy via http_options
         model = google.realtime.RealtimeModel(
-            model="gemini-2.5-flash-native-audio-preview", 
+            model="gemini-3.1-flash-live-preview", 
             voice="Adele",
             temperature=0.6,
         )
