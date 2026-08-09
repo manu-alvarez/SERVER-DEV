@@ -46,22 +46,24 @@ async def entrypoint(ctx: JobContext):
     await ctx.connect(auto_subscribe=AutoSubscribe.SUBSCRIBE_ALL)
 
     logger.info("Configuring RealtimeModel (Gemini 3.1 Live)...")
+    from livekit.agents.voice import Agent, AgentSession
+    
     # Native Speech-to-Speech Realtime Model
     model = google.realtime.RealtimeModel(
         model="gemini-3.1-flash-live", 
         voice="Puck",
         temperature=0.6,
-        instructions=COACH_INSTRUCTIONS
     )
 
-    # Init the VoiceAssistant
-    agent = google.realtime.VoiceAssistant(
-        model=model,
-        video_input=True # Optional: allows showing things to the coach via camera
+    # Init the Agent
+    agent = Agent(
+        instructions=COACH_INSTRUCTIONS,
+        llm=model,
     )
+    session = AgentSession()
 
-    logger.info("Starting VoiceAssistant...")
-    agent.start(ctx.room)
+    logger.info("Starting AgentSession...")
+    asyncio.create_task(session.start(agent, room=ctx.room))
     
     logger.info("Coach Nikolina is fully OPERATIONAL and listening")
 

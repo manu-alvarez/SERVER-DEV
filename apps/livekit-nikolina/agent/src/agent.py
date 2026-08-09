@@ -297,23 +297,25 @@ async def entrypoint(ctx: JobContext) -> None:
                     headers=headers
                 )
 
+        from livekit.agents.voice import Agent, AgentSession
+        
         model = google.realtime.RealtimeModel(
             model="gemini-3.1-flash-live", 
             voice="Puck",
             temperature=0.6,
-            instructions=system_prompt,
             api_key=api_key,
             http_options=http_options
         )
 
-        agent = google.realtime.VoiceAssistant(
-            model=model,
-            fnc_ctx=fnc_ctx,
-            video_input=True 
+        agent = Agent(
+            instructions=system_prompt,
+            llm=model,
+            tools=fnc_ctx.flatten() if fnc_ctx else [],
         )
+        session = AgentSession()
 
         # Hook up events
-        @agent.on("agent_speech_committed")
+        @session.on("agent_speech_committed")
         def _on_agent_speech(msg):
             try:
                 content = getattr(msg, "content", "")
@@ -329,7 +331,7 @@ async def entrypoint(ctx: JobContext) -> None:
             except Exception as e:
                 logger.warning(f"Chat hook (agent) error: {e}")
 
-        @agent.on("user_speech_committed")
+        @session.on("user_speech_committed")
         def _on_user_speech(msg):
             try:
                 content = getattr(msg, "content", "")
@@ -360,7 +362,7 @@ async def entrypoint(ctx: JobContext) -> None:
         # Start Session
         logger.info("Starting AgentSession...")
         start_time = datetime.now()
-        agent.start(ctx.room)
+        asyncio.create_task(session.start(agent, room=ctx.room))
 
         async def send_initial_greeting():
             nonlocal _greeted
