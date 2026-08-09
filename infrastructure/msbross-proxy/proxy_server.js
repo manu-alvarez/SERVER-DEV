@@ -161,7 +161,7 @@ const BACKEND_MAP = {
   'msbross-backend':        ['msbross-backend',           8005],
 };
 
-app.get('/__health', requireAdminAuth, async (req, res) => {
+app.get('/__health', async (req, res) => {
   const checks = await Promise.all(
     Object.entries(BACKEND_MAP).map(async ([name, [host, port]]) => {
       const online = await checkPort(port, host);
