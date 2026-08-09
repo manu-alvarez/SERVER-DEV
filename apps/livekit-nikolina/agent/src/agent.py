@@ -268,44 +268,19 @@ async def entrypoint(ctx: JobContext) -> None:
         fnc_ctx = RestaurantTools(ctx, session_state)
 
         logger.info("Configuring RealtimeModel (Gemini 3.1 Live)...")
-        api_key = os.getenv("GEMINI_API_KEY", "dummy_key")
-        http_options = None
 
+        # Wait for participant before setting up the model
         participant = await ctx.wait_for_participant()
-        if participant:
-            metadata_str = participant.metadata
-            godmode_token = ""
-            user_custom_keys = ""
-            
-            if metadata_str:
-                try:
-                    meta = _json.loads(metadata_str)
-                    godmode_token = meta.get("x-godmode-token", "")
-                    user_custom_keys = meta.get("x-user-custom-keys", "")
-                except Exception as e:
-                    logger.warning(f"Error parsing metadata: {e}")
-
-            if godmode_token or user_custom_keys:
-                import google.genai.types as gtypes
-                headers = {}
-                if godmode_token:
-                    headers["x-godmode-token"] = godmode_token
-                if user_custom_keys:
-                    headers["x-user-custom-keys"] = user_custom_keys
-                
-                http_options = gtypes.HttpOptions(
-                    baseUrl="http://127.0.0.1:8080/_api/gemini",
-                    headers=headers
-                )
+        logger.info(f"Participant joined: {participant.identity if participant else 'unknown'}")
 
         from livekit.agents.voice import Agent, AgentSession
         
+        # SDK auto-reads GOOGLE_API_KEY from env — do NOT pass api_key manually
+        # Gemini Live uses a direct WebSocket to Google — do NOT proxy via http_options
         model = google.realtime.RealtimeModel(
             model="gemini-3.1-flash-live-preview", 
             voice="Puck",
             temperature=0.6,
-            api_key=api_key,
-            http_options=http_options,
             enable_affective_dialog=False,
             proactivity=False,
             thinking_config=gtypes.ThinkingConfig(thinkingLevel="minimal")
