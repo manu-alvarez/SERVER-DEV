@@ -51,7 +51,7 @@ async def entrypoint(ctx: JobContext):
     # Native Speech-to-Speech Realtime Model
     model = google.realtime.RealtimeModel(
         model="gemini-2.5-flash-native-audio-preview-12-2025", 
-        voice="Adele",
+        voice="Puck",
         temperature=0.6,
     )
 
