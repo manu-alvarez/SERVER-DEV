@@ -487,7 +487,7 @@ services:
       - traefik.http.routers.portainer.tls.certresolver=myresolver
       - traefik.http.services.portainer.loadbalancer.server.port=9000
       - traefik.http.routers.portainer.middlewares=admin-auth
-      - traefik.http.middlewares.admin-auth.basicauth.users=admin:$$apr1$$tsube.dv$$ntEzPeXD8lwJK5E5SQbGF1
+      - traefik.http.middlewares.admin-auth.basicauth.users=admin:$$apr1$$Q3va5IaG$$1iyE9t2f3iZgf.x.7EkoA1
 
   uptime-kuma:
     <<: *common

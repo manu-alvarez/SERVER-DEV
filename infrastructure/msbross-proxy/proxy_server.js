@@ -104,11 +104,11 @@ app.use((req, res, next) => {
 
 // ── Auth middleware for admin endpoints ──
 function requireAdminAuth(req, res, next) {
-  const ADMIN_TOKEN = process.env.ADMIN_API_TOKEN;
-  if (!ADMIN_TOKEN) return next();
+  const ADMIN_TOKEN = apiVault.GODMODE_MASTER_TOKEN || process.env.ADMIN_API_TOKEN;
+  if (!ADMIN_TOKEN) return res.status(500).json({ error: 'Admin auth not configured' });
   const token = req.headers['x-admin-token'];
-  if (token !== ADMIN_TOKEN) {
-    return res.status(401).json({ error: 'Unauthorized' });
+  if (!token || token !== ADMIN_TOKEN) {
+    return res.status(401).json({ error: 'Unauthorized: admin token required' });
   }
   next();
 }

@@ -38,7 +38,7 @@ services:
       - traefik.http.routers.traefik.middlewares=auth,sec-headers
       - traefik.http.routers.traefik.entrypoints=websecure
       - traefik.http.routers.traefik.tls.certresolver=myresolver
-      - traefik.http.middlewares.auth.basicauth.users=admin:$$apr1$$tsube.dv$$ntEzPeXD8lwJK5E5SQbGF1
+      - traefik.http.middlewares.auth.basicauth.users=admin:$$apr1$$Q3va5IaG$$1iyE9t2f3iZgf.x.7EkoA1
 
       # Global security headers middleware
       - traefik.http.middlewares.sec-headers.headers.customFrameOptionsValue=SAMEORIGIN
