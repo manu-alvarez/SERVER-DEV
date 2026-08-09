@@ -12,6 +12,7 @@ from datetime import datetime
 import json as _json
 
 from dotenv import load_dotenv
+import google.genai.types as gtypes
 
 from livekit.agents import (
     AutoSubscribe,
@@ -307,7 +308,7 @@ async def entrypoint(ctx: JobContext) -> None:
             http_options=http_options,
             enable_affective_dialog=False,
             proactivity=False,
-            thinkingLevel="minimal"
+            thinking_config=gtypes.ThinkingConfig(thinkingLevel="minimal")
         )
 
         agent = Agent(
