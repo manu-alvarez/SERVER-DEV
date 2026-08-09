@@ -11,7 +11,8 @@ const MODEL = "llama-3.3-70b-versatile";
 /**
  * Check if Groq API key is configured.
  */
-export function isGroqConfigured(): boolean {
+export function isGroqConfigured(customHeaders?: Record<string, string>): boolean {
+  if (customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"])) return true;
   return !!process.env.GROQ_API_KEY;
 }
 
@@ -21,20 +22,31 @@ export function isGroqConfigured(): boolean {
 export async function groqGenerate(
   systemPrompt: string,
   userContent: string,
-  options?: { temperature?: number; maxTokens?: number }
+  options?: { temperature?: number; maxTokens?: number; customHeaders?: Record<string, string> }
 ): Promise<string> {
-  const apiKey = process.env.GROQ_API_KEY;
+  let apiKey = process.env.GROQ_API_KEY;
+  let groqUrl = GROQ_API_URL;
+  
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (options?.customHeaders && (options.customHeaders["x-godmode-token"] || options.customHeaders["x-user-custom-keys"])) {
+    groqUrl = "http://127.0.0.1:8080/_api/groq/chat/completions";
+    apiKey = "dummy_key"; // Proxy will handle real auth
+    if (options.customHeaders["x-godmode-token"]) headers["x-godmode-token"] = options.customHeaders["x-godmode-token"];
+    if (options.customHeaders["x-user-custom-keys"]) headers["x-user-custom-keys"] = options.customHeaders["x-user-custom-keys"];
+  }
+
   if (!apiKey) throw new Error("GROQ_API_KEY not configured");
+  headers["Authorization"] = `Bearer ${apiKey}`;
 
   const { temperature = 0.1, maxTokens = 2000 } = options || {};
 
   try {
-    const response = await fetch(GROQ_API_URL, {
+    const response = await fetch(groqUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
+      headers,
       body: JSON.stringify({
         model: MODEL,
         messages: [
@@ -63,8 +75,8 @@ export async function groqGenerate(
 /**
  * Generate structured JSON using Groq.
  */
-export async function groqJSON<T>(systemPrompt: string, userContent: string): Promise<T> {
-  const raw = await groqGenerate(systemPrompt, userContent);
+export async function groqJSON<T>(systemPrompt: string, userContent: string, customHeaders?: Record<string, string>): Promise<T> {
+  const raw = await groqGenerate(systemPrompt, userContent, { customHeaders });
   try {
     return JSON.parse(raw) as T;
   } catch {
@@ -84,8 +96,8 @@ export async function groqJSON<T>(systemPrompt: string, userContent: string): Pr
  * Get the best available LLM for structured extraction.
  * Priority: Groq (fast + generous) > Gemini (free but limited).
  */
-export function getBestLLM(): "groq" | "gemini" | null {
-  if (isGroqConfigured()) return "groq";
+export function getBestLLM(customHeaders?: Record<string, string>): "groq" | "gemini" | null {
+  if (isGroqConfigured(customHeaders)) return "groq";
   if (process.env.GEMINI_API_KEY) return "gemini";
   return null;
 }

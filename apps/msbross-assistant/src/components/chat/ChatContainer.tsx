@@ -5,6 +5,7 @@ import { HeroCards } from './HeroCards';
 import { MessageBubble } from './MessageBubble';
 import { Button } from '../ui/Button';
 import { Send, Loader2, X as XIcon, Mic } from 'lucide-react';
+import { Orb } from 'orb-ui';
 
 export function ChatContainer() {
   const { messages, isGenerating, attachments, setAttachments, clearAttachments } = useChatStore();
@@ -159,8 +160,17 @@ export function ChatContainer() {
               </Button>
             </div>
           </form>
-          <div className="text-center mt-2 text-[10px] text-white/30 uppercase tracking-widest">
-            MSBrOSs GODMODE LEVEL 99 // {isGenerating ? 'GENERANDO...' : 'SISTEMA EN LÍNEA'}
+          <div className="flex items-center justify-center gap-3 mt-2">
+            <Orb
+              state={isGenerating ? 'thinking' : isListening ? 'listening' : 'idle'}
+              theme="circle"
+              size={24}
+              disabled
+              aria-label="System status indicator"
+            />
+            <span className="text-[10px] text-white/30 uppercase tracking-widest">
+              MSBrOSs GODMODE LEVEL 99 // {isGenerating ? 'GENERANDO...' : isListening ? 'ESCUCHANDO...' : 'SISTEMA EN LÍNEA'}
+            </span>
           </div>
         </div>
       </div>

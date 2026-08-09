@@ -85,22 +85,33 @@ export const useGeminiApi = () => {
         generationConfig: { temperature: 1.0 }
       };
 
-      const adminToken = localStorage.getItem('msbross_admin_token');
-      let maxAttempts = adminToken ? 1 : Math.min(API_KEYS.length * 2, 10);
+      const godmodeToken = localStorage.getItem('msbross_godmode_token');
+      const userKeys = localStorage.getItem('msbross_user_api_key');
+      
+      let maxAttempts = (godmodeToken || userKeys) ? 1 : Math.min(API_KEYS.length * 2, 10);
+      
+      const isProxy = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
       
       for (let i = 0; i < maxAttempts; i++) {
         try {
           let targetUrl = '';
           let headers: Record<string, string> = { 'Content-Type': 'application/json' };
           
-          if (adminToken) {
-            // Modo Dios: Router privado
-            targetUrl = `https://llm.manuelalvarez.dev/api/gemini/v1beta/models/gemini-3.5-flash:generateContent`;
-            headers['x-msbross-admin-token'] = adminToken;
+          if (godmodeToken) headers['x-godmode-token'] = godmodeToken;
+          if (userKeys) headers['x-user-custom-keys'] = userKeys;
+          
+          if (godmodeToken || userKeys) {
+            targetUrl = isProxy 
+              ? `/_api/gemini/v1beta/models/gemini-3.5-flash:generateContent`
+              : `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=dummy`;
           } else {
             // Modo Público: Rotación de claves VITE
             const key = getNextKey();
-            targetUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${key}`;
+            targetUrl = isProxy 
+              ? `/_api/gemini/v1beta/models/gemini-3.5-flash:generateContent` // even for public rotation, the proxy accepts it or we can pass key 
+              : `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent`;
+            
+            targetUrl = `${targetUrl}?key=${key}`;
           }
 
           const response = await fetch(targetUrl, {

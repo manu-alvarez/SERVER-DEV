@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     GOOGLE_TTS_API_KEY: str = ""
 
     # Ollama (local VPS, free, zero rate limits)
-    OLLAMA_BASE_URL: str = "http://172.20.0.1:11434/v1"
+    OLLAMA_BASE_URL: str = "http://100.100.2.10:11434/v1"
     OLLAMA_MODEL: str = "gemma3:4b"
 
     # Groq

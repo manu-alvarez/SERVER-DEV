@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import {
   AppBar, Toolbar, Container, Box, Typography, TextField, Button,
   Chip, Card, Snackbar, Alert, Tooltip, Tabs, Tab, Fade, Stack,
@@ -22,6 +22,8 @@ import CostAnalyzer from './components/CostAnalyzer'
 import DunnageGuide from './components/DunnageGuide'
 import EmailTemplates from './components/EmailTemplates'
 import ToolSelector from './components/ToolSelector'
+import GodModeListener from './components/GodModeListener'
+import ApiConfigModal from './components/ApiConfigModal'
 import { saveSearch, saveRFQ } from './lib/storage'
 import { createTrelloCard } from './services/trello'
 import GlobalAlerts from './components/GlobalAlerts'
@@ -74,24 +76,6 @@ const parseQuery = (text: string) => {
 }
 
 function App() {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl + Shift + M
-      if (e.ctrlKey && e.shiftKey && e.key === 'M') {
-        e.preventDefault();
-        const token = window.prompt('MSBross Bóveda: Introduce el token maestro para activar el Modo Dios (LLM Proxy):');
-        if (token) {
-          localStorage.setItem('msbross_admin_token', token);
-          alert('Modo Dios activado en LogiSearch. Tus peticiones usarán el proxy seguro.');
-        } else if (token === '') {
-          localStorage.removeItem('msbross_admin_token');
-          alert('Modo Dios desactivado. Usando claves públicas.');
-        }
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   const [query, setQuery] = useState('')
   const [activeTool, setActiveTool] = useState<string | null>(null)
@@ -104,6 +88,7 @@ function App() {
   const [lastSearchId, setLastSearchId] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   const isHome = !activeTool
   const isAiSearch = activeTool === 'route' || activeTool === 'expert' || activeTool === 'general'
@@ -213,6 +198,7 @@ function App() {
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <GodModeListener />
       <AppBar position="sticky">
         <Toolbar sx={{ maxWidth: 1200, width: '100%', mx: 'auto', px: { xs: 2, md: 3 } }}>
           <Box onClick={handleHome} sx={{ width: 40, height: 40, borderRadius: 2.5, background: 'linear-gradient(135deg, #00E5FF, #00B8D4)', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1.5, cursor: 'pointer' }}>
@@ -224,9 +210,12 @@ function App() {
           <Tooltip title="Historial">
             <Button startIcon={<HistoryIcon />} onClick={() => setShowHistory(true)} sx={{ color: 'text.secondary', '&:hover': { color: 'white' }, mr: 1 }} size="small">Historial</Button>
           </Tooltip>
+          <Button onClick={() => setIsSettingsOpen(true)} sx={{ color: 'text.secondary', '&:hover': { color: 'white' }, mr: 1 }} size="small">⚙️ APIs</Button>
           {!isHome && <Button startIcon={<SmartIcon />} onClick={handleHome} sx={{ color: 'text.secondary', '&:hover': { color: 'white' } }} size="small">Inicio</Button>}
         </Toolbar>
       </AppBar>
+
+      <ApiConfigModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
 
       <Container maxWidth="lg" sx={{ flex: 1, py: { xs: 3, md: 5 } }}>
         <GlobalAlerts />

@@ -3,12 +3,12 @@ import { ModelConfigSchema } from '../lib/schemas';
 import { z } from 'zod';
 
 const fetchModels = async () => {
-  const adminToken = localStorage.getItem('msbross_admin_token');
-  const customKeys = localStorage.getItem('msbross_assistant_custom_keys');
+  const adminToken = localStorage.getItem('msbross_godmode_token');
+  const customKeys = localStorage.getItem('msbross_user_api_key');
   
   const headers: Record<string, string> = {};
-  if (adminToken) headers['x-msbross-admin-token'] = adminToken;
-  if (customKeys) headers['x-custom-api-keys'] = customKeys;
+  if (adminToken) headers['x-godmode-token'] = adminToken;
+  if (customKeys) headers['x-user-custom-keys'] = customKeys;
 
   const response = await fetch('/_msbross/api/models', { headers });
   if (!response.ok) {
@@ -26,11 +26,5 @@ export function useModels() {
     queryFn: fetchModels,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: 2,
-    placeholderData: [
-      { id: 'gm/gemini-3.5-flash',      name: 'Gemini 3.5 Flash',       provider: 'Gemini', free: true },
-      { id: 'gm/gemini-3.1-pro',        name: 'Gemini 3.1 Pro',         provider: 'Gemini', free: true },
-      { id: 'gm/gemini-3.1-flash-lite', name: 'Gemini 3.1 Flash Lite',  provider: 'Gemini', free: true },
-      { id: 'gr/llama-3.3-70b-versatile', name: 'Llama 3.3 70B',        provider: 'Groq',   free: true },
-    ]
   });
 }

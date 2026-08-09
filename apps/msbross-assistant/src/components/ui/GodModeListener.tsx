@@ -1,25 +1,24 @@
+"use client";
 import { useEffect } from "react";
 
 export default function GodModeListener() {
   useEffect(() => {
-    let tapCount = 0;
     let tapTimeout: ReturnType<typeof setTimeout>;
 
     const triggerGodMode = () => {
       const pwd = prompt("🔐 Modo Dios (Introduce la clave maestra):\nSi cancelas o dejas en blanco, se desactivará.");
       if (pwd) {
-        localStorage.setItem('msbross_admin_token', pwd);
+        localStorage.setItem('msbross_godmode_token', pwd);
         alert("✅ Clave de Modo Dios guardada. Se usará el proxy de MSBrOSs si es válida.");
         window.location.reload();
       } else if (pwd !== null) {
-        localStorage.removeItem('msbross_admin_token');
+        localStorage.removeItem('msbross_godmode_token');
         alert("❌ Modo Dios Desactivado.");
         window.location.reload();
       }
     };
 
     const handleTouchStart = (e: TouchEvent) => {
-      // Require 2 fingers for GodMode long press to avoid accidental triggers while scrolling
       if (e.touches.length === 2) {
         tapTimeout = setTimeout(() => {
           triggerGodMode();

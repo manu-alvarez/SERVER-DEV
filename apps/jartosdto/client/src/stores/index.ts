@@ -61,6 +61,7 @@ interface ChatState {
   temperature: number;
   maxTokens: number;
   autoSpeak: boolean;
+  personality: string;
 
   setMessages: (msgs: ChatMessage[]) => void;
   addMessage: (msg: ChatMessage) => void;
@@ -72,6 +73,7 @@ interface ChatState {
   setTemperature: (t: number) => void;
   setMaxTokens: (t: number) => void;
   setAutoSpeak: (v: boolean) => void;
+  setPersonality: (p: string) => void;
   clearChat: () => void;
 }
 
@@ -79,11 +81,12 @@ export const useChatStore = create<ChatState>((set) => ({
   messages: [],
   conversationId: null,
   isStreaming: false,
-  selectedModel: "gpt-4o",
+  selectedModel: "",
   webSearchEnabled: false,
   temperature: 0.7,
   maxTokens: 4096,
   autoSpeak: false,
+  personality: 'default',
 
   setMessages: (messages) => set({ messages }),
   addMessage: (msg) => set((s) => ({ messages: [...s.messages, msg] })),
@@ -104,6 +107,7 @@ export const useChatStore = create<ChatState>((set) => ({
   setTemperature: (temperature) => set({ temperature }),
   setMaxTokens: (maxTokens) => set({ maxTokens }),
   setAutoSpeak: (autoSpeak) => set({ autoSpeak }),
+  setPersonality: (personality) => set({ personality }),
   clearChat: () => set({ messages: [], conversationId: null }),
 }));
 

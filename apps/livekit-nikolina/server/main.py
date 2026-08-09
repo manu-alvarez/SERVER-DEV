@@ -91,70 +91,14 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 # ---------------------------------------------------------------------------
 
 
+# Note: RestaurantInfoUpdate, TableCreate/Update, ReservationCreate,
+# MenuItemCreate/Update schemas are defined in src/api/routes.py.
+# Only schemas used directly by main.py endpoints remain here.
+
 class TokenRequest(BaseModel):
     participant_identity: str
     room_name: str
 
-
-class RestaurantInfoUpdate(BaseModel):
-    name: Optional[str] = None
-    address: Optional[str] = None
-    phone: Optional[str] = None
-    description: Optional[str] = None
-    cuisine_type: Optional[str] = None
-    opening_time_lunch: Optional[str] = None
-    closing_time_lunch: Optional[str] = None
-    opening_time_dinner: Optional[str] = None
-    closing_time_dinner: Optional[str] = None
-    days_open: Optional[str] = None
-    days_closed: Optional[str] = None
-    reservation_slot_minutes: Optional[int] = None
-    max_party_size: Optional[int] = None
-    special_notes: Optional[str] = None
-
-
-class TableCreate(BaseModel):
-    table_number: int
-    capacity: int
-    location: str = "interior"
-    description: str = ""
-
-
-class TableUpdate(BaseModel):
-    table_number: Optional[int] = None
-    capacity: Optional[int] = None
-    location: Optional[str] = None
-    description: Optional[str] = None
-    is_active: Optional[int] = None
-
-
-class ReservationCreate(BaseModel):
-    customer_name: str
-    date: str
-    time: str
-    num_guests: int
-    customer_phone: str = ""
-    notes: str = ""
-
-
-class MenuItemCreate(BaseModel):
-    name: str
-    description: str = ""
-    category: str = "principal"
-    price: float = 0.0
-    allergens: str = ""
-    is_available: bool = True
-    is_daily_special: bool = False
-
-
-class MenuItemUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    category: Optional[str] = None
-    price: Optional[float] = None
-    allergens: Optional[str] = None
-    is_available: Optional[bool] = None
-    is_daily_special: Optional[bool] = None
 
 class LLMConfigUpdate(BaseModel):
     model_name: Optional[str] = None
@@ -211,16 +155,16 @@ AVAILABLE_MODELS = [
     "llama3.2:3b",
     # Gemini models
     "gemini-omni",
-    "gemini-3.5-flash",
-    "gemini-3.1-flash-lite",
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-8b",
 ]
 
 PIPELINE_CATALOG = {
     "llm": {
         "providers": ["gemini", "ollama"],
         "models": [
-            "gemini-3.5-flash",
-            "gemini-3.1-flash-lite",
+            "gemini-1.5-flash",
+            "gemini-1.5-flash-8b",
             "llama3.2:3b",
             "llama3.2:1b",
         ],
@@ -230,7 +174,7 @@ PIPELINE_CATALOG = {
             "faster-whisper",
         ],
         "urls": {
-            "faster-whisper": "http://localhost:9000",
+            "faster-whisper": "http://host.docker.internal:9000",
         },
     },
     "tts": {
@@ -238,7 +182,7 @@ PIPELINE_CATALOG = {
             "kokoro",
         ],
         "urls": {
-            "kokoro": "http://localhost:8001",
+            "kokoro": "http://host.docker.internal:8001",
         },
     },
     "realtime": {
@@ -247,8 +191,8 @@ PIPELINE_CATALOG = {
         ],
         "models": [
             "gemini-omni",
-            "gemini-3.5-flash",
-            "gemini-3.1-flash-lite",
+            "gemini-1.5-flash",
+            "gemini-1.5-flash-8b",
         ],
     },
 }
@@ -272,7 +216,7 @@ def _has_python_pkg(pkg_name: str) -> bool:
 
 
 def _ollama_status() -> dict:
-    base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+    base_url = os.getenv("OLLAMA_BASE_URL", "http://host.docker.internal:11434")
 
     # Add system PATH to ensure we find ollama
     current_path = os.environ.get("PATH", "")
@@ -349,7 +293,7 @@ def _sync_llm_config_with_active_pipeline() -> None:
             or "Aoede"
         )
     elif architecture == "modular" and llm_provider == "gemini":
-        update["model_name"] = pipeline.get("llm_model") or "gemini-3.5-flash"
+        update["model_name"] = pipeline.get("llm_model") or "gemini-1.5-flash"
 
     db.update_llm_config(**update)
 
@@ -366,12 +310,12 @@ def _providers_status() -> dict:
             else "GOOGLE_API_KEY missing",
         },
         "faster_whisper": {
-            "available": _http_available("http://localhost:9000/"),
-            "url": os.getenv("FASTER_WHISPER_URL", "http://localhost:9000"),
+            "available": _http_available(os.getenv("FASTER_WHISPER_URL", "http://host.docker.internal:9000") + "/"),
+            "url": os.getenv("FASTER_WHISPER_URL", "http://host.docker.internal:9000"),
         },
         "kokoro": {
-            "available": _http_available("http://localhost:8001/v1/models"),
-            "url": os.getenv("KOKORO_URL", "http://localhost:8001"),
+            "available": _http_available(os.getenv("KOKORO_URL", "http://host.docker.internal:8001") + "/v1/models"),
+            "url": os.getenv("KOKORO_URL", "http://host.docker.internal:8001"),
         },
     }
 
@@ -597,7 +541,7 @@ def get_agent_status(current_user: str = Depends(get_current_user)):
     try:
         import time as _t
         _start = _t.monotonic()
-        urlopen("http://localhost:8001/api/health", timeout=2)
+        urlopen("http://host.docker.internal:8001/api/health", timeout=2)
         api_latency = int((_t.monotonic() - _start) * 1000)
     except: pass
 

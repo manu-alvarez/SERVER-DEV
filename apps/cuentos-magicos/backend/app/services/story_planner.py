@@ -60,7 +60,7 @@ RESPETA OBLIGATORIAMENTE el numero de capitulos indicado segun la duracion.
 """
 
 
-async def generate_story_text(session: AsyncSession, story: Story) -> dict[str, Any]:
+async def generate_story_text(session: AsyncSession, story: Story, auth_headers: dict = None) -> dict[str, Any]:
     """
     Generate the complete story structure, chapter texts, and visual prompts
     using the configured LLM provider (Groq by default for free tier).
@@ -100,7 +100,7 @@ async def generate_story_text(session: AsyncSession, story: Story) -> dict[str, 
         data = cached["payload"]
     else:
         # Call LLM API
-        client, api_model = _get_llm_client(provider, model)
+        client, api_model = _get_llm_client(provider, model, auth_headers)
 
         completion = client.chat.completions.create(
             model=api_model,
@@ -128,22 +128,33 @@ async def generate_story_text(session: AsyncSession, story: Story) -> dict[str, 
     return data
 
 
-def _get_llm_client(provider: str, model: str) -> tuple:
+def _get_llm_client(provider: str, model: str, auth_headers: dict = None) -> tuple:
     """Get the appropriate OpenAI-compatible client based on provider."""
+    import httpx
+    
+    # If GodMode or User keys are provided, route through msbross-proxy
+    is_godmode = auth_headers and ('x-godmode-token' in auth_headers or 'x-user-custom-keys' in auth_headers)
+    
     if provider == "groq":
         client = OpenAI(
-            api_key=settings.GROQ_API_KEY,
-            base_url="https://api.groq.com/openai/v1"
+            api_key="dummy" if is_godmode else settings.GROQ_API_KEY,
+            base_url="http://127.0.0.1:8080/_api/groq/openai/v1" if is_godmode else "https://api.groq.com/openai/v1",
+            default_headers=auth_headers
         )
         api_model = model or settings.GROQ_MODEL
     elif provider == "openrouter":
         client = OpenAI(
-            api_key=settings.OPENROUTER_API_KEY,
-            base_url="https://openrouter.ai/api/v1"
+            api_key="dummy" if is_godmode else settings.OPENROUTER_API_KEY,
+            base_url="http://127.0.0.1:8080/_api/openrouter" if is_godmode else "https://openrouter.ai/api/v1",
+            default_headers=auth_headers
         )
         api_model = model or settings.OPENROUTER_MODEL
     elif provider == "openai":
-        client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        client = OpenAI(
+            api_key="dummy" if is_godmode else settings.OPENAI_API_KEY,
+            base_url="http://127.0.0.1:8080/_api/openai/v1" if is_godmode else None,
+            default_headers=auth_headers
+        )
         api_model = model or settings.OPENAI_MODEL_STORY
     elif provider == "ollama":
         client = OpenAI(

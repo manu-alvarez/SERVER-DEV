@@ -21,20 +21,6 @@ module.exports = {
       exp_backoff_delay: 1000,
       min_uptime: '15s',
       max_memory_restart: '1G'
-    },
-
-    {
-      name: 'web-restaurante-atenea-backend',
-      script: 'venv/bin/python3',
-      args: '-m uvicorn main:app --host 0.0.0.0 --port 8009',
-      cwd: path.join(__dirname, 'apps/web-restaurante-atenea'),
-      out_file: path.join(__dirname, 'logs/atenea.log'),
-      error_file: path.join(__dirname, 'logs/atenea.error.log'),
-      autorestart: true,
-      max_restarts: 15,
-      exp_backoff_delay: 1000,
-      min_uptime: '15s',
-      max_memory_restart: '500M'
     }
   ]
 };

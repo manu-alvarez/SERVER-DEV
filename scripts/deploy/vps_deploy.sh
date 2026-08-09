@@ -10,7 +10,6 @@ cd "$ROOT_DIR"
 echo "🔄 1. Sincronizando con GitHub (main)..."
 git fetch origin
 git reset --hard origin/main
-git clean -ffd
 
 echo "⚙️ 2. Copiando configuración limpia de docker-compose..."
 cp infrastructure/docker-compose.yml docker-compose.yml

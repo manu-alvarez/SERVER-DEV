@@ -199,46 +199,41 @@ class MSBrOSsHandler(http.server.SimpleHTTPRequestHandler):
         keys = {}
         headers = headers or self.headers
         
-        # 1. First, check if custom API keys are provided via headers
-        if headers and 'x-custom-api-keys' in headers:
+        # 1. Modo Dios (Inyectado por el Proxy)
+        if headers and headers.get('x-godmode-active') == 'true':
+            keys["or"] = [headers.get('x-injected-openrouter', '')]
+            keys["gm"] = [headers.get('x-injected-google', '')]
+            keys["gr"] = [headers.get('x-injected-groq', '')]
+            keys["mi"] = [headers.get('x-injected-mistral', '')]
+            keys["ol"] = [headers.get('x-injected-ollama', '')]
+            keys["hf"] = [headers.get('x-injected-huggingface', '')]
+            
+        # 2. Claves Personalizadas del Usuario (Sobrescriben el Modo Dios)
+        if headers and 'x-user-custom-keys' in headers:
             try:
-                custom_keys = json.loads(headers['x-custom-api-keys'])
-                keys["or"] = [custom_keys.get("openrouter", "")]
-                keys["gm"] = [custom_keys.get("gemini", "")]
-                keys["gr"] = [custom_keys.get("groq", "")]
-                keys["mi"] = [custom_keys.get("mistral", "")]
+                custom_keys = json.loads(headers['x-user-custom-keys'])
+                if custom_keys.get("OPENROUTER"): keys["or"] = [custom_keys.get("OPENROUTER")]
+                if custom_keys.get("GEMINI"): keys["gm"] = [custom_keys.get("GEMINI")]
+                if custom_keys.get("GROQ"): keys["gr"] = [custom_keys.get("GROQ")]
+                if custom_keys.get("MISTRAL"): keys["mi"] = [custom_keys.get("MISTRAL")]
+                if custom_keys.get("OLLAMA"): keys["ol"] = [custom_keys.get("OLLAMA")]
             except Exception as e:
                 print(f"[MSBrOSs] Error parsing custom keys: {e}")
                 
-        # 2. Check for God Mode (Admin Token)
-        admin_token = headers.get('x-msbross-admin-token') if headers else None
-        if admin_token == 'msbross-master-key-2026':
-            # En Docker la montamos en /api_keys_vault.json
-            vault_path = "/api_keys_vault.json"
-            if not os.path.exists(vault_path):
-                # Fallback para entorno local sin docker
-                vault_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "api_keys_vault.json")
+        # 3. Fallback a .env local (para desarrollo sin Docker)
+        if not any(k for lst in keys.values() for k in lst if k):
+            vault_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "infrastructure", "msbross-proxy", "api_keys_vault.json")
             if os.path.exists(vault_path):
                 try:
                     with open(vault_path, "r", encoding="utf-8") as f:
                         vault = json.load(f)
                         llms = vault.get("LLM_PROVIDERS", {})
-                        # OpenRouter
-                        keys["or"] = [k["key"] for k in llms.get("OPENROUTER", []) if isinstance(k, dict) and k.get("key")]
-                        # Gemini
-                        keys["gm"] = [k["key"] for k in llms.get("GOOGLE_GEMINI", []) if isinstance(k, dict) and k.get("key")]
-                        # Groq
-                        keys["gr"] = [k["key"] for k in llms.get("GROQ", []) if isinstance(k, dict) and k.get("key")]
-                        # Mistral
-                        keys["mi"] = [llms.get("OTHER_LLMS", {}).get("MISTRAL")]
-                        # Ollama (if Cloud key exists)
-                        keys["ol"] = [llms.get("OTHER_LLMS", {}).get("OLLAMA_CLOUD", "")]
-                        # Together
-                        keys["tg"] = [llms.get("OTHER_LLMS", {}).get("TOGETHER", "")]
-                        # HuggingFace
-                        keys["hf"] = [vault.get("MULTIMEDIA_AND_VOICE", {}).get("HUGGINGFACE", "")]
+                        if not keys.get("or") or not keys["or"][0]: keys["or"] = [k["key"] for k in llms.get("OPENROUTER", []) if isinstance(k, dict) and k.get("key")]
+                        if not keys.get("gm") or not keys["gm"][0]: keys["gm"] = [k["key"] for k in llms.get("GOOGLE_GEMINI", []) if isinstance(k, dict) and k.get("key")]
+                        if not keys.get("gr") or not keys["gr"][0]: keys["gr"] = [k["key"] for k in llms.get("GROQ", []) if isinstance(k, dict) and k.get("key")]
+                        if not keys.get("ol") or not keys["ol"][0]: keys["ol"] = [llms.get("OTHER_LLMS", {}).get("OLLAMA_CLOUD", "")]
                 except Exception as e:
-                    print(f"[MSBrOSs] Error reading keys vault: {e}")
+                    print(f"[MSBrOSs] Error reading keys vault fallback: {e}")
                     
         return keys
 
@@ -326,7 +321,7 @@ class MSBrOSsHandler(http.server.SimpleHTTPRequestHandler):
             url = f"https://api-inference.huggingface.co/models/{real_model}/v1/chat/completions"
         elif provider_prefix == "ol/":
             keys_pool = keys_dict.get("ol", [""])
-            url = "http://172.20.0.1:11434/v1/chat/completions" if not keys_pool[0] else "https://ollama.alvarezconsult.com/v1/chat/completions"
+            url = "http://100.100.2.10:11434/v1/chat/completions" if not keys_pool[0] else "https://ollama.alvarezconsult.com/v1/chat/completions"
         else: # "or/"
             keys_pool = keys_dict.get("or", [])
             url = "https://openrouter.ai/api/v1/chat/completions"

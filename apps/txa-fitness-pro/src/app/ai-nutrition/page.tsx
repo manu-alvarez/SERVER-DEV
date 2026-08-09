@@ -25,9 +25,15 @@ export default function AINutritionPage() {
     setError("");
 
     try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      const godmode = localStorage.getItem('msbross_godmode_token');
+      const userKeysStr = localStorage.getItem('msbross_user_api_key');
+      if (godmode) headers['x-godmode-token'] = godmode;
+      if (userKeysStr) headers['x-user-custom-keys'] = userKeysStr;
+
       const response = await fetch("/app/txafitnesspro/api/ai/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ 
           diagnosticReport: report
         }),

@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from app.db import get_conversations, get_conversation, create_conversation
-from app.models import AVAILABLE_MODELS
+from app.models import get_all_models
 from app.chat import chat_stream
 from app.tools import calculator
 from app.websocket_manager import node_manager
@@ -45,7 +45,7 @@ async def get_nodes():
 
 @router.get("/api/models")
 async def get_models():
-    return AVAILABLE_MODELS
+    return await get_all_models()
 
 
 @router.get("/api/conversations")
@@ -166,11 +166,8 @@ class WeatherPayload(BaseModel):
 async def tool_weather(body: WeatherPayload):
     if not body.city:
         raise HTTPException(400, "city required")
+    # No more hardcoded 22C sunny dummy data. We enforce real usage.
     return {
         "city": body.city,
-        "temperature": 22,
-        "condition": "Sunny",
-        "humidity": 45,
-        "wind": "12 km/h",
-        "note": "Local fallback data - connect OpenWeatherMap API for live real-time metrics",
+        "error": "OpenWeatherMap API no configurada. Los datos locales mockeados han sido eliminados por seguridad y precisión."
     }

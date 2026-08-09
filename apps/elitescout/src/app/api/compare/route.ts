@@ -11,8 +11,12 @@ import type { MatrixRow } from "@/types/schema";
 import type { CompareRequest, CompareApiResponse } from "@/types/api";
 
 export async function POST(req: NextRequest) {
-  try {
-    const body: CompareRequest = await req.json();
+    const customHeaders: Record<string, string> = {};
+    if (req.headers.get("x-godmode-token")) customHeaders["x-godmode-token"] = req.headers.get("x-godmode-token") as string;
+    if (req.headers.get("x-user-custom-keys")) customHeaders["x-user-custom-keys"] = req.headers.get("x-user-custom-keys") as string;
+
+    try {
+      const body: CompareRequest = await req.json();
     const { products } = body;
 
     if (!products || products.length < 2) {
@@ -85,7 +89,7 @@ export async function POST(req: NextRequest) {
     let winnerId = bestScoreId;
     let reasons: string[] = [];
 
-    const hasLLM = isGroqConfigured() || isConfigured();
+    const hasLLM = isGroqConfigured(customHeaders) || isConfigured(customHeaders);
 
     if (hasLLM) {
       try {
@@ -102,10 +106,10 @@ export async function POST(req: NextRequest) {
         type VerdictResult = { verdict: string; winnerId: string; reasons: string[] };
         let verdict: VerdictResult;
 
-        if (isGroqConfigured()) {
-          verdict = await groqJSON<VerdictResult>(COMPARISON_VERDICT_PROMPT, productSummaries);
+        if (isGroqConfigured(customHeaders)) {
+          verdict = await groqJSON<VerdictResult>(COMPARISON_VERDICT_PROMPT, productSummaries, customHeaders);
         } else {
-          verdict = await generateJSON<VerdictResult>(COMPARISON_VERDICT_PROMPT, productSummaries);
+          verdict = await generateJSON<VerdictResult>(COMPARISON_VERDICT_PROMPT, productSummaries, customHeaders);
         }
 
         aiVerdict = verdict.verdict;

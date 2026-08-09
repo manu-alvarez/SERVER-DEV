@@ -35,7 +35,8 @@ export interface TavilySearchResult {
 /**
  * Check if Tavily API key is configured.
  */
-export function isTavilyConfigured(): boolean {
+export function isTavilyConfigured(customHeaders?: Record<string, string>): boolean {
+  if (customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"])) return true;
   return !!process.env.TAVILY_API_KEY;
 }
 
@@ -49,9 +50,11 @@ async function tavilySearch(
     maxResults?: number;
     includeDomains?: string[];
     excludeDomains?: string[];
+    customHeaders?: Record<string, string>;
   } = {}
 ): Promise<TavilyResult[]> {
-  const apiKey = process.env.TAVILY_API_KEY;
+  const isGodMode = options.customHeaders && (options.customHeaders["x-godmode-token"] || options.customHeaders["x-user-custom-keys"]);
+  const apiKey = isGodMode ? "dummy" : process.env.TAVILY_API_KEY;
   if (!apiKey) return [];
 
   const { searchDepth = "basic", maxResults = 10, includeDomains, excludeDomains } = options;
@@ -72,11 +75,13 @@ async function tavilySearch(
       body.exclude_domains = excludeDomains;
     }
 
-    const response = await fetch(TAVILY_API_URL, {
+    const url = isGodMode ? "http://127.0.0.1:8080/_api/tavily/search" : TAVILY_API_URL;
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
+        ...options.customHeaders,
       },
       body: JSON.stringify(body),
     });
@@ -98,7 +103,7 @@ async function tavilySearch(
  * Product-focused search with price extraction from Tavily content.
  * Uses two queries: shopping-focused and comparison-focused.
  */
-export async function searchProductsWithTavily(query: string): Promise<TavilySearchResult[]> {
+export async function searchProductsWithTavily(query: string, customHeaders?: Record<string, string>): Promise<TavilySearchResult[]> {
   // ━━━ CARRIER & NON-RETAIL BLACKLIST ━━━
   const excludeDomains = [
     // Social media
@@ -138,11 +143,13 @@ export async function searchProductsWithTavily(query: string): Promise<TavilySea
       searchDepth: "basic",
       maxResults: 10,
       excludeDomains,
+      customHeaders,
     }),
     tavilySearch(`${query} comparar precio tienda online españa`, {
       searchDepth: "advanced",
       maxResults: 8,
       includeDomains: trustedRetail,
+      customHeaders,
     }),
   ]);
 
@@ -185,7 +192,7 @@ export async function searchProductsWithTavily(query: string): Promise<TavilySea
 /**
  * Search for reviews.
  */
-export async function searchReviewsWithTavily(query: string): Promise<TavilySearchResult[]> {
+export async function searchReviewsWithTavily(query: string, customHeaders?: Record<string, string>): Promise<TavilySearchResult[]> {
   const results = await tavilySearch(`${query} opiniones review reseñas`, {
     searchDepth: "basic",
     maxResults: 5,
@@ -193,6 +200,7 @@ export async function searchReviewsWithTavily(query: string): Promise<TavilySear
       "reddit.com", "trustpilot.com", "chollometro.com",
       "forocoches.com", "xataka.com", "computerhoy.com",
     ],
+    customHeaders,
   });
 
   return results.map((r) => ({

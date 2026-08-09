@@ -37,7 +37,7 @@ async def _retry_with_backoff(func, max_retries: int = 3, base_delay: float = 5.
             raise
 
 
-async def generate_images_for_story(session: AsyncSession, story_id: str) -> None:
+async def generate_images_for_story(session: AsyncSession, story_id: str, auth_headers: dict = None) -> None:
     """Generate images for all chapters of a story using free providers."""
     logger.info(f"Generating images for story_id={story_id}")
 
@@ -98,7 +98,7 @@ async def generate_images_for_story(session: AsyncSession, story_id: str) -> Non
                     elif provider == "huggingface":
                         return await _generate_huggingface(prompt, story_id, chapter.chapter_number, session)
                     elif provider == "openai":
-                        return await _generate_openai(prompt, story_id, chapter.chapter_number, session)
+                        return await _generate_openai(prompt, story_id, chapter.chapter_number, session, auth_headers)
                     return await _generate_pollinations(prompt, story_id, chapter.chapter_number, session)
 
                 image_url = await _retry_with_backoff(
@@ -202,10 +202,16 @@ async def _generate_huggingface(prompt: str, story_id: str, chapter_num: int,
 
 
 async def _generate_openai(prompt: str, story_id: str, chapter_num: int,
-                           session: AsyncSession) -> str:
+                           session: AsyncSession, auth_headers: dict = None) -> str:
     """Generate image using OpenAI DALL-E 3."""
     from openai import OpenAI
-    client = OpenAI(api_key=settings.OPENAI_API_KEY)
+    is_godmode = auth_headers and ('x-godmode-token' in auth_headers or 'x-user-custom-keys' in auth_headers)
+
+    client = OpenAI(
+        api_key="dummy" if is_godmode else settings.OPENAI_API_KEY,
+        base_url="http://127.0.0.1:8080/_api/openai/v1" if is_godmode else None,
+        default_headers=auth_headers
+    )
 
     response = client.images.generate(
         model="dall-e-3",

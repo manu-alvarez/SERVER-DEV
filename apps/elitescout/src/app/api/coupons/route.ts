@@ -14,6 +14,10 @@ import type { CouponRequest, CouponApiResponse } from "@/types/api";
 
 export async function POST(req: NextRequest) {
   try {
+    const customHeaders: Record<string, string> = {};
+    if (req.headers.get("x-godmode-token")) customHeaders["x-godmode-token"] = req.headers.get("x-godmode-token") as string;
+    if (req.headers.get("x-user-custom-keys")) customHeaders["x-user-custom-keys"] = req.headers.get("x-user-custom-keys") as string;
+
     const body: CouponRequest = await req.json();
     const { productName, storeName } = body;
 
@@ -50,7 +54,7 @@ export async function POST(req: NextRequest) {
     // Step 3: Extract coupons with Gemini (if configured)
     let coupons: CouponCode[] = [];
 
-    if (isConfigured()) {
+    if (isConfigured(customHeaders)) {
       const combinedContent = successfulScrapes
         .map((s) => `--- Fuente: ${s.url} ---\n${s.content.slice(0, 3000)}`)
         .join("\n\n");
@@ -58,7 +62,8 @@ export async function POST(req: NextRequest) {
       try {
         coupons = await generateJSON<CouponCode[]>(
           COUPON_HUNTER_PROMPT,
-          `Producto: ${productName}\nTienda: ${storeName}\n\nContenido extraído:\n${combinedContent}`
+          `Producto: ${productName}\nTienda: ${storeName}\n\nContenido extraído:\n${combinedContent}`,
+          customHeaders
         );
 
         // Ensure array and validate structure

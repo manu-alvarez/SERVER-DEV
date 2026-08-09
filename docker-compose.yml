@@ -1,0 +1,506 @@
+networks:
+  msbross_net:
+    external: true
+
+volumes:
+  cuentos-pg-data:
+    external: true
+  elitescout-pg-data:
+    external: true
+  jartosdto-minio-data:
+    external: true
+  jartosdto-pg-data:
+    external: true
+  jartosdto-redis-data:
+    external: true
+  portainer_data:
+    external: true
+  uptime-kuma-data:
+    external: true
+
+x-common: &common
+  networks:
+    - msbross_net
+  restart: unless-stopped
+
+x-backend: &backend
+  <<: *common
+
+services:
+
+  # ──────────────────────────────────────────────
+  # TRAEFIK — REVERSE PROXY (L7, SSL, Security)
+  # Managed in infrastructure/traefik/docker-compose.yml
+  # ──────────────────────────────────────────────
+
+  # ──────────────────────────────────────────────
+  # DATABASES & INFRASTRUCTURE
+  # ──────────────────────────────────────────────
+
+  msbross-cuentos-db:
+    <<: *common
+    container_name: msbross-cuentos-db
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - cuentos-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  msbross-elitescout-db:
+    <<: *common
+    container_name: msbross-elitescout-db
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - elitescout-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  jartosdto-postgres:
+    <<: *common
+    container_name: jartosdto-postgres
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: jartosdto
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: jartosdto
+    volumes:
+      - jartosdto-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jartosdto"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  jartosdto-redis:
+    <<: *common
+    container_name: jartosdto-redis
+    image: redis:7-alpine
+    volumes:
+      - jartosdto-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  jartosdto-minio:
+    <<: *common
+    container_name: jartosdto-minio
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: jartosdto
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - jartosdto-minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # ──────────────────────────────────────────────
+  # BACKEND SERVICES
+  # ──────────────────────────────────────────────
+
+  cuentos-magicos-backend:
+    <<: *backend
+    container_name: cuentos-magicos-backend
+    image: msbross-cuentos-magicos-backend:granian
+    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8007
+    depends_on:
+      msbross-cuentos-db:
+        condition: service_healthy
+    env_file:
+      - /home/ubuntu/MSBrossAI/apps/cuentos-magicos/.env
+    environment:
+      - PORT=8007
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@msbross-cuentos-db:5432/cuentos_magicos
+      - REDIS_URL=redis://jartosdto-redis:6379/0
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/cuentos-magicos/backend:/app
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8007/health').status == 200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  cuentos-magicos-celery:
+    <<: *backend
+    container_name: cuentos-magicos-celery
+    image: msbross-cuentos-magicos-backend:granian
+    command: python -m celery -A app.core.celery_app worker --loglevel=info --queues=stories,images,audio,video --concurrency=2
+    depends_on:
+      jartosdto-redis:
+        condition: service_healthy
+      msbross-cuentos-db:
+        condition: service_healthy
+    env_file:
+      - /home/ubuntu/MSBrossAI/apps/cuentos-magicos/.env
+    environment:
+      - REDIS_URL=redis://jartosdto-redis:6379/0
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@msbross-cuentos-db:5432/cuentos_magicos
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/cuentos-magicos/backend:/app
+
+  elitescout-backend:
+    <<: *backend
+    container_name: elitescout-backend
+    image: node:22-alpine
+    command: sh start-server.sh
+    working_dir: /app
+    depends_on:
+      msbross-elitescout-db:
+        condition: service_healthy
+    environment:
+      - PORT=8003
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/elitescout:/app
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8003/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  gas-station-backend:
+    <<: *backend
+    container_name: gas-station-backend
+    image: msbross-gas-station-backend:granian
+    command: sh -c "pip install -r requirements.txt && python -m uvicorn main:app --host 0.0.0.0 --port 3005"
+    environment:
+      - PORT=3005
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/gas-station/backend:/app
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:3005/health').status == 200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  iaprod-backend:
+    <<: *backend
+    container_name: iaprod-backend
+    image: msbross-iaprod-backend:granian
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 8006
+    env_file:
+      - /home/ubuntu/MSBrossAI/apps/iaprod-os/.env
+    environment:
+      - PORT=8006
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/iaprod-os/backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8006/health').status == 200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  industrialpro-backend:
+    <<: *backend
+    container_name: industrialpro-backend
+    image: msbross-industrial-backend:granian
+    command: python -m uvicorn app:app --host 0.0.0.0 --port 8002
+    environment:
+      - PORT=8002
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/industrialpro/backend:/app
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8002/health').status == 200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  jartosdto-backend:
+    <<: *backend
+    container_name: jartosdto-backend
+    image: msbross-jartosdto-backend:granian
+    command: python -m granian app.main:app --host 0.0.0.0 --port 8010 --interface asgi
+    depends_on:
+      jartosdto-postgres:
+        condition: service_healthy
+      jartosdto-redis:
+        condition: service_healthy
+      jartosdto-minio:
+        condition: service_healthy
+    env_file:
+      - /home/ubuntu/MSBrossAI/apps/jartosdto/.env
+    environment:
+      - PORT=8010
+      - OLLAMA_BASE_URL=http://100.100.2.10:11434
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/jartosdto/server:/app
+
+  msbross-backend:
+    <<: *backend
+    container_name: msbross-backend
+    image: msbross-msbross:granian
+    command: python -m granian app.main:app --host 0.0.0.0 --port 8005 --interface asgi
+    environment:
+      - PORT=8005
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/msbross-backend/server-fastapi:/app
+      - /home/ubuntu/MSBrossAI/api_keys_vault.json:/api_keys_vault.json:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.msbross-api.rule=Host(`assistant.manuelalvarez.dev`) && PathPrefix(`/_msbross`)
+      - traefik.http.routers.msbross-api.priority=2000
+      - traefik.http.routers.msbross-api.entrypoints=websecure
+      - traefik.http.routers.msbross-api.tls.certresolver=myresolver
+      - traefik.http.routers.msbross-api.middlewares=strip-msbross
+      - traefik.http.middlewares.strip-msbross.stripprefix.prefixes=/_msbross
+      - traefik.http.services.msbross-backend.loadbalancer.server.port=8005
+      - traefik.http.routers.msbross-api.service=msbross-backend
+
+  nikolina-api-hub:
+    <<: *backend
+    container_name: nikolina-api-hub
+    image: msbross-nikolina-backend:granian
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 8001
+    env_file:
+      - /home/ubuntu/MSBrossAI/apps/livekit-nikolina/.env
+    environment:
+      - PORT=8001
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/livekit-nikolina/server:/app
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8001/health').status == 200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nikolina-agent:
+    <<: *backend
+    container_name: nikolina-agent
+    image: msbross-nikolina-backend:latest
+    command: python src/agent.py start
+    env_file:
+      - /home/ubuntu/MSBrossAI/apps/livekit-nikolina/.env
+    environment:
+      - PYTHONPATH=/app/src:/server/src
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/livekit-nikolina/agent:/app
+      - /home/ubuntu/MSBrossAI/apps/livekit-nikolina/server:/server
+
+  it-coach-agent:
+    <<: *backend
+    container_name: it-coach-agent
+    image: msbross-nikolina-backend:latest
+    command: python src/coach_agent.py start
+    env_file:
+      - /home/ubuntu/MSBrossAI/apps/livekit-nikolina/.env
+    environment:
+      - PYTHONPATH=/app/src:/server/src
+      - LIVEKIT_WORKER_PORT=8082
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/livekit-nikolina/agent:/app
+      - /home/ubuntu/MSBrossAI/apps/livekit-nikolina/server:/server
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.it-coach-agent.rule=Host(`itcoach.manuelalvarez.dev`)
+      - traefik.http.routers.it-coach-agent.entrypoints=websecure
+      - traefik.http.routers.it-coach-agent.tls.certresolver=myresolver
+      - traefik.http.services.it-coach-agent.loadbalancer.server.port=8082
+
+  traductor-backend:
+    <<: *backend
+    container_name: traductor-backend
+    image: msbross-traductor-backend:granian
+    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8004
+    environment:
+      - PORT=8004
+      - OLLAMA_BASE_URL=http://100.100.2.10:11434/v1
+      - OLLAMA_MODEL=qwen2.5:3b
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/traductor-pro/server-fastapi:/app
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8004/health').status == 200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traductor-api.rule=Host(`traductor.manuelalvarez.dev`) && PathPrefix(`/_traductor`)
+      - traefik.http.routers.traductor-api.entrypoints=websecure
+      - traefik.http.routers.traductor-api.tls.certresolver=myresolver
+      - traefik.http.routers.traductor-api.middlewares=strip-traductor
+      - traefik.http.middlewares.strip-traductor.stripprefix.prefixes=/_traductor
+      - traefik.http.services.traductor-api.loadbalancer.server.port=8004
+      - traefik.http.routers.traductor-api.service=traductor-api
+
+  it-english-backend:
+    <<: *backend
+    container_name: it-english-backend
+    image: node:22-bookworm-slim
+    command: sh -c "npm install && node server.js"
+    working_dir: /app
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/it-english-coach:/app
+    healthcheck:
+      test: ["CMD", "node", "-e", "const h=require('http');h.get('http://localhost:8787/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ──────────────────────────────────────────────
+  # STATIC APPS VIA MSBROSS PROXY (Node.js :8080)
+  # ──────────────────────────────────────────────
+
+  msbross-proxy:
+    <<: *common
+    container_name: msbross-proxy
+    image: node:22-alpine
+    command: node infrastructure/msbross-proxy/proxy_server.js
+    working_dir: /app
+    environment:
+      - NODE_ENV=production
+      - ADMIN_API_TOKEN=${ADMIN_API_TOKEN}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    ports:
+      - 127.0.0.1:8080:8080
+    volumes:
+      - /home/ubuntu/MSBrossAI:/app
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.msbross-proxy-root.rule=Host(`manuelalvarez.dev`) || Host(`appgen.manuelalvarez.dev`) || Host(`assistant.manuelalvarez.dev`) || Host(`combipro.manuelalvarez.dev`) || Host(`cv.manuelalvarez.dev`) || Host(`edelweiss.manuelalvarez.dev`) || Host(`expositator.manuelalvarez.dev`) || Host(`gasstation.manuelalvarez.dev`) || Host(`iaprod.manuelalvarez.dev`) || Host(`industrial.manuelalvarez.dev`) || Host(`itenglish.manuelalvarez.dev`) || Host(`jartosdto.manuelalvarez.dev`) || Host(`logisearch.manuelalvarez.dev`) || Host(`logitrack.manuelalvarez.dev`) || Host(`mano.manuelalvarez.dev`) || Host(`maya.manuelalvarez.dev`) || Host(`mokotools.manuelalvarez.dev`) || Host(`nikolina.manuelalvarez.dev`) || Host(`taskflow.manuelalvarez.dev`) || Host(`traductor.manuelalvarez.dev`) || Host(`cuentos.manuelalvarez.dev`) || Host(`elitescout.manuelalvarez.dev`) || Host(`atenea.manuelalvarez.dev`)
+      - traefik.http.routers.msbross-proxy-root.entrypoints=websecure
+      - traefik.http.routers.msbross-proxy-root.tls.certresolver=myresolver
+      - traefik.http.routers.msbross-proxy-root.service=msbross-proxy-svc
+      - traefik.http.services.msbross-proxy-svc.loadbalancer.server.port=8080
+
+  llm-admin-proxy:
+    <<: *backend
+    container_name: llm-admin-proxy
+    image: oven/bun:alpine
+    command: sh -c "bun install && bun run index.ts"
+    working_dir: /app
+    env_file:
+      - /home/ubuntu/MSBrossAI/apps/llm-admin-proxy/.env
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/llm-admin-proxy:/app
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.llm-proxy.rule=Host(`llm.manuelalvarez.dev`)
+      - traefik.http.routers.llm-proxy.entrypoints=websecure
+      - traefik.http.routers.llm-proxy.tls.certresolver=myresolver
+      - traefik.http.services.llm-proxy.loadbalancer.server.port=8020
+
+  atenea-backend:
+    <<: *backend
+    container_name: atenea-backend
+    image: msbross-atenea-backend:granian
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 8009
+    environment:
+      - PORT=8009
+    volumes:
+      - /home/ubuntu/MSBrossAI/apps/web-restaurante-atenea:/app
+      - /home/ubuntu/MSBrossAI/apps/web-restaurante-atenea/data:/app/data
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8009/health').status == 200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+
+# ──────────────────────────────────────────────
+  # SSR APPS (Next.js / Direct Docker)
+  # ──────────────────────────────────────────────
+
+  mapfre:
+    <<: *common
+    container_name: mapfre
+    image: msbross-mapfre:latest
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mapfre.rule=Host(`mapfre.manuelalvarez.dev`) && PathPrefix(`/app/mapfre`)
+      - traefik.http.routers.mapfre.entrypoints=websecure
+      - traefik.http.routers.mapfre.tls.certresolver=myresolver
+      - traefik.http.services.mapfre.loadbalancer.server.port=3333
+      - traefik.http.routers.mapfre-redirect.rule=Host(`mapfre.manuelalvarez.dev`) && !PathPrefix(`/app/mapfre`)
+      - traefik.http.routers.mapfre-redirect.entrypoints=websecure
+      - traefik.http.routers.mapfre-redirect.tls.certresolver=myresolver
+      - traefik.http.routers.mapfre-redirect.middlewares=redirect-mapfre
+      - traefik.http.middlewares.redirect-mapfre.redirectregex.regex=^https?://([^/]+)/(.*)$$
+      - traefik.http.middlewares.redirect-mapfre.redirectregex.replacement=https://$${1}/app/mapfre/$${2}
+
+  perfume-trading:
+    <<: *common
+    container_name: perfume-trading
+    image: msbross-perfume:latest
+    environment:
+      - SKIP_AUTH=true  # NOTA: Auth deshabilitado intencionalmente (app demo)
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.perfume.rule=Host(`perfume.manuelalvarez.dev`) && PathPrefix(`/app/perfume-trading`)
+      - traefik.http.routers.perfume.entrypoints=websecure
+      - traefik.http.routers.perfume.tls.certresolver=myresolver
+      - traefik.http.services.perfume.loadbalancer.server.port=3000
+      - traefik.http.routers.perfume-redirect.rule=Host(`perfume.manuelalvarez.dev`) && !PathPrefix(`/app/perfume-trading`)
+      - traefik.http.routers.perfume-redirect.entrypoints=websecure
+      - traefik.http.routers.perfume-redirect.tls.certresolver=myresolver
+      - traefik.http.routers.perfume-redirect.middlewares=redirect-perfume
+      - traefik.http.middlewares.redirect-perfume.redirectregex.regex=^https?://([^/]+)/(.*)$$
+      - traefik.http.middlewares.redirect-perfume.redirectregex.replacement=https://$${1}/app/perfume-trading/$${2}
+
+  txa-fitness-pro:
+    <<: *common
+    container_name: txa-fitness-pro
+    image: msbross-fitness:latest
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.txafitness.rule=Host(`txafitness.manuelalvarez.dev`) && PathPrefix(`/app/txafitnesspro`)
+      - traefik.http.routers.txafitness.entrypoints=websecure
+      - traefik.http.routers.txafitness.tls.certresolver=myresolver
+      - traefik.http.services.txafitness.loadbalancer.server.port=3000
+      - traefik.http.routers.txafitness-redirect.rule=Host(`txafitness.manuelalvarez.dev`) && !PathPrefix(`/app/txafitnesspro`)
+      - traefik.http.routers.txafitness-redirect.entrypoints=websecure
+      - traefik.http.routers.txafitness-redirect.tls.certresolver=myresolver
+      - traefik.http.routers.txafitness-redirect.middlewares=redirect-txafitness
+      - traefik.http.middlewares.redirect-txafitness.redirectregex.regex=^https?://([^/]+)/(.*)$$
+      - traefik.http.middlewares.redirect-txafitness.redirectregex.replacement=https://$${1}/app/txafitnesspro/$${2}
+
+  # ──────────────────────────────────────────────
+  # MONITORING & MANAGEMENT
+  # ──────────────────────────────────────────────
+
+  portainer:
+    <<: *common
+    container_name: portainer
+    image: portainer/portainer-ce:lts
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.portainer.rule=Host(`portainer.manuelalvarez.dev`)
+      - traefik.http.routers.portainer.entrypoints=websecure
+      - traefik.http.routers.portainer.tls.certresolver=myresolver
+      - traefik.http.services.portainer.loadbalancer.server.port=9000
+      - traefik.http.routers.portainer.middlewares=admin-auth
+      - traefik.http.middlewares.admin-auth.basicauth.users=admin:$$apr1$$tsube.dv$$ntEzPeXD8lwJK5E5SQbGF1
+
+  uptime-kuma:
+    <<: *common
+    container_name: uptime-kuma
+    image: louislam/uptime-kuma:1
+    volumes:
+      - uptime-kuma-data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.kuma.rule=Host(`monitor.manuelalvarez.dev`)
+      - traefik.http.routers.kuma.entrypoints=websecure
+      - traefik.http.routers.kuma.tls.certresolver=myresolver
+      - traefik.http.routers.kuma.middlewares=admin-auth
+      - traefik.http.services.kuma.loadbalancer.server.port=3001
+

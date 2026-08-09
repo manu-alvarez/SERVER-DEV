@@ -58,9 +58,18 @@ export const useEvaluator = () => {
       utteranceBufferRef.current = []; 
 
       const { apiKey, knowledgeBase } = useExpositatorStore.getState();
-      const adminToken = localStorage.getItem('msbross_admin_token');
+      const godmodeToken = localStorage.getItem('msbross_godmode_token');
+      const userKeysStr = localStorage.getItem('msbross_user_api_key');
+      let userKey = apiKey;
       
-      if ((apiKey || adminToken) && knowledgeBase) {
+      if (userKeysStr) {
+        try {
+          const parsed = JSON.parse(userKeysStr);
+          if (parsed.gemini) userKey = parsed.gemini;
+        } catch (e) {}
+      }
+      
+      if ((userKey || godmodeToken) && knowledgeBase) {
         const prompt = `
         Actúa como Tribunal de Oposiciones.
         BASE DE CONOCIMIENTO OBLIGATORIA:
@@ -75,12 +84,14 @@ export const useEvaluator = () => {
         `;
 
         try {
-          let targetUrl = `${GEMINI_ENDPOINT}?key=${apiKey}`;
+          let targetUrl = `${GEMINI_ENDPOINT}?key=${userKey || 'dummy'}`;
           let headers: Record<string, string> = { 'Content-Type': 'application/json' };
           
-          if (adminToken) {
-            targetUrl = `https://llm.manuelalvarez.dev/api/gemini/v1beta/models/gemini-3.5-flash:generateContent`;
-            headers['x-msbross-admin-token'] = adminToken;
+          if (godmodeToken || userKeysStr) {
+            const hostname = window.location.hostname === 'localhost' ? '127.0.0.1' : window.location.hostname;
+            targetUrl = `http://${hostname}:8080/_api/gemini/v1beta/models/gemini-3.5-flash:generateContent`;
+            if (godmodeToken) headers['x-godmode-token'] = godmodeToken;
+            if (userKeysStr) headers['x-user-custom-keys'] = userKeysStr;
           }
 
           const response = await fetch(targetUrl, {

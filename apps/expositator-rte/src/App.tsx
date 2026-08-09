@@ -6,6 +6,9 @@ import { WebcamViewport } from './components/WebcamViewport';
 import { VisionDropzone } from './components/VisionDropzone';
 import { TribunalLogs } from './components/TribunalLogs';
 import { MetricsPanel } from './components/MetricsPanel';
+import { useState } from 'react';
+import GodModeListener from './components/GodModeListener';
+import ApiConfigModal from './components/ApiConfigModal';
 
 function App() {
   const { 
@@ -14,6 +17,8 @@ function App() {
     isRunning, startSession, stopSession,
     addLog
   } = useExpositatorStore();
+
+  const [isApiModalOpen, setIsApiModalOpen] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -79,6 +84,8 @@ function App() {
 
   return (
     <>
+      <GodModeListener />
+      <ApiConfigModal isOpen={isApiModalOpen} onClose={() => setIsApiModalOpen(false)} />
       {/* Background Orbs */}
       <div className="bg-orbs-container">
         <div className="orb orb-1"></div>
@@ -111,6 +118,16 @@ function App() {
               >
                 {apiKey ? '✓ GUARDADA' : 'GUARDAR API'}
               </button>
+              <div className="hidden sm:block w-px h-8 bg-white/10 mx-1"></div>
+              
+              <button 
+                onClick={() => setIsApiModalOpen(true)}
+                className="bg-white/5 hover:bg-white/10 text-slate-300 px-3 py-2 rounded-lg text-lg transition-colors shadow-lg border border-white/10"
+                title="Ajustes de API"
+              >
+                ⚙️
+              </button>
+
               <div className="hidden sm:block w-px h-8 bg-white/10 mx-1"></div>
               
               <div className="portal-card h-[38px] w-full sm:w-[160px] shrink-0">

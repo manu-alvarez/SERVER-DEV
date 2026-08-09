@@ -50,10 +50,10 @@ export function ModelSelector() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-[calc(100%+8px)] left-0 w-full z-[9999] bg-[#161a22]/95 backdrop-blur-xl border border-[#2d3342] rounded-2xl p-2 shadow-[0_10px_40px_rgba(0,0,0,0.5)]"
+            exit={{ opacity: 0, y: 10 }}
+            className="absolute bottom-[calc(100%+8px)] left-0 w-full z-[9999] bg-[#161a22]/95 backdrop-blur-xl border border-[#2d3342] rounded-2xl p-2 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]"
           >
             {isLoading ? (
               <div className="p-4 text-center text-white/50 text-sm">Cargando modelos...</div>

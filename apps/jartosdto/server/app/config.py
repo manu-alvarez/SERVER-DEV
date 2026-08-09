@@ -51,10 +51,12 @@ class Settings(BaseSettings):
     anthropic_api_key: Optional[str] = None
     google_api_key: Optional[str] = None
     mistral_api_key: Optional[str] = None
+    groq_api_key: Optional[str] = None
+    openrouter_api_key: Optional[str] = None
 
     # ── Local Model Runners ──────────────────────────────
-    ollama_base_url: str = "http://host.docker.internal:11434"
-    vllm_base_url: str = "http://host.docker.internal:8001"
+    ollama_base_url: str = "http://100.100.2.10:11434"
+    vllm_base_url: str = "http://100.100.2.10:8001"
     lmstudio_base_url: str = "http://host.docker.internal:1234"
 
     # ── Web Search ───────────────────────────────────────

@@ -124,13 +124,19 @@ def _preprocess_story_text_for_narration(text: str) -> str:
     return text
 
 
-async def _generate_openai_tts(text: str, voice_name: str | None = None, speed: float | None = None) -> bytes:
+async def _generate_openai_tts(text: str, voice_name: str | None = None, speed: float | None = None, auth_headers: dict = None) -> bytes:
     """Generate audio using OpenAI TTS API (tts-1 model)."""
     voice = voice_name or settings.OPENAI_TTS_VOICE or "alloy"
     voice = OPENAI_VOICE_MAP.get(voice, "alloy")
     speed_val = speed or settings.OPENAI_TTS_SPEED or 0.9
 
-    client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+    is_godmode = auth_headers and ('x-godmode-token' in auth_headers or 'x-user-custom-keys' in auth_headers)
+    
+    client = AsyncOpenAI(
+        api_key="dummy" if is_godmode else settings.OPENAI_API_KEY,
+        base_url="http://127.0.0.1:8080/_api/openai/v1" if is_godmode else None,
+        default_headers=auth_headers
+    )
 
     async def _call_api():
         response = await client.audio.speech.create(
@@ -230,7 +236,7 @@ def _pcm_to_mp3(pcm_bytes: bytes) -> bytes:
         os.unlink(pcm_path)
 
 
-async def generate_audio_for_story(session: AsyncSession, story_id: str) -> None:
+async def generate_audio_for_story(session: AsyncSession, story_id: str, auth_headers: dict = None) -> None:
     """Generate TTS audio for all chapters using high fidelity voice chain (OpenAI -> Gemini -> Edge)."""
     logger.info(f"Generating audio for story_id={story_id}")
 
@@ -309,7 +315,7 @@ async def generate_audio_for_story(session: AsyncSession, story_id: str) -> None
                             voice_to_use = "onyx"
                     openai_voice = OPENAI_VOICE_MAP.get(voice_to_use, "nova")
                     logger.info(f"Using OpenAI TTS (voice: {openai_voice}, speed: {speed}) for chapter {chapter.chapter_number}")
-                    audio_bytes = await _generate_openai_tts(text, voice_name=openai_voice, speed=speed)
+                    audio_bytes = await _generate_openai_tts(text, voice_name=openai_voice, speed=speed, auth_headers=auth_headers)
                     provider_id = f"openai-tts:{openai_voice}"
                 except Exception as e:
                     logger.warning(f"OpenAI TTS failed for chapter {chapter.chapter_number}, falling back: {e}")

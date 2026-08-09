@@ -6,6 +6,8 @@ import { useOddsApi } from './hooks/useOddsApi';
 import SettingsPanel from './components/SettingsPanel';
 import ComboResults from './components/ComboResults';
 import HistoryPanel from './components/HistoryPanel';
+import GodModeListener from './components/GodModeListener';
+import ApiConfigModal from './components/ApiConfigModal';
 import { Match, Pick, Combo } from './types';
 
 function calcProb(odds: number): number { return Math.round((1 / (odds * 1.05)) * 100); }
@@ -83,8 +85,13 @@ export default function App() {
   const { apiKey, setApiKey, removeApiKey, selectedLeagues, risk, stake, selectedMarket, addHistoryCombos } = useComboStore();
   const [inputKey, setInputKey] = useState('');
   const [combos, setCombos] = useState<Combo[]>([]);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const godmodeToken = typeof window !== 'undefined' ? localStorage.getItem('msbross_godmode_token') : null;
+  const userKeys = typeof window !== 'undefined' ? localStorage.getItem('msbross_user_api_key') : null;
 
   const activeApiKey = apiKey || (import.meta as any).env.VITE_ODDS_API_KEY || '';
+  const hasAccess = !!activeApiKey || !!godmodeToken || !!userKeys;
 
   // The Renderer & Networker: Data is fetched via TanStack Query and validated with Zod
   const { data: matches = [], isLoading, isFetching, refetch, isError, error } = useOddsApi(selectedLeagues, activeApiKey);
@@ -107,7 +114,7 @@ export default function App() {
     })));
   };
 
-  if (!apiKey && !(import.meta as any).env.VITE_ODDS_API_KEY) {
+  if (!hasAccess) {
     return (
       <div className="min-h-screen flex items-center justify-center p-8 relative">
         <div className="bg-orbs-container">
@@ -136,6 +143,7 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen pb-16">
+      <GodModeListener />
       <div className="bg-orbs-container">
         <div className="orb orb-1"></div><div className="orb orb-2"></div><div className="orb orb-3"></div>
       </div>
@@ -167,14 +175,14 @@ export default function App() {
             >
               <RefreshCw size={18} className={isFetching ? "animate-spin" : ""} /> {isFetching ? 'Calculando...' : 'Recargar Red'}
             </button>
-            {apiKey && (
-               <button onClick={removeApiKey} className="glass-panel glass-panel-hover p-3 rounded-xl text-rose-500 cursor-pointer" title="Desconectar">
-                 <XCircle size={20} />
-               </button>
-            )}
+            <button onClick={() => setIsSettingsOpen(true)} className="glass-panel glass-panel-hover p-3 rounded-xl text-white cursor-pointer" title="Configurar APIs">
+              ⚙️
+            </button>
           </div>
         </div>
       </motion.header>
+
+      <ApiConfigModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
 
       <motion.main 
         initial={{ opacity: 0 }} 

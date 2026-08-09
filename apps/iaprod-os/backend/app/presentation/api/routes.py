@@ -25,21 +25,23 @@ os.makedirs(TEMP_AUDIO_DIR, exist_ok=True)
 import json
 
 def get_chat_usecase(request: Request) -> ChatUseCase:
-    admin_token = request.headers.get("x-msbross-admin-token")
-    custom_keys_str = request.headers.get("x-custom-api-keys") or "{}"
+    godmode_active = request.headers.get("x-godmode-active") == "true"
+    injected_groq = request.headers.get("x-injected-groq")
+    injected_gemini = request.headers.get("x-injected-google")
+    custom_keys_str = request.headers.get("x-user-custom-keys") or "{}"
     
     try:
         custom_keys = json.loads(custom_keys_str)
     except:
         custom_keys = {}
         
-    if admin_token == "msbross-master-key-2026":
+    if godmode_active and injected_groq:
         # God Mode bypasses fallback and uses the Admin proxy with Llama 3.3 70b
         # Llama 3.3 70b has tool support so it matches GroqAdapter needs
         llm = GroqAdapter(
-            api_key=admin_token, 
-            base_url="https://llm.manuelalvarez.dev/v1",
-            model="groq:llama-3.3-70b-versatile"
+            api_key=injected_groq, 
+            base_url="https://api.groq.com/openai/v1",
+            model="llama-3.3-70b-versatile"
         )
     elif custom_keys.get("groq"):
         llm = FallbackLLMAdapter(adapters=[
@@ -134,6 +136,42 @@ async def vision_analyze(request: Request, body: VisionAnalyzeRequest, audio: Gr
     except Exception as e:
         logger.exception("Vision analysis error")
         return JSONResponse(status_code=500, content={"response": f"Error: {e}", "emotion": "error"})
+
+import httpx
+
+CLOUD_MODELS = [
+    {"id": "gm/gemini-3.5-flash", "name": "Gemini 3.5 Flash", "provider": "Gemini", "free": True},
+    {"id": "gm/gemini-3.1-pro", "name": "Gemini 3.1 Pro", "provider": "Gemini", "free": True},
+    {"id": "gm/gemini-3.1-flash-lite", "name": "Gemini 3.1 Flash Lite", "provider": "Gemini", "free": True},
+    {"id": "gr/llama-3.3-70b-versatile", "name": "Llama 3.3 70B", "provider": "Groq", "free": True},
+    {"id": "gr/llama-3.1-8b-instant", "name": "Llama 3.1 8B Instant", "provider": "Groq", "free": True},
+    {"id": "gr/mixtral-8x7b-32768", "name": "Mixtral 8x7B", "provider": "Groq", "free": True},
+    {"id": "or/deepseek/deepseek-chat:free", "name": "DeepSeek V3", "provider": "OpenRouter", "free": True},
+    {"id": "or/google/gemma-3-27b-it:free", "name": "Gemma 3 27B", "provider": "OpenRouter", "free": True},
+]
+
+OLLAMA_BASE_URL = "http://100.100.2.10:11434"
+
+@router.get("/api/models")
+async def get_models():
+    ollama_models = []
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            res = await client.get(f"{OLLAMA_BASE_URL}/api/tags")
+            if res.status_code == 200:
+                data = res.json()
+                for m in data.get("models", []):
+                    name = m.get("name", "")
+                    display = name.replace(":", " ").replace("-", " ").title()
+                    ollama_models.append({
+                        "id": f"ol/{name}",
+                        "name": display,
+                        "provider": "Ollama",
+                        "free": True,
+                    })
+    except Exception as e:
+        logger.warning(f"Could not reach Ollama at {OLLAMA_BASE_URL}: {e}")
+    return CLOUD_MODELS + ollama_models
 
 @router.post("/api/clear-memory")
 async def clear_memory(request: Request):

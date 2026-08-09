@@ -7,7 +7,7 @@ import { useChatStore, useUIStore, useAuthStore } from "@/stores";
 import { clearToken } from "@/lib/api";
 import { timeAgo, truncate } from "@/lib/utils";
 import type { Conversation } from "@/types/chat";
-import SettingsModal from "./SettingsModal";
+import ApiConfigModal from "../ApiConfigModal";
 
 /**
  * Sidebar with conversation list, new chat button, and navigation.
@@ -128,7 +128,7 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <ApiConfigModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </aside>
   );
 }

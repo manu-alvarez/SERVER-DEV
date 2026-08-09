@@ -11,14 +11,31 @@ const API_KEY = process.env.GEMINI_API_KEY || "";
 let genAI: GoogleGenerativeAI | null = null;
 
 /** Get or create Gemini client instance */
-function getClient(): GoogleGenerativeAI {
+function getClient(customHeaders?: Record<string, string>): GoogleGenerativeAI {
+  const isGodMode = customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]);
+  let key = API_KEY;
+  
+  if (isGodMode) {
+    key = "dummy_key";
+  }
+
+  if (!key) {
+    throw new Error(
+      "GEMINI_API_KEY not set. Get a free key at https://aistudio.google.com"
+    );
+  }
+
+  // Create a new instance if we have GodMode, else use singleton
+  if (isGodMode) {
+    // @ts-ignore: TS doesn't know about second options argument in this version
+    return new GoogleGenerativeAI(key, {
+      baseUrl: "http://127.0.0.1:8080/_api/gemini",
+      customHeaders,
+    } as any);
+  }
+
   if (!genAI) {
-    if (!API_KEY) {
-      throw new Error(
-        "GEMINI_API_KEY not set. Get a free key at https://aistudio.google.com"
-      );
-    }
-    genAI = new GoogleGenerativeAI(API_KEY);
+    genAI = new GoogleGenerativeAI(key);
   }
   return genAI;
 }
@@ -32,10 +49,11 @@ function getClient(): GoogleGenerativeAI {
 export async function generateText(
   systemPrompt: string,
   userContent: string,
-  jsonMode = false
+  jsonMode = false,
+  customHeaders?: Record<string, string>
 ): Promise<string> {
   try {
-    const client = getClient();
+    const client = getClient(customHeaders);
     const model = client.getGenerativeModel({
       model: "gemini-3.5-flash",
       systemInstruction: systemPrompt,
@@ -58,9 +76,10 @@ export async function generateText(
  */
 export async function generateJSON<T>(
   systemPrompt: string,
-  userContent: string
+  userContent: string,
+  customHeaders?: Record<string, string>
 ): Promise<T> {
-  const text = await generateText(systemPrompt, userContent, true);
+  const text = await generateText(systemPrompt, userContent, true, customHeaders);
 
   try {
     // Clean potential markdown code fences
@@ -80,9 +99,10 @@ export async function generateJSON<T>(
  */
 export async function* streamText(
   systemPrompt: string,
-  userContent: string
+  userContent: string,
+  customHeaders?: Record<string, string>
 ): AsyncGenerator<string> {
-  const client = getClient();
+  const client = getClient(customHeaders);
   const model = client.getGenerativeModel({
     model: "gemini-3.5-flash",
     systemInstruction: systemPrompt,
@@ -97,6 +117,7 @@ export async function* streamText(
 }
 
 /** Check if Gemini API key is configured */
-export function isConfigured(): boolean {
+export function isConfigured(customHeaders?: Record<string, string>): boolean {
+  if (customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"])) return true;
   return !!API_KEY;
 }

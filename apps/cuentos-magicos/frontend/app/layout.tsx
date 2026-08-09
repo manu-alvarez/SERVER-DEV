@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "../styles/magic-effects.css";
 import MagicBackground from "@/components/MagicBackground";
+import ApiConfigWrapper from "@/components/ui/ApiConfigWrapper";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://msbross.me/app/cuentos-magicos"),
@@ -42,6 +43,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
       <body className="antialiased relative bg-gradient-to-br from-amber-950 via-stone-950 to-orange-950 min-h-screen text-white">
+        <ApiConfigWrapper />
         <MagicBackground />
         <div className="relative z-10">{children}</div>
       </body>

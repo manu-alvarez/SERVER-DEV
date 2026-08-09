@@ -94,19 +94,24 @@ function getBookingUrl(name: string, dateFrom?: string, dateTo?: string): string
   return `https://www.booking.com/searchresults.html?ss=${ss}&checkin=${checkin}&checkout=${checkout}&group_adults=2&group_children=1&age=3&lang=es`;
 }
 
-async function groqExtract(searchResults: any[], apiKey: string): Promise<AIDestination[]> {
+async function groqExtract(searchResults: any[], apiKey: string, customHeaders?: Record<string, string>): Promise<AIDestination[]> {
   const simplified = searchResults.slice(0, 6).map((r: any) => ({
     title: r.title || "",
     content: (r.content || "").slice(0, 500),
     url: r.url || "",
   }));
 
-  const res = await fetchWithTimeout("https://api.groq.com/openai/v1/chat/completions", {
+  const isGodMode = customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]);
+  const url = isGodMode ? "http://127.0.0.1:8080/_api/groq/chat/completions" : "https://api.groq.com/openai/v1/chat/completions";
+  const headers: any = {
+    "Authorization": `Bearer ${isGodMode ? "dummy_key" : apiKey}`,
+    "Content-Type": "application/json",
+    ...customHeaders,
+  };
+
+  const res = await fetchWithTimeout(url, {
     method: "POST",
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
+    headers,
     body: JSON.stringify({
       model: "llama-3.3-70b-versatile",
       messages: [
@@ -176,13 +181,17 @@ function heuristicFamilyScore(amenities: string[], name = "", hotelName = ''): n
   return Math.min(1, Math.max(0.3, Math.round(score * 100) / 100));
 }
 
-async function geminiRequest(prompt: string, key: string): Promise<string> {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${key}`;
+async function geminiRequest(prompt: string, key: string, customHeaders?: Record<string, string>): Promise<string> {
+  const isGodMode = customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]);
+  const url = isGodMode
+    ? `http://127.0.0.1:8080/_api/gemini/v1beta/models/gemini-3.5-flash:generateContent?key=dummy_key`
+    : `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${key}`;
+    
   const res = await fetchWithTimeout(
     url,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...customHeaders },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: { temperature: 0.1, maxOutputTokens: 2048 },
@@ -195,16 +204,20 @@ async function geminiRequest(prompt: string, key: string): Promise<string> {
   return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 }
 
-async function openrouterScore(destinations: AIDestination[], apiKey: string): Promise<{ name: string; familyScore: number; familyNotes: string }[] | null> {
-  if (!apiKey) return null;
+async function openrouterScore(destinations: AIDestination[], apiKey: string, customHeaders?: Record<string, string>): Promise<{ name: string; familyScore: number; familyNotes: string }[] | null> {
+  if (!apiKey && !(customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]))) return null;
+  const isGodMode = customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]);
+  const url = isGodMode ? "http://127.0.0.1:8080/_api/openrouter" : "https://openrouter.ai/api/v1/chat/completions";
+  
   try {
     const res = await fetchWithTimeout(
-      "https://openrouter.ai/api/v1/chat/completions",
+      url,
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${apiKey}`,
+          Authorization: `Bearer ${isGodMode ? "dummy_key" : apiKey}`,
           "Content-Type": "application/json",
+          ...customHeaders,
         },
         body: JSON.stringify({
           model: "openai/gpt-4o-mini",
@@ -231,7 +244,7 @@ async function openrouterScore(destinations: AIDestination[], apiKey: string): P
   }
 }
 
-async function geminiScore(destinations: AIDestination[], geminiKeys: string[], openrouterKey: string): Promise<AIDestination[]> {
+async function geminiScore(destinations: AIDestination[], geminiKeys: string[], openrouterKey: string, customHeaders?: Record<string, string>): Promise<AIDestination[]> {
   if (destinations.length === 0) return [];
 
   const prompt = `Evalúa cada hotel para Manu, Arantxa y su hija Edelweiss (3.5 años) desde Mequinenza.
@@ -240,12 +253,13 @@ Responde SOLO JSON array [{ "name", "familyScore", "familyNotes" }].
 Datos: ${JSON.stringify(destinations, null, 2)}`;
 
   let text = "";
-  if (geminiKeys.length > 0) {
-    for (let attempt = 0; attempt < geminiKeys.length; attempt++) {
-      const key = geminiKeys[attempt % geminiKeys.length];
+  const hasGodMode = customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]);
+  if (geminiKeys.length > 0 || hasGodMode) {
+    for (let attempt = 0; attempt < (hasGodMode ? 1 : geminiKeys.length); attempt++) {
+      const key = hasGodMode ? "dummy" : geminiKeys[attempt % geminiKeys.length];
       await new Promise((r) => setTimeout(r, attempt * 500));
       try {
-        text = await geminiRequest(prompt, key);
+        text = await geminiRequest(prompt, key, customHeaders);
         break;
       } catch {
         continue;
@@ -255,7 +269,7 @@ Datos: ${JSON.stringify(destinations, null, 2)}`;
 
   let scores: { name: string; familyScore: number; familyNotes: string }[] = [];
   if (!text) {
-    const or = await openrouterScore(destinations, openrouterKey);
+    const or = await openrouterScore(destinations, openrouterKey, customHeaders);
     if (or) scores = or;
   } else {
     const cleaned = text.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
@@ -279,7 +293,7 @@ Datos: ${JSON.stringify(destinations, null, 2)}`;
   }));
 }
 
-async function fetchRealFlightPrices(destinations: AIDestination[], dateFrom: string, tavilyKey: string, groqKey: string): Promise<Map<string, number>> {
+async function fetchRealFlightPrices(destinations: AIDestination[], dateFrom: string, tavilyKey: string, groqKey: string, customHeaders?: Record<string, string>): Promise<Map<string, number>> {
   const priceMap = new Map<string, number>();
   const query = `vuelos a ${destinations
     .map((d) => d.name)
@@ -293,9 +307,10 @@ async function fetchRealFlightPrices(destinations: AIDestination[], dateFrom: st
     });
     if (!res.ok) return priceMap;
     const data = await res.json();
-    const groq = await fetchWithTimeout("https://api.groq.com/openai/v1/chat/completions", {
+    const isGodMode = customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]);
+    const groq = await fetchWithTimeout(isGodMode ? "http://127.0.0.1:8080/_api/groq/chat/completions" : "https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
-      headers: { Authorization: `Bearer ${groqKey}`, "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${isGodMode ? "dummy" : groqKey}`, "Content-Type": "application/json", ...customHeaders },
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
         messages: [
@@ -326,7 +341,7 @@ async function fetchRealFlightPrices(destinations: AIDestination[], dateFrom: st
   return priceMap;
 }
 
-async function fetchRealTrainPrices(destinations: AIDestination[], tavilyKey: string, groqKey: string): Promise<Map<string, number>> {
+async function fetchRealTrainPrices(destinations: AIDestination[], tavilyKey: string, groqKey: string, customHeaders?: Record<string, string>): Promise<Map<string, number>> {
   const priceMap = new Map<string, number>();
   const query = `tren a ${destinations
     .map((d) => d.name)
@@ -340,9 +355,10 @@ async function fetchRealTrainPrices(destinations: AIDestination[], tavilyKey: st
     });
     if (!res.ok) return priceMap;
     const data = await res.json();
-    const groq = await fetchWithTimeout("https://api.groq.com/openai/v1/chat/completions", {
+    const isGodMode = customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]);
+    const groq = await fetchWithTimeout(isGodMode ? "http://127.0.0.1:8080/_api/groq/chat/completions" : "https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
-      headers: { Authorization: `Bearer ${groqKey}`, "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${isGodMode ? "dummy" : groqKey}`, "Content-Type": "application/json", ...customHeaders },
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
         messages: [
@@ -408,8 +424,13 @@ export async function POST(req: NextRequest) {
     ].filter(Boolean);
     const openrouterKey = process.env.OPENROUTER_KEY || "";
 
+    const customHeaders: Record<string, string> = {};
+    if (req.headers.get("x-godmode-token")) customHeaders["x-godmode-token"] = req.headers.get("x-godmode-token") as string;
+    if (req.headers.get("x-user-custom-keys")) customHeaders["x-user-custom-keys"] = req.headers.get("x-user-custom-keys") as string;
+    const hasGodMode = !!(customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]);
+
     if (!tavilyKey) throw new Error("TAVILY_API_KEY is not configured on server.");
-    if (!groqKey) throw new Error("GROQ_API_KEY is not configured on server.");
+    if (!groqKey && !hasGodMode) throw new Error("GROQ_API_KEY is not configured on server.");
 
     const accomFilter = accommodationType && accommodationType !== "all" ? ` ${accommodationType}` : "";
     const searchQuery = destination
@@ -421,18 +442,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, data: [] });
     }
 
-    const extracted = await groqExtract(results, groqKey);
+    const extracted = await groqExtract(results, groqKey, customHeaders);
     if (extracted.length === 0) {
       return NextResponse.json({ success: true, data: [] });
     }
 
-    const scored = await geminiScore(extracted, geminiKeys, openrouterKey);
+    const scored = await geminiScore(extracted, geminiKeys, openrouterKey, customHeaders);
     const enriched = enrichWithImages(scored);
 
     // Fetch real transport prices
     const [flightPrices, trainPrices] = await Promise.all([
-      fetchRealFlightPrices(enriched, dateFrom, tavilyKey, groqKey),
-      fetchRealTrainPrices(enriched, tavilyKey, groqKey),
+      fetchRealFlightPrices(enriched, dateFrom, tavilyKey, groqKey, customHeaders),
+      fetchRealTrainPrices(enriched, tavilyKey, groqKey, customHeaders),
     ]);
 
     // Fetch real images from Wikipedia for each destination (max 3 concurrent)

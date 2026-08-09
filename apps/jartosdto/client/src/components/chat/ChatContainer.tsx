@@ -6,6 +6,7 @@ import { streamChat } from "@/lib/api";
 import type { ChatMessage, StreamChunk } from "@/types/chat";
 import MessageBubble from "./MessageBubble";
 import MessageInput from "./MessageInput";
+import { Orb } from "orb-ui";
 
 /**
  * Main chat container: message list + input.
@@ -104,8 +105,8 @@ export default function ChatContainer() {
   }, [messages, selectedModel, webSearchEnabled, conversationId, temperature, maxTokens, addMessage, updateLastAssistant, setIsStreaming, setConversationId]);
 
   return (
-    <div className="portal-card" style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 32px)", margin: "16px", flex: 1 }}>
-      <div className="portal-card-inner" style={{ display: "flex", flexDirection: "column", height: "100%", borderRadius: "18px" }}>
+    <div className="portal-card flex flex-col flex-1 m-2 sm:m-4 h-[calc(100vh-16px)] sm:h-[calc(100vh-32px)]">
+      <div className="portal-card-inner flex flex-col h-full rounded-[18px]">
       {/* Messages area */}
       <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", paddingTop: 20, paddingBottom: 20 }}>
         {messages.length === 0 ? (
@@ -118,7 +119,7 @@ export default function ChatContainer() {
       </div>
 
       {/* Input */}
-      <MessageInput onSend={handleSend} disabled={isStreaming} />
+      <MessageInput onSend={handleSend} disabled={isStreaming || !selectedModel} />
       </div>
     </div>
   );
@@ -127,12 +128,14 @@ export default function ChatContainer() {
 function EmptyState() {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: 16 }}>
-      <div style={{ width: 72, height: 72, borderRadius: 20, background: "linear-gradient(135deg, var(--accent-start), var(--accent-end))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, boxShadow: "var(--shadow-glow)" }}>⚡</div>
+      <div style={{ filter: 'drop-shadow(0 0 30px rgba(168, 85, 247, 0.5))' }}>
+        <Orb state="idle" theme="bars" size={100} disabled aria-label="JartosDTo AI" />
+      </div>
       <h2 className="gradient-text" style={{ fontSize: 28, fontWeight: 700 }}>JartosDTo</h2>
       <p style={{ color: "var(--text-tertiary)", fontSize: 15, maxWidth: 400, textAlign: "center", lineHeight: 1.6 }}>
         Your unified AI chat. Choose a model, enable web search, upload documents, or just start typing.
       </p>
-      <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8, marginTop: 8 }}>
         {["🔍 Web Search", "📎 Upload Files", "🧠 Deep Thinking", "💻 Code Execution"].map(f => (
           <span key={f} style={{ background: "var(--bg-tertiary)", padding: "6px 14px", borderRadius: 20, fontSize: 12, color: "var(--text-secondary)", border: "1px solid var(--border-subtle)" }}>{f}</span>
         ))}

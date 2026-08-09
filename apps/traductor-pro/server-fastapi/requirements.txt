@@ -6,3 +6,4 @@ python-multipart
 openai
 pypdf
 python-docx
+uvicorn

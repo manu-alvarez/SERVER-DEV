@@ -94,7 +94,7 @@ def build_request(model_id: str, messages: list[dict], keys: dict) -> tuple[str,
 
     elif prefix == "ol/":
         key = keys.get("ol", [""])[0]
-        url = "http://172.20.0.1:11434/v1/chat/completions" if not key else "https://ollama.alvarezconsult.com/v1/chat/completions"
+        url = "http://100.100.2.10:11434/v1/chat/completions" if not key else "https://ollama.alvarezconsult.com/v1/chat/completions"
         if key:
             headers["Authorization"] = f"Bearer {key}"
         payload = {"model": real_model, "messages": messages, "stream": True}

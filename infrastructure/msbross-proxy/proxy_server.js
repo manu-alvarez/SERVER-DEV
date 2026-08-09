@@ -13,6 +13,26 @@ app.disable('x-powered-by');
 const PORT = 8080;
 const WWW  = path.join(__dirname, '../../www');
 
+// ── API Keys Vault (GodMode) ──
+let apiVault = {};
+const vaultPath = path.join(__dirname, 'api_keys_vault.json');
+function loadVault() {
+  try {
+    if (fs.existsSync(vaultPath)) {
+      apiVault = JSON.parse(fs.readFileSync(vaultPath, 'utf8'));
+      console.log('[Security] API Vault loaded successfully for GodMode');
+    }
+  } catch (e) {
+    console.error('[Security] Failed to load API Vault:', e.message);
+  }
+}
+loadVault();
+try {
+  fs.watch(vaultPath, (eventType) => {
+    if (eventType === 'change') loadVault();
+  });
+} catch(e) {}
+
 // ── Compression ──
 app.use(compression({ level: 6, threshold: 1024 }));
 
@@ -138,7 +158,7 @@ const BACKEND_MAP = {
   'mapfre':                 ['mapfre',                    3333],
   'txa-fitness-pro':        ['txa-fitness-pro',           3000],
   'it-english-backend':     ['it-english-backend',        8787],
-  'msbross-backend':        ['msbross-backend',           8000],
+  'msbross-backend':        ['msbross-backend',           8005],
 };
 
 app.get('/__health', requireAdminAuth, async (req, res) => {
@@ -314,7 +334,6 @@ for (const name of NEXT_APPS) {
   });
 }
 
-// ── Proxy helpers ──
 const proxyOpts = (target, stripPrefix, ws = false) => ({
   target,
   changeOrigin: true,
@@ -327,6 +346,24 @@ const proxyOpts = (target, stripPrefix, ws = false) => ({
     },
     proxyReqWs: (proxyReq, req, socket) => {
       console.log(`[WebSocket] ${req.url} -> ${target}`);
+    },
+    proxyReq: (proxyReq, req, res) => {
+      // ── GODMODE INJECTOR ──
+      const godmodeToken = req.headers['x-godmode-token'];
+      if (godmodeToken && godmodeToken === apiVault.GODMODE_MASTER_TOKEN) {
+        proxyReq.setHeader('x-godmode-active', 'true');
+        if (apiVault.LLM_PROVIDERS?.OPENAI?.[0]?.key) proxyReq.setHeader('x-injected-openai', apiVault.LLM_PROVIDERS.OPENAI[0].key);
+        if (apiVault.LLM_PROVIDERS?.ANTHROPIC?.[0]?.key) proxyReq.setHeader('x-injected-anthropic', apiVault.LLM_PROVIDERS.ANTHROPIC[0].key);
+        if (apiVault.LLM_PROVIDERS?.GOOGLE_GEMINI?.[0]?.key) proxyReq.setHeader('x-injected-google', apiVault.LLM_PROVIDERS.GOOGLE_GEMINI[0].key);
+        if (apiVault.LLM_PROVIDERS?.GROQ?.[0]?.key) proxyReq.setHeader('x-injected-groq', apiVault.LLM_PROVIDERS.GROQ[0].key);
+        if (apiVault.LLM_PROVIDERS?.MISTRAL?.[0]?.key) proxyReq.setHeader('x-injected-mistral', apiVault.LLM_PROVIDERS.MISTRAL[0].key);
+        if (apiVault.OLLAMA_URL) proxyReq.setHeader('x-injected-ollama', apiVault.OLLAMA_URL);
+        if (apiVault.LLM_PROVIDERS?.OPENROUTER?.[0]?.key) proxyReq.setHeader('x-injected-openrouter', apiVault.LLM_PROVIDERS.OPENROUTER[0].key);
+        
+        // Inject other services
+        if (apiVault.THEODDS_API_KEY) proxyReq.setHeader('x-injected-theodds', apiVault.THEODDS_API_KEY);
+        if (apiVault.TAVILY_API_KEY) proxyReq.setHeader('x-injected-tavily', apiVault.TAVILY_API_KEY);
+      }
     },
   },
 });
@@ -343,6 +380,13 @@ app.use('/app/elitescout', createProxyMiddleware({
     error: (err, req, res) => {
       console.error(`[Proxy error] ${req.url} -> http://elitescout-backend:8003: ${err.message}`);
       if (res && res.writeHead) res.status(502).json({ error: 'Backend unavailable', detail: err.message });
+    },
+    proxyReq: (proxyReq, req, res) => {
+      const godmodeToken = req.headers['x-godmode-token'];
+      if (godmodeToken && godmodeToken === apiVault.GODMODE_MASTER_TOKEN) {
+        proxyReq.setHeader('x-godmode-active', 'true');
+        if (apiVault.LLM_PROVIDERS?.OPENAI?.[0]?.key) proxyReq.setHeader('x-injected-openai', apiVault.LLM_PROVIDERS.OPENAI[0].key);
+      }
     }
   }
 }));
@@ -353,15 +397,14 @@ app.use('/_cuentosmagicos',createProxyMiddleware(proxyOpts('http://cuentos-magic
 app.use('/_jartosdto',     createProxyMiddleware(proxyOpts('http://jartosdto-backend:8010', '/_jartosdto')));
 app.use('/_atenea',        createProxyMiddleware(proxyOpts('http://atenea-backend:8009', '/_atenea')));
 app.use('/_traductor',     createProxyMiddleware(proxyOpts('http://traductor-backend:8004', '/_traductor')));
-app.use('/_msbross',       createProxyMiddleware(proxyOpts('http://msbross-backend:8000', '/_msbross')));
+app.use('/_msbross',       createProxyMiddleware(proxyOpts('http://msbross-backend:8005', '/_msbross')));
 
 
 // ── IT English Coach AI Proxy ──
 app.post('/_coach/api/evaluate', express.json(), async (req, res) => {
   try {
-    const vault = require('./api_keys_vault.json');
-    const geminiKey = vault?.LLM_PROVIDERS?.GOOGLE_GEMINI?.[0]?.key;
-    if (!geminiKey) return res.status(500).json({ error: 'Gemini Key missing' });
+    const geminiKey = apiVault?.LLM_PROVIDERS?.GOOGLE_GEMINI?.[0]?.key;
+    if (!geminiKey) return res.status(500).json({ error: 'Gemini Key missing in GodMode vault' });
 
     const { messages = [], system } = req.body;
     const contents = [];
@@ -392,6 +435,49 @@ app.post('/_coach/api/evaluate', express.json(), async (req, res) => {
   }
 });
 
+// ── TheOdds API Proxy for CombiPro (GodMode Injector) ──
+app.use('/_oddsapi', (req, res, next) => {
+  const godmodeToken = req.headers['x-godmode-token'];
+  const userKey = req.headers['x-user-custom-keys'];
+  
+  let apiKeyToUse = null;
+  if (godmodeToken && godmodeToken === apiVault.GODMODE_MASTER_TOKEN && apiVault.THEODDS_API_KEY) {
+    apiKeyToUse = apiVault.THEODDS_API_KEY;
+  } else if (userKey) {
+    try {
+      const keys = JSON.parse(userKey);
+      if (keys.theodds) apiKeyToUse = keys.theodds;
+    } catch (e) {}
+  }
+  
+  if (!apiKeyToUse && req.query.apiKey) {
+    apiKeyToUse = req.query.apiKey;
+  }
+
+  // Si no hay API key tras intentar todas las vías, devolver error para evitar fallo en TheOdds
+  if (!apiKeyToUse) {
+    return res.status(401).json({ error: 'Missing API Key for TheOdds API' });
+  }
+
+  // Modificar req.url para asegurar que incluya el apiKey
+  // Quitamos cualquier apiKey existente para no duplicar
+  const urlObj = new URL(req.url, 'http://localhost');
+  urlObj.searchParams.set('apiKey', apiKeyToUse);
+  req.url = urlObj.pathname + urlObj.search;
+
+  next();
+}, createProxyMiddleware({
+  target: 'https://api.the-odds-api.com',
+  changeOrigin: true,
+  pathRewrite: { '^/_oddsapi': '' },
+  on: {
+    error: (err, req, res) => {
+      console.error(`[Proxy error] TheOdds API: ${err.message}`);
+      if (res && res.writeHead) res.status(502).json({ error: 'Backend unavailable' });
+    }
+  }
+}));
+
 // ── LiveKit WebSocket proxy ──
 app.use('/rtc', createProxyMiddleware({
   target: 'http://host.docker.internal:7880',
@@ -407,6 +493,56 @@ app.use('/rtc', createProxyMiddleware({
     },
   },
 }));
+
+// ── Generic AI Proxy Endpoints for GodMode Ecosystem ──
+const createAIProxy = (path, target, extractUserKey, injectGodModeKey) => {
+  app.use(path, (req, res, next) => {
+    const godmodeToken = req.headers['x-godmode-token'];
+    const userKeyHeader = req.headers['x-user-custom-keys'];
+    
+    let keyToUse = null;
+    if (godmodeToken && godmodeToken === apiVault.GODMODE_MASTER_TOKEN) {
+      keyToUse = injectGodModeKey();
+    } else if (userKeyHeader) {
+      try {
+        const keys = JSON.parse(userKeyHeader);
+        keyToUse = extractUserKey(keys);
+      } catch (e) {}
+    }
+    
+    req.proxyAuthKey = keyToUse;
+    next();
+  }, createProxyMiddleware({
+    target,
+    changeOrigin: true,
+    ws: true,
+    pathRewrite: { [`^${path}`]: '' },
+    on: {
+      proxyReq: (proxyReq, req, res) => {
+        if (req.proxyAuthKey) {
+          if (path.includes('gemini')) {
+            proxyReq.path = proxyReq.path.includes('?') 
+              ? `${proxyReq.path}&key=${req.proxyAuthKey}`
+              : `${proxyReq.path}?key=${req.proxyAuthKey}`;
+          } else {
+            proxyReq.setHeader('Authorization', `Bearer ${req.proxyAuthKey}`);
+          }
+        }
+      },
+      error: (err, req, res) => {
+        console.error(`[AI Proxy error] ${path}: ${err.message}`);
+        if (res && res.writeHead) res.status(502).json({ error: 'AI Backend unavailable' });
+      }
+    }
+  }));
+};
+
+createAIProxy('/_api/tavily', 'https://api.tavily.com', k => k.tavily, () => apiVault.TAVILY_API_KEY);
+createAIProxy('/_api/gemini', 'https://generativelanguage.googleapis.com', k => k.gemini, () => apiVault.GEMINI_API_KEY);
+createAIProxy('/_api/openrouter', 'https://openrouter.ai/api', k => k.openrouter, () => apiVault.OPENROUTER_API_KEY);
+createAIProxy('/_api/groq', 'https://api.groq.com', k => k.groq, () => apiVault.GROQ_API_KEY);
+createAIProxy('/_api/anthropic', 'https://api.anthropic.com', k => k.anthropic, () => apiVault.ANTHROPIC_API_KEY);
+
 
 // ── Static files & SPA fallback ──
 app.use(express.static(WWW, {

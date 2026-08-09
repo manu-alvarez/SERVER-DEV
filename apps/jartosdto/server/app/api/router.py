@@ -11,22 +11,45 @@ from pydantic import BaseModel
 import httpx
 
 from app.db.vector import vector_db
+from app.config import get_settings
 
 api_router = APIRouter()
+settings = get_settings()
+
+def _get_api_keys(req: Request) -> dict:
+    """Helper to extract API keys considering GodMode injection from proxy and user custom keys."""
+    keys = {}
+    is_godmode = req.headers.get("x-godmode-active") == "true"
+    
+    # 1. Start with injected headers (highest priority if GodMode)
+    if is_godmode:
+        if req.headers.get("x-injected-openai"): keys["openai"] = req.headers.get("x-injected-openai")
+        if req.headers.get("x-injected-anthropic"): keys["anthropic"] = req.headers.get("x-injected-anthropic")
+        if req.headers.get("x-injected-google"): keys["gemini"] = req.headers.get("x-injected-google")
+        if req.headers.get("x-injected-groq"): keys["groq"] = req.headers.get("x-injected-groq")
+        if req.headers.get("x-injected-openrouter"): keys["openrouter"] = req.headers.get("x-injected-openrouter")
+        if req.headers.get("x-injected-tavily"): keys["tavily"] = req.headers.get("x-injected-tavily")
+        
+    # 2. Add user custom keys from frontend (if not already set by GodMode)
+    custom_keys_str = req.headers.get("x-user-custom-keys") or req.headers.get("x-custom-api-keys") or "{}"
+    try:
+        custom_keys = json.loads(custom_keys_str)
+        for k, v in custom_keys.items():
+            if k not in keys and v:
+                keys[k] = v
+    except json.JSONDecodeError:
+        pass
+        
+    return keys
 
 @api_router.get("/models/")
 async def get_models(req: Request):
-    keys_str = req.headers.get("x-custom-api-keys", "{}")
-    admin_token = req.headers.get("x-msbross-admin-token")
-    try:
-        api_keys = json.loads(keys_str)
-    except Exception as e:
-        logger.warning(f"Failed to parse x-custom-api-keys: {e}")
-        api_keys = {}
+    api_keys = _get_api_keys(req)
+    is_godmode = req.headers.get("x-godmode-active") == "true"
 
     models = []
     
-    if admin_token == "msbross-master-key-2026":
+    if is_godmode:
         # En God Mode, inyectamos los modelos premium estáticos directamente
         models.extend([
             {"id": "openai:gpt-4o", "provider": "openai", "display_name": "OpenAI: GPT-4o (God Mode)", "is_vision": True, "is_thinking": False},
@@ -39,7 +62,7 @@ async def get_models(req: Request):
     
     async with httpx.AsyncClient(timeout=10.0) as client:
         # OpenRouter
-        if api_keys.get("openrouter"):
+        if api_keys.get("openrouter") or getattr(settings, "openrouter_api_key", None):
             try:
                 res = await client.get("https://openrouter.ai/api/v1/models")
                 if res.status_code == 200:
@@ -58,9 +81,10 @@ async def get_models(req: Request):
                 logger.error(f"Error checking model provider: {e}")
 
         # Groq
-        if api_keys.get("groq"):
+        groq_key = api_keys.get("groq") or getattr(settings, "groq_api_key", None)
+        if groq_key:
             try:
-                res = await client.get("https://api.groq.com/openai/v1/models", headers={"Authorization": f"Bearer {api_keys['groq']}"})
+                res = await client.get("https://api.groq.com/openai/v1/models", headers={"Authorization": f"Bearer {groq_key}"})
                 if res.status_code == 200:
                     data = res.json().get("data", [])
                     # Filter: exclude non-chat models (whisper, distil-whisper, tts, etc.)
@@ -80,9 +104,10 @@ async def get_models(req: Request):
                 logger.error(f"Error checking model provider: {e}")
                 
         # OpenAI
-        if api_keys.get("openai"):
+        openai_key = api_keys.get("openai") or getattr(settings, "openai_api_key", None)
+        if openai_key:
             try:
-                res = await client.get("https://api.openai.com/v1/models", headers={"Authorization": f"Bearer {api_keys['openai']}"})
+                res = await client.get("https://api.openai.com/v1/models", headers={"Authorization": f"Bearer {openai_key}"})
                 if res.status_code == 200:
                     data = res.json().get("data", [])
                     # Filter only gpt and o1/o3 models to avoid cluttering with DALL-E, TTS, etc.
@@ -99,10 +124,11 @@ async def get_models(req: Request):
                 logger.error(f"Error checking model provider: {e}")
 
         # Anthropic
-        if api_keys.get("anthropic"):
+        anthropic_key = api_keys.get("anthropic") or getattr(settings, "anthropic_api_key", None)
+        if anthropic_key:
             try:
                 res = await client.get("https://api.anthropic.com/v1/models", headers={
-                    "x-api-key": api_keys["anthropic"],
+                    "x-api-key": anthropic_key,
                     "anthropic-version": "2023-06-01"
                 })
                 if res.status_code == 200:
@@ -120,9 +146,10 @@ async def get_models(req: Request):
                 logger.error(f"Error checking model provider: {e}")
                 
         # Gemini (Google AI Studio)
-        if api_keys.get("gemini"):
+        gemini_key = api_keys.get("gemini") or getattr(settings, "google_api_key", None)
+        if gemini_key:
             try:
-                res = await client.get(f"https://generativelanguage.googleapis.com/v1beta/models?key={api_keys['gemini']}")
+                res = await client.get(f"https://generativelanguage.googleapis.com/v1beta/models?key={gemini_key}")
                 if res.status_code == 200:
                     data = res.json().get("models", [])
                     for m in data:
@@ -150,7 +177,11 @@ async def get_models(req: Request):
         
         for prov_key, default_base, display_prefix in custom_providers:
             val = api_keys.get(prov_key)
-            if not val: continue
+            if not val:
+                if prov_key == "ollama":
+                    val = getattr(settings, "ollama_base_url", "http://100.100.2.10:11434")
+                else:
+                    continue
             
             # If default_base is None, we expect the user to have provided the base URL
             if default_base:
@@ -158,17 +189,22 @@ async def get_models(req: Request):
                 headers = {"Authorization": f"Bearer {val}"}
             else:
                 base_url = val.rstrip('/')
-                # Auto-correct https to http for Tailscale/local IPs which rarely have valid SSL
-                if base_url.startswith("https://") and any(x in base_url for x in ["100.", "192.", "10.", "127.", "localhost"]):
-                    base_url = base_url.replace("https://", "http://")
+                if not base_url.startswith("http://") and not base_url.startswith("https://"):
+                    base_url = "http://" + base_url
+                    
                 headers = {}
                 
             try:
-                res = await client.get(f"{base_url}/v1/models", headers=headers)
+                endpoint = f"{base_url}/v1/models"
+                if prov_key == "ollama":
+                    endpoint = f"{base_url}/api/tags"
+
+                logger.info(f"Attempting to fetch models from {prov_key} at {endpoint}")
+                res = await client.get(endpoint, headers=headers)
                 if res.status_code == 200:
                     data = res.json().get("data", [])
                     # Support Ollama's /api/tags format if it returned that
-                    if not data and "models" in res.json():
+                    if prov_key == "ollama" and "models" in res.json():
                         data = res.json()["models"]
                         
                     for m in data:
@@ -257,14 +293,9 @@ async def chat_completions(req: Request, body: ChatRequest):
     """
     Handles RAG chat and connects to the user's selected model using their custom API keys.
     """
-    # 1. Parse custom API keys from header
-    keys_str = req.headers.get("x-custom-api-keys", "{}")
-    admin_token = req.headers.get("x-msbross-admin-token")
-    try:
-        api_keys = json.loads(keys_str)
-    except Exception as e:
-        logger.warning(f"Failed to parse x-custom-api-keys: {e}")
-        api_keys = {}
+    # 1. Parse API keys considering GodMode
+    api_keys = _get_api_keys(req)
+    is_godmode = req.headers.get("x-godmode-active") == "true"
         
     user_query = body.messages[-1].content
     
@@ -299,55 +330,59 @@ async def chat_completions(req: Request, body: ChatRequest):
 
     if prov == "groq":
         base_url = "https://api.groq.com/openai/v1/chat/completions"
-        api_key = api_keys.get("groq")
+        api_key = api_keys.get("groq") or getattr(settings, "groq_api_key", None)
     elif prov == "openai":
         base_url = "https://api.openai.com/v1/chat/completions"
-        api_key = api_keys.get("openai")
+        api_key = api_keys.get("openai") or getattr(settings, "openai_api_key", None)
     elif prov == "gemini":
         # Google provides an OpenAI-compatible endpoint
         base_url = f"https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
-        api_key = api_keys.get("gemini")
+        api_key = api_keys.get("gemini") or getattr(settings, "google_api_key", None)
     elif prov == "anthropic":
         # Use Anthropic's OpenAI-compatible chat completions endpoint via their proxy
         # Anthropic doesn't have an OpenAI-compat endpoint natively.
         # Route via OpenRouter if key is available, else error.
-        if api_keys.get("openrouter"):
+        or_key = api_keys.get("openrouter") or getattr(settings, "openrouter_api_key", None)
+        if or_key:
             base_url = "https://openrouter.ai/api/v1/chat/completions"
             model_id = f"anthropic/{model_id}"  # OpenRouter expects this format
-            api_key = api_keys.get("openrouter")
+            api_key = or_key
         else:
             base_url = None
             api_key = None
     elif prov == "mistral":
         base_url = "https://api.mistral.ai/v1/chat/completions"
-        api_key = api_keys.get("mistral")
+        api_key = api_keys.get("mistral") or getattr(settings, "mistral_api_key", None)
     elif prov == "minimax":
         base_url = "https://api.minimax.chat/v1/chat/completions"
         api_key = api_keys.get("minimax")
     elif prov in ["ollama", "llamacpp", "lmstudio", "vllm"]:
-        custom_url = api_keys.get(prov, "").rstrip('/')
+        custom_url = api_keys.get(prov, "")
+        if prov == "ollama" and not custom_url:
+            custom_url = getattr(settings, "ollama_base_url", "http://100.100.2.10:11434")
+            
+        custom_url = custom_url.rstrip('/')
         if custom_url.startswith("https://") and any(x in custom_url for x in ["100.", "192.", "10.", "127.", "localhost"]):
             custom_url = custom_url.replace("https://", "http://")
+            
+        if custom_url and not custom_url.startswith("http://") and not custom_url.startswith("https://"):
+            custom_url = "http://" + custom_url
+            
         base_url = f"{custom_url}/v1/chat/completions" if custom_url else None
         api_key = "sk-local"
     elif "/" in raw_model_id:
         # OpenRouter-style model IDs contain a slash (e.g. "nvidia/nemotron-nano-12b")
         base_url = "https://openrouter.ai/api/v1/chat/completions"
         model_id = raw_model_id
-        api_key = api_keys.get("openrouter")
+        api_key = api_keys.get("openrouter") or getattr(settings, "openrouter_api_key", None)
     else:
         # Fallback: try OpenRouter
         base_url = "https://openrouter.ai/api/v1/chat/completions"
         model_id = raw_model_id
-        api_key = api_keys.get("openrouter")
+        api_key = api_keys.get("openrouter") or getattr(settings, "openrouter_api_key", None)
 
-    # 🚀 God Mode Intercept
-    if admin_token == "msbross-master-key-2026":
-        # Route directly to the secure MSBross Admin LLM proxy
-        base_url = "https://llm.manuelalvarez.dev/v1/chat/completions"
-        api_key = admin_token
-        # The proxy handles OpenRouter / OpenAI natively, so just pass the raw model ID
-        model_id = raw_model_id.split(":", 1)[-1] if ":" in raw_model_id else raw_model_id
+    # God Mode no longer redirects to a hardcoded proxy LLM URL.
+    # It just seamlessly uses the x-injected headers set by the proxy (done in _get_api_keys).
 
     if not api_key:
         async def mock_error():

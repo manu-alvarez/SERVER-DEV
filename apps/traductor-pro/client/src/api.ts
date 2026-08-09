@@ -58,9 +58,15 @@ export type HistoryEntry = z.infer<typeof HistoryEntrySchema>;
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/_traductor/api';
 
 export async function processText(payload: ProcessPayload): Promise<ProcessResult> {
+  const godmode = localStorage.getItem('msbross_godmode_token');
+  const userKeysStr = localStorage.getItem('msbross_user_api_key');
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (godmode) headers['x-godmode-token'] = godmode;
+  if (userKeysStr) headers['x-user-custom-keys'] = userKeysStr;
+
   const res = await fetch(`${API_BASE}/process`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
@@ -72,9 +78,15 @@ export async function processText(payload: ProcessPayload): Promise<ProcessResul
 }
 
 export async function processExtras(payload: ExtrasPayload): Promise<ExtrasResult> {
+  const godmode = localStorage.getItem('msbross_godmode_token');
+  const userKeysStr = localStorage.getItem('msbross_user_api_key');
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (godmode) headers['x-godmode-token'] = godmode;
+  if (userKeysStr) headers['x-user-custom-keys'] = userKeysStr;
+
   const res = await fetch(`${API_BASE}/extras`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
@@ -88,8 +100,15 @@ export async function processExtras(payload: ExtrasPayload): Promise<ExtrasResul
 export async function extractText(file: File): Promise<string> {
   const formData = new FormData();
   formData.append('file', file);
+  const godmode = localStorage.getItem('msbross_godmode_token');
+  const userKeysStr = localStorage.getItem('msbross_user_api_key');
+  const headers: Record<string, string> = {};
+  if (godmode) headers['x-godmode-token'] = godmode;
+  if (userKeysStr) headers['x-user-custom-keys'] = userKeysStr;
+
   const res = await fetch(`${API_BASE}/documents/extract-text`, {
     method: 'POST',
+    headers,
     body: formData,
   });
   if (!res.ok) {

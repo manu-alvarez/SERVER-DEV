@@ -96,7 +96,7 @@ async def _mux_video_and_audio(video_path: str, audio_path: str, output_path: st
         return False
 
 
-async def generate_video_for_story(session: AsyncSession, story_id: str) -> None:
+async def generate_video_for_story(session: AsyncSession, story_id: str, auth_headers: dict = None) -> None:
     """Generate video clips for all chapters, mux with audio, and concat into a final story video."""
     logger.info(f"Generating video for story_id={story_id}")
 

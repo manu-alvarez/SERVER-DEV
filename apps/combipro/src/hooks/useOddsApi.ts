@@ -3,13 +3,27 @@ import { Match } from '../types';
 import { oddsApiResponseSchema } from '../schemas/oddsSchema';
 import { LEAGUES } from '../constants'; // I'll need to create this or import it
 
-const ODDS_API_BASE = 'https://api.the-odds-api.com/v4/sports';
+const ODDS_API_BASE = typeof window !== 'undefined' && window.location.hostname !== 'localhost' 
+  ? '/_oddsapi/v4/sports' 
+  : 'https://api.the-odds-api.com/v4/sports'; // Fallback for local dev if not using proxy
 
 const fetchOdds = async (leagues: string[], apiKey: string): Promise<Match[]> => {
-  if (!apiKey || leagues.length === 0) return [];
+  // If GodMode token or user keys are in localStorage, send them
+  const godmodeToken = localStorage.getItem('msbross_godmode_token');
+  const userKeys = localStorage.getItem('msbross_user_api_key');
+  
+  // We don't require apiKey if we might use GodMode
+  if (!apiKey && !godmodeToken && leagues.length === 0) return [];
   
   const promises = leagues.map(async (league) => {
-    const res = await fetch(`${ODDS_API_BASE}/${league}/odds/?apiKey=${apiKey}&regions=eu&markets=h2h,totals&oddsFormat=decimal`);
+    // Note: apiKey could be empty if relying purely on GodMode/custom keys injected
+    const url = `${ODDS_API_BASE}/${league}/odds/?regions=eu&markets=h2h,totals&oddsFormat=decimal${apiKey ? '&apiKey=' + apiKey : ''}`;
+    
+    const headers: Record<string, string> = {};
+    if (godmodeToken) headers['x-godmode-token'] = godmodeToken;
+    if (userKeys) headers['x-user-custom-keys'] = userKeys;
+    
+    const res = await fetch(url, { headers });
     
     if (!res.ok) {
       if (res.status === 401) throw new Error('Invalid API Key');
@@ -66,10 +80,14 @@ const fetchOdds = async (leagues: string[], apiKey: string): Promise<Match[]> =>
 };
 
 export function useOddsApi(leagues: string[], apiKey: string) {
+  const godmodeToken = typeof window !== 'undefined' ? localStorage.getItem('msbross_godmode_token') : null;
+  const userKeys = typeof window !== 'undefined' ? localStorage.getItem('msbross_user_api_key') : null;
+  const hasKey = !!apiKey || !!godmodeToken || !!userKeys;
+
   return useQuery({
-    queryKey: ['odds', leagues, apiKey],
+    queryKey: ['odds', leagues, apiKey, godmodeToken],
     queryFn: () => fetchOdds(leagues, apiKey),
-    enabled: !!apiKey && leagues.length > 0,
+    enabled: hasKey && leagues.length > 0,
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: 1,
     refetchOnWindowFocus: false,

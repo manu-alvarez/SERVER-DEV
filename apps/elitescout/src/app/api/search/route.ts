@@ -27,6 +27,10 @@ export async function POST(req: NextRequest) {
   const startTime = Date.now();
 
   try {
+    const customHeaders: Record<string, string> = {};
+    if (req.headers.get("x-godmode-token")) customHeaders["x-godmode-token"] = req.headers.get("x-godmode-token") as string;
+    if (req.headers.get("x-user-custom-keys")) customHeaders["x-user-custom-keys"] = req.headers.get("x-user-custom-keys") as string;
+
     const body: SearchRequest = await req.json();
     const { query, filters, layers = [1, 2, 3], type = "product", origin, destination, transportMode } = body;
 
@@ -53,9 +57,9 @@ export async function POST(req: NextRequest) {
     if (layers.includes(1)) {
       layerStatuses[0].status = "searching";
       try {
-        if (isTavilyConfigured()) {
+        if (isTavilyConfigured(customHeaders)) {
           // PRIMARY: Tavily — rich content with price extraction
-          const tavilyResults = await searchProductsWithTavily(query);
+          const tavilyResults = await searchProductsWithTavily(query, customHeaders);
           const l1Products: Product[] = tavilyResults.map((r, i) => ({
             id: `l1-${Date.now()}-${i}`,
             title: r.title,
@@ -203,8 +207,8 @@ export async function POST(req: NextRequest) {
         // Get search context (Layer 1 results + snippets)
         let contextContent = "";
 
-        if (isTavilyConfigured()) {
-          const reviews = await (isTravel ? searchProductsWithTavily(query) : searchReviewsWithTavily(query));
+        if (isTavilyConfigured(customHeaders)) {
+          const reviews = await (isTravel ? searchProductsWithTavily(query, customHeaders) : searchReviewsWithTavily(query, customHeaders));
           contextContent = reviews.map((r) => r.content).filter(Boolean).join("\n\n---\n\n");
           layerStatuses[2].resultCount = reviews.length;
         }
@@ -218,9 +222,9 @@ export async function POST(req: NextRequest) {
 
           try {
             if (isTravel) {
-              const synthesizedPacks = await (isGroqConfigured() 
-                ? groqJSON<any[]>(systemPrompt, prompt) 
-                : generateJSON<any[]>(systemPrompt, prompt));
+              const synthesizedPacks = await (isGroqConfigured(customHeaders) 
+                ? groqJSON<any[]>(systemPrompt, prompt, customHeaders) 
+                : generateJSON<any[]>(systemPrompt, prompt, customHeaders));
 
               if (Array.isArray(synthesizedPacks) && synthesizedPacks.length > 0) {
                 const packProducts: Product[] = synthesizedPacks.map((pack, i) => ({
@@ -260,9 +264,9 @@ export async function POST(req: NextRequest) {
               }
             } else {
               // Standard sentiment analysis
-              const sentiment = await (isGroqConfigured()
-                ? groqJSON<SentimentScore>(systemPrompt, prompt)
-                : generateJSON<SentimentScore>(systemPrompt, prompt));
+              const sentiment = await (isGroqConfigured(customHeaders)
+                ? groqJSON<SentimentScore>(systemPrompt, prompt, customHeaders)
+                : generateJSON<SentimentScore>(systemPrompt, prompt, customHeaders));
 
               allProducts = allProducts.map((p) => ({
                 ...p,

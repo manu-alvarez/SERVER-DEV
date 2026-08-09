@@ -20,14 +20,28 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { diagnosticReport } = body as { diagnosticReport: DiagnosticReport };
 
-    // Usar la clave gratuita del servidor (Level 99)
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
+    const godmodeToken = req.headers.get('x-godmode-token');
+    const userKeysStr = req.headers.get('x-user-custom-keys');
+
+    // Usar la clave gratuita del servidor (Level 99) si no hay godmode ni user keys
+    const apiKey = process.env.GEMINI_API_KEY || "dummy_key";
+    if (!apiKey && !godmodeToken && !userKeysStr) {
       logTelemetry("AI_GENERATE", 500, "Missing GEMINI_API_KEY in env");
       return NextResponse.json({ error: "El servidor no tiene configurada su API Key gratuita." }, { status: 500 });
     }
 
-    const ai = new GoogleGenAI({ apiKey });
+    let httpOptions;
+    if (godmodeToken || userKeysStr) {
+      httpOptions = {
+        baseUrl: "http://127.0.0.1:8080/_api/gemini",
+        headers: {
+          ...(godmodeToken && { 'x-godmode-token': godmodeToken }),
+          ...(userKeysStr && { 'x-user-custom-keys': userKeysStr })
+        }
+      };
+    }
+
+    const ai = new GoogleGenAI({ apiKey, httpOptions });
 
     if (!diagnosticReport || !diagnosticReport.weakAreas) {
       logTelemetry("AI_GENERATE", 400, "Invalid diagnostic report");

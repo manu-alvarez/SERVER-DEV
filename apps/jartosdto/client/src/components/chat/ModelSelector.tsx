@@ -27,9 +27,14 @@ export default function ModelSelector() {
       setModels(newModels);
       
       if (newModels.length > 0) {
+        const saved = localStorage.getItem("jartosdto-model");
         const currentSelected = useChatStore.getState().selectedModel;
-        if (!newModels.find(m => m.id === currentSelected)) {
-          useChatStore.getState().setSelectedModel(newModels[0].id);
+        if (saved && newModels.find(m => m.id === saved)) {
+          if (currentSelected !== saved) {
+            useChatStore.getState().setSelectedModel(saved);
+          }
+        } else if (currentSelected && !newModels.find(m => m.id === currentSelected)) {
+          useChatStore.getState().setSelectedModel("");
         }
       }
     }).catch(() => {});
@@ -40,15 +45,15 @@ export default function ModelSelector() {
   return (
     <div style={{ position: "relative" }}>
       <button onClick={() => setOpen(!open)} className="btn-ghost" style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px" }}>
-        <span style={{ width: 8, height: 8, borderRadius: "50%", background: PROVIDER_COLORS[current?.provider || "openai"] || "#888" }} />
-        <span style={{ fontSize: 13, fontWeight: 500 }}>{current?.display_name || selectedModel}</span>
+        <span style={{ width: 8, height: 8, borderRadius: "50%", background: current ? (PROVIDER_COLORS[current.provider] || "#888") : "transparent" }} />
+        <span style={{ fontSize: 13, fontWeight: 500 }}>{current?.display_name || (selectedModel ? selectedModel : "Seleccionar modelo...")}</span>
         <span style={{ fontSize: 10 }}>{open ? "▲" : "▼"}</span>
       </button>
 
       {open && (
         <div className="glass-card" style={{ position: "absolute", top: "100%", left: 0, marginTop: 4, width: 300, maxHeight: 400, overflowY: "auto", zIndex: 100, padding: 6 }}>
           {models.map(m => (
-            <button key={m.id} onClick={() => { setSelectedModel(m.id); setOpen(false); }}
+            <button key={m.id} onClick={() => { setSelectedModel(m.id); localStorage.setItem("jartosdto-model", m.id); setOpen(false); }}
               style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", padding: "10px 12px", border: "none", borderRadius: 8, background: m.id === selectedModel ? "var(--accent-glow)" : "transparent", color: m.id === selectedModel ? "var(--text-accent)" : "var(--text-primary)", cursor: "pointer", textAlign: "left", fontSize: 13, transition: "background 0.1s" }}
               onMouseEnter={e => { if (m.id !== selectedModel) e.currentTarget.style.background = "var(--bg-hover)"; }}
               onMouseLeave={e => { if (m.id !== selectedModel) e.currentTarget.style.background = "transparent"; }}

@@ -115,6 +115,44 @@ async def get_public_token(request: Request):
     if not livekit_url:
         raise HTTPException(status_code=500, detail="LIVEKIT_URL not configured")
 
+    from livekit.api import AccessToken, VideoGrants
+    import json
+    
+    try:
+        data = await request.json()
+        caller_name = data.get("caller_name", "Cliente")
+    except:
+        caller_name = "Cliente"
+        
+    room_name = f"atenea-{os.urandom(4).hex()}"
+    
+    godmode_token = request.headers.get("x-godmode-token", "")
+    custom_keys = request.headers.get("x-user-custom-keys", "")
+
+    token = AccessToken(api_key, api_secret) \
+        .with_identity(f"cliente-{os.urandom(4).hex()}") \
+        .with_name(caller_name) \
+        .with_grants(VideoGrants(room_join=True, room=room_name))
+        
+    metadata = {}
+    if godmode_token:
+        metadata["x-godmode-token"] = godmode_token
+    if custom_keys:
+        metadata["x-user-custom-keys"] = custom_keys
+        
+    if metadata:
+        token = token.with_metadata(json.dumps(metadata))
+        
+    jwt = token.to_jwt()
+
+    await _dispatch_agent(livekit_url, api_key, api_secret, room_name)
+
+    return {
+        "accessToken": jwt,
+        "livekitUrl": livekit_url,
+        "room": room_name
+    }
+
 
 from fastapi.staticfiles import StaticFiles
 

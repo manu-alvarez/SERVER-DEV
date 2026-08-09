@@ -41,7 +41,7 @@ sync_app "apps/gas-station/dist" "gas-station"
 sync_app "apps/livekit-nikolina/frontend/dist" "livekit-nikolina"
 sync_app "apps/taskflow-pro/dist" "taskflow"
 sync_app "apps/traductor-pro/client/dist" "traductor-pro"
-sync_app "apps/it-english-coach-frontend/dist" "it-english-coach"
+sync_app "apps/it-english-coach/dist" "it-english-coach"
 sync_app "apps/cv-portfolio/dist" "cv"
 
 # Special apps (no build, just raw frontend or index.html)

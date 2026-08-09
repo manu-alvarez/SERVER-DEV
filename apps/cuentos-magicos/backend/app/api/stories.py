@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,6 +29,7 @@ router = APIRouter(prefix="/api/stories", tags=["stories"])
 
 @router.post("/generate", response_model=StoryGenerateResponse)
 async def generate_story(
+    request: Request,
     payload: StoryGenerateRequest,
     session: AsyncSession = Depends(get_session),
     user_id: Optional[str] = None,
@@ -76,9 +77,18 @@ async def generate_story(
     await session.commit()
     await session.refresh(story)
 
+    # Extract GodMode headers
+    godmode_token = request.headers.get('x-godmode-token')
+    user_keys = request.headers.get('x-user-custom-keys')
+    auth_headers = {}
+    if godmode_token:
+        auth_headers['x-godmode-token'] = godmode_token
+    if user_keys:
+        auth_headers['x-user-custom-keys'] = user_keys
+
     # --- ASYNCHRONOUS EXECUTION VIA CELERY ---
     # 1. Launch Text Generation Task
-    story_text_generation_task.delay(str(story.id), tier_limits)
+    story_text_generation_task.delay(str(story.id), tier_limits, auth_headers)
     
     return StoryGenerateResponse(
         story_id=str(story.id),

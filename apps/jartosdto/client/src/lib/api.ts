@@ -81,8 +81,10 @@ async function apiFetch(path: string, opts: RequestInit = {}): Promise<Response>
   if (!(opts.body instanceof FormData)) {
     headers["Content-Type"] = "application/json";
   }
-  const adminToken = typeof window !== "undefined" ? localStorage.getItem('msbross_admin_token') : null;
-  if (adminToken) headers["x-msbross-admin-token"] = adminToken;
+  const adminToken = typeof window !== "undefined" ? localStorage.getItem('msbross_godmode_token') : null;
+  const customKeys = typeof window !== "undefined" ? localStorage.getItem('msbross_user_api_key') : null;
+  if (adminToken) headers["x-godmode-token"] = adminToken;
+  if (customKeys) headers["x-user-custom-keys"] = customKeys;
   
   const baseUrl = typeof window !== "undefined" ? "" : API_URL;
   return fetch(`${baseUrl}/_jartosdto/api/v1${path}`, { ...opts, headers });
@@ -239,16 +241,17 @@ export async function streamChat(body: {
   });
   saveMessagesLocal(targetConvId, existingMsgs);
 
-  const adminToken = typeof window !== "undefined" ? localStorage.getItem('msbross_admin_token') : null;
+  const adminToken = typeof window !== "undefined" ? localStorage.getItem('msbross_godmode_token') : null;
+  const customKeys = typeof window !== "undefined" ? localStorage.getItem('msbross_user_api_key') : null;
 
   // 3. Fetch from backend
   const res = await fetch(`${baseUrl}/_jartosdto/api/v1/chat/completions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-custom-api-keys": JSON.stringify(keys),
+      ...(customKeys ? { "x-user-custom-keys": customKeys } : {}),
       ...(t ? { Authorization: `Bearer ${t}` } : {}),
-      ...(adminToken ? { "x-msbross-admin-token": adminToken } : {}),
+      ...(adminToken ? { "x-godmode-token": adminToken } : {}),
     },
     body: JSON.stringify({ ...body, stream: true }),
   });

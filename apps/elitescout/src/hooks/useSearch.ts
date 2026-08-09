@@ -35,9 +35,17 @@ export function useSearch(options: SearchOptions = {}) {
   const { data, isLoading, error, refetch } = useQuery<SearchResponse>({
     queryKey: ["search", submittedQuery, filters, selectedLayers, options.type, options.origin, options.destination, options.transportMode],
     queryFn: async () => {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (typeof window !== "undefined") {
+        const gmToken = localStorage.getItem("godmode_token");
+        const customKeys = localStorage.getItem("user_custom_keys");
+        if (gmToken) headers["x-godmode-token"] = gmToken;
+        if (customKeys) headers["x-user-custom-keys"] = customKeys;
+      }
+
       const res = await fetch(apiUrl("/app/elitescout/api/search/"), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ 
           query: submittedQuery, 
           filters, 

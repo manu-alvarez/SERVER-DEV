@@ -50,17 +50,15 @@ export default function MessageBubble({
 
   return (
     <div
+      className="flex mb-4 px-2 sm:px-5"
       style={{
-        display: "flex",
         justifyContent: isUser ? "flex-end" : "flex-start",
-        marginBottom: 16,
-        padding: "0 20px",
       }}
     >
       <div
+        className="w-full sm:w-auto"
         style={{
-          maxWidth: isUser ? "75%" : "85%",
-          width: isUser ? "auto" : "100%",
+          maxWidth: isUser ? "95%" : "100%",
         }}
       >
         {/* Role label and Voice button */}
@@ -79,7 +77,7 @@ export default function MessageBubble({
         )}
 
         {/* Message body */}
-        <div className={isUser ? "message-user" : "message-assistant"} style={{ padding: isUser ? "12px 16px" : "0" }}>
+        <div className={isUser ? "message-user" : "message-assistant"} style={{ padding: isUser ? "8px 12px" : "0" }}>
           <div className={`markdown-body ${isStreaming ? "streaming-cursor" : ""}`}>
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}

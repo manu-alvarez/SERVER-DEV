@@ -1,13 +1,22 @@
 import { motion } from 'framer-motion';
 import { ModelSelector } from './ModelSelector';
 import { Wrench, AudioLines } from 'lucide-react';
+import { Orb } from 'orb-ui';
 
 export function HeroCards() {
   return (
     <div className="flex flex-col items-center md:justify-center min-h-[70vh] w-full px-4 relative z-20 perspective-1000 pb-32">
       
-      {/* Dynamic Aura Glow behind Title */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg h-32 bg-gradient-to-r from-[#00ffcc]/30 via-[#ffcc00]/20 to-[#aa3bff]/30 blur-[80px] -z-10 rounded-full mix-blend-screen animate-pulse pointer-events-none"></div>
+      {/* C2 Orb — Reactive Core */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1.2, type: 'spring', bounce: 0.3 }}
+        className="mb-8"
+        style={{ filter: 'drop-shadow(0 0 40px rgba(0, 255, 204, 0.4))' }}
+      >
+        <Orb state="idle" theme="circle" size={140} aria-label="MSBrOSs Command Center" />
+      </motion.div>
 
       {/* Massive Gradient Title with 3D Pop */}
       <motion.h1 

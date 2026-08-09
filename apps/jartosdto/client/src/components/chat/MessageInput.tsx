@@ -68,7 +68,7 @@ export default function MessageInput({
   };
 
   return (
-    <div style={{ padding: "12px 20px 20px", borderTop: "1px solid var(--border-subtle)" }}>
+    <div className="p-2 sm:p-5 border-t border-[var(--border-subtle)]">
       {files.length > 0 && (
         <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
           {files.map((f, i) => (
@@ -79,7 +79,7 @@ export default function MessageInput({
           ))}
         </div>
       )}
-      <div className="glass-card" style={{ display: "flex", alignItems: "flex-end", gap: 8, padding: 8, borderRadius: "var(--radius-lg)" }}>
+      <div className="glass-card flex flex-wrap sm:flex-nowrap items-end gap-2 sm:gap-3 p-2" style={{ borderRadius: "var(--radius-lg)" }}>
         <button onClick={() => fileRef.current?.click()} style={{ background: "transparent", border: "none", color: "var(--text-tertiary)", cursor: "pointer", padding: 8, fontSize: 18, borderRadius: 8 }}>📎</button>
         <input ref={fileRef} type="file" multiple hidden onChange={e => e.target.files && setFiles(Array.from(e.target.files))} />
         <button onClick={() => setWebSearchEnabled(!webSearchEnabled)} style={{ background: webSearchEnabled ? "var(--accent-glow)" : "transparent", border: webSearchEnabled ? "1px solid var(--border-active)" : "none", color: webSearchEnabled ? "var(--text-accent)" : "var(--text-tertiary)", cursor: "pointer", padding: 8, fontSize: 18, borderRadius: 8 }} title={webSearchEnabled ? "Disable web search" : "Enable web search"}>🌐</button>

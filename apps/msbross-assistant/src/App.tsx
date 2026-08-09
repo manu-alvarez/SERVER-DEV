@@ -1,14 +1,15 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ChatContainer } from './components/chat/ChatContainer';
 import { Button } from './components/ui/Button';
-import { Plus, Wrench, Menu } from 'lucide-react';
+import { Plus, Wrench, Menu, Activity } from 'lucide-react';
 import { useChatStore } from './store/useChatStore';
 import { useModels } from './hooks/useModels';
 
 import { StitchPanel } from './components/ui/StitchPanel';
 import { ToolsPanel } from './components/ui/ToolsPanel';
+import { C2Monitor } from './components/ui/C2Monitor';
 import { AnimatePresence } from 'framer-motion';
-import { SettingsModal } from './components/ui/SettingsModal';
+import { ApiConfigModal } from './components/ui/ApiConfigModal';
 import GodModeListener from './components/ui/GodModeListener';
 import { useState } from 'react';
 
@@ -16,7 +17,7 @@ const queryClient = new QueryClient();
 
 import { useQuery } from '@tanstack/react-query';
 
-function Topbar({ onSettingsClick }: { onSettingsClick: () => void }) {
+function Topbar({ onSettingsClick, onMonitorClick }: { onSettingsClick: () => void; onMonitorClick: () => void }) {
   const { setMessages, setIsToolsOpen } = useChatStore();
   const { data: models = [] } = useModels();
   
@@ -44,6 +45,10 @@ function Topbar({ onSettingsClick }: { onSettingsClick: () => void }) {
           <Button variant="ghost" className="text-white/70 hover:text-white gap-2 text-sm font-medium transition-all hover:bg-white/5" onClick={onSettingsClick}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             APIs
+          </Button>
+          <Button variant="ghost" className="text-white/70 hover:text-white gap-2 text-sm font-medium transition-all hover:bg-white/5" onClick={onMonitorClick}>
+            <Activity className="w-4 h-4 text-[#aa3bff]" />
+            Monitor
           </Button>
           <Button variant="ghost" className="text-white/70 hover:text-white gap-2 text-sm font-medium transition-all hover:bg-white/5" onClick={() => { setMessages([]); alert("Nueva sesión iniciada."); }}>
             <Plus className="w-4 h-4 text-[#00ffcc]" />
@@ -78,12 +83,13 @@ function Topbar({ onSettingsClick }: { onSettingsClick: () => void }) {
 function MSBrOSsApp() {
   const { stitch, isToolsOpen } = useChatStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [monitorOpen, setMonitorOpen] = useState(false);
 
   return (
     <div className="h-[100dvh] w-full bg-[#0a0c10] text-white flex flex-col overflow-hidden font-sans relative">
       <GodModeListener />
-      <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
-      <Topbar onSettingsClick={() => setSettingsOpen(true)} />
+      <ApiConfigModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <Topbar onSettingsClick={() => setSettingsOpen(true)} onMonitorClick={() => setMonitorOpen(!monitorOpen)} />
       
       <main className="flex-1 pt-16 relative z-10 flex w-full h-full overflow-hidden">
         {/* Chat Area */}
@@ -96,9 +102,14 @@ function MSBrOSsApp() {
           {stitch.isOpen && <StitchPanel />}
         </AnimatePresence>
         
-        {/* Tools Panel — conditionally rendered for proper AnimatePresence */}
+        {/* Tools Panel */}
         <AnimatePresence>
           {isToolsOpen && <ToolsPanel />}
+        </AnimatePresence>
+
+        {/* C2 Monitor Panel */}
+        <AnimatePresence>
+          {monitorOpen && <C2Monitor isOpen={monitorOpen} onClose={() => setMonitorOpen(false)} />}
         </AnimatePresence>
       </main>
       

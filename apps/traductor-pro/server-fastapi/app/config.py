@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     google_api_key: str = ""
     openrouter_api_key: str = ""
-    ollama_base_url: str = "http://172.20.0.1:11434/v1"
+    ollama_base_url: str = "http://100.100.2.10:11434/v1"
     ollama_model: str = "gemma3:4b"
 
     @property

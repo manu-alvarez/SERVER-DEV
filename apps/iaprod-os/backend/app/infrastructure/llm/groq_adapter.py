@@ -27,7 +27,7 @@ MAX_TOOL_ITERATIONS = 5
 
 # Ollama local models (priority order — best → fastest)
 # Installed on VPS (7 models): deepseek-r1:7b, gemma3:4b, deepseek-r1:1.5b, qwen2.5:3b, phi3:mini, llama3.2:3b, nomic-embed-text
-# Access via Docker bridge gateway (msbross_net: 172.20.0.1)
+# Access via Tailscale private network (100.100.2.10)
 OLLAMA_MODELS = [
     "deepseek-r1:7b",  # 4.5GB — Best reasoning (+thinking capability), ~7.6B params
     "gemma3:4b",       # 3.1GB — Excellent multilingual, ~4.3B params
@@ -36,7 +36,7 @@ OLLAMA_MODELS = [
     "llama3.2:3b",     # 1.9GB — Solid fallback
     "phi3:mini",       # 2.0GB — Lightweight, fast on CPU
 ]
-OLLAMA_BASE_URL = "http://172.20.0.1:11434"
+OLLAMA_BASE_URL = "http://100.100.2.10:11434"
 
 # OpenRouter models (used when Groq is completely unavailable)
 OPENROUTER_MODELS = [

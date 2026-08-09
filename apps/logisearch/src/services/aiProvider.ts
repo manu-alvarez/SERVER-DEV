@@ -57,15 +57,16 @@ function getGroqKeys(): string[] {
 
 // ─── Provider configs ───
 
+const IS_PROXY = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+
 const GEMINI_CONFIG: AIProviderConfig = {
     name: 'Gemini',
-    baseUrl: 'https://generativelanguage.googleapis.com/v1beta/models',
+    baseUrl: IS_PROXY ? '/_api/gemini/v1beta/models' : 'https://generativelanguage.googleapis.com/v1beta/models',
     keys: [], // populated dynamically
     model: 'gemini-3.5-flash',
     buildRequest: (prompt: string, model: string) => {
-        // Key is appended in the send function
         return {
-            url: `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+            url: `${IS_PROXY ? '/_api/gemini' : 'https://generativelanguage.googleapis.com'}/v1beta/models/${model}:generateContent`,
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
             }),
@@ -81,11 +82,11 @@ const GEMINI_CONFIG: AIProviderConfig = {
 
 const OPENROUTER_CONFIG: AIProviderConfig = {
     name: 'OpenRouter',
-    baseUrl: 'https://openrouter.ai/api/v1/chat/completions',
+    baseUrl: IS_PROXY ? '/_api/openrouter' : 'https://openrouter.ai/api/v1/chat/completions',
     keys: [],
     model: 'meta-llama/llama-3.3-70b-instruct:free', // Free tier, reliable
     buildRequest: (prompt: string, model: string) => ({
-        url: 'https://openrouter.ai/api/v1/chat/completions',
+        url: `${IS_PROXY ? '/_api/openrouter' : 'https://openrouter.ai/api'}/v1/chat/completions`,
         body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: prompt }],
@@ -102,11 +103,11 @@ const OPENROUTER_CONFIG: AIProviderConfig = {
 
 const GROQ_CONFIG: AIProviderConfig = {
     name: 'Groq',
-    baseUrl: 'https://api.groq.com/openai/v1/chat/completions',
+    baseUrl: IS_PROXY ? '/_api/groq/openai/v1/chat/completions' : 'https://api.groq.com/openai/v1/chat/completions',
     keys: [],
     model: 'llama-3.3-70b-versatile',
     buildRequest: (prompt: string, model: string) => ({
-        url: 'https://api.groq.com/openai/v1/chat/completions',
+        url: `${IS_PROXY ? '/_api/groq' : 'https://api.groq.com'}/openai/v1/chat/completions`,
         body: JSON.stringify({
             model,
             messages: [{ role: 'user', content: prompt }],
@@ -147,9 +148,14 @@ async function sendWithRetry(
             let finalUrl = url
             const finalHeaders = { ...headers }
 
-            if (provider.name === 'Gemini') {
+            const godmodeToken = localStorage.getItem('msbross_godmode_token');
+            const userKeys = localStorage.getItem('msbross_user_api_key');
+            if (godmodeToken) finalHeaders['x-godmode-token'] = godmodeToken;
+            if (userKeys) finalHeaders['x-user-custom-keys'] = userKeys;
+
+            if (provider.name === 'Gemini' && !IS_PROXY) {
                 finalUrl = `${url}?key=${key}`
-            } else {
+            } else if (!IS_PROXY) {
                 finalHeaders['Authorization'] = `Bearer ${key}`
             }
 
@@ -198,36 +204,17 @@ async function sendWithRetry(
 // ─── Main export: send to AI with full fallback chain ───
 
 export async function sendToAI(prompt: string): Promise<string> {
-    const adminToken = typeof localStorage !== 'undefined' ? localStorage.getItem('msbross_admin_token') : null;
-
-    if (adminToken) {
-        // MODO DIOS: Use the secure private proxy instead of rotating public keys
-        console.log('🔮 Modo Dios activado: Usando MSBross Private Proxy');
-        try {
-            const response = await fetch('https://llm.manuelalvarez.dev/api/gemini/v1beta/models/gemini-3.5-flash:generateContent', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-msbross-admin-token': adminToken
-                },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                })
-            });
-
-            if (!response.ok) throw new Error(`Proxy error: ${response.status}`);
-            const data = await response.json();
-            const result = GEMINI_CONFIG.parseResponse(data);
-            if (result) return result;
-        } catch (e) {
-            console.error('Proxy falló', e);
-            // Fallback to normal behavior if proxy fails
-        }
-    }
-
     const geminiKeys = getGeminiKeys()
     const openRouterKeys = getOpenRouterKeys()
     const groqKeys = getGroqKeys()
+
+    const hasGodmode = typeof localStorage !== 'undefined' && localStorage.getItem('msbross_godmode_token');
+    const hasUserKeys = typeof localStorage !== 'undefined' && localStorage.getItem('msbross_user_api_key');
+    
+    // Si tenemos modo Dios o claves personalizadas, inyectamos un array dummy para que intente al menos una petición
+    if ((hasGodmode || hasUserKeys) && geminiKeys.length === 0) geminiKeys.push('dummy_key');
+    if ((hasGodmode || hasUserKeys) && openRouterKeys.length === 0) openRouterKeys.push('dummy_key');
+    if ((hasGodmode || hasUserKeys) && groqKeys.length === 0) groqKeys.push('dummy_key');
 
     const errors: string[] = []
 

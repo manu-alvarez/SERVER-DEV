@@ -15,5 +15,20 @@
   <body style="background: #050508;">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      window.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.shiftKey && e.key === 'M') {
+          e.preventDefault();
+          const token = window.prompt('MSBross Bóveda: Introduce el token maestro para activar el Modo Dios (LLM Proxy):');
+          if (token) {
+            localStorage.setItem('msbross_godmode_token', token);
+            alert('Modo Dios activado. Tus peticiones usarán el proxy seguro.');
+          } else if (token === '') {
+            localStorage.removeItem('msbross_godmode_token');
+            alert('Modo Dios desactivado. Usando claves públicas.');
+          }
+        }
+      });
+    </script>
   </body>
 </html>

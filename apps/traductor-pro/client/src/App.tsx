@@ -9,6 +9,7 @@ import { useAppStore } from './store';
 import { Button } from './components/ui/Button';
 import { Select } from './components/ui/Select';
 import { PROVIDERS } from './api';
+import ApiConfigWrapper from './components/ui/ApiConfigWrapper';
 
 export default function App() {
   const [tab, setTab] = useState(0);
@@ -25,6 +26,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-zinc-950 text-slate-200">
+      <ApiConfigWrapper />
       <AmbientGlow />
       
       <div className="relative z-10 container mx-auto px-4 py-8 md:py-12 flex flex-col min-h-screen">

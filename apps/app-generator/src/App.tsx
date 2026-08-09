@@ -1,29 +1,27 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { ChatPanel } from './components/chat/ChatPanel';
 import { SandboxPortal } from './components/sandbox/SandboxPortal';
+import GodModeListener from './components/GodModeListener';
+import ApiConfigModal from './components/ApiConfigModal';
+import { Settings } from 'lucide-react';
 
 export default function App() {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl + Shift + M
-      if (e.ctrlKey && e.shiftKey && e.key === 'M') {
-        e.preventDefault();
-        const token = window.prompt('MSBross Bóveda: Introduce el token maestro para activar el Modo Dios (LLM Proxy):');
-        if (token) {
-          localStorage.setItem('msbross_admin_token', token);
-          alert('Modo Dios activado. Tus peticiones usarán el proxy seguro.');
-        } else if (token === '') {
-          localStorage.removeItem('msbross_admin_token');
-          alert('Modo Dios desactivado. Usando claves públicas.');
-        }
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   return (
     <div className="bento-layout relative">
+      <GodModeListener />
+      <ApiConfigModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      
+      {/* Floating Settings Button */}
+      <button 
+        onClick={() => setIsSettingsOpen(true)}
+        className="fixed top-4 right-4 z-50 p-3 rounded-xl bg-black/50 border border-white/10 text-white hover:bg-black/70 backdrop-blur-md transition-all cursor-pointer"
+        title="Configurar APIs"
+      >
+        <Settings size={20} />
+      </button>
+
       {/* Dynamic Background Effects */}
       <div className="bg-orbs-container">
         <div className="orb orb-1" />

@@ -1,11 +1,12 @@
 import React, { useRef, useEffect, useState } from 'react';
 import NeuralOrb from './components/NeuralOrb';
+import ModelSelector from './components/ModelSelector';
 import './index.css';
 import { useCoreLogic } from './hooks/useCoreLogic';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useCamera } from './hooks/useCamera';
 import GodModeListener from './components/GodModeListener';
-import SettingsModal from './components/SettingsModal';
+import { ApiConfigModal } from './components/ApiConfigModal';
 
 export default function App() {
   const [input, setInput] = useState('');
@@ -15,6 +16,7 @@ export default function App() {
   } = useCoreLogic();
 
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [selectedModel, setSelectedModel] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -71,7 +73,7 @@ export default function App() {
   return (
     <div className="app-container">
       <GodModeListener />
-      <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <ApiConfigModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
       {visionModeActive && (
         <div className="vision-mode-overlay" style={{
           position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', 
@@ -106,9 +108,10 @@ export default function App() {
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M12 12 2.1 7.1"/><path d="M12 12l9.9 4.9"/></svg>
               </div>
               <h1 className="brand-title">IAPROD OS</h1>
-              <div className="version-tag">v10 (Godmode)</div>
+              <div className="version-tag">v1.0.0</div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <ModelSelector selected={selectedModel} onSelect={setSelectedModel} />
               <button 
                 onClick={() => setSettingsOpen(true)}
                 style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer' }}
@@ -133,7 +136,7 @@ export default function App() {
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                 </div>
                 <h2>System Ready</h2>
-                <p>Neural core is synchronized. Awaiting directives.</p>
+                <p>Sistema en línea. Esperando directivas.</p>
               </div>
             ) : (
               messages.map(msg => (
@@ -211,7 +214,7 @@ export default function App() {
             )}
           </form>
           </div>
-          <div className="dock-footer-text">IAProd OS Multi-LLM Environment. Godmode Core Active.</div>
+          <div className="dock-footer-text">IAProd OS Environment</div>
         </footer>
       </div>
     </div>

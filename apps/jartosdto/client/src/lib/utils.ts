@@ -26,4 +26,4 @@ export function truncate(str: string, max: number): string {
 
 /** API base URL from environment. */
 export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' ? `http://${window.location.hostname}:8100` : "http://localhost:8100");
+  process.env.NEXT_PUBLIC_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? '/_jartosdto' : "http://localhost:8100");
