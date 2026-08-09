@@ -511,6 +511,15 @@ const createAIProxy = (path, target, extractUserKey, injectGodModeKey) => {
     }
     
     req.proxyAuthKey = keyToUse;
+    
+    // Inject query parameter directly into req.url for Gemini (Handles both HTTP and WebSocket)
+    if (keyToUse && path.includes('gemini')) {
+      const urlObj = new URL(req.url, 'http://localhost');
+      // If there's already a dummy key from the SDK, remove or overwrite it
+      urlObj.searchParams.set('key', keyToUse);
+      req.url = urlObj.pathname + urlObj.search;
+    }
+
     next();
   }, createProxyMiddleware({
     target,
@@ -519,14 +528,13 @@ const createAIProxy = (path, target, extractUserKey, injectGodModeKey) => {
     pathRewrite: { [`^${path}`]: '' },
     on: {
       proxyReq: (proxyReq, req, res) => {
-        if (req.proxyAuthKey) {
-          if (path.includes('gemini')) {
-            proxyReq.path = proxyReq.path.includes('?') 
-              ? `${proxyReq.path}&key=${req.proxyAuthKey}`
-              : `${proxyReq.path}?key=${req.proxyAuthKey}`;
-          } else {
-            proxyReq.setHeader('Authorization', `Bearer ${req.proxyAuthKey}`);
-          }
+        if (req.proxyAuthKey && !path.includes('gemini')) {
+          proxyReq.setHeader('Authorization', `Bearer ${req.proxyAuthKey}`);
+        }
+      },
+      proxyReqWs: (proxyReq, req, socket, options, head) => {
+        if (req.proxyAuthKey && !path.includes('gemini')) {
+          proxyReq.setHeader('Authorization', `Bearer ${req.proxyAuthKey}`);
         }
       },
       error: (err, req, res) => {

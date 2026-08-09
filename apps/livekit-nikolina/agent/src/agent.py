@@ -300,7 +300,7 @@ async def entrypoint(ctx: JobContext) -> None:
         from livekit.agents.voice import Agent, AgentSession
         
         model = google.realtime.RealtimeModel(
-            model="gemini-3.1-flash-live", 
+            model="gemini-3.1-flash-live-preview", 
             voice="Puck",
             temperature=0.6,
             api_key=api_key,
