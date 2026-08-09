@@ -8,7 +8,6 @@ import os
 import asyncio
 import logging
 from dotenv import load_dotenv
-import google.genai.types as gtypes
 
 from livekit.agents import (
     AutoSubscribe,
@@ -54,9 +53,6 @@ async def entrypoint(ctx: JobContext):
         model="gemini-3.1-flash-live-preview", 
         voice="Adele",
         temperature=0.6,
-        enable_affective_dialog=False,
-        proactivity=False,
-        thinking_config=gtypes.ThinkingConfig(thinkingLevel="minimal")
     )
 
     # Init the Agent
