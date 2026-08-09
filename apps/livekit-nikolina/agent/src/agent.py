@@ -304,7 +304,10 @@ async def entrypoint(ctx: JobContext) -> None:
             voice="Puck",
             temperature=0.6,
             api_key=api_key,
-            http_options=http_options
+            http_options=http_options,
+            enable_affective_dialog=False,
+            proactivity=False,
+            thinkingLevel="minimal"
         )
 
         agent = Agent(

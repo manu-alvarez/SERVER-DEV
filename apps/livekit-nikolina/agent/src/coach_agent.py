@@ -53,6 +53,9 @@ async def entrypoint(ctx: JobContext):
         model="gemini-3.1-flash-live-preview", 
         voice="Puck",
         temperature=0.6,
+        enable_affective_dialog=False,
+        proactivity=False,
+        thinkingLevel="minimal"
     )
 
     # Init the Agent
