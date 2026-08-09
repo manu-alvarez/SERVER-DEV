@@ -277,7 +277,7 @@ async def entrypoint(ctx: JobContext) -> None:
         # SDK auto-reads GOOGLE_API_KEY from env — do NOT pass api_key manually
         # Gemini Live uses a direct WebSocket to Google — do NOT proxy via http_options
         model = google.realtime.RealtimeModel(
-            model="gemini-3.1-flash-live-preview", 
+            model="gemini-2.5-flash-native-audio-preview", 
             voice="Adele",
             temperature=0.6,
         )
