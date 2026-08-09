@@ -279,7 +279,7 @@ async def entrypoint(ctx: JobContext) -> None:
         # Gemini Live uses a direct WebSocket to Google — do NOT proxy via http_options
         model = google.realtime.RealtimeModel(
             model="gemini-3.1-flash-live-preview", 
-            voice="Puck",
+            voice="Adele",
             temperature=0.6,
             enable_affective_dialog=False,
             proactivity=False,
