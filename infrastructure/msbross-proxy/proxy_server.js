@@ -374,7 +374,7 @@ app.use('/_gas-station',   createProxyMiddleware(proxyOpts('http://gas-station-b
 app.use('/_industrialpro', createProxyMiddleware(proxyOpts('http://industrialpro-backend:8002', '/_industrialpro')));
 
 app.use('/app/elitescout', createProxyMiddleware({
-  target: 'http://elitescout-backend:8003/app/elitescout',
+  target: 'http://elitescout-backend:8003/app/elitescout/',
   changeOrigin: true,
   on: {
     error: (err, req, res) => {
