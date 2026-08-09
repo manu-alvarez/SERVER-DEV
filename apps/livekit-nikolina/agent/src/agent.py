@@ -72,7 +72,7 @@ async def get_summary(messages) -> str:
 # ---------------------------------------------------------------------------
 class RestaurantTools(llm.ToolContext):
     def __init__(self, ctx, session_state):
-        super().__init__()
+        super().__init__(tools=[])
         self.ctx = ctx
         self.session_state = session_state
 
