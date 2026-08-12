@@ -6,7 +6,7 @@ import {
 } from '@livekit/components-react';
 import '@livekit/components-styles';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Phone, Calendar as CalendarIcon, Settings, LogIn, Mic, Power } from 'lucide-react';
+import { LayoutDashboard, Phone, Calendar as CalendarIcon, Settings, LogIn, Mic, Power, Menu, X } from 'lucide-react';
 
 import { useNikolinaBackend } from './hooks/useNikolinaBackend';
 import { NeuralOrb } from './components/agent/NeuralOrb';
@@ -25,6 +25,7 @@ const LIVEKIT_URL = (import.meta as any).env.VITE_LIVEKIT_URL ||
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabType>('assistant');
   const [adminPassword, setAdminPassword] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const [isLivekitConnected, setIsLivekitConnected] = useState(false);
   const [livekitToken, setLivekitToken] = useState('');
@@ -111,11 +112,37 @@ export default function App() {
   ];
 
   return (
-    <div className="flex h-screen bg-[#050b14] overflow-hidden text-gray-100 font-sans">
+    <div className="flex flex-col md:flex-row h-screen bg-[#050b14] overflow-hidden text-gray-100 font-sans">
       
+      {/* MOBILE HEADER */}
+      <div className="md:hidden flex items-center justify-between p-4 bg-[#0a1520] border-b border-white/5 z-30 shrink-0 shadow-lg">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 p-0.5">
+            <div className="w-full h-full bg-[#0a1520] rounded-[6px] flex items-center justify-center">
+              <Mic className="w-4 h-4 text-cyan-400" />
+            </div>
+          </div>
+          <h1 className="font-bold text-md text-white">Nikolina AI</h1>
+        </div>
+        <button 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="text-gray-300 p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+        >
+          {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+      </div>
+
+      {/* MOBILE BACKDROP */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* SIDEBAR */}
-      <aside className="w-64 bg-[#0a1520] border-r border-white/5 flex flex-col z-20 shadow-2xl">
-        <div className="p-6 border-b border-white/5">
+      <aside className={`fixed md:relative top-0 left-0 w-72 md:w-64 h-full bg-[#0a1520] border-r border-white/5 flex flex-col z-50 shadow-2xl transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
+        <div className="p-6 border-b border-white/5 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 p-0.5 shadow-[0_0_15px_rgba(6,182,212,0.5)]">
               <div className="w-full h-full bg-[#0a1520] rounded-[10px] flex items-center justify-center">
@@ -127,13 +154,22 @@ export default function App() {
               <p className="text-[10px] font-mono text-cyan-400/80 uppercase tracking-widest">{restaurantInfo.name}</p>
             </div>
           </div>
+          <button 
+            className="md:hidden text-gray-400 hover:text-white p-2" 
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {tabs.map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as TabType)}
+              onClick={() => {
+                setActiveTab(tab.id as TabType);
+                setIsMobileMenuOpen(false);
+              }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 font-medium text-sm ${
                 activeTab === tab.id 
                   ? 'bg-cyan-500/10 text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.1)]' 
