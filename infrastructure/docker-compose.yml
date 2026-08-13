@@ -254,7 +254,7 @@ services:
     <<: *backend
     container_name: nikolina-agent
     image: msbross-nikolina-backend:latest
-    command: python src/agent.py start --workers 1
+    command: python src/agent.py start
     env_file:
       - /home/ubuntu/MSBrossAI/apps/livekit-nikolina/.env
     environment:
@@ -267,7 +267,7 @@ services:
     <<: *backend
     container_name: it-coach-agent
     image: msbross-nikolina-backend:latest
-    command: python src/coach_agent.py start --workers 1
+    command: python src/coach_agent.py start
     env_file:
       - /home/ubuntu/MSBrossAI/apps/livekit-nikolina/.env
     environment:
