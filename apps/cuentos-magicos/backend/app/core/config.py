@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     APP_PORT: int = 8000
     APP_DEBUG: bool = True
     APP_SECRET_KEY: str = "change-me-to-a-random-secret-key"
+    GODMODE_MASTER_TOKEN: str = ""
 
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/cuentos_magicos"

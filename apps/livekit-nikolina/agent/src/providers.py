@@ -54,7 +54,7 @@ class ProviderFactory:
         elif provider == "ollama":
             from livekit.plugins import openai as lk_openai
             # Try to use provided base_url, fallback to env or default
-            url = base_url or os.getenv("OLLAMA_BASE_URL", "http://host.docker.internal:11434/v1")
+            url = base_url or os.getenv("OLLAMA_BASE_URL", "http://100.100.2.10:11434/v1")
             # Ensure URL ends with /v1 for OpenAI-compatible API
             if url and not url.rstrip("/").endswith("/v1"):
                 url = url.rstrip("/") + "/v1"
@@ -91,7 +91,7 @@ class ProviderFactory:
         
         elif provider == "faster-whisper":
             return FasterWhisperSTTWrapper(
-                base_url=os.getenv("FASTER_WHISPER_URL", "http://host.docker.internal:9000"),
+                base_url=os.getenv("FASTER_WHISPER_URL", "http://100.100.2.10:9000"),
                 model=model,
                 language=language,
             )
@@ -123,7 +123,7 @@ class ProviderFactory:
         
         elif provider == "kokoro":
             return KokoroTTSWrapper(
-                base_url=server_url or "http://host.docker.internal:8001",
+                base_url=server_url or "http://100.100.2.10:8001",
                 voice=voice,
                 speed=speed
             )
@@ -321,16 +321,16 @@ class KokoroTTSWrapper(tts.TTS):
 async def check_provider_status() -> dict:
     """Check availability status of all providers."""
     status = {
-        "ollama": {"available": False, "url": os.getenv("OLLAMA_BASE_URL", "http://host.docker.internal:11434"), "models": []},
-        "kokoro": {"available": False, "url": os.getenv("KOKORO_URL", "http://host.docker.internal:8001")},
-        "faster-whisper": {"available": False, "url": os.getenv("FASTER_WHISPER_URL", "http://host.docker.internal:9000")},
+        "ollama": {"available": False, "url": os.getenv("OLLAMA_BASE_URL", "http://100.100.2.10:11434"), "models": []},
+        "kokoro": {"available": False, "url": os.getenv("KOKORO_URL", "http://100.100.2.10:8001")},
+        "faster-whisper": {"available": False, "url": os.getenv("FASTER_WHISPER_URL", "http://100.100.2.10:9000")},
         "gemini": {"available": bool(os.getenv("GOOGLE_API_KEY")), "note": "API key required"},
     }
     
     async with httpx.AsyncClient(timeout=3.0) as client:
         # Ollama
         try:
-            ollama_url = os.getenv("OLLAMA_BASE_URL", "http://host.docker.internal:11434")
+            ollama_url = os.getenv("OLLAMA_BASE_URL", "http://100.100.2.10:11434")
             resp = await client.get(f"{ollama_url.rstrip('/')}/api/tags")
             if resp.status_code == 200:
                 status["ollama"]["available"] = True

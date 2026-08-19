@@ -290,7 +290,7 @@ services:
     command: python -m granian app.main:app --host 0.0.0.0 --port 8004 --interface asgi
     environment:
       - PORT=8004
-      - OLLAMA_BASE_URL=http://172.20.0.1:11434/v1
+      - OLLAMA_BASE_URL=http://100.100.2.10:11434/v1
       - OLLAMA_MODEL=qwen2.5:3b
     env_file:
       - /home/ubuntu/MSBrossAI/apps/traductor-pro/.env
