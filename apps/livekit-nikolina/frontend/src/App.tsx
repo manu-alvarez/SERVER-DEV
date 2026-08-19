@@ -114,8 +114,8 @@ export default function App() {
   return (
     <div className="flex flex-col md:flex-row h-screen bg-[#050b14] overflow-hidden text-gray-100 font-sans">
       
-      {/* GLOBAL HEADER */}
-      <div className="flex items-center justify-between p-4 bg-[#0a1520] border-b border-white/5 z-30 shrink-0 shadow-lg md:hidden">
+      {/* MOBILE HEADER */}
+      <div className="md:hidden flex items-center justify-between p-4 bg-[#0a1520] border-b border-white/5 z-30 shrink-0 shadow-lg">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 p-0.5">
             <div className="w-full h-full bg-[#0a1520] rounded-[6px] flex items-center justify-center">
@@ -135,13 +135,13 @@ export default function App() {
       {/* MOBILE BACKDROP */}
       {isMobileMenuOpen && (
         <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
       {/* SIDEBAR */}
-      <aside className={`fixed lg:relative top-0 left-0 w-72 lg:w-64 h-full bg-[#0a1520] border-r border-white/5 flex flex-col z-50 shadow-2xl transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
+      <aside className={`fixed md:relative top-0 left-0 w-72 md:w-64 h-full bg-[#0a1520] border-r border-white/5 flex flex-col z-50 shadow-2xl transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
         <div className="p-6 border-b border-white/5 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 p-0.5 shadow-[0_0_15px_rgba(6,182,212,0.5)]">
@@ -155,7 +155,7 @@ export default function App() {
             </div>
           </div>
           <button 
-            className="lg:hidden text-gray-400 hover:text-white p-2" 
+            className="md:hidden text-gray-400 hover:text-white p-2" 
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <X className="w-5 h-5" />
