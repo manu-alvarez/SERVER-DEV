@@ -62,7 +62,7 @@ class Settings(BaseSettings):
 
     # OpenRouter
     OPENROUTER_API_KEY: str = ""
-    OPENROUTER_MODEL: str = "meta-llama/llama-3.3-70b-instruct:free"
+    OPENROUTER_MODEL: str = "meta-llama/llama-3.3-70b-instruct"
 
     # Mistral
     MISTRAL_API_KEY: str = ""
