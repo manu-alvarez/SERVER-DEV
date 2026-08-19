@@ -12,7 +12,6 @@ const MODEL = "llama-3.3-70b-versatile";
  * Check if Groq API key is configured.
  */
 export function isGroqConfigured(customHeaders?: Record<string, string>): boolean {
-  if (customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"])) return true;
   return !!process.env.GROQ_API_KEY;
 }
 
@@ -31,11 +30,8 @@ export async function groqGenerate(
     "Content-Type": "application/json",
   };
 
-  if (options?.customHeaders && (options.customHeaders["x-godmode-token"] || options.customHeaders["x-user-custom-keys"])) {
     groqUrl = "http://127.0.0.1:8080/_api/groq/chat/completions";
     apiKey = "dummy_key"; // Proxy will handle real auth
-    if (options.customHeaders["x-godmode-token"]) headers["x-godmode-token"] = options.customHeaders["x-godmode-token"];
-    if (options.customHeaders["x-user-custom-keys"]) headers["x-user-custom-keys"] = options.customHeaders["x-user-custom-keys"];
   }
 
   if (!apiKey) throw new Error("GROQ_API_KEY not configured");

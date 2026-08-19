@@ -10,7 +10,6 @@ import { ToolsPanel } from './components/ui/ToolsPanel';
 import { C2Monitor } from './components/ui/C2Monitor';
 import { AnimatePresence } from 'framer-motion';
 import { ApiConfigModal } from './components/ui/ApiConfigModal';
-import GodModeListener from './components/ui/GodModeListener';
 import { useState } from 'react';
 
 const queryClient = new QueryClient();
@@ -87,7 +86,6 @@ function MSBrOSsApp() {
 
   return (
     <div className="h-[100dvh] w-full bg-[#0a0c10] text-white flex flex-col overflow-hidden font-sans relative">
-      <GodModeListener />
       <ApiConfigModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <Topbar onSettingsClick={() => setSettingsOpen(true)} onMonitorClick={() => setMonitorOpen(!monitorOpen)} />
       

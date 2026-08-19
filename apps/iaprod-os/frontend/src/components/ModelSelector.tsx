@@ -22,11 +22,8 @@ export default function ModelSelector({ selected, onSelect }: Props) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const adminToken = localStorage.getItem('msbross_godmode_token');
     const customKeys = localStorage.getItem('msbross_user_api_key');
     const headers: Record<string, string> = {};
-    if (adminToken) headers['x-godmode-token'] = adminToken;
-    if (customKeys) headers['x-user-custom-keys'] = customKeys;
 
     fetch(`${API_BASE}/models`, { headers })
       .then(r => r.json())

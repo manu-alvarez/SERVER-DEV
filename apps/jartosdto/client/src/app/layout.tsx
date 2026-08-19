@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import GodModeListener from "@/components/GodModeListener";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://jartosdto.manuelalvarez.dev"),
@@ -17,7 +16,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body>
-        <GodModeListener />
         {children}
       </body>
     </html>

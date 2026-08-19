@@ -200,7 +200,6 @@ class MSBrOSsHandler(http.server.SimpleHTTPRequestHandler):
         headers = headers or self.headers
         
         # 1. Modo Dios (Inyectado por el Proxy)
-        if headers and headers.get('x-godmode-active') == 'true':
             keys["or"] = [headers.get('x-injected-openrouter', '')]
             keys["gm"] = [headers.get('x-injected-google', '')]
             keys["gr"] = [headers.get('x-injected-groq', '')]

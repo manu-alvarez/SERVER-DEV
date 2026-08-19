@@ -139,7 +139,7 @@ async def generate_story_text(session: AsyncSession, story: Story, auth_headers:
 def _get_llm_client(provider: str, model: str) -> tuple:
     """Get the appropriate OpenAI-compatible client based on provider.
     
-    Each provider uses its API key directly from settings — no proxy, no GodMode.
+    Each provider uses its API key directly from settings — direct API access.
     """
     if provider == "gemini":
         client = OpenAI(

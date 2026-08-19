@@ -12,10 +12,9 @@ let genAI: GoogleGenerativeAI | null = null;
 
 /** Get or create Gemini client instance */
 function getClient(customHeaders?: Record<string, string>): GoogleGenerativeAI {
-  const isGodMode = customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]);
   let key = API_KEY;
   
-  if (isGodMode) {
+  if (useProxy) {
     key = "dummy_key";
   }
 
@@ -25,8 +24,8 @@ function getClient(customHeaders?: Record<string, string>): GoogleGenerativeAI {
     );
   }
 
-  // Create a new instance if we have GodMode, else use singleton
-  if (isGodMode) {
+  // Create a new instance if we have proxy, else use singleton
+  if (useProxy) {
     // @ts-ignore: TS doesn't know about second options argument in this version
     return new GoogleGenerativeAI(key, {
       baseUrl: "http://127.0.0.1:8080/_api/gemini",
@@ -118,6 +117,5 @@ export async function* streamText(
 
 /** Check if Gemini API key is configured */
 export function isConfigured(customHeaders?: Record<string, string>): boolean {
-  if (customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"])) return true;
   return !!API_KEY;
 }

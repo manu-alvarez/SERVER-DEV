@@ -205,11 +205,11 @@ async def _generate_openai(prompt: str, story_id: str, chapter_num: int,
                            session: AsyncSession, auth_headers: dict = None) -> str:
     """Generate image using OpenAI DALL-E 3."""
     from openai import OpenAI
-    is_godmode = auth_headers and ('x-godmode-token' in auth_headers or 'x-user-custom-keys' in auth_headers)
+    # Direct API access — no proxy
 
     client = OpenAI(
-        api_key="dummy" if is_godmode else settings.OPENAI_API_KEY,
-        base_url="http://127.0.0.1:8080/_api/openai/v1" if is_godmode else None,
+        api_key=settings.OPENAI_API_KEY,
+        base_url=None,
         default_headers=auth_headers
     )
 

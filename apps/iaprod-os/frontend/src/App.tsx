@@ -5,7 +5,6 @@ import './index.css';
 import { useCoreLogic } from './hooks/useCoreLogic';
 import { useSpeechRecognition } from './hooks/useSpeechRecognition';
 import { useCamera } from './hooks/useCamera';
-import GodModeListener from './components/GodModeListener';
 import { ApiConfigModal } from './components/ApiConfigModal';
 
 export default function App() {
@@ -72,7 +71,6 @@ export default function App() {
 
   return (
     <div className="app-container">
-      <GodModeListener />
       <ApiConfigModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
       {visionModeActive && (
         <div className="vision-mode-overlay" style={{

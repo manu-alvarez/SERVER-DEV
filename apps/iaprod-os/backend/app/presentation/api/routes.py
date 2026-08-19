@@ -25,7 +25,7 @@ os.makedirs(TEMP_AUDIO_DIR, exist_ok=True)
 import json
 
 def get_chat_usecase(request: Request) -> ChatUseCase:
-    godmode_active = request.headers.get("x-godmode-active") == "true"
+    # Always use injected keys from proxy
     injected_groq = request.headers.get("x-injected-groq")
     injected_gemini = request.headers.get("x-injected-google")
     custom_keys_str = request.headers.get("x-user-custom-keys") or "{}"
@@ -35,7 +35,7 @@ def get_chat_usecase(request: Request) -> ChatUseCase:
     except:
         custom_keys = {}
         
-    if godmode_active and injected_groq:
+    if injected_groq:
         # God Mode bypasses fallback and uses the Admin proxy with Llama 3.3 70b
         # Llama 3.3 70b has tool support so it matches GroqAdapter needs
         llm = GroqAdapter(

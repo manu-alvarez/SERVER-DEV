@@ -85,10 +85,9 @@ export const useGeminiApi = () => {
         generationConfig: { temperature: 1.0 }
       };
 
-      const godmodeToken = localStorage.getItem('msbross_godmode_token');
       const userKeys = localStorage.getItem('msbross_user_api_key');
       
-      let maxAttempts = (godmodeToken || userKeys) ? 1 : Math.min(API_KEYS.length * 2, 10);
+      let maxAttempts = Math.min(API_KEYS.length * 2, 10);
       
       const isProxy = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
       
@@ -97,10 +96,8 @@ export const useGeminiApi = () => {
           let targetUrl = '';
           let headers: Record<string, string> = { 'Content-Type': 'application/json' };
           
-          if (godmodeToken) headers['x-godmode-token'] = godmodeToken;
           if (userKeys) headers['x-user-custom-keys'] = userKeys;
           
-          if (godmodeToken || userKeys) {
             targetUrl = isProxy 
               ? `/_api/gemini/v1beta/models/gemini-3.5-flash:generateContent`
               : `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=dummy`;

@@ -201,7 +201,7 @@ export const APPS_DATA = [
   },
   {
     name: 'MSBrOSs Assistant',
-    desc: 'Laboratorio de pruebas (BYOK) para inyectar system prompts y testear modelos. Interfaz de administración técnica (C2 Admin) con GodMode.',
+    desc: 'Laboratorio de pruebas (BYOK) para inyectar system prompts y testear modelos. Interfaz de administración técnica (C2 Admin) avanzada.',
     tech: 'React, Node.js, FastAPI, Multi-LLM API',
     url: 'https://assistant.manuelalvarez.dev',
     icon: MessageSquare,

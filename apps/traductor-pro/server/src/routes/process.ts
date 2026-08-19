@@ -81,15 +81,8 @@ Instrucción específica: ${systemPrompt}
     for (const providerName of providersToTry) {
       try {
         console.log(`[process] Intentando proveedor: ${providerName}`);
-        const customHeaders: Record<string, string> = {};
-        if (req.headers['x-godmode-token']) {
-          customHeaders['x-godmode-token'] = req.headers['x-godmode-token'] as string;
-        }
-        if (req.headers['x-user-custom-keys']) {
-          customHeaders['x-user-custom-keys'] = req.headers['x-user-custom-keys'] as string;
-        }
 
-        const aiProvider = ProviderFactory.create(providerName, customHeaders);
+        const aiProvider = ProviderFactory.create(providerName);
         const completion = await aiProvider.chat.completions.create({
           model: aiProvider.getDefaultModel(),
           temperature: 0.2,

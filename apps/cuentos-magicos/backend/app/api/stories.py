@@ -77,14 +77,6 @@ async def generate_story(
     await session.commit()
     await session.refresh(story)
 
-    # Extract GodMode headers
-    godmode_token = request.headers.get('x-godmode-token')
-    user_keys = request.headers.get('x-user-custom-keys')
-    auth_headers = {}
-    if godmode_token:
-        auth_headers['x-godmode-token'] = godmode_token
-    if user_keys:
-        auth_headers['x-user-custom-keys'] = user_keys
 
     # --- ASYNCHRONOUS EXECUTION VIA CELERY ---
     # 1. Launch Text Generation Task

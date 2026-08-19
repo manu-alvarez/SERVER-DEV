@@ -84,11 +84,7 @@ export function useNikolinaBackend() {
   };
 
   const generateLivekitToken = async (participantName: string) => {
-    const godmode = localStorage.getItem('msbross_godmode_token');
-    const userKeysStr = localStorage.getItem('msbross_user_api_key');
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (godmode) headers['x-godmode-token'] = godmode;
-    if (userKeysStr) headers['x-user-custom-keys'] = userKeysStr;
     
     const res = await fetch(`${API_BASE}/token`, {
       method: 'POST',

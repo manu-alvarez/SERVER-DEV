@@ -130,11 +130,11 @@ async def _generate_openai_tts(text: str, voice_name: str | None = None, speed: 
     voice = OPENAI_VOICE_MAP.get(voice, "alloy")
     speed_val = speed or settings.OPENAI_TTS_SPEED or 0.9
 
-    is_godmode = auth_headers and ('x-godmode-token' in auth_headers or 'x-user-custom-keys' in auth_headers)
+    # Direct API access — no proxy
     
     client = AsyncOpenAI(
-        api_key="dummy" if is_godmode else settings.OPENAI_API_KEY,
-        base_url="http://127.0.0.1:8080/_api/openai/v1" if is_godmode else None,
+        api_key=settings.OPENAI_API_KEY,
+        base_url=None,
         default_headers=auth_headers
     )
 

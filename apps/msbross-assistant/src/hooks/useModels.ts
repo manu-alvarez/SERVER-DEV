@@ -3,12 +3,9 @@ import { ModelConfigSchema } from '../lib/schemas';
 import { z } from 'zod';
 
 const fetchModels = async () => {
-  const adminToken = localStorage.getItem('msbross_godmode_token');
   const customKeys = localStorage.getItem('msbross_user_api_key');
   
   const headers: Record<string, string> = {};
-  if (adminToken) headers['x-godmode-token'] = adminToken;
-  if (customKeys) headers['x-user-custom-keys'] = customKeys;
 
   const response = await fetch('/_msbross/api/models', { headers });
   if (!response.ok) {

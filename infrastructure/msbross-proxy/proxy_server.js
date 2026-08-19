@@ -13,14 +13,14 @@ app.disable('x-powered-by');
 const PORT = 8080;
 const WWW  = path.join(__dirname, '../../www');
 
-// ── API Keys Vault (GodMode) ──
+// ── API Keys Vault ──
 let apiVault = {};
 const vaultPath = path.join(__dirname, 'api_keys_vault.json');
 function loadVault() {
   try {
     if (fs.existsSync(vaultPath)) {
       apiVault = JSON.parse(fs.readFileSync(vaultPath, 'utf8'));
-      console.log('[Security] API Vault loaded successfully for GodMode');
+      console.log('[Security] API Vault loaded successfully');
     }
   } catch (e) {
     console.error('[Security] Failed to load API Vault:', e.message);
@@ -104,7 +104,7 @@ app.use((req, res, next) => {
 
 // ── Auth middleware for admin endpoints ──
 function requireAdminAuth(req, res, next) {
-  const ADMIN_TOKEN = apiVault.GODMODE_MASTER_TOKEN || process.env.ADMIN_API_TOKEN;
+  const ADMIN_TOKEN = process.env.ADMIN_API_TOKEN;
   if (!ADMIN_TOKEN) return res.status(500).json({ error: 'Admin auth not configured' });
   const token = req.headers['x-admin-token'];
   if (!token || token !== ADMIN_TOKEN) {
@@ -348,22 +348,16 @@ const proxyOpts = (target, stripPrefix, ws = false) => ({
       console.log(`[WebSocket] ${req.url} -> ${target}`);
     },
     proxyReq: (proxyReq, req, res) => {
-      // ── GODMODE INJECTOR ──
-      const godmodeToken = req.headers['x-godmode-token'];
-      if (godmodeToken && godmodeToken === apiVault.GODMODE_MASTER_TOKEN) {
-        proxyReq.setHeader('x-godmode-active', 'true');
-        if (apiVault.LLM_PROVIDERS?.OPENAI?.[0]?.key) proxyReq.setHeader('x-injected-openai', apiVault.LLM_PROVIDERS.OPENAI[0].key);
-        if (apiVault.LLM_PROVIDERS?.ANTHROPIC?.[0]?.key) proxyReq.setHeader('x-injected-anthropic', apiVault.LLM_PROVIDERS.ANTHROPIC[0].key);
-        if (apiVault.LLM_PROVIDERS?.GOOGLE_GEMINI?.[0]?.key) proxyReq.setHeader('x-injected-google', apiVault.LLM_PROVIDERS.GOOGLE_GEMINI[0].key);
-        if (apiVault.LLM_PROVIDERS?.GROQ?.[0]?.key) proxyReq.setHeader('x-injected-groq', apiVault.LLM_PROVIDERS.GROQ[0].key);
-        if (apiVault.LLM_PROVIDERS?.MISTRAL?.[0]?.key) proxyReq.setHeader('x-injected-mistral', apiVault.LLM_PROVIDERS.MISTRAL[0].key);
-        if (apiVault.OLLAMA_URL) proxyReq.setHeader('x-injected-ollama', apiVault.OLLAMA_URL);
-        if (apiVault.LLM_PROVIDERS?.OPENROUTER?.[0]?.key) proxyReq.setHeader('x-injected-openrouter', apiVault.LLM_PROVIDERS.OPENROUTER[0].key);
-        
-        // Inject other services
-        if (apiVault.THEODDS_API_KEY) proxyReq.setHeader('x-injected-theodds', apiVault.THEODDS_API_KEY);
-        if (apiVault.TAVILY_API_KEY) proxyReq.setHeader('x-injected-tavily', apiVault.TAVILY_API_KEY);
-      }
+      // ── Auto-inject API keys from vault for all backend requests ──
+      if (apiVault.LLM_PROVIDERS?.OPENAI?.[0]?.key) proxyReq.setHeader('x-injected-openai', apiVault.LLM_PROVIDERS.OPENAI[0].key);
+      if (apiVault.LLM_PROVIDERS?.ANTHROPIC?.[0]?.key) proxyReq.setHeader('x-injected-anthropic', apiVault.LLM_PROVIDERS.ANTHROPIC[0].key);
+      if (apiVault.LLM_PROVIDERS?.GOOGLE_GEMINI?.[0]?.key) proxyReq.setHeader('x-injected-google', apiVault.LLM_PROVIDERS.GOOGLE_GEMINI[0].key);
+      if (apiVault.LLM_PROVIDERS?.GROQ?.[0]?.key) proxyReq.setHeader('x-injected-groq', apiVault.LLM_PROVIDERS.GROQ[0].key);
+      if (apiVault.LLM_PROVIDERS?.MISTRAL?.[0]?.key) proxyReq.setHeader('x-injected-mistral', apiVault.LLM_PROVIDERS.MISTRAL[0].key);
+      if (apiVault.OLLAMA_URL) proxyReq.setHeader('x-injected-ollama', apiVault.OLLAMA_URL);
+      if (apiVault.LLM_PROVIDERS?.OPENROUTER?.[0]?.key) proxyReq.setHeader('x-injected-openrouter', apiVault.LLM_PROVIDERS.OPENROUTER[0].key);
+      if (apiVault.THEODDS_API_KEY) proxyReq.setHeader('x-injected-theodds', apiVault.THEODDS_API_KEY);
+      if (apiVault.TAVILY_API_KEY) proxyReq.setHeader('x-injected-tavily', apiVault.TAVILY_API_KEY);
     },
   },
 });
@@ -382,11 +376,7 @@ app.use('/app/elitescout', createProxyMiddleware({
       if (res && res.writeHead) res.status(502).json({ error: 'Backend unavailable', detail: err.message });
     },
     proxyReq: (proxyReq, req, res) => {
-      const godmodeToken = req.headers['x-godmode-token'];
-      if (godmodeToken && godmodeToken === apiVault.GODMODE_MASTER_TOKEN) {
-        proxyReq.setHeader('x-godmode-active', 'true');
-        if (apiVault.LLM_PROVIDERS?.OPENAI?.[0]?.key) proxyReq.setHeader('x-injected-openai', apiVault.LLM_PROVIDERS.OPENAI[0].key);
-      }
+      if (apiVault.LLM_PROVIDERS?.OPENAI?.[0]?.key) proxyReq.setHeader('x-injected-openai', apiVault.LLM_PROVIDERS.OPENAI[0].key);
     }
   }
 }));
@@ -403,8 +393,8 @@ app.use('/_msbross',       createProxyMiddleware(proxyOpts('http://msbross-backe
 // ── IT English Coach AI Proxy ──
 app.post('/_coach/api/evaluate', express.json(), async (req, res) => {
   try {
-    const geminiKey = apiVault?.LLM_PROVIDERS?.GOOGLE_GEMINI?.[0]?.key;
-    if (!geminiKey) return res.status(500).json({ error: 'Gemini Key missing in GodMode vault' });
+    const geminiKey = apiVault?.LLM_PROVIDERS?.GOOGLE_GEMINI?.[0]?.key || apiVault?.GEMINI_API_KEY;
+    if (!geminiKey) return res.status(500).json({ error: 'Gemini Key missing in API vault' });
 
     const { messages = [], system } = req.body;
     const contents = [];
@@ -419,7 +409,7 @@ app.post('/_coach/api/evaluate', express.json(), async (req, res) => {
       });
     }
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${geminiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${geminiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents })
@@ -435,32 +425,15 @@ app.post('/_coach/api/evaluate', express.json(), async (req, res) => {
   }
 });
 
-// ── TheOdds API Proxy for CombiPro (GodMode Injector) ──
+// ── TheOdds API Proxy for CombiPro ──
 app.use('/_oddsapi', (req, res, next) => {
-  const godmodeToken = req.headers['x-godmode-token'];
-  const userKey = req.headers['x-user-custom-keys'];
-  
-  let apiKeyToUse = null;
-  if (godmodeToken && godmodeToken === apiVault.GODMODE_MASTER_TOKEN && apiVault.THEODDS_API_KEY) {
-    apiKeyToUse = apiVault.THEODDS_API_KEY;
-  } else if (userKey) {
-    try {
-      const keys = JSON.parse(userKey);
-      if (keys.theodds) apiKeyToUse = keys.theodds;
-    } catch (e) {}
-  }
-  
-  if (!apiKeyToUse && req.query.apiKey) {
-    apiKeyToUse = req.query.apiKey;
-  }
+  // Always inject vault key, fallback to query param
+  let apiKeyToUse = apiVault.THEODDS_API_KEY || req.query.apiKey;
 
-  // Si no hay API key tras intentar todas las vías, devolver error para evitar fallo en TheOdds
   if (!apiKeyToUse) {
     return res.status(401).json({ error: 'Missing API Key for TheOdds API' });
   }
 
-  // Modificar req.url para asegurar que incluya el apiKey
-  // Quitamos cualquier apiKey existente para no duplicar
   const urlObj = new URL(req.url, 'http://localhost');
   urlObj.searchParams.set('apiKey', apiKeyToUse);
   req.url = urlObj.pathname + urlObj.search;
@@ -494,21 +467,11 @@ app.use('/rtc', createProxyMiddleware({
   },
 }));
 
-// ── Generic AI Proxy Endpoints for GodMode Ecosystem ──
-const createAIProxy = (path, target, extractUserKey, injectGodModeKey) => {
+// ── Generic AI Proxy Endpoints ──
+const createAIProxy = (path, target, extractUserKey, injectVaultKey) => {
   app.use(path, (req, res, next) => {
-    const godmodeToken = req.headers['x-godmode-token'];
-    const userKeyHeader = req.headers['x-user-custom-keys'];
-    
-    let keyToUse = null;
-    if (godmodeToken && godmodeToken === apiVault.GODMODE_MASTER_TOKEN) {
-      keyToUse = injectGodModeKey();
-    } else if (userKeyHeader) {
-      try {
-        const keys = JSON.parse(userKeyHeader);
-        keyToUse = extractUserKey(keys);
-      } catch (e) {}
-    }
+    // Always inject vault key for all AI proxy routes
+    let keyToUse = injectVaultKey();
     
     req.proxyAuthKey = keyToUse;
     

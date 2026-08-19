@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ChatPanel } from './components/chat/ChatPanel';
 import { SandboxPortal } from './components/sandbox/SandboxPortal';
-import GodModeListener from './components/GodModeListener';
 import ApiConfigModal from './components/ApiConfigModal';
 import { Settings } from 'lucide-react';
 
@@ -10,7 +9,6 @@ export default function App() {
 
   return (
     <div className="bento-layout relative">
-      <GodModeListener />
       <ApiConfigModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       
       {/* Floating Settings Button */}

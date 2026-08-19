@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState, useRef } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 
-const GODMODE_TOKEN = process.env.EXPO_PUBLIC_GODMODE_TOKEN || "";
+
 const WS_URL = "wss://assistant.manuelalvarez.dev/_msbross/ws/nodes/";
 
 // Generar ID único para este dispositivo
@@ -30,7 +30,6 @@ export default function App() {
       // @ts-ignore: React Native WebSocket accepts a 3rd argument for headers but TS types don't include it.
       const ws = new WebSocket(WS_URL + NODE_ID, undefined, {
         headers: {
-          "x-godmode-token": GODMODE_TOKEN
         }
       } as any);
 

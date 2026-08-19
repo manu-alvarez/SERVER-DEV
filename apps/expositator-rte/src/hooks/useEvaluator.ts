@@ -57,19 +57,9 @@ export const useEvaluator = () => {
       const blockToEvaluate = utteranceBufferRef.current.join(" ");
       utteranceBufferRef.current = []; 
 
-      const { apiKey, knowledgeBase } = useExpositatorStore.getState();
-      const godmodeToken = localStorage.getItem('msbross_godmode_token');
-      const userKeysStr = localStorage.getItem('msbross_user_api_key');
-      let userKey = apiKey;
+      const { knowledgeBase } = useExpositatorStore.getState();
       
-      if (userKeysStr) {
-        try {
-          const parsed = JSON.parse(userKeysStr);
-          if (parsed.gemini) userKey = parsed.gemini;
-        } catch (e) {}
-      }
-      
-      if ((userKey || godmodeToken) && knowledgeBase) {
+      if (knowledgeBase) {
         const prompt = `
         Actúa como Tribunal de Oposiciones.
         BASE DE CONOCIMIENTO OBLIGATORIA:
@@ -84,15 +74,9 @@ export const useEvaluator = () => {
         `;
 
         try {
-          let targetUrl = `${GEMINI_ENDPOINT}?key=${userKey || 'dummy'}`;
-          let headers: Record<string, string> = { 'Content-Type': 'application/json' };
-          
-          if (godmodeToken || userKeysStr) {
-            const hostname = window.location.hostname === 'localhost' ? '127.0.0.1' : window.location.hostname;
-            targetUrl = `http://${hostname}:8080/_api/gemini/v1beta/models/gemini-3.5-flash:generateContent`;
-            if (godmodeToken) headers['x-godmode-token'] = godmodeToken;
-            if (userKeysStr) headers['x-user-custom-keys'] = userKeysStr;
-          }
+          // Always route through proxy — keys injected automatically from vault
+          const targetUrl = `/_api/gemini/v1beta/models/gemini-3.6-flash:generateContent`;
+          const headers: Record<string, string> = { 'Content-Type': 'application/json' };
 
           const response = await fetch(targetUrl, {
             method: 'POST',
