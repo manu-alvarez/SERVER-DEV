@@ -150,7 +150,7 @@ def _get_llm_client(provider: str, model: str, auth_headers: dict = None) -> tup
     elif provider == "openrouter":
         client = OpenAI(
             api_key="dummy" if is_godmode else settings.OPENROUTER_API_KEY,
-            base_url=f"{proxy_host}/_api/openrouter" if is_godmode else "https://openrouter.ai/api/v1",
+            base_url=f"{proxy_host}/_api/openrouter/v1" if is_godmode else "https://openrouter.ai/api/v1",
             default_headers=auth_headers
         )
         api_model = model or settings.OPENROUTER_MODEL
