@@ -100,9 +100,9 @@ async def generate_story_text(session: AsyncSession, story: Story, auth_headers:
         data = cached["payload"]
     else:
         # Call LLM API
-        client, api_model = _get_llm_client(provider, model, auth_headers)
+        client, api_model = _get_llm_client(provider, model)
 
-        completion = client.chat.completions.create(
+        create_kwargs = dict(
             model=api_model,
             messages=[
                 {"role": "system", "content": STORY_SYSTEM_PROMPT},
@@ -113,9 +113,17 @@ async def generate_story_text(session: AsyncSession, story: Story, auth_headers:
             response_format={"type": "json_object"},
         )
 
+        completion = client.chat.completions.create(**create_kwargs)
+
         raw = completion.choices[0].message.content
         if not raw:
             raise ValueError("Empty response from LLM")
+
+        # Safety: strip markdown code fences if model wraps JSON in them
+        import re
+        json_match = re.search(r'```(?:json)?\s*\n?(.*?)\n?```', raw, re.DOTALL)
+        if json_match:
+            raw = json_match.group(1).strip()
 
         # Moderate generated text
         moderate_text(raw)
@@ -128,37 +136,32 @@ async def generate_story_text(session: AsyncSession, story: Story, auth_headers:
     return data
 
 
-def _get_llm_client(provider: str, model: str, auth_headers: dict = None) -> tuple:
-    """Get the appropriate OpenAI-compatible client based on provider."""
-    import httpx
+def _get_llm_client(provider: str, model: str) -> tuple:
+    """Get the appropriate OpenAI-compatible client based on provider.
     
-    auth_headers = auth_headers or {}
-    if settings.GODMODE_MASTER_TOKEN and 'x-godmode-token' not in auth_headers:
-        auth_headers['x-godmode-token'] = settings.GODMODE_MASTER_TOKEN
-        
-    # If GodMode or User keys are provided, route through msbross-proxy
-    is_godmode = 'x-godmode-token' in auth_headers or 'x-user-custom-keys' in auth_headers
-    proxy_host = "http://msbross-proxy:8080"
-    
-    if provider == "groq":
+    Each provider uses its API key directly from settings — no proxy, no GodMode.
+    """
+    if provider == "gemini":
         client = OpenAI(
-            api_key="dummy" if is_godmode else settings.GROQ_API_KEY,
-            base_url=f"{proxy_host}/_api/groq/openai/v1" if is_godmode else "https://api.groq.com/openai/v1",
-            default_headers=auth_headers
+            api_key=settings.GOOGLE_API_KEY,
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+        )
+        api_model = model or settings.GOOGLE_MODEL
+    elif provider == "groq":
+        client = OpenAI(
+            api_key=settings.GROQ_API_KEY,
+            base_url="https://api.groq.com/openai/v1",
         )
         api_model = model or settings.GROQ_MODEL
     elif provider == "openrouter":
         client = OpenAI(
-            api_key="dummy" if is_godmode else settings.OPENROUTER_API_KEY,
-            base_url=f"{proxy_host}/_api/openrouter/v1" if is_godmode else "https://openrouter.ai/api/v1",
-            default_headers=auth_headers
+            api_key=settings.OPENROUTER_API_KEY,
+            base_url="https://openrouter.ai/api/v1",
         )
         api_model = model or settings.OPENROUTER_MODEL
     elif provider == "openai":
         client = OpenAI(
-            api_key="dummy" if is_godmode else settings.OPENAI_API_KEY,
-            base_url=f"{proxy_host}/_api/openai/v1" if is_godmode else None,
-            default_headers=auth_headers
+            api_key=settings.OPENAI_API_KEY,
         )
         api_model = model or settings.OPENAI_MODEL_STORY
     elif provider == "ollama":
