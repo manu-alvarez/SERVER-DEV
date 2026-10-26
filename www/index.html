@@ -1,35 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/logo-icon.png" />
-    <link rel="apple-touch-icon" href="/logo192.png" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="icon" type="image/png" href="./logo-icon.png" />
+    <link rel="apple-touch-icon" href="./logo192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MSBross Ecosystem — MSBross</title>
-    <script type="module" crossorigin src="/assets/index-BwSQedyv.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CxzmotjR.css">
-  <link rel="manifest" href="/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script></head>
+    <title>Manuel Álvarez — Técnico de Sistemas | Desarrollador Web & IA</title>
+    <meta name="description" content="Portfolio profesional de Manuel Álvarez. Técnico de Sistemas, Desarrollador Web, Apps y Herramientas con Inteligencia Artificial. Proyectos reales desplegados en servidor propio." />
+    <meta name="author" content="Manuel Álvarez" />
+    <meta property="og:title" content="Manuel Álvarez — Portfolio" />
+    <meta property="og:description" content="Técnico de Sistemas | Desarrollador Web, Apps y Herramientas con IA" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://manuelalvarez.dev" />
+    <meta name="theme-color" content="#060B18" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <script type="module" crossorigin src="./assets/index-BcbR_ZIZ.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BztzVRhi.css">
+  </head>
   <body>
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for(let registration of registrations) {
-            registration.unregister();
-            console.log('Service Worker unregistered to force update');
-          }
-        }).catch(function(err) {
-          console.log('Service Worker unregistration failed: ', err);
-        });
-      }
-      
-      // Also clear caches
-      if ('caches' in window) {
-        caches.keys().then(function(names) {
-          for (let name of names)
-            caches.delete(name);
-        });
-      }
-    </script>
     <div id="root"></div>
   </body>
 </html>
