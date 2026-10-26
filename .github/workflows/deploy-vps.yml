@@ -47,7 +47,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          script: sudo chown -R ${{ secrets.VPS_USER }}:${{ secrets.VPS_USER }} /home/ubuntu/MSBrossAI/apps/msbross-backend/ || true
+          script: sudo chown -R ${{ secrets.VPS_USER }}:${{ secrets.VPS_USER }} /home/ubuntu/MSBrossAI/apps/ /home/ubuntu/MSBrossAI/www/ || true
 
       - name: Deploy Apps
         run: |
@@ -55,6 +55,7 @@ jobs:
             --exclude 'node_modules' --exclude 'dist' --exclude '.next' \
             --exclude '.git' --exclude '__pycache__' --exclude 'venv' --exclude '.venv' \
             --exclude '.env' --exclude '*.log' --exclude '*.error.log' \
+            --exclude 'storage' --exclude '*.db' --exclude '*.sqlite' --exclude '*.sqlite3' \
             -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
             ./apps/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/apps/
 
