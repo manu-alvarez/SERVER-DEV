@@ -2,25 +2,25 @@ import { motion } from 'framer-motion';
 import { ArrowDown, Download, ArrowRight } from 'lucide-react';
 
 const FLOATING_TAGS = [
-  { label: 'IA', delay: 0, x: -140, y: -90, color: 'from-cyan-500 to-blue-500' },
-  { label: 'WEB', delay: 0.8, x: -160, y: -20, color: 'from-blue-500 to-indigo-500' },
-  { label: 'APPS', delay: 1.6, x: -150, y: 50, color: 'from-indigo-500 to-purple-500' },
-  { label: 'SISTEMAS', delay: 2.4, x: -130, y: 120, color: 'from-cyan-400 to-teal-400' },
-  { label: '</>', delay: 3.2, x: -90, y: 180, color: 'from-blue-400 to-cyan-400' },
+  { label: 'IA', delay: 0, x: -140, y: -90 },
+  { label: 'WEB', delay: 0.8, x: -160, y: -20 },
+  { label: 'APPS', delay: 1.6, x: -150, y: 50 },
+  { label: 'SISTEMAS', delay: 2.4, x: -130, y: 120 },
+  { label: '</>', delay: 3.2, x: -90, y: 180 },
 ];
 
 export default function Hero() {
   return (
     <section
       id="inicio"
-      className="relative min-h-screen flex items-center overflow-hidden pt-20 pb-16"
+      className="relative min-h-screen flex items-center overflow-hidden pt-24 pb-16"
     >
       {/* Cinematic ambient background glow */}
       <div className="absolute top-1/4 left-1/4 w-[650px] h-[650px] bg-blue-600/15 rounded-full blur-[140px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
       <div className="absolute top-1/3 right-10 w-[550px] h-[550px] bg-cyan-500/15 rounded-full blur-[130px] pointer-events-none" />
       <div className="absolute bottom-10 right-1/3 w-[450px] h-[450px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* Grid overlay pattern */}
+      {/* Cyber Grid overlay pattern */}
       <div
         className="absolute inset-0 opacity-[0.03] pointer-events-none"
         style={{
@@ -48,7 +48,7 @@ export default function Hero() {
               </span>
             </motion.div>
 
-            {/* Name Heading */}
+            {/* Name Heading with Studio Display Font */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -95,7 +95,7 @@ export default function Hero() {
             >
               <a
                 href="#proyectos"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold text-sm shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold text-sm shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/45 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
               >
                 Ver proyectos
                 <ArrowRight size={17} />
@@ -103,7 +103,7 @@ export default function Hero() {
               <a
                 href="/app/cv/CV-Manuel_Alvarez_Dianez.pdf"
                 download
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-slate-900/60 backdrop-blur-md text-slate-200 font-semibold text-sm border border-slate-700/70 hover:border-slate-500 hover:text-white hover:bg-slate-800/60 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-slate-900/80 backdrop-blur-md text-slate-200 font-semibold text-sm border border-slate-700/80 hover:border-cyan-400/50 hover:text-white hover:bg-slate-800/80 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
               >
                 <Download size={17} />
                 Descargar CV
@@ -138,7 +138,7 @@ export default function Hero() {
             </motion.div>
           </div>
 
-          {/* Right Column: Cinematic Portrait with Floating Tags */}
+          {/* Right Column: Cinematic Portrait with Cybernetic Orbit and Badges */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -146,11 +146,18 @@ export default function Hero() {
             className="lg:col-span-5 relative flex items-center justify-center"
           >
             <div className="relative w-full max-w-[460px] aspect-[4/5] flex items-center justify-center">
+              {/* Concentric Cybernetic Orbital Rings */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="w-[420px] h-[420px] rounded-full border border-cyan-500/15 border-dashed animate-[spin_60s_linear_infinite]" />
+                <div className="absolute w-[340px] h-[340px] rounded-full border border-blue-500/20" />
+                <div className="absolute w-[480px] h-[480px] rounded-full border border-indigo-500/10 border-dotted animate-[spin_90s_linear_infinite_reverse]" />
+              </div>
+
               {/* Radial Cyan Glow Aura */}
-              <div className="absolute inset-4 bg-gradient-to-br from-cyan-500/20 via-blue-600/20 to-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute inset-4 bg-gradient-to-br from-cyan-500/25 via-blue-600/20 to-purple-600/15 rounded-full blur-3xl pointer-events-none" />
 
               {/* Portrait Frame with Cyber Rim Light & Soft Mask */}
-              <div className="relative w-full h-full rounded-3xl overflow-hidden border border-cyan-500/20 bg-gradient-to-b from-slate-900/60 to-[#060B18] shadow-2xl shadow-cyan-950/40">
+              <div className="relative w-full h-full rounded-3xl overflow-hidden border border-cyan-500/30 bg-gradient-to-b from-slate-900/60 to-[#060B18] shadow-2xl shadow-cyan-950/50">
                 {/* Photo container with cyan duotone / dark blue cinematic tint */}
                 <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
                   <img
@@ -163,7 +170,7 @@ export default function Hero() {
                     }}
                   />
                   {/* Cyberpunk Blue Neon Rim overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-blue-900/30 via-transparent to-cyan-500/20 mix-blend-color-dodge pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-blue-900/35 via-transparent to-cyan-400/25 mix-blend-color-dodge pointer-events-none" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#060B18] via-transparent to-transparent pointer-events-none" />
                 </div>
               </div>
@@ -187,7 +194,7 @@ export default function Hero() {
                       }}
                       className="absolute left-0 pointer-events-auto cursor-default"
                     >
-                      <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-950/80 backdrop-blur-xl border border-cyan-400/40 shadow-lg shadow-cyan-500/10 hover:border-cyan-300 hover:shadow-cyan-400/30 transition-all group">
+                      <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-950/85 backdrop-blur-xl border border-cyan-400/40 shadow-xl shadow-cyan-500/15 hover:border-cyan-300 hover:shadow-cyan-400/40 hover:scale-105 transition-all group">
                         <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]" />
                         <span className="text-xs font-bold tracking-wider text-cyan-300 group-hover:text-white transition-colors">
                           {tag.label}

@@ -1,17 +1,15 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-  ExternalLink,
   Bot,
   Workflow,
   Sparkles,
   Cpu,
   Layers,
   ArrowUpRight,
-  Code2,
-  Terminal,
   Activity,
   CheckCircle2,
+  Play,
 } from 'lucide-react';
 import type { Project } from '../data/projects';
 import { FEATURED_PROJECTS } from '../data/projects';
@@ -22,12 +20,17 @@ interface ProjectShowcaseProps {
 }
 
 export default function ProjectShowcase({ selectedProject, onClose }: ProjectShowcaseProps) {
-  // Default to UIEP / Plataforma de Agentes IA if none selected
   const project = selectedProject || FEATURED_PROJECTS[0];
   const [activeTab, setActiveTab] = useState<'canvas' | 'code'>('canvas');
+  const [isSimulating, setIsSimulating] = useState(false);
+
+  const handleSimulate = () => {
+    setIsSimulating(true);
+    setTimeout(() => setIsSimulating(false), 2400);
+  };
 
   return (
-    <section className="relative py-12 lg:py-16">
+    <section className="relative py-8 lg:py-12">
       {/* Background neon ambient */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-cyan-600/10 rounded-full blur-[140px] pointer-events-none" />
 
@@ -36,7 +39,7 @@ export default function ProjectShowcase({ selectedProject, onClose }: ProjectSho
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="rounded-3xl bg-gradient-to-b from-slate-900/90 to-slate-950/95 border border-cyan-500/25 p-6 sm:p-10 shadow-2xl shadow-cyan-950/30 overflow-hidden relative"
+          className="rounded-3xl bg-gradient-to-b from-slate-900/95 via-[#0A1224]/95 to-slate-950/98 border border-cyan-500/30 p-6 sm:p-10 shadow-2xl shadow-cyan-950/40 overflow-hidden relative"
         >
           {/* Subtle top cyan line */}
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent" />
@@ -65,6 +68,8 @@ export default function ProjectShowcase({ selectedProject, onClose }: ProjectSho
                   ? 'IA y Productividad'
                   : project.category === 'apps-mobile'
                   ? 'Apps y Móviles'
+                  : project.category === 'audio'
+                  ? 'Audio y Multimedia'
                   : 'Sistemas y Herramientas'}
               </div>
 
@@ -92,40 +97,41 @@ export default function ProjectShowcase({ selectedProject, onClose }: ProjectSho
                     href={project.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm shadow-lg shadow-cyan-500/25 hover:shadow-cyan-400/40 transition-all cursor-pointer"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-sm shadow-xl shadow-cyan-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
                   >
                     Ver demo
                     <ArrowUpRight size={16} />
                   </a>
                 ) : (
-                  <span className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-semibold text-sm">
+                  <span className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 font-semibold text-sm">
+                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
                     En desarrollo activo
                   </span>
                 )}
 
                 <a
                   href="#contacto"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-800/80 hover:bg-slate-700/80 text-white font-semibold text-sm border border-slate-700 transition-all cursor-pointer"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-800/80 hover:bg-slate-700/80 text-white font-semibold text-sm border border-slate-700 hover:border-slate-500 transition-all cursor-pointer"
                 >
                   Consultar detalles
                 </a>
               </div>
 
-              {/* Feature Badges Grid */}
-              <div className="grid grid-cols-2 gap-2.5 pt-4 border-t border-slate-800">
-                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+              {/* Feature Badges Grid (4 Pills with Icons from Mockup) */}
+              <div className="grid grid-cols-2 gap-2.5 pt-4 border-t border-slate-800/80">
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-900/70 border border-slate-800/80">
                   <Bot size={16} className="text-cyan-400 shrink-0" />
                   <span className="text-xs text-slate-200 font-medium">Creación de agentes</span>
                 </div>
-                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-900/70 border border-slate-800/80">
                   <Workflow size={16} className="text-purple-400 shrink-0" />
                   <span className="text-xs text-slate-200 font-medium">Flujos de trabajo</span>
                 </div>
-                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-900/70 border border-slate-800/80">
                   <Cpu size={16} className="text-blue-400 shrink-0" />
                   <span className="text-xs text-slate-200 font-medium">Prompt engineering</span>
                 </div>
-                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-900/70 border border-slate-800/80">
                   <Layers size={16} className="text-emerald-400 shrink-0" />
                   <span className="text-xs text-slate-200 font-medium">Integraciones</span>
                 </div>
@@ -149,7 +155,7 @@ export default function ProjectShowcase({ selectedProject, onClose }: ProjectSho
               </div>
             </div>
 
-            {/* Right Column: Interactive Tablet Mockup with Workflow Canvas */}
+            {/* Right Column: Interactive 3D Tablet Mockup with Workflow Canvas */}
             <div className="lg:col-span-6 relative">
               <div className="relative rounded-2xl bg-slate-950 border border-slate-800 shadow-2xl overflow-hidden">
                 {/* Device Header Bar */}
@@ -165,7 +171,7 @@ export default function ProjectShowcase({ selectedProject, onClose }: ProjectSho
                   <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => setActiveTab('canvas')}
-                      className={`px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
+                      className={`px-2.5 py-1 rounded text-[11px] font-medium transition-colors cursor-pointer ${
                         activeTab === 'canvas'
                           ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
                           : 'text-slate-400 hover:text-white'
@@ -175,7 +181,7 @@ export default function ProjectShowcase({ selectedProject, onClose }: ProjectSho
                     </button>
                     <button
                       onClick={() => setActiveTab('code')}
-                      className={`px-2.5 py-1 rounded text-[11px] font-medium transition-colors ${
+                      className={`px-2.5 py-1 rounded text-[11px] font-medium transition-colors cursor-pointer ${
                         activeTab === 'code'
                           ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
                           : 'text-slate-400 hover:text-white'
@@ -187,7 +193,7 @@ export default function ProjectShowcase({ selectedProject, onClose }: ProjectSho
                 </div>
 
                 {/* Device Content Area */}
-                <div className="p-5 min-h-[360px] bg-gradient-to-b from-[#0B132B]/50 to-[#060B18] relative overflow-hidden flex flex-col justify-between">
+                <div className="p-5 min-h-[380px] bg-gradient-to-b from-[#0B132B]/60 to-[#060B18] relative overflow-hidden flex flex-col justify-between">
                   {/* Subtle Canvas Dot Grid */}
                   <div
                     className="absolute inset-0 opacity-[0.08] pointer-events-none"
@@ -199,9 +205,30 @@ export default function ProjectShowcase({ selectedProject, onClose }: ProjectSho
 
                   {activeTab === 'canvas' ? (
                     <div className="relative z-10 space-y-4">
+                      {/* Top simulation trigger */}
+                      <div className="flex items-center justify-between pb-1">
+                        <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+                          Pipeline de Ejecución
+                        </span>
+                        <button
+                          onClick={handleSimulate}
+                          disabled={isSimulating}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-[11px] font-medium transition-all cursor-pointer disabled:opacity-50"
+                        >
+                          <Play size={11} className={isSimulating ? 'animate-spin' : ''} />
+                          {isSimulating ? 'Procesando...' : 'Simular Flujo'}
+                        </button>
+                      </div>
+
                       {/* Flow Node 1: Input Trigger */}
                       <div className="flex items-center gap-3">
-                        <div className="px-3.5 py-2 rounded-xl bg-blue-500/15 border border-blue-500/40 text-blue-300 text-xs font-semibold shadow-md flex items-center gap-2">
+                        <div
+                          className={`px-3.5 py-2 rounded-xl border text-xs font-semibold shadow-md flex items-center gap-2 transition-all duration-300 ${
+                            isSimulating
+                              ? 'bg-blue-500/30 border-blue-400 text-white shadow-blue-500/40 scale-102'
+                              : 'bg-blue-500/15 border-blue-500/40 text-blue-300'
+                          }`}
+                        >
                           <Activity size={14} className="text-blue-400 animate-pulse" />
                           <span>Input: User Query / Voice Stream</span>
                         </div>
@@ -210,7 +237,13 @@ export default function ProjectShowcase({ selectedProject, onClose }: ProjectSho
                       </div>
 
                       {/* Flow Node 2: Central Orchestrator */}
-                      <div className="p-4 rounded-xl bg-slate-900/90 border border-cyan-500/40 shadow-lg shadow-cyan-950/50 space-y-2">
+                      <div
+                        className={`p-4 rounded-xl bg-slate-900/90 border shadow-lg space-y-2 transition-all duration-300 ${
+                          isSimulating
+                            ? 'border-cyan-400 shadow-cyan-950/80 ring-1 ring-cyan-400/50'
+                            : 'border-cyan-500/40 shadow-cyan-950/50'
+                        }`}
+                      >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Bot size={16} className="text-cyan-400" />
@@ -221,13 +254,13 @@ export default function ProjectShowcase({ selectedProject, onClose }: ProjectSho
                           </span>
                         </div>
                         <div className="grid grid-cols-3 gap-2 pt-1 text-[10px] font-mono">
-                          <div className="p-1.5 rounded bg-slate-950/60 border border-slate-800 text-slate-300 text-center">
+                          <div className="p-1.5 rounded bg-slate-950/70 border border-slate-800 text-slate-300 text-center">
                             Gemini 3.8
                           </div>
-                          <div className="p-1.5 rounded bg-slate-950/60 border border-slate-800 text-slate-300 text-center">
+                          <div className="p-1.5 rounded bg-slate-950/70 border border-slate-800 text-slate-300 text-center">
                             ChromaDB RAG
                           </div>
-                          <div className="p-1.5 rounded bg-slate-950/60 border border-slate-800 text-slate-300 text-center">
+                          <div className="p-1.5 rounded bg-slate-950/70 border border-slate-800 text-slate-300 text-center">
                             Tool Dispatch
                           </div>
                         </div>
@@ -235,11 +268,23 @@ export default function ProjectShowcase({ selectedProject, onClose }: ProjectSho
 
                       {/* Flow Node 3: Outputs */}
                       <div className="grid grid-cols-2 gap-3 pt-1">
-                        <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs">
+                        <div
+                          className={`p-3 rounded-xl border text-xs transition-all duration-300 ${
+                            isSimulating
+                              ? 'bg-purple-500/20 border-purple-400 shadow-lg shadow-purple-950/50'
+                              : 'bg-purple-500/10 border-purple-500/30 text-purple-300'
+                          }`}
+                        >
                           <div className="font-semibold text-white mb-0.5">PromptForge Synthesizer</div>
                           <div className="text-[10px] text-purple-300/80">Context injection & Guardrails</div>
                         </div>
-                        <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs">
+                        <div
+                          className={`p-3 rounded-xl border text-xs transition-all duration-300 ${
+                            isSimulating
+                              ? 'bg-emerald-500/20 border-emerald-400 shadow-lg shadow-emerald-950/50'
+                              : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                          }`}
+                        >
                           <div className="font-semibold text-white mb-0.5">Execution Engine</div>
                           <div className="text-[10px] text-emerald-300/80">API actions, DB update & Voice TTS</div>
                         </div>
@@ -273,10 +318,10 @@ export default function ProjectShowcase({ selectedProject, onClose }: ProjectSho
                   {/* Device Footer Telemetry */}
                   <div className="pt-4 mt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] font-mono text-slate-400">
                     <span className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       Status: Active on Port 8080
                     </span>
-                    <span>Uptime 99.98%</span>
+                    <span className="text-cyan-400">Uptime 99.98%</span>
                   </div>
                 </div>
               </div>

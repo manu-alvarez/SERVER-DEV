@@ -5,12 +5,14 @@ import About from './components/About';
 import Technologies from './components/Technologies';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import ParticleCanvas from './components/ParticleCanvas';
 
 function App() {
   return (
-    <>
+    <div className="relative min-h-screen bg-[#060B18] text-[#F1F5F9] selection:bg-cyan-500/30 selection:text-white">
+      <ParticleCanvas />
       <Navbar />
-      <main>
+      <main className="relative z-10">
         <Hero />
         <Projects />
         <About />
@@ -18,7 +20,7 @@ function App() {
         <Contact />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }
 

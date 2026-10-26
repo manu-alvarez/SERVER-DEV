@@ -101,34 +101,29 @@ VPS Contabo (ubuntu)
 ## 📋 3. PLAN DE EJECUCIÓN
 
 ### FASE 0: Limpieza ✅ COMPLETADA
-- [x] Eliminar archivos antiguos del código fuente (`src/pages/`, `Layout.tsx`, `apps.ts`, `App.css`)
-- [x] Limpiar `www/assets/` — eliminados 8 bundles JS/CSS de builds anteriores (~2.6MB basura)
-- [ ] Consolidar favicons — hay 5 archivos de ~930KB cada uno que son el mismo PNG (no crítico)
+- [x] Limpieza en VPS: `docker builder prune -a -f` ejecutado (reclamados 8.83 GB de disco SSD en el servidor)
+- [x] Limpieza de carpetas huérfanas en la raíz de `/home/ubuntu/MSBrossAI/`: eliminadas `gas-station`, `iaputa-os`, `traductor-pro`, `web-restaurante-atenea`, `moko-tools`, `combipro`, `app-generator`, `msbross-backend` y backups viejos
+- [x] Limpieza y consolidación de favicons pesados: eliminados 4.6 MB de archivos PNG redundantes de 931 KB (`favicon.png`, `icon.png`, `logo-icon.png`, `mad_logo.png`)
 - [x] Limpiar service workers viejos (`sw.js`, `workbox-*.js`, `registerSW.js`, `manifest.webmanifest`)
 
-### FASE 1: Reescritura del Frontend ✅ COMPLETADA (Alineación 100% Mockup)
-- [x] Reescribir `index.html` con SEO, Google Fonts Inter
-- [x] Reescribir `src/index.css` — design system completo
-- [x] Reescribir `src/App.tsx` — SPA fluida
-- [x] `src/data/projects.ts` — 7 proyectos estrella + 3 secundarios + 12 tecnologías con SVG oficiales
-- [x] Crear componentes:
-  - [x] `Navbar.tsx` — sticky glass, scroll spy, monograma MA, enlaces limpios
-  - [x] `Hero.tsx` — tipografía gradiente, CTAs con glow, stats, retrato duotone y 5 badges ciber (IA, WEB, APPS, SISTEMAS, </>)
-  - [x] `ProjectCard.tsx` — icono cuadrado gradiente, flecha diagonal superior derecha, pill status badge
-  - [x] `ProjectShowcase.tsx` — panel interactivo del proyecto seleccionado (Panel 2 del mockup) con canvas de flujo de agentes y terminal
-  - [x] `Projects.tsx` — tabs de categoría tipo pill, grid 4 columnas, showcase integrado y "Otros proyectos destacados"
-  - [x] `About.tsx` — historia, motivación, 4 skill cards (2x2), cita y consola de infraestructura/workstation de desarrollo
-  - [x] `Technologies.tsx` — grid 3x4 (12 logos SVG oficiales), cita y onda luminosa de neón
-  - [x] `Contact.tsx` — mockup de smartphone interactivo (Panel 6 del mockup), tarjetas de contacto y formulario POST `/api/contact`
-  - [x] `Footer.tsx` — copyright + iconos sociales SVG
-- [x] `vite.config.ts` — `base: './'`, sin PWA plugin
+### FASE 1: Reescritura del Frontend ✅ COMPLETADA (Studio-Grade / Awwwards Level)
+- [x] Reescribir `index.html` con SEO, Google Fonts Inter, favicons relativos y limpios
+- [x] Reescribir `src/index.css` — design system obsidian glass completo
+- [x] `src/components/ParticleCanvas.tsx` — canvas interactivo de partículas y malla gravitacional reactiva al cursor
+- [x] `src/components/Hero.tsx` — retrato con aura duotono, anillos orbitales cibernéticos concéntricos y 5 badges flotantes (`IA`, `WEB`, `APPS`, `SISTEMAS`, `</>`)
+- [x] `src/components/ProjectCard.tsx` — perspectiva 3D física tilt (`perspective: 1000px`, `rotateX/Y`) y foco de luz dinámico (`Spotlight Cursor Tracking`)
+- [x] `src/components/ProjectShowcase.tsx` — maqueta de tablet 3D con simulación interactiva de pulso por nodos en tiempo real
+- [x] `src/components/Projects.tsx` — grid de 4 columnas para los 7 proyectos estrella + tarjeta horizontal para Teringo Neural Cockpit con visualizador animado de ondas
+- [x] `src/components/About.tsx` — 4 skill cards, cita y consola de centro de mando con telemetría en vivo del VPS Contabo
+- [x] `src/components/Technologies.tsx` — cuadrícula 4x3 con 12 logos vectoriales oficiales y onda luminiscente
+- [x] `src/components/Contact.tsx` — smartphone 3D interactivo y formulario conectado a `/api/contact`
+- [x] `src/components/Navbar.tsx` & `Footer.tsx` — barra cápsula translúcida, monograma MA y enlaces sociales
 
-### FASE 2: Build ✅ COMPLETADO (3er pase — High-End Mockup Fidelity)
-- [x] `npm install` (clean install)
-- [x] `npx vite build` → exitoso (391ms)
-  - `dist/assets/index-EkqYXvTs.css` (70.7KB, gzip 10.9KB)
-  - `dist/assets/index-DzGrvFk6.js` (431.3KB, gzip 131.8KB)
-  - `dist/index.html` (1.5KB)
+### FASE 2: Build ✅ COMPLETADO (Studio-Grade v4)
+- [x] `npx vite build` → exitoso (403ms)
+  - `dist/assets/index-Dyf_MpNw.css` (77.3KB, gzip 11.6KB)
+  - `dist/assets/index-DunrOHTX.js` (438.9KB, gzip 134.1KB)
+  - `dist/index.html` (1.54KB)
 - [x] Copiado a `www/` (index.html + assets/)
 
 ### FASE 3: Verificación Visual ✅ COMPLETADA
