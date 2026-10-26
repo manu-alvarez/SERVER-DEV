@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { ArrowDown, Download, ArrowRight } from 'lucide-react';
+import ArchitectCockpit from './ArchitectCockpit';
 
 export default function Hero() {
   return (
@@ -24,7 +25,7 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* Left Column (Typography & CTAs) */}
-          <div className="lg:col-span-7 space-y-6 sm:space-y-7">
+          <div className="lg:col-span-6 space-y-6 sm:space-y-7">
             {/* Availability Pill */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
@@ -132,26 +133,14 @@ export default function Hero() {
             </motion.div>
           </div>
 
-          {/* Right Column: Real Manuel Portrait organically fused into the background */}
+          {/* Right Column: 3D Cyber-Architect Cockpit */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="lg:col-span-5 relative flex items-center justify-center lg:justify-end"
+            className="lg:col-span-6 relative flex items-center justify-center lg:justify-end w-full"
           >
-            <div className="relative w-full max-w-[480px] aspect-square flex items-center justify-center">
-              {/* Soft Ambient Backlight Glow behind Manuel's silhouette */}
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 via-blue-600/15 to-purple-600/10 rounded-full blur-[90px] pointer-events-none" />
-
-              {/* Seamless Portrait Container */}
-              <div className="relative w-full h-full flex items-center justify-center overflow-visible">
-                <img
-                  src="./hero-portrait.png"
-                  alt="Manuel Álvarez — Perfil Profesional"
-                  className="w-full h-full object-contain filter contrast-105 select-none pointer-events-none drop-shadow-[0_10px_40px_rgba(6,182,212,0.15)]"
-                />
-              </div>
-            </div>
+            <ArchitectCockpit />
           </motion.div>
         </div>
       </div>
