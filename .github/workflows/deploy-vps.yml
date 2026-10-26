@@ -111,8 +111,9 @@ jobs:
             cd infrastructure/traefik && docker compose up -d && cd /home/ubuntu/MSBrossAI
 
             echo "=== Deploying Docker services ==="
-            docker rm -f msbross-proxy perfume-trading mapfre txa-fitness-pro 2>/dev/null || true
-            docker compose up -d --build
+            docker rm -f msbross-proxy 2>/dev/null || true
+            docker compose up -d --build msbross-proxy
+            docker compose up -d --build || true
 
             echo "=== Restarting Traefik to refresh routes & certificates ==="
             cd infrastructure/traefik && docker compose restart && cd /home/ubuntu/MSBrossAI
