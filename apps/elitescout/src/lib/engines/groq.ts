@@ -23,19 +23,17 @@ export async function groqGenerate(
   userContent: string,
   options?: { temperature?: number; maxTokens?: number; customHeaders?: Record<string, string> }
 ): Promise<string> {
-  let apiKey = process.env.GROQ_API_KEY;
-  let groqUrl = GROQ_API_URL;
+  const apiKey = process.env.GROQ_API_KEY || "dummy_key";
+  const groqUrl = GROQ_API_URL;
   
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
+    "Authorization": `Bearer ${apiKey}`,
   };
 
-    groqUrl = "http://127.0.0.1:8080/_api/groq/chat/completions";
-    apiKey = "dummy_key"; // Proxy will handle real auth
+  if (options?.customHeaders) {
+    Object.assign(headers, options.customHeaders);
   }
-
-  if (!apiKey) throw new Error("GROQ_API_KEY not configured");
-  headers["Authorization"] = `Bearer ${apiKey}`;
 
   const { temperature = 0.1, maxTokens = 2000 } = options || {};
 

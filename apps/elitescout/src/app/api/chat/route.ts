@@ -6,16 +6,21 @@ export async function POST(req: NextRequest) {
     const { messages } = body;
 
     const customHeaders: Record<string, string> = {};
-    if (req.headers.get("x-user-custom-keys")) customHeaders["x-user-custom-keys"] = req.headers.get("x-user-custom-keys") as string;
+    if (req.headers.get("x-user-custom-keys")) {
+      customHeaders["x-user-custom-keys"] = req.headers.get("x-user-custom-keys") as string;
+    }
 
     const groqKey = process.env.GROQ_KEY || process.env.GROQ_API_KEY || "";
+    if (!groqKey) {
       return NextResponse.json({ error: "Groq API key not configured on server" }, { status: 500 });
     }
 
+    const url = "https://api.groq.com/openai/v1/chat/completions";
 
     const res = await fetch(url, {
       method: "POST",
       headers: {
+        "Authorization": `Bearer ${groqKey}`,
         "Content-Type": "application/json",
         ...customHeaders,
       },
