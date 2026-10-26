@@ -12,6 +12,7 @@ let genAI: GoogleGenerativeAI | null = null;
 
 /** Get or create Gemini client instance */
 function getClient(customHeaders?: Record<string, string>): GoogleGenerativeAI {
+  const useProxy = !!customHeaders && !!customHeaders["x-user-custom-keys"];
   let key = API_KEY;
   
   if (useProxy) {

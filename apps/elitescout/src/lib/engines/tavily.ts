@@ -52,6 +52,7 @@ async function tavilySearch(
     customHeaders?: Record<string, string>;
   } = {}
 ): Promise<TavilyResult[]> {
+  const useProxy = !!options.customHeaders && !!options.customHeaders["x-user-custom-keys"];
   const apiKey = useProxy ? "dummy" : process.env.TAVILY_API_KEY;
   if (!apiKey) return [];
 
