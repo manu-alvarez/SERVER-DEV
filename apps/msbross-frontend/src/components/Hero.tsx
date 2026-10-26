@@ -140,26 +140,16 @@ export default function Hero() {
             className="lg:col-span-5 relative flex items-center justify-center lg:justify-end"
           >
             <div className="relative w-full max-w-[480px] aspect-square flex items-center justify-center">
-              {/* Soft Atmospheric Backlight Glow - diffuse & wide */}
-              <div className="absolute -inset-10 bg-gradient-to-br from-cyan-500/15 via-blue-600/10 to-indigo-600/5 rounded-full blur-[120px] pointer-events-none" />
-              <div className="absolute inset-4 bg-gradient-to-t from-blue-600/10 via-cyan-500/5 to-transparent rounded-full blur-[70px] pointer-events-none" />
+              {/* Soft Ambient Backlight Glow behind Manuel's silhouette */}
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 via-blue-600/15 to-purple-600/10 rounded-full blur-[90px] pointer-events-none" />
 
-              {/* Seamless Portrait Container with feathered radial vignette */}
-              <div
-                className="relative w-full h-full flex items-center justify-center overflow-visible"
-                style={{
-                  maskImage: 'radial-gradient(ellipse 80% 75% at 50% 46%, black 25%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,0.25) 75%, transparent 100%)',
-                  WebkitMaskImage: 'radial-gradient(ellipse 80% 75% at 50% 46%, black 25%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,0.25) 75%, transparent 100%)',
-                }}
-              >
+              {/* Seamless Portrait Container */}
+              <div className="relative w-full h-full flex items-center justify-center overflow-visible">
                 <img
                   src="./hero-portrait.png"
                   alt="Manuel Álvarez — Perfil Profesional"
-                  className="w-full h-full object-contain opacity-80 select-none pointer-events-none"
+                  className="w-full h-full object-contain filter contrast-105 select-none pointer-events-none drop-shadow-[0_10px_40px_rgba(6,182,212,0.15)]"
                 />
-
-                {/* Atmospheric gradient overlay anchoring into canvas */}
-                <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-[#060B18] via-transparent to-transparent opacity-80" />
               </div>
             </div>
           </motion.div>
