@@ -106,57 +106,48 @@ VPS Contabo (ubuntu)
 - [ ] Consolidar favicons — hay 5 archivos de ~930KB cada uno que son el mismo PNG (no crítico)
 - [x] Limpiar service workers viejos (`sw.js`, `workbox-*.js`, `registerSW.js`, `manifest.webmanifest`)
 
-### FASE 1: Reescritura del Frontend ✅ COMPLETADA
+### FASE 1: Reescritura del Frontend ✅ COMPLETADA (Alineación 100% Mockup)
 - [x] Reescribir `index.html` con SEO, Google Fonts Inter
 - [x] Reescribir `src/index.css` — design system completo
-- [x] Reescribir `src/App.tsx` — SPA sin React Router
-- [x] Crear `src/data/projects.ts` — 7 featured + 3 otros
-- [x] Crear `src/hooks/useScrollSpy.ts`
+- [x] Reescribir `src/App.tsx` — SPA fluida
+- [x] `src/data/projects.ts` — 7 proyectos estrella + 3 secundarios + 12 tecnologías con SVG oficiales
 - [x] Crear componentes:
-  - [x] `Navbar.tsx` — sticky glass, scroll spy, SVG inline brand icons
-  - [x] `Hero.tsx` — nombre gradiente, stats, floating cards
-  - [x] `Projects.tsx` — grid + filtros por categoría
-  - [x] `ProjectCard.tsx` — icon gradient + badge status
-  - [x] `About.tsx` — foto real (`profile-photo.png`), skill cards, quote
-  - [x] `Technologies.tsx` — grid 12 techs + card "Hablemos"
-  - [x] `Contact.tsx` — formulario POST `/api/contact`
-  - [x] `Footer.tsx` — copyright + SVG social icons
-- [x] Actualizar `vite.config.ts` — `base: './'`, eliminar PWA plugin
+  - [x] `Navbar.tsx` — sticky glass, scroll spy, monograma MA, enlaces limpios
+  - [x] `Hero.tsx` — tipografía gradiente, CTAs con glow, stats, retrato duotone y 5 badges ciber (IA, WEB, APPS, SISTEMAS, </>)
+  - [x] `ProjectCard.tsx` — icono cuadrado gradiente, flecha diagonal superior derecha, pill status badge
+  - [x] `ProjectShowcase.tsx` — panel interactivo del proyecto seleccionado (Panel 2 del mockup) con canvas de flujo de agentes y terminal
+  - [x] `Projects.tsx` — tabs de categoría tipo pill, grid 4 columnas, showcase integrado y "Otros proyectos destacados"
+  - [x] `About.tsx` — historia, motivación, 4 skill cards (2x2), cita y consola de infraestructura/workstation de desarrollo
+  - [x] `Technologies.tsx` — grid 3x4 (12 logos SVG oficiales), cita y onda luminosa de neón
+  - [x] `Contact.tsx` — mockup de smartphone interactivo (Panel 6 del mockup), tarjetas de contacto y formulario POST `/api/contact`
+  - [x] `Footer.tsx` — copyright + iconos sociales SVG
+- [x] `vite.config.ts` — `base: './'`, sin PWA plugin
 
-### FASE 2: Build ✅ COMPLETADO (2do pase — SVGs profesionales)
+### FASE 2: Build ✅ COMPLETADO (3er pase — High-End Mockup Fidelity)
 - [x] `npm install` (clean install)
-- [x] `npx vite build` → exitoso
-  - `dist/assets/index-BztzVRhi.css` (39KB, gzip 7.5KB)
-  - `dist/assets/index-BcbR_ZIZ.js` (403KB, gzip 126KB)
+- [x] `npx vite build` → exitoso (391ms)
+  - `dist/assets/index-EkqYXvTs.css` (70.7KB, gzip 10.9KB)
+  - `dist/assets/index-DzGrvFk6.js` (431.3KB, gzip 131.8KB)
   - `dist/index.html` (1.5KB)
-- [x] Segundo pase de diseño: emojis reemplazados por SVGs profesionales en iconos de proyecto y logos de tecnología
+- [x] Copiado a `www/` (index.html + assets/)
 
-### FASE 3: Verificación Visual 🟡 PENDIENTE
-- [ ] Verificar en VPS tras deploy cada sección
-- [ ] Ajustar estilos/contenido según feedback del usuario
-- [ ] Verificar responsive (móvil/tablet/desktop)
+### FASE 3: Verificación Visual 🟡 EN PROGRESO (Validación y Deploy)
+- [x] Alineación visual de los 6 paneles del mockup de referencia
+- [ ] Verificación en vivo en VPS tras deploy
+- [ ] Comprobación responsive
 
-### FASE 4: Deploy a Producción 🟡 EN PROGRESO
-- [x] Assets viejos eliminados de `www/assets/` (8 archivos, ~2.6MB)
+### FASE 4: Deploy a Producción 🟡 LISTO PARA DISPARAR
+- [x] Assets viejos eliminados de `www/assets/`
 - [x] Service workers y manifest eliminados de `www/`
-- [x] Build nuevo copiado a `www/` (index.html + assets/)
-- [ ] Git commit + push
-- [ ] Trigger deploy pipeline
-
-Comandos pendientes:
-```bash
-cd /Users/manu/Library/Mobile\ Documents/com~apple~CloudDocs/Desktop/SERVER-DEV
-git add www/ apps/msbross-frontend/ docs/
-git commit -m "feat: redesign portfolio landing — 7 featured projects, dark premium aesthetic"
-git push
-env -u GITHUB_TOKEN gh workflow run deploy-vps.yml
-```
+- [x] Build nuevo v3 copiado a `www/` (index.html + assets/)
+- [x] Rebase limpio con `origin/main` y resolución de archivos de conflicto iCloud
+- [ ] Commit de cambios v3 + push
+- [ ] Trigger deploy pipeline: `env -u GITHUB_TOKEN gh workflow run deploy-vps.yml`
 
 ### FASE 5: Post-Deploy 🔴 PENDIENTE
-- [ ] Actualizar rutas SPA en proxy_server.js (líneas 909-916) si es necesario
-- [ ] Verificar que `manuelalvarez.dev` carga la nueva landing
-- [ ] Verificar que todas las SPAs en `/app/*` siguen funcionando
-- [ ] Verificar que el formulario de contacto funciona (POST `/api/contact`)
+- [ ] Verificar que `manuelalvarez.dev` carga el nuevo portfolio
+- [ ] Verificar que todas las SPAs en `/app/*` continúan funcionando
+- [ ] Probar envío de formulario en `/api/contact`
 
 ---
 
