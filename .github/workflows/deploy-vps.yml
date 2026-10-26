@@ -117,6 +117,8 @@ jobs:
 
             echo "=== Restarting Traefik to refresh routes & certificates ==="
             cd infrastructure/traefik && docker compose restart && cd /home/ubuntu/MSBrossAI
+            sleep 5
+            docker logs --tail 25 traefik
 
             echo "=== Reloading PM2 ==="
             pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js
