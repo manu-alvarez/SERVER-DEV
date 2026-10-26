@@ -27,22 +27,22 @@ export const FEATURED_PROJECTS: Project[] = [
   {
     id: 'uiep',
     name: 'UIEP',
-    subtitle: 'Gestión Operativa de Emergencias',
-    description: 'Plataforma integral para unidades de intervención y emergencias: gestión de personal, cuadrantes de guardia, control de flota operativa y reportes en tiempo real.',
-    category: 'systems',
+    subtitle: 'Universal Intelligence Engineering Platform',
+    description: 'Plataforma avanzada de ingeniería de agentes y entidades de IA: diseñador visual de arquitecturas con diagramas interactivos, pipelines de abstracción y adaptadores a frameworks.',
+    category: 'ai-enterprise',
     iconBg: 'linear-gradient(135deg, #3B82F6, #8B5CF6)',
     iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>`,
-    tech: ['React', 'TypeScript', 'Tailwind', 'Vite'],
-    url: 'https://manuelalvarez.dev/app/uiep/',
+    tech: ['Next.js', 'React Flow', 'Zustand', 'TypeScript', 'Tailwind'],
+    url: 'https://uiep.manuelalvarez.dev',
     status: 'live',
     featured: true,
     features: [
-      'Cuadrantes de guardias y asignación dinámica de turnos',
-      'Control de flota vehicular y equipamiento de emergencia',
-      'Generación de partes de intervención y exportación estructurada',
-      'Panel responsivo de alta visibilidad para terminales operativas'
+      'Constructor visual interactivo de agentes de IA y flujos de trabajo con React Flow',
+      'Motor de diseño modular con niveles de abstracción (concept, engineering, implementation)',
+      'Adaptadores dinámicos para frameworks líderes (OpenAI Agents, LangChain, CrewAI)',
+      'Exportación instantánea de esquemas de entidades y configuraciones de ejecución'
     ],
-    architecture: 'Single Page Application (SPA) modular alojada en VPS con proxy reverso NGINX/Node.js.'
+    architecture: 'Arquitectura monorepo Turborepo con paquetes desacoplados (@uiep/design-engine, @uiep/framework-adapter, @uiep/ui) servida en subdominio propio.'
   },
   {
     id: 'iaprod-os',
@@ -234,7 +234,7 @@ export const OTHER_PROJECTS: Project[] = [
     iconBg: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
     iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 6v4"/><path d="M10 8h4"/><circle cx="12" cy="15" r="2"/></svg>`,
     tech: ['React', 'TypeScript', 'Canvas', 'Framer Motion'],
-    url: 'https://manuelalvarez.dev/app/tarot-rws/',
+    url: 'https://tarot.manuelalvarez.dev',
     status: 'live',
     featured: false,
     features: [
@@ -252,7 +252,7 @@ export const OTHER_PROJECTS: Project[] = [
     iconBg: 'linear-gradient(135deg, #EC4899, #F43F5E)',
     iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/><line x1="8" x2="16" y1="22"/></svg>`,
     tech: ['React', 'CSS3', 'Audio Player', 'Vite'],
-    url: 'https://manuelalvarez.dev/app/beca-laud/',
+    url: 'https://becalaud.manuelalvarez.dev',
     status: 'live',
     featured: false,
     features: [

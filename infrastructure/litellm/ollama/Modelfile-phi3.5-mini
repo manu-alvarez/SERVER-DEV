@@ -1,0 +1,27 @@
+FROM phi3.5:mini-instruct-q4_K_M
+
+# System prompt for efficient reasoning
+SYSTEM """You are an efficient AI assistant. Be concise and accurate."""
+
+# Optimized for speed and low RAM
+PARAMETER temperature 0.1
+PARAMETER num_ctx 32768
+PARAMETER num_gpu 999
+PARAMETER num_thread 8
+PARAMETER batch_size 512
+PARAMETER flash_attention true
+PARAMETER mlock false
+
+PARAMETER stop "</s>"
+PARAMETER stop "<|endoftext|>"
+PARAMETER stop "<|assistant|>"
+
+# Phi-3.5 template
+TEMPLATE """{{- if .System }}<|system|>
+{{ .System }}<|end|>
+{{ end }}{{- range .Messages }}<|{{ .Role }}|>
+{{ .Content }}<|end|>
+{{ end }}<|assistant|>
+"""
+
+LICENSE """Phi-3.5 Mini License"""

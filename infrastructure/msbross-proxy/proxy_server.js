@@ -33,6 +33,56 @@ try {
   });
 } catch(e) {}
 
+// ── Key Rotation Tracker ──
+const providerKeyIndices = {
+  OPENAI: 0,
+  ANTHROPIC: 0,
+  GOOGLE_GEMINI: 0,
+  GROQ: 0,
+  MISTRAL: 0,
+  OPENROUTER: 0
+};
+
+function rotateVaultKey(provider) {
+  const keys = apiVault.LLM_PROVIDERS?.[provider];
+  if (keys && keys.length > 1) {
+    providerKeyIndices[provider] = (providerKeyIndices[provider] + 1) % keys.length;
+    console.warn(`[Proxy Rotation] Rotated ${provider} to key index ${providerKeyIndices[provider]}`);
+  }
+}
+
+function getVaultKey(provider) {
+  if (provider === 'OLLAMA') return apiVault.OLLAMA_URL;
+  if (provider === 'TAVILY') return apiVault.TAVILY_API_KEY;
+  if (provider === 'THEODDS') return apiVault.THEODDS_API_KEY;
+  
+  try {
+    if (!apiVault.LLM_PROVIDERS) return null;
+    const keys = apiVault.LLM_PROVIDERS[provider];
+    if (providerKeyIndices[provider] === undefined || isNaN(providerKeyIndices[provider])) {
+      providerKeyIndices[provider] = 0;
+    }
+    
+    if (!keys || !Array.isArray(keys) || keys.length === 0) {
+      if (provider === 'GOOGLE_GEMINI') return apiVault.GEMINI_API_KEY;
+      if (provider === 'GROQ') return apiVault.GROQ_API_KEY;
+      if (provider === 'ANTHROPIC') return apiVault.ANTHROPIC_API_KEY;
+      if (provider === 'OPENROUTER') return apiVault.OPENROUTER_API_KEY;
+      return null;
+    }
+    
+    const idx = providerKeyIndices[provider] % keys.length;
+    if (!keys[idx]) {
+       console.error(`[getVaultKey] Error: keys[${idx}] is undefined for provider ${provider}! length is ${keys.length}`);
+       return null;
+    }
+    return keys[idx].key; 
+  } catch (e) {
+    console.error(`[getVaultKey] Fatal error for ${provider}:`, e);
+    return null;
+  }
+}
+
 // ── Compression ──
 app.use(compression({ level: 6, threshold: 1024 }));
 
@@ -234,13 +284,53 @@ app.get('/api/visits-badge', (req, res) => {
   res.send(svg);
 });
 
+
+// ── Contact Message Endpoint ──
+const messagesFile = path.join(__dirname, '../../data', 'messages.json');
+app.post('/api/contact', express.json(), (req, res) => {
+  const { name, email, subject, message } = req.body || {};
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: 'Nombre, email y mensaje son campos obligatorios.' });
+  }
+
+  const msgEntry = {
+    id: Date.now().toString(),
+    date: new Date().toISOString(),
+    ip: req.ip || req.headers['x-forwarded-for'] || 'unknown',
+    name: String(name).slice(0, 100).trim(),
+    email: String(email).slice(0, 120).trim(),
+    subject: String(subject || 'Mensaje desde manuelalvarez.dev').slice(0, 150).trim(),
+    message: String(message).slice(0, 5000).trim(),
+  };
+
+  try {
+    const dir = path.dirname(messagesFile);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    let existing = [];
+    if (fs.existsSync(messagesFile)) {
+      try { existing = JSON.parse(fs.readFileSync(messagesFile, 'utf8')); } catch(e) {}
+    }
+    existing.unshift(msgEntry);
+    fs.writeFileSync(messagesFile, JSON.stringify(existing.slice(0, 500), null, 2));
+    console.log(`[Contact] Mensaje recibido de ${msgEntry.name} <${msgEntry.email}>`);
+    return res.json({ success: true, message: '¡Mensaje recibido correctamente! Manuel se pondrá en contacto pronto.' });
+  } catch (err) {
+    console.error('[Contact Error]', err);
+    return res.status(500).json({ error: 'Error interno al procesar el mensaje.' });
+  }
+});
+
 // ── Static SPAs ──
 const NEXT_APPS = [
-  'app-generator', 'cuentos-magicos', 'combipro', 'industrialpro',
-  'edelweiss', 'expositator-rte', 'iaprod-os', 'jartosdto',
-  'logisearch', 'moko-tools', 'msbross', 'gas-station', 'livekit-nikolina',
-  'taskflow', 'traductor-pro', 'web-restaurante-atenea', 'it-english-coach',
-  'cv', 'logitrack', 'maya', 'assistant'
+  'agent-builder-pro', 'agent-forge', 'app-generator', 'beca-laud',
+  'beca-laud-band', 'beca-laud-crm', 'combipro', 'cuadrante-horarios',
+  'cuentos-magicos', 'cv', 'edelweiss', 'expositator-rte', 'gas-station',
+  'iaprod-os', 'industrialpro', 'intercompiler', 'jartosdto',
+  'livekit-nikolina', 'logisearch', 'logitrack', 'maya', 'moko-tools',
+  'msbross', 'multi-agent-orch', 'omnidev-os', 'perfume-ean', 'perfume-trading',
+  'prompt-generator', 'tarot-maya', 'tarot-rws', 'taskflow', 'teringo',
+  'traductor-pro', 'tu-energia-maya', 'uiep', 'web-restaurante-atenea',
+  'it-english-coach', 'assistant'
 ];
 
 const DOMAIN_APP_MAP = {
@@ -266,7 +356,10 @@ const DOMAIN_APP_MAP = {
   'atenea.manuelalvarez.dev': 'web-restaurante-atenea',
   'taskflow.manuelalvarez.dev': 'taskflow',
   'edelweiss.manuelalvarez.dev': 'edelweiss',
-  'cv.manuelalvarez.dev': 'cv'
+  'cv.manuelalvarez.dev': 'cv',
+  'uiep.manuelalvarez.dev': 'uiep',
+  'tarot.manuelalvarez.dev': 'tarot-rws',
+  'becalaud.manuelalvarez.dev': 'beca-laud'
 };
 
 app.use((req, res, next) => {
@@ -293,6 +386,23 @@ app.use((req, res, next) => {
       req.url = `/app/${mappedApp}${req.url}`;
     }
   }
+
+  // Handle SPA subpaths and assets when accessed via main domain or without mapped subdomain
+  if (!mappedApp) {
+    const referer = req.headers.referer || '';
+    if (req.url.startsWith('/_next/')) {
+      if (referer.includes('/app/cuentos-magicos')) {
+        req.url = `/app/cuentos-magicos${req.url}`;
+      } else if (referer.includes('/app/jartosdto')) {
+        req.url = `/app/jartosdto${req.url}`;
+      } else if (referer.includes('/app/uiep')) {
+        req.url = `/app/uiep${req.url}`;
+      }
+    }
+    if (req.path === '/stories' || req.path.startsWith('/stories/') || req.path === '/create' || req.path.startsWith('/create/')) {
+      return res.redirect(302, `/app/cuentos-magicos${req.url}`);
+    }
+  }
   next();
 });
 
@@ -308,7 +418,7 @@ for (const name of NEXT_APPS) {
   });
 
   app.use(prefix, express.static(appDir, {
-    index: false,
+    index: 'index.html',
     setHeaders: (res, path) => {
       if (path.endsWith('.html') || path.endsWith('sw.js')) {
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
@@ -322,8 +432,21 @@ for (const name of NEXT_APPS) {
     }
   }));
 
-  app.get(new RegExp(`^/app/${name}/(.*)$`), (req, res, next) => {
+  app.get(new RegExp(`^/app/${name}(?:/(.*))?$`), (req, res, next) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    const sub = (req.params[0] || '').split('?')[0].replace(/\/+$/, '');
+    if (sub) {
+      const candidates = [
+        path.join(appDir, sub, 'index.html'),
+        path.join(appDir, sub + '.html'),
+        path.join(appDir, sub)
+      ];
+      for (const p of candidates) {
+        if (fs.existsSync(p) && fs.statSync(p).isFile()) {
+          return res.sendFile(p);
+        }
+      }
+    }
     const indexFile = path.join(appDir, 'index.html');
     res.sendFile(indexFile, err => {
       if (err) {
@@ -349,15 +472,15 @@ const proxyOpts = (target, stripPrefix, ws = false) => ({
     },
     proxyReq: (proxyReq, req, res) => {
       // ── Auto-inject API keys from vault for all backend requests ──
-      if (apiVault.LLM_PROVIDERS?.OPENAI?.[0]?.key) proxyReq.setHeader('x-injected-openai', apiVault.LLM_PROVIDERS.OPENAI[0].key);
-      if (apiVault.LLM_PROVIDERS?.ANTHROPIC?.[0]?.key) proxyReq.setHeader('x-injected-anthropic', apiVault.LLM_PROVIDERS.ANTHROPIC[0].key);
-      if (apiVault.LLM_PROVIDERS?.GOOGLE_GEMINI?.[0]?.key) proxyReq.setHeader('x-injected-google', apiVault.LLM_PROVIDERS.GOOGLE_GEMINI[0].key);
-      if (apiVault.LLM_PROVIDERS?.GROQ?.[0]?.key) proxyReq.setHeader('x-injected-groq', apiVault.LLM_PROVIDERS.GROQ[0].key);
-      if (apiVault.LLM_PROVIDERS?.MISTRAL?.[0]?.key) proxyReq.setHeader('x-injected-mistral', apiVault.LLM_PROVIDERS.MISTRAL[0].key);
-      if (apiVault.OLLAMA_URL) proxyReq.setHeader('x-injected-ollama', apiVault.OLLAMA_URL);
-      if (apiVault.LLM_PROVIDERS?.OPENROUTER?.[0]?.key) proxyReq.setHeader('x-injected-openrouter', apiVault.LLM_PROVIDERS.OPENROUTER[0].key);
-      if (apiVault.THEODDS_API_KEY) proxyReq.setHeader('x-injected-theodds', apiVault.THEODDS_API_KEY);
-      if (apiVault.TAVILY_API_KEY) proxyReq.setHeader('x-injected-tavily', apiVault.TAVILY_API_KEY);
+      const oai = getVaultKey('OPENAI'); if (oai) proxyReq.setHeader('x-injected-openai', oai);
+      const ant = getVaultKey('ANTHROPIC'); if (ant) proxyReq.setHeader('x-injected-anthropic', ant);
+      const gem = getVaultKey('GOOGLE_GEMINI'); if (gem) proxyReq.setHeader('x-injected-google', gem);
+      const gro = getVaultKey('GROQ'); if (gro) proxyReq.setHeader('x-injected-groq', gro);
+      const mis = getVaultKey('MISTRAL'); if (mis) proxyReq.setHeader('x-injected-mistral', mis);
+      const oll = getVaultKey('OLLAMA'); if (oll) proxyReq.setHeader('x-injected-ollama', oll);
+      const opr = getVaultKey('OPENROUTER'); if (opr) proxyReq.setHeader('x-injected-openrouter', opr);
+      const odd = getVaultKey('THEODDS'); if (odd) proxyReq.setHeader('x-injected-theodds', odd);
+      const tav = getVaultKey('TAVILY'); if (tav) proxyReq.setHeader('x-injected-tavily', tav);
     },
   },
 });
@@ -388,37 +511,78 @@ app.use('/_jartosdto',     createProxyMiddleware(proxyOpts('http://jartosdto-bac
 app.use('/_atenea',        createProxyMiddleware(proxyOpts('http://atenea-backend:8009', '/_atenea')));
 app.use('/_traductor',     createProxyMiddleware(proxyOpts('http://traductor-backend:8004', '/_traductor')));
 app.use('/_msbross',       createProxyMiddleware(proxyOpts('http://msbross-backend:8005', '/_msbross')));
+app.use('/_omnidev', createProxyMiddleware({ target: 'http://host.docker.internal:8765', changeOrigin: true, ws: true, pathRewrite: { '^/_omnidev': '' }, on: { error: (err, req, res) => { console.error('[OmniDev Proxy Error]', err.message); if (res && res.writeHead) res.status(502).json({ error: 'OmniDev backend unavailable' }); }, proxyReqWs: (proxyReq, req, socket) => { console.log('[OmniDev WS]', req.url); } } }));
 
 
 // ── IT English Coach AI Proxy ──
 app.post('/_coach/api/evaluate', express.json(), async (req, res) => {
   try {
-    const geminiKey = apiVault?.LLM_PROVIDERS?.GOOGLE_GEMINI?.[0]?.key || apiVault?.GEMINI_API_KEY;
-    if (!geminiKey) return res.status(500).json({ error: 'Gemini Key missing in API vault' });
+    const keys = apiVault?.LLM_PROVIDERS?.GOOGLE_GEMINI || [];
+    let keysToTry = keys.map(k => k.key);
+    if (keysToTry.length === 0 && apiVault?.GEMINI_API_KEY) {
+      keysToTry.push(apiVault.GEMINI_API_KEY);
+    }
+    if (keysToTry.length === 0) return res.status(500).json({ error: 'Gemini Key missing in API vault' });
 
     const { messages = [], system } = req.body;
-    const contents = [];
-    if (system) {
-      contents.push({ role: 'user', parts: [{ text: `SYSTEM INSTRUCTION: ${system}` }] });
-      contents.push({ role: 'model', parts: [{ text: 'Understood.' }] });
-    }
-    for (const msg of messages) {
-      contents.push({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }]
-      });
-    }
+    let successText = null;
+    let lastStatus = 500;
+    
+    for (const geminiKey of keysToTry) {
+      const contents = [];
+      if (system) {
+        contents.push({ role: 'user', parts: [{ text: `SYSTEM INSTRUCTION: ${system}` }] });
+        contents.push({ role: 'model', parts: [{ text: 'Understood.' }] });
+      }
+      for (const msg of messages) {
+        contents.push({
+          role: msg.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: msg.content }]
+        });
+      }
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${geminiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${geminiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        successText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        break; // Success!
+      } else {
+        lastStatus = response.status;
+        console.warn(`[Coach Proxy] Gemini key failed with ${lastStatus}. Rotating...`);
+        rotateVaultKey('GOOGLE_GEMINI');
+      }
+    }
+    
+    if (successText !== null) {
+      return res.json({ text: successText });
+    }
+    
+    console.warn(`[Coach Proxy] ALL Gemini keys failed. Falling back to Ollama VPS!`);
+    const ollamaUrl = apiVault.OLLAMA_URL || 'http://172.20.0.1:11434';
+    const ollamaMsgs = [];
+    if (system) ollamaMsgs.push({ role: 'system', content: system });
+    for (const msg of messages) {
+      ollamaMsgs.push({ role: msg.role === 'assistant' ? 'assistant' : 'user', content: msg.content });
+    }
+    
+    const ollamaRes = await fetch(`${ollamaUrl}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents })
+      body: JSON.stringify({ model: 'gemma3:4b', messages: ollamaMsgs, stream: false })
     });
+    
+    if (ollamaRes.ok) {
+      const oData = await ollamaRes.json();
+      return res.json({ text: oData.message?.content || '' });
+    }
+    
+    throw new Error(`Ollama fallback also failed: ${ollamaRes.status}`);
 
-    if (!response.ok) throw new Error(`Gemini API error: ${response.status}`);
-    const data = await response.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    res.json({ text });
   } catch (error) {
     console.error('Coach API Error:', error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -468,17 +632,15 @@ app.use('/rtc', createProxyMiddleware({
 }));
 
 // ── Generic AI Proxy Endpoints ──
-const createAIProxy = (path, target, extractUserKey, injectVaultKey) => {
+const createAIProxy = (path, target, providerName) => {
   app.use(path, (req, res, next) => {
-    // Always inject vault key for all AI proxy routes
-    let keyToUse = injectVaultKey();
+    let keyToUse = getVaultKey(providerName);
     
     req.proxyAuthKey = keyToUse;
+    req.proxyProviderName = providerName;
     
-    // Inject query parameter directly into req.url for Gemini (Handles both HTTP and WebSocket)
     if (keyToUse && path.includes('gemini')) {
       const urlObj = new URL(req.url, 'http://localhost');
-      // If there's already a dummy key from the SDK, remove or overwrite it
       urlObj.searchParams.set('key', keyToUse);
       req.url = urlObj.pathname + urlObj.search;
     }
@@ -490,13 +652,19 @@ const createAIProxy = (path, target, extractUserKey, injectVaultKey) => {
     ws: true,
     pathRewrite: { [`^${path}`]: '' },
     on: {
+      proxyRes: (proxyRes, req, res) => {
+        if (proxyRes.statusCode === 429 || proxyRes.statusCode === 401) {
+          console.warn(`[AI Proxy] Provider ${req.proxyProviderName} returned ${proxyRes.statusCode}. Rotating key.`);
+          if (req.proxyProviderName) rotateVaultKey(req.proxyProviderName);
+        }
+      },
       proxyReq: (proxyReq, req, res) => {
-        if (req.proxyAuthKey && !path.includes('gemini')) {
+        if (req.proxyAuthKey) {
           proxyReq.setHeader('Authorization', `Bearer ${req.proxyAuthKey}`);
         }
       },
       proxyReqWs: (proxyReq, req, socket, options, head) => {
-        if (req.proxyAuthKey && !path.includes('gemini')) {
+        if (req.proxyAuthKey) {
           proxyReq.setHeader('Authorization', `Bearer ${req.proxyAuthKey}`);
         }
       },
@@ -508,11 +676,226 @@ const createAIProxy = (path, target, extractUserKey, injectVaultKey) => {
   }));
 };
 
-createAIProxy('/_api/tavily', 'https://api.tavily.com', k => k.tavily, () => apiVault.TAVILY_API_KEY);
-createAIProxy('/_api/gemini', 'https://generativelanguage.googleapis.com', k => k.gemini, () => apiVault.GEMINI_API_KEY);
-createAIProxy('/_api/openrouter', 'https://openrouter.ai/api', k => k.openrouter, () => apiVault.OPENROUTER_API_KEY);
-createAIProxy('/_api/groq', 'https://api.groq.com', k => k.groq, () => apiVault.GROQ_API_KEY);
-createAIProxy('/_api/anthropic', 'https://api.anthropic.com', k => k.anthropic, () => apiVault.ANTHROPIC_API_KEY);
+// ── Helper for async sleep ──
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
+// ── Universal AI Fallback (LLMs) ──
+const unifiedLlmHandler = async (req, res) => {
+  const fallbackChain = ['GOOGLE_GEMINI', 'NVIDIA', 'CEREBRAS', 'GROQ', 'TOGETHER_AI', 'OLLAMA'];
+  let body = req.body;
+  if (!body || typeof body !== 'object') {
+    return res.status(400).json({ error: 'Invalid JSON body' });
+  }
+
+  for (const provider of fallbackChain) {
+    let key = getVaultKey(provider);
+    if (!key && provider !== 'OLLAMA') continue;
+
+    let url, headers = { 'Content-Type': 'application/json' };
+    let providerBody = { ...body };
+
+    if (provider === 'GOOGLE_GEMINI') {
+      url = `https://generativelanguage.googleapis.com/v1beta/openai/chat/completions?key=${key}`;
+      headers['Authorization'] = `Bearer ${key}`;
+      // Usar modelo moderno válido por defecto
+      providerBody.model = 'gemini-1.5-flash'; 
+    } else if (provider === 'NVIDIA') {
+      url = 'https://integrate.api.nvidia.com/v1/chat/completions';
+      headers['Authorization'] = `Bearer ${key}`;
+      providerBody.model = 'meta/llama-3.1-8b-instruct';
+    } else if (provider === 'GROQ') {
+      url = 'https://api.groq.com/openai/v1/chat/completions';
+      headers['Authorization'] = `Bearer ${key}`;
+      providerBody.model = 'llama-3.3-70b-versatile';
+    } else if (provider === 'CEREBRAS') {
+      url = 'https://api.cerebras.ai/v1/chat/completions';
+      headers['Authorization'] = `Bearer ${key}`;
+      providerBody.model = 'llama3.1-8b';
+    } else if (provider === 'TOGETHER_AI') {
+      url = 'https://api.together.xyz/v1/chat/completions';
+      headers['Authorization'] = `Bearer ${key}`;
+      providerBody.model = 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo';
+    } else if (provider === 'OLLAMA') {
+      url = `${apiVault.OLLAMA_URL || 'http://172.20.0.1:11434'}/v1/chat/completions`;
+      providerBody.model = 'gemma3:4b';
+    }
+
+    try {
+      console.log(`[UnifiedProxy] Trying ${provider} for LLM request...`);
+      const fetchRes = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(providerBody),
+        // Timeout dinámico ajustado a 25 segundos para fallar rápido a los siguientes
+        signal: AbortSignal.timeout(25000) 
+      });
+
+      if (fetchRes.ok) {
+        res.status(fetchRes.status);
+        fetchRes.headers.forEach((val, k) => res.setHeader(k, val));
+        
+        if (fetchRes.body) {
+          const { Readable } = require('stream');
+          Readable.fromWeb(fetchRes.body).pipe(res);
+        } else {
+          res.send(await fetchRes.text());
+        }
+        return; // Success! Done.
+      } else {
+        const errorText = await fetchRes.text().catch(() => 'no body');
+        console.warn(`[UnifiedProxy] ${provider} failed with HTTP ${fetchRes.status}: ${errorText.substring(0, 150)}`);
+        if (fetchRes.status === 429 || fetchRes.status === 401 || fetchRes.status === 403 || fetchRes.status === 404 || fetchRes.status === 400 || fetchRes.status >= 500) {
+          if (provider !== 'OLLAMA') rotateVaultKey(provider);
+        }
+        await delay(300); // 300ms sleep prevent IP burst blocks
+      }
+    } catch (e) {
+      console.warn(`[UnifiedProxy] ${provider} network error: ${e.message}`);
+      await delay(300);
+    }
+  }
+
+  res.status(502).json({ error: 'All AI providers failed including local fallback.' });
+};
+
+// ── Universal AI Fallback (Audio TTS) ──
+const unifiedAudioHandler = async (req, res) => {
+  let body = req.body;
+  if (!body || typeof body !== 'object') {
+    return res.status(400).json({ error: 'Invalid JSON body' });
+  }
+
+  // Rotamos entre claves de OpenAI para TTS
+  const maxRetries = 3; 
+  for (let i = 0; i < maxRetries; i++) {
+    let key = getVaultKey('OPENAI');
+    if (!key) break;
+    
+    try {
+      console.log(`[UnifiedAudio] Trying OPENAI TTS (Attempt ${i + 1})...`);
+      const fetchRes = await fetch('https://api.openai.com/v1/audio/speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(30000) 
+      });
+
+      if (fetchRes.ok) {
+        res.status(fetchRes.status);
+        fetchRes.headers.forEach((val, k) => res.setHeader(k, val));
+        if (fetchRes.body) {
+          const { Readable } = require('stream');
+          Readable.fromWeb(fetchRes.body).pipe(res);
+        } else {
+          res.send(await fetchRes.buffer());
+        }
+        return;
+      } else {
+        const errorText = await fetchRes.text().catch(() => 'no body');
+        console.warn(`[UnifiedAudio] OPENAI failed with HTTP ${fetchRes.status}: ${errorText.substring(0, 100)}`);
+        if (fetchRes.status === 429 || fetchRes.status === 401 || fetchRes.status === 403 || fetchRes.status === 402) {
+          rotateVaultKey('OPENAI');
+        } else {
+          // If it's a 400 bad request (e.g. text too long), abort early.
+          return res.status(fetchRes.status).json({ error: 'OPENAI Audio API error', details: errorText });
+        }
+        await delay(500);
+      }
+    } catch (e) {
+      console.warn(`[UnifiedAudio] OPENAI network error: ${e.message}`);
+      await delay(500);
+    }
+  }
+  res.status(502).json({ error: 'All Audio API keys failed.' });
+};
+
+// ── Universal AI Fallback (Images) ──
+const unifiedImageHandler = async (req, res) => {
+  let body = req.body;
+  if (!body || typeof body !== 'object') {
+    return res.status(400).json({ error: 'Invalid JSON body' });
+  }
+
+  const fallbackChain = ['OPENAI', 'TOGETHER_AI'];
+  
+  for (const provider of fallbackChain) {
+    let key = getVaultKey(provider);
+    if (!key) continue;
+
+    let url, headers = { 'Content-Type': 'application/json' };
+    let providerBody = {};
+
+    if (provider === 'OPENAI') {
+      url = 'https://api.openai.com/v1/images/generations';
+      headers['Authorization'] = `Bearer ${key}`;
+      providerBody = { ...body }; // Standard OpenAI payload: {prompt, model, size}
+    } else if (provider === 'TOGETHER_AI') {
+      url = 'https://api.together.xyz/v1/images/generations';
+      headers['Authorization'] = `Bearer ${key}`;
+      // Adapt from OpenAI to TogetherAI Image Gen (e.g., Flux)
+      providerBody = {
+        model: 'black-forest-labs/FLUX.1-schnell-Free',
+        prompt: body.prompt || '',
+        width: 1024,
+        height: 1024,
+        steps: 4,
+        n: 1,
+        response_format: body.response_format || 'b64_json'
+      };
+    }
+
+    try {
+      console.log(`[UnifiedImage] Trying ${provider} for Image request...`);
+      const fetchRes = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(providerBody),
+        signal: AbortSignal.timeout(45000) // Images take longer
+      });
+
+      if (fetchRes.ok) {
+        const json = await fetchRes.json();
+        // TogetherAI returns slightly different format in some models, but OpenAI-compatible endpoint usually normalizes it
+        return res.json(json);
+      } else {
+        const errorText = await fetchRes.text().catch(() => 'no body');
+        console.warn(`[UnifiedImage] ${provider} failed with HTTP ${fetchRes.status}: ${errorText.substring(0, 100)}`);
+        if (fetchRes.status === 429 || fetchRes.status === 401 || fetchRes.status === 403 || fetchRes.status === 400 || fetchRes.status === 402) {
+          rotateVaultKey(provider);
+        }
+        await delay(500);
+      }
+    } catch (e) {
+      console.warn(`[UnifiedImage] ${provider} network error: ${e.message}`);
+      await delay(500);
+    }
+  }
+
+  res.status(502).json({ error: 'All Image generation providers failed.' });
+};
+
+// Montar handler (express.json limit 50mb para soportar imágenes en base64 si es necesario)
+const jsonParser = express.json({ limit: '50mb' });
+app.post('/_api/llm/chat/completions', jsonParser, unifiedLlmHandler);
+app.post('/_api/gemini/v1beta/openai/chat/completions', jsonParser, unifiedLlmHandler);
+app.post('/_api/audio/speech', jsonParser, unifiedAudioHandler);
+app.post('/_api/images/generations', jsonParser, unifiedImageHandler);
+
+
+createAIProxy('/_api/tavily', 'https://api.tavily.com', 'TAVILY');
+createAIProxy('/_api/gemini', 'https://generativelanguage.googleapis.com', 'GOOGLE_GEMINI');
+createAIProxy('/_api/openrouter', 'https://openrouter.ai/api', 'OPENROUTER');
+createAIProxy('/_api/groq', 'https://api.groq.com', 'GROQ');
+createAIProxy('/_api/anthropic', 'https://api.anthropic.com', 'ANTHROPIC');
+createAIProxy('/_api/openai', 'https://api.openai.com', 'OPENAI');
+createAIProxy('/_api/deepseek', 'https://api.deepseek.com', 'DEEPSEEK');
+createAIProxy('/_api/nvidia', 'https://integrate.api.nvidia.com', 'NVIDIA');
+createAIProxy('/_api/mistral', 'https://api.mistral.ai', 'MISTRAL');
+createAIProxy('/_api/together', 'https://api.together.xyz', 'TOGETHER_AI');
+createAIProxy('/_api/cerebras', 'https://api.cerebras.ai', 'CEREBRAS');
+createAIProxy('/_api/siliconflow', 'https://api.siliconflow.cn', 'SILICONFLOW');
+createAIProxy('/_api/deepinfra', 'https://api.deepinfra.com', 'DEEPINFRA');
+createAIProxy('/_api/opencodezen', 'https://api.opencodezen.com', 'OPENCODE_ZEN');
 
 
 // ── Static files & SPA fallback ──
@@ -526,6 +909,11 @@ app.use(express.static(WWW, {
 
 app.get(/\/(favicon\.ico|favicon\.svg|vite\.svg|logo\.png|logo\.svg|apple-touch-icon\.png)$/, (req, res) => {
   res.sendFile(path.join(__dirname, 'favicon.png'));
+});
+
+app.get(['/apps', '/profile', '/architecture', '/contact', '/bots'], (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+  res.sendFile(path.join(WWW, 'index.html'));
 });
 
 app.use((req, res) => {

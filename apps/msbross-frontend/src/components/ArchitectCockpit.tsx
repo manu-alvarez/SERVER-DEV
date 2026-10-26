@@ -86,7 +86,7 @@ export default function ArchitectCockpit() {
             {/* Location & Modality */}
             <div className="flex items-center gap-1.5 text-slate-300 font-medium">
               <MapPin size={14} className="text-cyan-400 shrink-0" />
-              <span>Sevilla, ES</span>
+              <span>Mequinenza (Zaragoza)</span>
               <span className="text-slate-500">·</span>
               <span className="text-slate-400 text-[11px]">Remoto / Presencial</span>
             </div>

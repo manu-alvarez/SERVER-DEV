@@ -1,0 +1,45 @@
+{
+  "llm_proxy": {
+    "base_url": "http://localhost:4000/v1",
+    "api_key": "sk-litellm-proxy-b5e28a4a4dd0b3ac3fc8990a9f37a6ff61fd833e16002f340f54b13dd70bfdc1",
+    "models": [
+      "openai/gpt-4o",
+      "openai/gpt-4o-mini",
+      "anthropic/claude-sonnet-4-5",
+      "anthropic/claude-haiku",
+      "google/gemini-2.5-pro",
+      "google/gemini-2.5-flash",
+      "groq/llama-3.3-70b",
+      "groq/qwen3-6b",
+      "openrouter/llama-3.3-70b-free",
+      "deepseek/deepseek-chat",
+      "mistral/mistral-small",
+      "mistral/codestral",
+      "together/llama-3.3-70b",
+      "cerebras/llama-3.3-70b",
+      "siliconflow/qwen2.5-72b",
+      "deepinfra/llama-3.3-70b",
+      "nvidia/llama-3.3-70b",
+      "minimax/minimax-m1-80k",
+      "huggingface/llama-3.3-70b",
+      "xiaomi-mimo/gpt-4o-mini",
+      "ollama/gemma3-4b"
+    ],
+    "default_model": "openai/gpt-4o-mini",
+    "timeout": 60,
+    "retry_strategy": "failover",
+    "max_retries": 3,
+    "fallback_chain": [
+      "groq/llama-3.3-70b",
+      "openrouter/llama-3.3-70b-free",
+      "deepseek/deepseek-chat",
+      "mistral/mistral-small",
+      "google/gemini-2.5-flash"
+    ]
+  },
+  "agent": {
+    "name": "MSBross AI Agent",
+    "version": "1.0.0",
+    "provider": "litellm"
+  }
+}

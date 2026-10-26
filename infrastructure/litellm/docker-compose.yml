@@ -1,0 +1,23 @@
+name: litellm
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm:main
+    container_name: litellm-proxy
+    command: --config /app/config.yaml --port 4000 --workers 4
+    env_file:
+      - .env
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+    networks:
+      - msbross_net
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:4000/health').status == 200 else 1)\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+networks:
+  msbross_net:
+    external: true

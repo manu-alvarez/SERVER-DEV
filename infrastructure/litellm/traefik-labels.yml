@@ -1,0 +1,11 @@
+# Optional: Add these labels to docker-compose.yml if you want Traefik integration
+# Paste under the litellm service in infrastructure/litellm/docker-compose.yml
+
+labels:
+  - traefik.enable=true
+  - traefik.http.routers.litellm-proxy.rule=Host(`llm-proxy.manuelalvarez.dev`)
+  - traefik.http.routers.litellm-proxy.entrypoints=websecure
+  - traefik.http.routers.litellm-proxy.tls.certresolver=myresolver
+  - traefik.http.middlewares.litellm-proxy-auth.basicauth.users=${LLM_PROXY_BASIC_AUTH:-admin:$$apr1$$tsube.dv$$ntEzPeXD8lwJK5E5SQbGF1}
+  - traefik.http.routers.litellm-proxy.middlewares=litellm-proxy-auth
+  - traefik.http.services.litellm-proxy.loadbalancer.server.port=4000

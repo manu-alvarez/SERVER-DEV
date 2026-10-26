@@ -1,0 +1,336 @@
+general_settings:
+  master_key: ${LITELLM_MASTER_KEY}
+  disable_duplicate_keys: true
+  max_parallel_requests: 10
+  timeout: 60
+  num_retries: 3
+  retry: true
+  allowed_ips: []
+
+router_settings:
+  routing_strategy: simple-shuffle
+  max_parallel_requests: 10
+  num_retries: 3
+  timeout: 60
+  retry_after: 1
+  allowed_fails: 3
+
+litellm_settings:
+  drop_params: true
+  request_timeout: 60
+  max_tokens: 8192
+  debug: false
+  set_verbose: false
+  suppress_debug_info: true
+  async_httpx_client: false
+  max_parallel_requests: 10
+
+model_list:
+  - model_name: openai/gpt-4o
+    litellm_params:
+      model: openai/gpt-4o
+      api_key: ${OPENAI_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: openai/gpt-4o
+      provider: openai
+      size: large
+
+  - model_name: openai/gpt-4o-mini
+    litellm_params:
+      model: openai/gpt-4o-mini
+      api_key: ${OPENAI_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: openai/gpt-4o-mini
+      provider: openai
+      size: small
+
+  - model_name: anthropic/claude-sonnet-4-5
+    litellm_params:
+      model: anthropic/claude-sonnet-4-5-20251001
+      api_key: ${ANTHROPIC_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: anthropic/claude-sonnet-4-5-20251001
+      provider: anthropic
+      size: large
+
+  - model_name: anthropic/claude-haiku
+    litellm_params:
+      model: anthropic/claude-haiku-4-5-20251001
+      api_key: ${ANTHROPIC_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: anthropic/claude-haiku-4-5-20251001
+      provider: anthropic
+      size: small
+
+  - model_name: google/gemini-2.5-pro
+    litellm_params:
+      model: gemini/gemini-2.5-pro
+      api_key: ${GOOGLE_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: gemini-2.5-pro
+      provider: google
+      size: large
+
+  - model_name: google/gemini-2.5-flash
+    litellm_params:
+      model: gemini/gemini-2.5-flash
+      api_key: ${GOOGLE_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: gemini-2.5-flash
+      provider: google
+      size: medium
+
+  - model_name: groq/llama-3.3-70b
+    litellm_params:
+      model: groq/llama-3.3-70b-versatile
+      api_key: ${GROQ_API_KEY}
+      max_tokens: 8192
+      timeout: 30
+    model_info:
+      id: llama-3.3-70b-versatile
+      provider: groq
+      size: large
+
+  - model_name: groq/qwen3-6b
+    litellm_params:
+      model: groq/qwen3-6b
+      api_key: ${GROQ_API_KEY}
+      max_tokens: 8192
+      timeout: 30
+    model_info:
+      id: qwen3-6b
+      provider: groq
+      size: small
+
+  - model_name: openrouter/llama-3.3-70b-free
+    litellm_params:
+      model: openrouter/meta-llama/llama-3.3-70b-instruct:free
+      api_key: ${OPENROUTER_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: meta-llama/llama-3.3-70b-instruct:free
+      provider: openrouter
+      size: large
+
+  - model_name: deepseek/deepseek-chat
+    litellm_params:
+      model: deepseek/deepseek-chat
+      api_key: ${DEEPSEEK_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: deepseek-chat
+      provider: deepseek
+      size: medium
+
+  - model_name: mistral/mistral-small
+    litellm_params:
+      model: mistral/mistral-small-latest
+      api_key: ${MISTRAL_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: mistral-small-latest
+      provider: mistral
+      size: small
+
+  - model_name: mistral/codestral
+    litellm_params:
+      model: mistral/codestral-latest
+      api_key: ${MISTRAL_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: codestral-latest
+      provider: mistral
+      size: small
+
+  - model_name: together/llama-3.3-70b
+    litellm_params:
+      model: together_ai/meta-llama/Llama-3.3-70B-Instruct-Turbo
+      api_key: ${TOGETHER_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: meta-llama/Llama-3.3-70B-Instruct-Turbo
+      provider: together
+      size: large
+
+  - model_name: cerebras/llama-3.3-70b
+    litellm_params:
+      model: cerebras/llama-3.3-70b
+      api_key: ${CEREBRAS_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: llama-3.3-70b
+      provider: cerebras
+      size: large
+
+  - model_name: siliconflow/qwen2.5-72b
+    litellm_params:
+      model: siliconflow/Qwen/Qwen2.5-72B-Instruct
+      api_key: ${SILICONFLOW_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: Qwen/Qwen2.5-72B-Instruct
+      provider: siliconflow
+      size: large
+
+  - model_name: deepinfra/llama-3.3-70b
+    litellm_params:
+      model: deepinfra/meta-llama/Llama-3.3-70B-Instruct
+      api_key: ${DEEPINFRA_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: meta-llama/Llama-3.3-70B-Instruct
+      provider: deepinfra
+      size: large
+
+  - model_name: nvidia/llama-3.3-70b
+    litellm_params:
+      model: nvidia_nim/meta/llama-3.3-70b-instruct
+      api_key: ${NVIDIA_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: meta/llama-3.3-70b-instruct
+      provider: nvidia
+      size: large
+
+  - model_name: minimax/minimax-m1-80k
+    litellm_params:
+      model: minimax/MiniMax-M1-80k
+      api_key: ${MINIMAX_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: MiniMax-M1-80k
+      provider: minimax
+      size: large
+
+  - model_name: huggingface/llama-3.3-70b
+    litellm_params:
+      model: hf/meta-llama/Llama-3.3-70B-Instruct
+      api_key: ${HUGGINGFACE_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: meta-llama/Llama-3.3-70B-Instruct
+      provider: huggingface
+      size: large
+
+  - model_name: opencode-zen/code-model
+    litellm_params:
+      model: opencode_zen/code-model
+      api_key: ${OPENCODE_ZEN_API_KEY}
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: code-model
+      provider: opencode-zen
+      size: medium
+
+  - model_name: xiaomi-mimo/gpt-4o-mini
+    litellm_params:
+      model: xiaomi_mimo/gpt-4o-mini
+      api_key: ${XIAOMI_MIMO_API_KEY}
+      api_base: https://token-plan-ams.xiaomimimo.com/v1
+      max_tokens: 8192
+      timeout: 60
+    model_info:
+      id: gpt-4o-mini
+      provider: xiaomi-mimo
+      size: small
+
+  - model_name: ollama/gemma3-4b
+    litellm_params:
+      model: ollama/gemma3:4b
+      api_base: http://100.100.2.10:11434
+      max_tokens: 8192
+      timeout: 120
+    model_info:
+      id: gemma3:4b
+      provider: ollama
+      size: small
+
+embedding_list:
+  - model_name: openai/text-embedding-3-small
+    litellm_params:
+      model: openai/text-embedding-3-small
+      api_key: ${OPENAI_API_KEY}
+    model_info:
+      id: text-embedding-3-small
+      provider: openai
+      dimensions: 1536
+
+  - model_name: openai/text-embedding-3-large
+    litellm_params:
+      model: openai/text-embedding-3-large
+      api_key: ${OPENAI_API_KEY}
+    model_info:
+      id: text-embedding-3-large
+      provider: openai
+      dimensions: 3072
+
+  - model_name: google/text-embedding-004
+    litellm_params:
+      model: gemini/text-embedding-004
+      api_key: ${GOOGLE_API_KEY}
+    model_info:
+      id: text-embedding-004
+      provider: google
+      dimensions: 768
+
+  - model_name: ollama/nomic-embed-text
+    litellm_params:
+      model: ollama/nomic-embed-text
+      api_base: http://100.100.2.10:11434
+    model_info:
+      id: nomic-embed-text
+      provider: ollama
+      dimensions: 768
+
+fallbacks:
+  - openai/gpt-4o:
+      - anthropic/claude-sonnet-4-5
+      - google/gemini-2.5-pro
+      - groq/llama-3.3-70b
+      - deepseek/deepseek-chat
+      - mistral/mistral-small
+
+  - anthropic/claude-sonnet-4-5:
+      - openai/gpt-4o
+      - google/gemini-2.5-pro
+      - groq/llama-3.3-70b
+      - deepseek/deepseek-chat
+      - mistral/mistral-small
+
+  - google/gemini-2.5-pro:
+      - openai/gpt-4o
+      - anthropic/claude-sonnet-4-5
+      - groq/llama-3.3-70b
+      - deepseek/deepseek-chat
+      - mistral/mistral-small
+
+input_cost_per_token: 0
+output_cost_per_token: 0
+max_budget: 0
+budget_duration: monthly
+cooldown_time: 0
+max_budget_usage: 100
