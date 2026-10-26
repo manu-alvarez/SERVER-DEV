@@ -9,7 +9,7 @@ import ParticleCanvas from './components/ParticleCanvas';
 
 function App() {
   return (
-    <div className="relative min-h-screen bg-[#060B18] text-[#F1F5F9] selection:bg-cyan-500/30 selection:text-white">
+    <div className="relative min-h-screen bg-[#040714] text-[#F1F5F9] selection:bg-cyan-500/30 selection:text-white">
       <ParticleCanvas />
       <Navbar />
       <main className="relative z-10">

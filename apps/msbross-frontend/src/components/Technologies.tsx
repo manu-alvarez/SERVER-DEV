@@ -3,7 +3,7 @@ import { TECHNOLOGIES } from '../data/projects';
 
 export default function Technologies() {
   return (
-    <section id="tecnologias" className="relative py-24 lg:py-32 overflow-hidden">
+    <section id="tecnologias" className="relative py-24 lg:py-32 overflow-hidden bg-[#040714]">
       {/* Ambient background glow */}
       <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute bottom-10 right-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[130px] pointer-events-none" />
@@ -17,7 +17,7 @@ export default function Technologies() {
           >
             <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-semibold tracking-wider uppercase mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-              Stack & Herramientas
+              Stack & Competencias
             </span>
           </motion.div>
 
@@ -42,7 +42,7 @@ export default function Technologies() {
           </motion.p>
         </div>
 
-        {/* 12 Tech Tiles Grid (4 Columns x 3 Rows) */}
+        {/* 12 Real Tech Tiles Grid (4 Columns x 3 Rows) */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
           {TECHNOLOGIES.map((tech, i) => (
             <motion.div
@@ -50,15 +50,18 @@ export default function Technologies() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.04 }}
-              className="p-5 rounded-2xl bg-gradient-to-b from-slate-900/80 to-[#0A1220]/90 border border-slate-800/80 hover:border-cyan-500/40 hover:shadow-xl hover:shadow-cyan-950/20 transition-all flex flex-col items-center justify-center gap-3.5 group cursor-default"
+              transition={{ delay: i * 0.03 }}
+              className="p-5 rounded-2xl bg-gradient-to-b from-[#0A1224]/90 to-[#060B18]/95 border border-slate-800/80 hover:border-cyan-500/40 hover:shadow-xl hover:shadow-cyan-950/25 transition-all flex flex-col items-center justify-center gap-3 group cursor-default"
             >
               <div
                 className="w-12 h-12 rounded-xl bg-slate-950/70 border border-slate-800/80 flex items-center justify-center p-2.5 transition-transform group-hover:scale-110 shadow-inner"
                 dangerouslySetInnerHTML={{ __html: tech.svg }}
               />
-              <span className="text-xs sm:text-sm font-bold text-slate-300 group-hover:text-white transition-colors">
+              <span className="text-xs sm:text-sm font-bold text-slate-300 group-hover:text-white transition-colors text-center">
                 {tech.name}
+              </span>
+              <span className="text-[10px] text-slate-500 font-mono -mt-1">
+                {tech.category}
               </span>
             </motion.div>
           ))}
@@ -79,7 +82,7 @@ export default function Technologies() {
           {/* Luminous Neon Wave Divider */}
           <div className="relative h-6 flex items-center justify-center">
             <svg
-              className="w-64 h-4 text-cyan-500/30 overflow-visible"
+              className="w-64 h-4 text-cyan-500/40 overflow-visible"
               viewBox="0 0 256 16"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -92,9 +95,9 @@ export default function Technologies() {
               />
               <defs>
                 <linearGradient id="wave-gradient" x1="0" y1="8" x2="256" y2="8" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#06B6D4" stopOpacity="0" />
-                  <stop offset="0.5" stopColor="#06B6D4" />
-                  <stop offset="1" stopColor="#3B82F6" stopOpacity="0" />
+                  <stop stopColor="#00d2ff" stopOpacity="0" />
+                  <stop offset="0.5" stopColor="#00d2ff" />
+                  <stop offset="1" stopColor="#7928ca" stopOpacity="0" />
                 </linearGradient>
               </defs>
             </svg>

@@ -1,28 +1,20 @@
 import { motion } from 'framer-motion';
 import { ArrowDown, Download, ArrowRight } from 'lucide-react';
 
-const FLOATING_TAGS = [
-  { label: 'IA', delay: 0, x: -140, y: -90 },
-  { label: 'WEB', delay: 0.8, x: -160, y: -20 },
-  { label: 'APPS', delay: 1.6, x: -150, y: 50 },
-  { label: 'SISTEMAS', delay: 2.4, x: -130, y: 120 },
-  { label: '</>', delay: 3.2, x: -90, y: 180 },
-];
-
 export default function Hero() {
   return (
     <section
       id="inicio"
-      className="relative min-h-screen flex items-center overflow-hidden pt-24 pb-16"
+      className="relative min-h-[92vh] flex items-center overflow-hidden pt-28 pb-16 bg-[#040714]"
     >
       {/* Cinematic ambient background glow */}
-      <div className="absolute top-1/4 left-1/4 w-[650px] h-[650px] bg-blue-600/15 rounded-full blur-[140px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
-      <div className="absolute top-1/3 right-10 w-[550px] h-[550px] bg-cyan-500/15 rounded-full blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-10 right-1/3 w-[450px] h-[450px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-blue-600/12 rounded-full blur-[140px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-cyan-500/15 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-[450px] h-[450px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* Cyber Grid overlay pattern */}
+      {/* Subtle background tech grid */}
       <div
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        className="absolute inset-0 opacity-[0.025] pointer-events-none"
         style={{
           backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)`,
           backgroundSize: '48px 48px',
@@ -30,9 +22,9 @@ export default function Hero() {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        <div className="grid lg:grid-cols-12 gap-8 items-center">
           {/* Left Column (Typography & CTAs) */}
-          <div className="lg:col-span-7 space-y-7">
+          <div className="lg:col-span-7 space-y-6 sm:space-y-7">
             {/* Availability Pill */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
@@ -95,15 +87,15 @@ export default function Hero() {
             >
               <a
                 href="#proyectos"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold text-sm shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/45 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-[#00d2ff] via-blue-600 to-[#7928ca] text-white font-semibold text-sm shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
               >
                 Ver proyectos
                 <ArrowRight size={17} />
               </a>
               <a
                 href="/app/cv/CV-Manuel_Alvarez_Dianez.pdf"
-                download
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-slate-900/80 backdrop-blur-md text-slate-200 font-semibold text-sm border border-slate-700/80 hover:border-cyan-400/50 hover:text-white hover:bg-slate-800/80 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                download="CV-Manuel_Alvarez_Dianez.pdf"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-slate-900/60 backdrop-blur-md text-slate-200 font-semibold text-sm border border-slate-700/80 hover:border-cyan-400/60 hover:text-white hover:bg-slate-800/80 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
               >
                 <Download size={17} />
                 Descargar CV
@@ -138,71 +130,30 @@ export default function Hero() {
             </motion.div>
           </div>
 
-          {/* Right Column: Cinematic Portrait with Cybernetic Orbit and Badges */}
+          {/* Right Column: Profile Portrait in Profile Angle blending seamlessly into the background */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="lg:col-span-5 relative flex items-center justify-center"
+            className="lg:col-span-5 relative flex items-center justify-center lg:justify-end"
           >
-            <div className="relative w-full max-w-[460px] aspect-[4/5] flex items-center justify-center">
-              {/* Concentric Cybernetic Orbital Rings */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-[420px] h-[420px] rounded-full border border-cyan-500/15 border-dashed animate-[spin_60s_linear_infinite]" />
-                <div className="absolute w-[340px] h-[340px] rounded-full border border-blue-500/20" />
-                <div className="absolute w-[480px] h-[480px] rounded-full border border-indigo-500/10 border-dotted animate-[spin_90s_linear_infinite_reverse]" />
-              </div>
+            <div className="relative w-full max-w-[420px] aspect-[3/4] flex items-center justify-center">
+              {/* Backlight Glow Aura */}
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/25 via-blue-600/20 to-purple-600/10 rounded-full blur-3xl pointer-events-none" />
 
-              {/* Radial Cyan Glow Aura */}
-              <div className="absolute inset-4 bg-gradient-to-br from-cyan-500/25 via-blue-600/20 to-purple-600/15 rounded-full blur-3xl pointer-events-none" />
-
-              {/* Portrait Frame with Cyber Rim Light & Soft Mask */}
-              <div className="relative w-full h-full rounded-3xl overflow-hidden border border-cyan-500/30 bg-gradient-to-b from-slate-900/60 to-[#060B18] shadow-2xl shadow-cyan-950/50">
-                {/* Photo container with cyan duotone / dark blue cinematic tint */}
-                <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-                  <img
-                    src="./profile-photo.png"
-                    alt="Manuel Álvarez"
-                    className="w-full h-full object-cover object-top filter contrast-125 brightness-95"
-                    style={{
-                      maskImage: 'radial-gradient(ellipse 90% 85% at 50% 45%, black 45%, transparent 95%)',
-                      WebkitMaskImage: 'radial-gradient(ellipse 90% 85% at 50% 45%, black 45%, transparent 95%)',
-                    }}
-                  />
-                  {/* Cyberpunk Blue Neon Rim overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-blue-900/35 via-transparent to-cyan-400/25 mix-blend-color-dodge pointer-events-none" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#060B18] via-transparent to-transparent pointer-events-none" />
-                </div>
-              </div>
-
-              {/* Floating Cybernetic Badges (IA, WEB, APPS, SISTEMAS, </>) */}
-              <div className="absolute inset-0 pointer-events-none flex items-center justify-start pl-2">
-                <div className="relative w-full h-full flex flex-col justify-center gap-3">
-                  {FLOATING_TAGS.map((tag) => (
-                    <motion.div
-                      key={tag.label}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{
-                        opacity: 1,
-                        x: [tag.x, tag.x + 6, tag.x],
-                        y: [tag.y, tag.y - 4, tag.y],
-                      }}
-                      transition={{
-                        opacity: { duration: 0.6, delay: 0.4 + tag.delay * 0.2 },
-                        x: { duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: tag.delay },
-                        y: { duration: 4, repeat: Infinity, ease: 'easeInOut', delay: tag.delay },
-                      }}
-                      className="absolute left-0 pointer-events-auto cursor-default"
-                    >
-                      <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-950/85 backdrop-blur-xl border border-cyan-400/40 shadow-xl shadow-cyan-500/15 hover:border-cyan-300 hover:shadow-cyan-400/40 hover:scale-105 transition-all group">
-                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]" />
-                        <span className="text-xs font-bold tracking-wider text-cyan-300 group-hover:text-white transition-colors">
-                          {tag.label}
-                        </span>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
+              {/* Seamless Portrait Container */}
+              <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+                <img
+                  src="./hero-portrait.png"
+                  alt="Manuel Álvarez — Perfil"
+                  className="w-full h-full object-contain object-right-bottom filter contrast-110"
+                  style={{
+                    maskImage:
+                      'radial-gradient(ellipse 95% 90% at 65% 50%, black 55%, transparent 95%)',
+                    WebkitMaskImage:
+                      'radial-gradient(ellipse 95% 90% at 65% 50%, black 55%, transparent 95%)',
+                  }}
+                />
               </div>
             </div>
           </motion.div>
@@ -214,15 +165,15 @@ export default function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10"
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10"
       >
         <a
           href="#proyectos"
-          className="flex flex-col items-center gap-1.5 text-slate-500 hover:text-cyan-400 transition-colors"
+          className="flex flex-col items-center gap-1 text-slate-500 hover:text-cyan-400 transition-colors"
           aria-label="Ir a proyectos"
         >
           <span className="text-[10px] uppercase tracking-widest font-semibold">Scroll</span>
-          <ArrowDown size={16} className="animate-bounce" />
+          <ArrowDown size={15} className="animate-bounce" />
         </a>
       </motion.div>
     </section>

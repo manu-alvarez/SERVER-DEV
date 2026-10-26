@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Monitor, Code, Bot, BookOpen, Terminal, ShieldCheck, Server, Cpu } from 'lucide-react';
+import { Monitor, Code, Bot, BookOpen } from 'lucide-react';
 
 const SKILLS = [
   {
@@ -38,13 +38,13 @@ const SKILLS = [
 
 export default function About() {
   return (
-    <section id="sobre-mi" className="relative py-24 lg:py-32 overflow-hidden">
+    <section id="sobre-mi" className="relative py-24 lg:py-32 overflow-hidden bg-[#040714]">
       {/* Ambient lighting */}
       <div className="absolute top-1/2 left-0 w-[550px] h-[550px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none -translate-y-1/2" />
       <div className="absolute bottom-0 right-10 w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[130px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-14 items-center">
           {/* Left Column: Story & Motivation */}
           <div className="lg:col-span-6 space-y-7">
             {/* Pill Badge */}
@@ -102,7 +102,7 @@ export default function About() {
                 return (
                   <div
                     key={skill.title}
-                    className="p-4 rounded-2xl bg-gradient-to-b from-slate-900/80 to-[#0A1220]/90 border border-slate-800/80 hover:border-slate-700 transition-all space-y-2.5 group"
+                    className="p-4 rounded-2xl bg-gradient-to-b from-slate-900/90 to-[#0A1220]/95 border border-slate-800/80 hover:border-cyan-500/40 hover:shadow-xl hover:shadow-cyan-950/20 transition-all space-y-2.5 group"
                   >
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105"
@@ -132,9 +132,9 @@ export default function About() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.32 }}
-              className="flex items-start gap-3.5 p-4 rounded-2xl bg-slate-900/40 border border-slate-800/60"
+              className="flex items-start gap-3.5 p-4 rounded-2xl bg-slate-900/50 border border-slate-800/80"
             >
-              <span className="text-3xl text-cyan-400/50 font-serif leading-none select-none">
+              <span className="text-3xl text-cyan-400 font-serif leading-none select-none">
                 “
               </span>
               <p className="text-xs sm:text-sm text-slate-300 italic leading-relaxed pt-0.5">
@@ -143,97 +143,25 @@ export default function About() {
             </motion.div>
           </div>
 
-          {/* Right Column: Workstation & Infrastructure Command Center */}
+          {/* Right Column: Workstation Setup Photo from Mockup */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-            className="lg:col-span-6 relative"
+            className="lg:col-span-6 relative flex items-center justify-center"
           >
             {/* Ambient workstation glow */}
-            <div className="absolute -inset-2 bg-gradient-to-br from-cyan-500/20 via-blue-600/15 to-purple-600/15 rounded-3xl blur-2xl pointer-events-none" />
+            <div className="absolute -inset-2 bg-gradient-to-br from-cyan-500/20 via-blue-600/15 to-purple-600/10 rounded-3xl blur-2xl pointer-events-none" />
 
-            {/* High-tech Multi-Monitor / Console Frame */}
-            <div className="relative rounded-3xl bg-slate-950 border border-slate-800 shadow-2xl overflow-hidden">
-              {/* Window Bar */}
-              <div className="flex items-center justify-between px-4 py-3 bg-slate-900/90 border-b border-slate-800">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
-                  <span className="text-xs font-mono text-slate-300 ml-2 font-semibold">
-                    vps-contabo:~# neofetch --ecosystem
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-mono font-semibold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    LIVE SERVER
-                  </span>
-                </div>
-              </div>
-
-              {/* Console Body */}
-              <div className="p-6 space-y-5 bg-gradient-to-b from-[#090F1E] to-[#060B18]">
-                {/* Active Services Grid */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800/80 space-y-1">
-                    <div className="flex items-center gap-2 text-cyan-400">
-                      <Server size={14} />
-                      <span className="text-xs font-bold text-white">Traefik v3 Proxy</span>
-                    </div>
-                    <p className="text-[11px] text-slate-400 font-mono">
-                      SSL Let's Encrypt · *.manuelalvarez.dev
-                    </p>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800/80 space-y-1">
-                    <div className="flex items-center gap-2 text-blue-400">
-                      <Cpu size={14} />
-                      <span className="text-xs font-bold text-white">Node.js Gateway</span>
-                    </div>
-                    <p className="text-[11px] text-slate-400 font-mono">
-                      Port 8080 · Express PM2 Cluster
-                    </p>
-                  </div>
-                </div>
-
-                {/* Real Code Preview Terminal */}
-                <div className="p-4 rounded-xl bg-slate-950/90 border border-slate-800/90 font-mono text-xs space-y-1">
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 border-b border-slate-800 pb-2 mb-2">
-                    <span className="flex items-center gap-1.5 text-cyan-400">
-                      <Terminal size={12} /> orchestrator.py
-                    </span>
-                    <span>FastAPI + LiveKit WebRTC</span>
-                  </div>
-                  <div>
-                    <span className="text-purple-400">async def</span>{' '}
-                    <span className="text-blue-400">dispatch_request</span>(query: QueryModel):
-                  </div>
-                  <div className="pl-4 text-slate-400">
-                    context = <span className="text-purple-400">await</span> memory.
-                    <span className="text-yellow-300">retrieve</span>(query.vector)
-                  </div>
-                  <div className="pl-4 text-slate-400">
-                    response = <span className="text-purple-400">await</span> llm_engine.
-                    <span className="text-yellow-300">generate_stream</span>(context)
-                  </div>
-                  <div className="pl-4 text-emerald-400">
-                    <span className="text-purple-400">return</span> AudioStreamResponse(response)
-                  </div>
-                </div>
-
-                {/* Live Stats Status Bar */}
-                <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-slate-800/80 text-[11px] font-mono text-slate-400">
-                  <span className="flex items-center gap-1 text-slate-300">
-                    <ShieldCheck size={13} className="text-emerald-400" />
-                    Security Hardened (UFW + Fail2Ban)
-                  </span>
-                  <span className="text-cyan-400">RAM: 4.8GB / 16GB</span>
-                  <span className="text-emerald-400">99.98% SLA</span>
-                </div>
-              </div>
+            {/* Workstation Photo Frame */}
+            <div className="relative rounded-3xl overflow-hidden border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 shadow-2xl shadow-cyan-950/40">
+              <img
+                src="./workstation.png"
+                alt="Manuel Álvarez — Workstation & Development Environment"
+                className="w-full h-auto object-cover rounded-3xl filter brightness-105 contrast-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#040714] via-transparent to-transparent opacity-40 pointer-events-none" />
             </div>
           </motion.div>
         </div>

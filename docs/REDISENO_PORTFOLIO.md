@@ -106,25 +106,25 @@ VPS Contabo (ubuntu)
 - [x] Limpieza y consolidación de favicons pesados: eliminados 4.6 MB de archivos PNG redundantes de 931 KB (`favicon.png`, `icon.png`, `logo-icon.png`, `mad_logo.png`)
 - [x] Limpiar service workers viejos (`sw.js`, `workbox-*.js`, `registerSW.js`, `manifest.webmanifest`)
 
-### FASE 1: Reescritura del Frontend ✅ COMPLETADA (Studio-Grade / Awwwards Level)
-- [x] Reescribir `index.html` con SEO, Google Fonts Inter, favicons relativos y limpios
-- [x] Reescribir `src/index.css` — design system obsidian glass completo
-- [x] `src/components/ParticleCanvas.tsx` — canvas interactivo de partículas y malla gravitacional reactiva al cursor
-- [x] `src/components/Hero.tsx` — retrato con aura duotono, anillos orbitales cibernéticos concéntricos y 5 badges flotantes (`IA`, `WEB`, `APPS`, `SISTEMAS`, `</>`)
-- [x] `src/components/ProjectCard.tsx` — perspectiva 3D física tilt (`perspective: 1000px`, `rotateX/Y`) y foco de luz dinámico (`Spotlight Cursor Tracking`)
-- [x] `src/components/ProjectShowcase.tsx` — maqueta de tablet 3D con simulación interactiva de pulso por nodos en tiempo real
-- [x] `src/components/Projects.tsx` — grid de 4 columnas para los 7 proyectos estrella + tarjeta horizontal para Teringo Neural Cockpit con visualizador animado de ondas
-- [x] `src/components/About.tsx` — 4 skill cards, cita y consola de centro de mando con telemetría en vivo del VPS Contabo
-- [x] `src/components/Technologies.tsx` — cuadrícula 4x3 con 12 logos vectoriales oficiales y onda luminiscente
-- [x] `src/components/Contact.tsx` — smartphone 3D interactivo y formulario conectado a `/api/contact`
-- [x] `src/components/Navbar.tsx` & `Footer.tsx` — barra cápsula translúcida, monograma MA y enlaces sociales
+### FASE 1: Reescritura del Frontend ✅ COMPLETADA (Studio-Grade v5 — Máxima Fidelidad al Mockup)
+- [x] Eliminados los tags flotantes que tapaban el texto en el Hero
+- [x] Retrato de Manuel (`hero-portrait.png`) integrado en el fondo oscuro (#040714) en ángulo de perfil idéntico al adjunto
+- [x] Eliminado el bloque repetitivo `AgentForge Studio` que se mostraba en todos los proyectos
+- [x] Textos y tecnologías personalizados y reales para los 7 proyectos estrella (sin repetición de "Creación de agentes, flujos...")
+- [x] En "Otros proyectos destacados" queda únicamente `App Generator` (eliminado bloque ancho de Teringo de esta sección)
+- [x] En "Mi historia, mi motivación", sustituido el bloque de consola/código por la fotografía de la workstation con múltiples pantallas (`workstation.png`)
+- [x] Sección de Tecnologías depurada con 12 tecnologías reales de su perfil (SMR + Full-Stack IA): Linux (Ubuntu), Windows, Cisco CCST, Docker, Traefik, Python/FastAPI, Node.js, React, TypeScript, PostgreSQL/Redis, LiveKit/IA, Git
+- [x] CV actualizado al PDF oficial adjuntado por el usuario
+- [x] Icono de pestaña (favicon) y preview de WhatsApp actualizados a la foto de Manuel
+- [x] Contacto transparente: acceso directo a WhatsApp (+34 651 352 065), Email y LinkedIn, además de guardado de mensajes en `/home/ubuntu/MSBrossAI/data/messages.json`
+- [x] Fix en `.github/workflows/deploy-vps.yml`: añadido `command_timeout: 30m` en `appleboy/ssh-action` para evitar que Docker builds prolongados disparen timeout en GitHub Actions
 
-### FASE 2: Build ✅ COMPLETADO (Studio-Grade v4)
-- [x] `npx vite build` → exitoso (403ms)
-  - `dist/assets/index-Dyf_MpNw.css` (77.3KB, gzip 11.6KB)
-  - `dist/assets/index-DunrOHTX.js` (438.9KB, gzip 134.1KB)
-  - `dist/index.html` (1.54KB)
-- [x] Copiado a `www/` (index.html + assets/)
+### FASE 2: Build ✅ COMPLETADO (v5)
+- [x] `npx vite build` → exitoso (537ms)
+  - `dist/assets/index-DZxd_8ps.css` (72.2KB, gzip 11.2KB)
+  - `dist/assets/index-DHLAPly0.js` (413.5KB, gzip 128.9KB)
+  - `dist/index.html` (2.32KB)
+- [x] Copiado a `www/` (index.html + assets/ + imágenes)
 
 ### FASE 3: Verificación Visual ✅ COMPLETADA
 - [x] Alineación visual de los 6 paneles del mockup de referencia
