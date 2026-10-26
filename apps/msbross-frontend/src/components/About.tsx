@@ -5,7 +5,7 @@ const SKILLS = [
   {
     icon: Monitor,
     title: 'Técnico de Sistemas',
-    desc: 'Infraestructura y soporte',
+    desc: 'Infraestructura y soporte SMR',
     color: '#3B82F6',
     bgColor: 'rgba(59, 130, 246, 0.15)',
     borderColor: 'rgba(59, 130, 246, 0.3)',
@@ -13,7 +13,7 @@ const SKILLS = [
   {
     icon: Code,
     title: 'Desarrollador',
-    desc: 'Web, Apps y Herramientas',
+    desc: 'Web, Apps y Microservicios',
     color: '#06B6D4',
     bgColor: 'rgba(6, 182, 212, 0.15)',
     borderColor: 'rgba(6, 182, 212, 0.3)',
@@ -21,7 +21,7 @@ const SKILLS = [
   {
     icon: Bot,
     title: 'IA & Automatización',
-    desc: 'Productividad y eficiencia',
+    desc: 'Agentes y Productividad B2B',
     color: '#8B5CF6',
     bgColor: 'rgba(139, 92, 246, 0.15)',
     borderColor: 'rgba(139, 92, 246, 0.3)',
@@ -38,10 +38,10 @@ const SKILLS = [
 
 export default function About() {
   return (
-    <section id="sobre-mi" className="relative py-24 lg:py-32 overflow-hidden bg-[#040714]">
+    <section id="sobre-mi" className="relative py-24 lg:py-32 overflow-hidden bg-[#060B18]">
       {/* Ambient lighting */}
-      <div className="absolute top-1/2 left-0 w-[550px] h-[550px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none -translate-y-1/2" />
-      <div className="absolute bottom-0 right-10 w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute top-1/2 left-0 w-[550px] h-[550px] bg-blue-600/12 rounded-full blur-[140px] pointer-events-none -translate-y-1/2" />
+      <div className="absolute bottom-0 right-10 w-[550px] h-[550px] bg-cyan-600/12 rounded-full blur-[130px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-14 items-center">
@@ -83,10 +83,7 @@ export default function About() {
               transition={{ delay: 0.16 }}
               className="text-slate-300 text-base sm:text-lg leading-relaxed"
             >
-              Soy Técnico de Sistemas y actualmente estoy en constante crecimiento
-              como desarrollador web, de apps y herramientas, integrando la inteligencia
-              artificial en todo lo que hago. Me apasiona la tecnología, la automatización
-              y la creación de soluciones que realmente aporten valor.
+              Soy Técnico en Sistemas Microinformáticos y Redes (SMR) con sólida experiencia en soporte IT, despliegue de infraestructura, redes Cisco y entornos Linux. En constante crecimiento como desarrollador full-stack y creador de herramientas con inteligencia artificial, administro mi propio servidor de producción orquestando microservicios, bases de datos y agentes en tiempo real.
             </motion.p>
 
             {/* 4 Skill Cards Grid (2x2) */}
@@ -102,7 +99,7 @@ export default function About() {
                 return (
                   <div
                     key={skill.title}
-                    className="p-4 rounded-2xl bg-gradient-to-b from-slate-900/90 to-[#0A1220]/95 border border-slate-800/80 hover:border-cyan-500/40 hover:shadow-xl hover:shadow-cyan-950/20 transition-all space-y-2.5 group"
+                    className="p-4 rounded-2xl bg-gradient-to-b from-[#0E1E3D]/80 to-[#0A1628]/90 border border-slate-800/80 hover:border-cyan-500/40 hover:shadow-xl hover:shadow-cyan-950/20 transition-all space-y-2.5 group"
                   >
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105"
@@ -132,36 +129,35 @@ export default function About() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.32 }}
-              className="flex items-start gap-3.5 p-4 rounded-2xl bg-slate-900/50 border border-slate-800/80"
+              className="flex items-start gap-3.5 p-4 rounded-2xl bg-[#0E1E3D]/50 border border-slate-800/80"
             >
               <span className="text-3xl text-cyan-400 font-serif leading-none select-none">
                 “
               </span>
               <p className="text-xs sm:text-sm text-slate-300 italic leading-relaxed pt-0.5">
-                No se trata solo de programar, sino de resolver problemas reales con tecnología.
+                No se trata solo de programar, sino de resolver problemas reales con tecnología robusta y bien diseñada.
               </p>
             </motion.div>
           </div>
 
-          {/* Right Column: Workstation Setup Photo from Mockup */}
+          {/* Right Column: Workstation seamlessly fused and diffused into the background */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.96 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
             className="lg:col-span-6 relative flex items-center justify-center"
           >
-            {/* Ambient workstation glow */}
-            <div className="absolute -inset-2 bg-gradient-to-br from-cyan-500/20 via-blue-600/15 to-purple-600/10 rounded-3xl blur-2xl pointer-events-none" />
+            {/* Soft ambient workstation glow behind image */}
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/18 via-blue-600/14 to-purple-600/10 rounded-full blur-[100px] pointer-events-none" />
 
-            {/* Workstation Photo Frame */}
-            <div className="relative rounded-3xl overflow-hidden border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 shadow-2xl shadow-cyan-950/40">
+            {/* Workstation Container: Fused directly without box/border */}
+            <div className="relative w-full overflow-visible flex items-center justify-center">
               <img
                 src="./workstation.png"
-                alt="Manuel Álvarez — Workstation & Development Environment"
-                className="w-full h-auto object-cover rounded-3xl filter brightness-105 contrast-110"
+                alt="Manuel Álvarez — Puesto de Desarrollo e Infraestructura"
+                className="w-full h-auto object-contain filter contrast-105 brightness-100 select-none pointer-events-none drop-shadow-[0_10px_50px_rgba(6,182,212,0.12)]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#040714] via-transparent to-transparent opacity-40 pointer-events-none" />
             </div>
           </motion.div>
         </div>

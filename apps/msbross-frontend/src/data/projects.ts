@@ -1,134 +1,305 @@
 export interface Project {
   id: string;
   name: string;
-  subtitle?: string;
+  subtitle: string;
   description: string;
   category: string;
   iconBg: string;
   iconSvg: string;
   tech: string[];
   url?: string;
+  github?: string;
   status: 'live' | 'development';
   featured: boolean;
+  features?: string[];
+  architecture?: string;
 }
 
 export const CATEGORIES = [
   { id: 'all', label: 'Todos' },
-  { id: 'agents', label: 'Plataforma de agentes' },
-  { id: 'ai-productivity', label: 'IA y productividad' },
-  { id: 'systems', label: 'Sistemas y herramientas' },
-  { id: 'apps-mobile', label: 'Apps y móviles' },
-  { id: 'audio', label: 'Audio y multimedia' },
+  { id: 'systems', label: 'Sistemas & Apps' },
+  { id: 'ai-enterprise', label: 'IA & Automatización' },
+  { id: 'multimedia', label: 'Audio & Multimedia' },
+  { id: 'tools', label: 'Herramientas Web' },
 ];
 
 export const FEATURED_PROJECTS: Project[] = [
   {
     id: 'uiep',
-    name: 'Plataforma de Agentes IA',
-    subtitle: 'UIEP + AgentForge + PromptForge',
-    description: 'Arquitectura unificada para la conceptualización, orquestación y despliegue de agentes autónomos con flujos modulares y generación contextual de prompts.',
-    category: 'agents',
+    name: 'UIEP',
+    subtitle: 'Gestión Operativa de Emergencias',
+    description: 'Plataforma integral para unidades de intervención y emergencias: gestión de personal, cuadrantes de guardia, control de flota operativa y reportes en tiempo real.',
+    category: 'systems',
     iconBg: 'linear-gradient(135deg, #3B82F6, #8B5CF6)',
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>`,
-    tech: ['React', 'TypeScript', 'Node.js', 'OpenAI', 'Canvas'],
-    status: 'development',
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>`,
+    tech: ['React', 'TypeScript', 'Tailwind', 'Vite'],
+    url: 'https://manuelalvarez.dev/app/uiep/',
+    status: 'live',
     featured: true,
+    features: [
+      'Cuadrantes de guardias y asignación dinámica de turnos',
+      'Control de flota vehicular y equipamiento de emergencia',
+      'Generación de partes de intervención y exportación estructurada',
+      'Panel responsivo de alta visibilidad para terminales operativas'
+    ],
+    architecture: 'Single Page Application (SPA) modular alojada en VPS con proxy reverso NGINX/Node.js.'
   },
   {
     id: 'iaprod-os',
-    name: 'IAProdOS / IAPutaOS',
-    subtitle: 'Herramientas y productividad',
-    description: 'Suite de productividad empresarial y automatización documental conectada con APIs de Google Workspace, Microsoft y modelos LLM de ultra-baja latencia.',
-    category: 'ai-productivity',
+    name: 'IA Prod OS',
+    subtitle: 'Productividad & Automatización B2B',
+    description: 'Suite empresarial de automatización documental, conectada con APIs y modelos de lenguaje de ultra-baja latencia para procesamiento inteligente de flujos de trabajo.',
+    category: 'ai-enterprise',
     iconBg: 'linear-gradient(135deg, #8B5CF6, #EC4899)',
     iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10"/><path d="M7 12h10"/><path d="M7 17h10"/></svg>`,
     tech: ['React', 'FastAPI', 'Groq', 'Google GenAI', 'Python'],
     url: 'https://iaprod.manuelalvarez.dev',
-    status: 'development',
+    status: 'live',
     featured: true,
+    features: [
+      'Procesamiento y análisis de documentos PDF y contratos por lotes',
+      'Conexión multimodelo con rotación inteligente de API Keys (Groq / Gemini / Ollama)',
+      'Generación estructurada de informes con descarga instantánea',
+      'Panel analítico de métricas y rendimiento de tareas'
+    ],
+    architecture: 'Backend en Python FastAPI (puerto 8006) + Frontend React Vite servido bajo subdominio iaprod.manuelalvarez.dev.'
   },
   {
     id: 'tu-energia-maya',
     name: 'Tu Energía Maya',
-    subtitle: 'Calendario + Tarot + App',
-    description: 'Calculadora astronómica y sincrónica del calendario Maya Tzolkin: cálculo de Kines natales, Tonos galácticos, Sellos solares y oráculo interactivo.',
-    category: 'apps-mobile',
+    subtitle: 'Sincronario Maya & Tarot Tzolk\'in',
+    description: 'Calculadora astronómica y sincrónica del calendario Maya Tzolkin: cálculo de Kines natales, oráculo interactivo y compatibilidad energética entre personas.',
+    category: 'tools',
     iconBg: 'linear-gradient(135deg, #F59E0B, #EF4444)',
     iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 1 0 10 10"/><circle cx="12" cy="12" r="4"/><path d="m15 9-3 3"/></svg>`,
-    tech: ['React', 'JavaScript', 'CSS3', 'Canvas'],
+    tech: ['React', 'JavaScript', 'CSS3', 'Web Audio API'],
     url: 'https://manu-alvarez.github.io/TuEnergiaMaya/',
-    status: 'development',
+    github: 'https://github.com/manu-alvarez/TuEnergiaMaya',
+    status: 'live',
     featured: true,
+    features: [
+      'Cálculo matemático exacto de Firma Galáctica y Kin Natal a partir de fecha de nacimiento',
+      '20 Sellos Solares (Nahuales) y 13 Tonos Galácticos con arquetipos y descripciones profundas',
+      'Tarot Maya Tzolk\'in integrado con Cruz Maya, Tríada del Tiempo y Onda Encantada',
+      'Sintetizador ceremonial de audio interactivo con Web Audio API y compatibilidad PWA'
+    ],
+    architecture: 'Desplegado en GitHub Pages con soporte Progressive Web App (PWA) y cero dependencias de compilación pesada.'
   },
   {
     id: 'logisearch',
     name: 'LogiSearch',
-    subtitle: 'Logística y búsqueda',
-    description: 'Buscador optimizado de referencias de almacén y logística con exportación de albaranes en PDF e interfaz de alto contraste para terminales y operarios.',
+    subtitle: 'Logística & Búsqueda Inteligente',
+    description: 'Motor de búsqueda optimizado para gestión de referencias logísticas, cálculo de cubicaje, albaranes PDF interactivos e interfaz táctil para terminales de almacén.',
     category: 'systems',
     iconBg: 'linear-gradient(135deg, #06B6D4, #3B82F6)',
     iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6"/><path d="M8 11h6"/></svg>`,
-    tech: ['React', 'TypeScript', 'Material UI', 'Tailwind', 'jsPDF'],
+    tech: ['React', 'TypeScript', 'Material UI', 'jsPDF', 'Tailwind'],
     url: 'https://logisearch.manuelalvarez.dev',
-    status: 'development',
+    github: 'https://github.com/manu-alvarez/LogiSearch',
+    status: 'live',
     featured: true,
+    features: [
+      'Búsqueda ultra-rápida de SKU, referencias y ubicaciones de pasillo/estantería',
+      'Calculadora de cubicaje y optimización de carga en pallets y camiones',
+      'Generación y descarga de albaranes de salida en PDF con formato oficial',
+      'Modo de alto contraste optimizado para lectores de código de barras y tablets industriales'
+    ],
+    architecture: 'Frontend en React / TypeScript con gestión de estado en memoria y exportación client-side.'
   },
   {
     id: 'nikolina-ai',
     name: 'Nikolina AI',
-    subtitle: 'Asistente de reservas',
-    description: 'Asistente conversacional de voz en tiempo real con ultra-baja latencia (<500ms) para reservas de hostelería, impulsado por LiveKit WebRTC y Google STT/TTS.',
-    category: 'agents',
+    subtitle: 'Agente de Voz en Tiempo Real',
+    description: 'Asistente de voz ultrarrápido con latencia sub-500ms para reservas hosteleras y atención telefónica automatizada, impulsado por LiveKit WebRTC y modelos neurales.',
+    category: 'ai-enterprise',
     iconBg: 'linear-gradient(135deg, #10B981, #06B6D4)',
     iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>`,
-    tech: ['LiveKit', 'WebRTC', 'FastAPI', 'Python', 'Google STT/TTS'],
+    tech: ['LiveKit', 'WebRTC', 'Python', 'FastAPI', 'Google STT/TTS'],
     url: 'https://nikolina.manuelalvarez.dev',
-    status: 'development',
+    github: 'https://github.com/manu-alvarez/LIVEKIT',
+    status: 'live',
     featured: true,
+    features: [
+      'Comunicación de voz bidireccional mediante WebRTC nativo (LiveKit Server propio en puerto 7880)',
+      'Interrupción en tiempo real (barge-in): el agente detiene su habla al detectar la voz del usuario',
+      'Gestión automática de reservas con extracción de slots (nombre, fecha, comensales, teléfono)',
+      'Backend en Python 3.12 conectado a APIs de síntesis y reconocimiento neural'
+    ],
+    architecture: 'LiveKit Server gestionado por PM2 + LiveKit Python Agent conectado al API Hub (puerto 8001).'
   },
   {
     id: 'foz-soundpro',
     name: 'FoZ SoundPro',
-    subtitle: 'Audio profesional',
-    description: 'Suite de procesamiento, síntesis y masterización de audio digital en el navegador sin dependencias externas, con ecualización gráfica y análisis espectral.',
-    category: 'audio',
+    subtitle: 'Masterización & Audio DSP Studio',
+    description: 'Estación de trabajo de audio digital (DAW) en el navegador: procesamiento espectral en tiempo real, ecualización gráfica paramétrica, limitadores y exportación lossless.',
+    category: 'multimedia',
     iconBg: 'linear-gradient(135deg, #EC4899, #8B5CF6)',
     iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
-    tech: ['Web Audio API', 'React', 'TypeScript', 'DSP'],
-    status: 'development',
+    tech: ['Web Audio API', 'React', 'TypeScript', 'Audio DSP'],
+    url: 'https://manu-alvarez.github.io/FoZ-SoundPro/',
+    github: 'https://github.com/manu-alvarez/FoZ-SoundPro',
+    status: 'live',
     featured: true,
+    features: [
+      'Secuenciador por pasos (16 voces, 16/32/64 pasos) para beatmaking',
+      'Motor DSP con ecualizador paramétrico de 5 bandas y analizador de espectro FFT',
+      'Compresor dinámico, distorsión armónica y limitador brickwall con latencia cero',
+      'Exportación directa a audio WAV 24-bit sin subida a servidores externos'
+    ],
+    architecture: 'Arquitectura 100% Web Audio API client-side, optimizada para hardware estándar en macOS, Windows y Linux.'
   },
   {
     id: 'teringo-mail',
-    name: 'Teringo Mail / Neural Cockpit',
-    subtitle: 'Correo y productividad con IA',
-    description: 'Cockpit de productividad para correo electrónico: clasificación automática de bandejas de entrada, redacción predictiva y síntesis de hilos.',
-    category: 'ai-productivity',
+    name: 'Teringo MailOps AI',
+    subtitle: 'Hub de Mensajería & IA Empresarial',
+    description: 'Sistema centralizado de operaciones de correo corporativo con clasificación semántica de emails entrantes, extracción de tareas y generación asistida de respuestas.',
+    category: 'ai-enterprise',
     iconBg: 'linear-gradient(135deg, #F59E0B, #10B981)',
     iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>`,
-    tech: ['React', 'TypeScript', 'Node.js', 'FastAPI', 'PostgreSQL'],
-    status: 'development',
+    tech: ['React', 'TypeScript', 'Node.js', 'FastAPI', 'Tailwind'],
+    url: 'https://manu-alvarez.github.io/MSB/apps/teringo/',
+    status: 'live',
     featured: true,
+    features: [
+      'Clasificación automática por intención (soporte, presupuestos, urgencias, spam)',
+      'Extracción de acciones y citas con integración en calendarios',
+      'Borradores inteligentes generados con tono y contexto corporativo',
+      'Búsqueda semántica sobre el histórico completo de correspondencia'
+    ],
+    architecture: 'Microfrontends integrados en el ecosistema MSBross con backends de procesamiento NLP.'
   },
 ];
 
 export const OTHER_PROJECTS: Project[] = [
   {
-    id: 'app-generator',
-    name: 'App Generator',
-    subtitle: 'Generación de aplicaciones',
-    description: 'Generador visual de prototipos e interfaces web interactivas a partir de especificaciones y prompts de lenguaje natural.',
-    category: 'ai-productivity',
-    iconBg: 'linear-gradient(135deg, #EC4899, #F43F5E)',
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg>`,
-    tech: ['React', 'TypeScript', 'Tailwind', 'Gemini API'],
-    url: 'https://appgen.manuelalvarez.dev',
-    status: 'development',
+    id: 'combipro',
+    name: 'CombiPro',
+    subtitle: 'Arbitraje Deportivo & TheOdds API',
+    description: 'Algoritmo de análisis de probabilidades y arbitraje de cuotas en tiempo real conectado con TheOdds API para identificar apuestas de valor y combinadas óptimas.',
+    category: 'tools',
+    iconBg: 'linear-gradient(135deg, #10B981, #06B6D4)',
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`,
+    tech: ['React', 'TypeScript', 'TheOdds API', 'Tailwind'],
+    url: 'https://combipro.manuelalvarez.dev',
+    status: 'live',
     featured: false,
+    features: [
+      'Monitorización de cuotas en tiempo real en las principales casas de apuestas',
+      'Cálculo de arbitraje deportivo (surebets) con filtro de rentabilidad',
+      'Generador asistido de combinadas equilibradas con análisis de riesgo'
+    ]
+  },
+  {
+    id: 'cuentos-magicos',
+    name: 'Cuentos Mágicos',
+    subtitle: 'Generador de Cuentos Infantiles con IA',
+    description: 'Plataforma para crear historias infantiles personalizadas con narrativa generativa por IA, ilustraciones automáticas y síntesis de voz (TTS) para lectura interactiva.',
+    category: 'ai-enterprise',
+    iconBg: 'linear-gradient(135deg, #EC4899, #8B5CF6)',
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>`,
+    tech: ['Next.js', 'FastAPI', 'OpenAI TTS', 'Stable Diffusion'],
+    url: 'https://cuentos.manuelalvarez.dev',
+    status: 'live',
+    featured: false,
+    features: [
+      'Creación de cuentos a medida especificando protagonistas, valores y temática',
+      'Generación de ilustraciones de portada e interiores con modelos de difusión',
+      'Lectura guiada por voz en off con reproductor interactivo y modo impresión'
+    ]
+  },
+  {
+    id: 'gas-station',
+    name: 'GasStation',
+    subtitle: 'Precios de Combustible en Tiempo Real',
+    description: 'Comparador de tarifas en estaciones de servicio de España con geolocalización, cálculo de ahorro en ruta e integración de datos oficiales del Ministerio.',
+    category: 'tools',
+    iconBg: 'linear-gradient(135deg, #F59E0B, #EF4444)',
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22h12"/><path d="M4 9h10"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/></svg>`,
+    tech: ['React', 'Node.js', 'Leaflet', 'APIs Geo'],
+    url: 'https://gasstation.manuelalvarez.dev',
+    status: 'live',
+    featured: false,
+    features: [
+      'Precios actualizados por hora para Gasolina 95, 98, Diésel y GLP',
+      'Mapa interactivo con filtros de distancia, precio más bajo y marca',
+      'Cálculo de coste de llenado de depósito según modelo de vehículo'
+    ]
+  },
+  {
+    id: 'tarot-rws',
+    name: 'Tarot RWS',
+    subtitle: 'Lectura Simbólica Rider-Waite-Smith',
+    description: 'Aplicación interactiva de tiradas de tarot basadas en la baraja tradicional Rider-Waite-Smith con análisis simbólico profundo, significados astrológicos y diseño inmersivo.',
+    category: 'tools',
+    iconBg: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 6v4"/><path d="M10 8h4"/><circle cx="12" cy="15" r="2"/></svg>`,
+    tech: ['React', 'TypeScript', 'Canvas', 'Framer Motion'],
+    url: 'https://manuelalvarez.dev/app/tarot-rws/',
+    status: 'live',
+    featured: false,
+    features: [
+      '78 cartas completas (Arcanos Mayores y Menores) en alta definición',
+      'Tiradas guiadas: Carta del Día, Pasado-Presente-Futuro y Cruz Celta',
+      'Interpretación interactiva de polaridades (derecha e invertida)'
+    ]
+  },
+  {
+    id: 'beca-laud-personal',
+    name: 'Beca Laud — Artista & Vocal Coach',
+    subtitle: 'Sitio Web Oficial & Portfolio',
+    description: 'Web oficial de la cantante y coach vocal Rebeca Laud: reproductor musical multimedia, trayectoria artística, catálogo de servicios pedagógicos y reservas online.',
+    category: 'multimedia',
+    iconBg: 'linear-gradient(135deg, #EC4899, #F43F5E)',
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/><line x1="8" x2="16" y1="22"/></svg>`,
+    tech: ['React', 'CSS3', 'Audio Player', 'Vite'],
+    url: 'https://manuelalvarez.dev/app/beca-laud/',
+    status: 'live',
+    featured: false,
+    features: [
+      'Reproductor interactivo de pistas vocales y temas destacados',
+      'Sección de formación técnica para alumnos y programas de entrenamiento vocal',
+      'Integración con reservas y contacto directo por WhatsApp'
+    ]
+  },
+  {
+    id: 'beca-laud-band',
+    name: 'Beca Laud — Banda & Eventos',
+    subtitle: 'Música en Directo & Contratación',
+    description: 'Portal de promoción y contratación para eventos privados, bodas y festivales: repertorio de temas filtrable por género, vídeos de directos y formulario de caché.',
+    category: 'multimedia',
+    iconBg: 'linear-gradient(135deg, #F59E0B, #D97706)',
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>`,
+    tech: ['React', 'Tailwind', 'Multimedia', 'Vite'],
+    url: 'https://manuelalvarez.dev/app/beca-laud-band/',
+    status: 'live',
+    featured: false,
+    features: [
+      'Repertorio interactivo clasificado por estilos musicales (Pop, Rock, Soul, Boleros)',
+      'Galería de actuaciones en directo y vídeos promocionales de eventos',
+      'Calculadora de presupuesto estimativo para contratación según formato'
+    ]
+  },
+  {
+    id: 'beca-laud-crm',
+    name: 'Beca Laud — CRM & Gestión',
+    subtitle: 'Panel Administrativo & Clases',
+    description: 'Sistema interno de gestión para el control de alumnos de técnica vocal, calendario de sesiones, seguimiento de progreso y facturación de actuaciones.',
+    category: 'systems',
+    iconBg: 'linear-gradient(135deg, #3B82F6, #1D4ED8)',
+    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+    tech: ['React', 'TypeScript', 'Dexie.js', 'Dashboard'],
+    url: 'https://manuelalvarez.dev/app/beca-laud-crm/',
+    status: 'live',
+    featured: false,
+    features: [
+      'Ficha individual de alumnos con registro de grabaciones y notas pedagógicas',
+      'Calendario sincronizado de clases semanales y bolos confirmados',
+      'Control de cobros mensuales y estados de facturación'
+    ]
   },
 ];
 
-// 12 REAL Technologies representing Manuel's skillset (Sistemas SMR + Desarrollo IA)
+// 12 REAL Technologies representing Manuel's verified skillset (SMR + Full-Stack IA)
 export const TECHNOLOGIES = [
   {
     name: 'Linux (Ubuntu)',

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ExternalLink, Globe, Moon, Sun } from 'lucide-react';
+import { Menu, X, Moon, Sun } from 'lucide-react';
 import { useScrollSpy } from '../hooks/useScrollSpy';
 
 const NAV_LINKS = [

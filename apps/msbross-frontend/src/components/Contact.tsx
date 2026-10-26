@@ -34,14 +34,14 @@ export default function Contact() {
   };
 
   return (
-    <section id="contacto" className="relative py-24 lg:py-32 bg-[#040714]">
+    <section id="contacto" className="relative py-24 lg:py-32 bg-[#060B18] overflow-hidden">
       {/* Ambient background glow */}
-      <div className="absolute top-1/2 right-10 w-[550px] h-[550px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none -translate-y-1/2" />
-      <div className="absolute bottom-10 left-10 w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute top-1/2 right-10 w-[550px] h-[550px] bg-blue-600/12 rounded-full blur-[140px] pointer-events-none -translate-y-1/2" />
+      <div className="absolute bottom-10 left-10 w-[500px] h-[500px] bg-cyan-600/12 rounded-full blur-[130px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          {/* Left: Mobile Phone Device Mockup (Panel 6 of Mockup) */}
+          {/* Left: Mobile Phone Device Mockup */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -56,9 +56,9 @@ export default function Contact() {
               </div>
 
               {/* Screen Content */}
-              <div className="rounded-[30px] bg-gradient-to-b from-[#0B132B] to-[#040714] p-5 border border-slate-800/80 text-center space-y-4">
+              <div className="rounded-[30px] bg-gradient-to-b from-[#0E1E3D] to-[#060B18] p-5 border border-slate-800/80 text-center space-y-4">
                 {/* Mini Profile Photo */}
-                <div className="relative w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-cyan-400/30 shadow-lg shadow-cyan-500/20">
+                <div className="relative w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-cyan-400/40 shadow-lg shadow-cyan-500/20">
                   <img
                     src="./profile-photo.png"
                     alt="Manuel Álvarez"
@@ -122,7 +122,7 @@ export default function Contact() {
                 Hablemos
               </h2>
               <p className="text-slate-400 mt-2 text-base sm:text-lg">
-                ¿Tienes un proyecto en mente o quieres saber más sobre mi trabajo? Escríbeme directamente.
+                ¿Tienes un proyecto en mente o quieres saber más sobre mi trabajo? Escríbeme directamente por cualquier vía.
               </p>
             </motion.div>
 
@@ -139,7 +139,7 @@ export default function Contact() {
                 href="https://wa.me/34651352065?text=Hola%20Manuel%2C%20he%20visto%20tu%20portfolio"
                 target="_blank"
                 rel="noreferrer"
-                className="p-4 rounded-2xl bg-gradient-to-b from-[#0A1224]/90 to-[#040714]/95 border border-slate-800/80 hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-950/20 transition-all flex items-center gap-3 group"
+                className="p-4 rounded-2xl bg-gradient-to-b from-[#0E1E3D]/90 to-[#0A1628]/95 border border-slate-800/80 hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-950/20 transition-all flex items-center gap-3 group"
               >
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400 shrink-0 group-hover:scale-105 transition-transform">
                   <MessageSquare size={18} />
@@ -157,7 +157,7 @@ export default function Contact() {
               {/* Email direct */}
               <a
                 href="mailto:manuelalvarezdianez@hotmail.com"
-                className="p-4 rounded-2xl bg-gradient-to-b from-[#0A1224]/90 to-[#040714]/95 border border-slate-800/80 hover:border-cyan-500/50 hover:shadow-xl hover:shadow-cyan-950/20 transition-all flex items-center gap-3 group"
+                className="p-4 rounded-2xl bg-gradient-to-b from-[#0E1E3D]/90 to-[#0A1628]/95 border border-slate-800/80 hover:border-cyan-500/50 hover:shadow-xl hover:shadow-cyan-950/20 transition-all flex items-center gap-3 group"
               >
                 <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/25 flex items-center justify-center text-cyan-400 shrink-0 group-hover:scale-105 transition-transform">
                   <Mail size={18} />
@@ -177,7 +177,7 @@ export default function Contact() {
                 href="https://linkedin.com/in/manu-alvarez-dev"
                 target="_blank"
                 rel="noreferrer"
-                className="p-4 rounded-2xl bg-gradient-to-b from-[#0A1224]/90 to-[#040714]/95 border border-slate-800/80 hover:border-blue-500/50 hover:shadow-xl hover:shadow-blue-950/20 transition-all flex items-center gap-3 group"
+                className="p-4 rounded-2xl bg-gradient-to-b from-[#0E1E3D]/90 to-[#0A1628]/95 border border-slate-800/80 hover:border-blue-500/50 hover:shadow-xl hover:shadow-blue-950/20 transition-all flex items-center gap-3 group"
               >
                 <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-center text-blue-400 shrink-0 group-hover:scale-105 transition-transform">
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
@@ -200,7 +200,7 @@ export default function Contact() {
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
               onSubmit={handleSubmit}
-              className="rounded-3xl bg-gradient-to-b from-[#0A1224]/90 to-[#040714]/95 border border-slate-800 p-6 sm:p-8 space-y-4 shadow-xl"
+              className="rounded-3xl bg-gradient-to-b from-[#0E1E3D]/90 to-[#060B18]/95 border border-slate-800 p-6 sm:p-8 space-y-4 shadow-xl"
             >
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
@@ -213,7 +213,7 @@ export default function Contact() {
                     required
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30 transition-all text-sm"
+                    className="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30 transition-all text-sm"
                     placeholder="Tu nombre"
                   />
                 </div>
@@ -227,7 +227,7 @@ export default function Contact() {
                     required
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30 transition-all text-sm"
+                    className="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30 transition-all text-sm"
                     placeholder="tu@email.com"
                   />
                 </div>
@@ -242,7 +242,7 @@ export default function Contact() {
                   type="text"
                   value={form.subject}
                   onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30 transition-all text-sm"
+                  className="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30 transition-all text-sm"
                   placeholder="¿De qué se trata?"
                 />
               </div>
@@ -257,7 +257,7 @@ export default function Contact() {
                   rows={4}
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30 transition-all text-sm resize-none"
+                  className="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30 transition-all text-sm resize-none"
                   placeholder="Cuéntame sobre tu proyecto o consulta..."
                 />
               </div>
@@ -266,7 +266,7 @@ export default function Contact() {
               <button
                 type="submit"
                 disabled={status === 'sending'}
-                className="w-full inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-[#00d2ff] via-blue-600 to-[#7928ca] text-white font-bold text-sm shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 text-white font-bold text-sm shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {status === 'sending' ? (
                   <>

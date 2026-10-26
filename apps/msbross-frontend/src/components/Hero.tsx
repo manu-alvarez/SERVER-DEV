@@ -5,16 +5,16 @@ export default function Hero() {
   return (
     <section
       id="inicio"
-      className="relative min-h-[92vh] flex items-center overflow-hidden pt-28 pb-16 bg-[#040714]"
+      className="relative min-h-[92vh] flex items-center overflow-hidden pt-28 pb-16 bg-[#060B18]"
     >
       {/* Cinematic ambient background glow */}
-      <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-blue-600/12 rounded-full blur-[140px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
-      <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-cyan-500/15 rounded-full blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-[450px] h-[450px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-blue-600/15 rounded-full blur-[140px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute top-1/3 right-1/4 w-[550px] h-[550px] bg-cyan-500/18 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-purple-600/12 rounded-full blur-[130px] pointer-events-none" />
 
       {/* Subtle background tech grid */}
       <div
-        className="absolute inset-0 opacity-[0.025] pointer-events-none"
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
         style={{
           backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)`,
           backgroundSize: '48px 48px',
@@ -22,7 +22,7 @@ export default function Hero() {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
-        <div className="grid lg:grid-cols-12 gap-8 items-center">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* Left Column (Typography & CTAs) */}
           <div className="lg:col-span-7 space-y-6 sm:space-y-7">
             {/* Availability Pill */}
@@ -31,7 +31,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold tracking-wide">
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold tracking-wide shadow-sm shadow-emerald-950/20">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -87,7 +87,7 @@ export default function Hero() {
             >
               <a
                 href="#proyectos"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-[#00d2ff] via-blue-600 to-[#7928ca] text-white font-semibold text-sm shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 text-white font-semibold text-sm shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
               >
                 Ver proyectos
                 <ArrowRight size={17} />
@@ -95,34 +95,36 @@ export default function Hero() {
               <a
                 href="/app/cv/CV-Manuel_Alvarez_Dianez.pdf"
                 download="CV-Manuel_Alvarez_Dianez.pdf"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-slate-900/60 backdrop-blur-md text-slate-200 font-semibold text-sm border border-slate-700/80 hover:border-cyan-400/60 hover:text-white hover:bg-slate-800/80 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-slate-900/80 backdrop-blur-md text-slate-200 font-semibold text-sm border border-slate-700/80 hover:border-cyan-400/60 hover:text-white hover:bg-slate-800/80 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-black/20"
               >
                 <Download size={17} />
                 Descargar CV
               </a>
             </motion.div>
 
-            {/* Stats Row */}
+            {/* Clean Stats Row (7+ Proyectos removed as requested) */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="grid grid-cols-3 gap-6 pt-8 border-t border-slate-800/80 max-w-lg"
+              className="flex items-center gap-8 pt-8 border-t border-slate-800/80 max-w-lg"
             >
               <div>
-                <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-                  7+
-                </div>
-                <div className="text-xs text-slate-400 mt-1 font-medium">Proyectos principales</div>
-              </div>
-              <div>
-                <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+                <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">
                   5+
                 </div>
                 <div className="text-xs text-slate-400 mt-1 font-medium">Años de experiencia</div>
               </div>
+              <div className="h-8 w-px bg-slate-800" />
               <div>
                 <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                  100%
+                </div>
+                <div className="text-xs text-slate-400 mt-1 font-medium">Producción propia</div>
+              </div>
+              <div className="h-8 w-px bg-slate-800" />
+              <div>
+                <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                   ∞
                 </div>
                 <div className="text-xs text-slate-400 mt-1 font-medium">Aprendiendo siempre</div>
@@ -130,29 +132,23 @@ export default function Hero() {
             </motion.div>
           </div>
 
-          {/* Right Column: Profile Portrait in Profile Angle blending seamlessly into the background */}
+          {/* Right Column: Real Manuel Portrait organically fused into the background */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="lg:col-span-5 relative flex items-center justify-center lg:justify-end"
           >
-            <div className="relative w-full max-w-[420px] aspect-[3/4] flex items-center justify-center">
-              {/* Backlight Glow Aura */}
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/25 via-blue-600/20 to-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative w-full max-w-[480px] aspect-square flex items-center justify-center">
+              {/* Soft Ambient Backlight Glow behind Manuel's silhouette */}
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 via-blue-600/15 to-purple-600/10 rounded-full blur-[90px] pointer-events-none" />
 
               {/* Seamless Portrait Container */}
-              <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+              <div className="relative w-full h-full flex items-center justify-center overflow-visible">
                 <img
                   src="./hero-portrait.png"
-                  alt="Manuel Álvarez — Perfil"
-                  className="w-full h-full object-contain object-right-bottom filter contrast-110"
-                  style={{
-                    maskImage:
-                      'radial-gradient(ellipse 95% 90% at 65% 50%, black 55%, transparent 95%)',
-                    WebkitMaskImage:
-                      'radial-gradient(ellipse 95% 90% at 65% 50%, black 55%, transparent 95%)',
-                  }}
+                  alt="Manuel Álvarez — Perfil Profesional"
+                  className="w-full h-full object-contain filter contrast-105 select-none pointer-events-none drop-shadow-[0_10px_40px_rgba(6,182,212,0.15)]"
                 />
               </div>
             </div>
