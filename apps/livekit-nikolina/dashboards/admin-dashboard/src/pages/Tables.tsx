@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import {
-    Box, Typography, Grid, Card, CardContent, Chip, Button, IconButton,
+    Box, Typography, Grid, Card, Chip, Button, IconButton,
     Dialog, DialogTitle, DialogContent, DialogActions, TextField, MenuItem, Select, FormControl, InputLabel
 } from '@mui/material';
 import {
-    EventSeat as TablesIcon,
     Add as AddIcon,
     People as PeopleIcon,
     Edit as EditIcon,
     Delete as DeleteIcon
 } from '@mui/icons-material';
 import { getTables, createTable, updateTable, deleteTable } from '../api';
+import { PageHeader } from '../components/PageShell';
 
 const locationConfig: Record<string, { color: string; bg: string }> = {
     interior: { color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.08)' },
@@ -86,86 +86,64 @@ export default function Tables() {
     };
 
     return (
-        <Box sx={{ animation: 'fadeInUp 0.4s ease-out' }}>
-            {/* Header */}
-            <Box sx={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4,
-            }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Box sx={{
-                        width: 42, height: 42, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: 'linear-gradient(135deg, rgba(6,182,212,0.15) 0%, rgba(59,130,246,0.15) 100%)',
-                        border: '1px solid rgba(6,182,212,0.2)',
-                    }}>
-                        <TablesIcon sx={{ color: '#22d3ee', fontSize: 22 }} />
-                    </Box>
-                    <Typography variant="h4" sx={{ fontWeight: 700 }}>Gestión de Mesas</Typography>
-                </Box>
-                <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpen()}>Añadir Mesa</Button>
-            </Box>
+        <Box>
+            <PageHeader
+                title="Gestión de Mesas"
+                subtitle="Capacidad, ubicación y estado de las mesas del restaurante"
+                actions={
+                    <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpen()}>Añadir Mesa</Button>
+                }
+            />
 
             {/* Grid of Table Cards */}
             <Grid container spacing={3}>
-                {tables.map((t, idx) => {
+                {tables.map((t) => {
                     const loc = locationConfig[t.location] || locationConfig.interior;
                     return (
                         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={t.id}>
                             <Card sx={{
-                                height: '100%', animation: `fadeInUp 0.4s ease-out ${idx * 60}ms both`, position: 'relative', overflow: 'visible',
-                                '&::before': {
-                                    content: '""', position: 'absolute', top: 0, left: 0, right: 0, height: '3px',
-                                    background: t.is_active
-                                        ? `linear-gradient(90deg, ${loc.color}, transparent)`
-                                        : 'linear-gradient(90deg, #475569, transparent)',
-                                },
+                                height: '100%', position: 'relative', overflow: 'visible',
+                                p: 2.5, borderRadius: '14px', bgcolor: 'rgba(255,255,255,0.02)',
                             }}>
-                                <CardContent sx={{ p: 3 }}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                                        <Typography sx={{
-                                            fontWeight: 700, fontSize: '1.8rem',
-                                            background: t.is_active
-                                                ? `linear-gradient(135deg, #f1f5f9 0%, ${loc.color} 150%)`
-                                                : 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
-                                            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                                        }}>
-                                            T{t.table_number}
-                                        </Typography>
-                                        <Box>
-                                            <IconButton size="small" onClick={() => handleOpen(t)}><EditIcon fontSize="small" /></IconButton>
-                                            <IconButton size="small" color="error" onClick={() => handleDelete(t.id)}><DeleteIcon fontSize="small" /></IconButton>
-                                        </Box>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                                    <Typography sx={{ fontWeight: 700, fontSize: '1.8rem' }}>
+                                        T{t.table_number}
+                                    </Typography>
+                                    <Box>
+                                        <IconButton size="small" onClick={() => handleOpen(t)}><EditIcon fontSize="small" /></IconButton>
+                                        <IconButton size="small" color="error" onClick={() => handleDelete(t.id)}><DeleteIcon fontSize="small" /></IconButton>
                                     </Box>
+                                </Box>
 
-                                    <Chip
-                                        label={t.is_active ? 'Activa' : 'Inactiva'}
-                                        size="small"
-                                        sx={{
-                                            bgcolor: t.is_active ? 'rgba(16,185,129,0.1)' : 'rgba(100,116,139,0.1)',
-                                            color: t.is_active ? '#10b981' : '#64748b',
-                                            border: `1px solid ${t.is_active ? 'rgba(16,185,129,0.3)' : 'rgba(100,116,139,0.2)'}`,
-                                            fontWeight: 600, fontSize: '0.7rem', mb: 2, mr: 1
-                                        }}
-                                    />
-                                    
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                        <PeopleIcon sx={{ fontSize: 16, color: '#94a3b8' }} />
-                                        <Typography sx={{ color: '#94a3b8', fontSize: '0.85rem' }}>
-                                            {t.capacity} personas
-                                        </Typography>
-                                    </Box>
-                                    <Chip
-                                        label={t.location} size="small"
-                                        sx={{
-                                            bgcolor: loc.bg, color: loc.color, border: `1px solid ${loc.color}30`,
-                                            fontWeight: 500, fontSize: '0.7rem', mt: 1, textTransform: 'capitalize',
-                                        }}
-                                    />
-                                    {t.description && (
-                                        <Typography sx={{ color: '#475569', fontSize: '0.75rem', mt: 1.5 }}>
-                                            {t.description}
-                                        </Typography>
-                                    )}
-                                </CardContent>
+                                <Chip
+                                    label={t.is_active ? 'Activa' : 'Inactiva'}
+                                    size="small"
+                                    sx={{
+                                        bgcolor: t.is_active ? 'rgba(16,185,129,0.1)' : 'rgba(100,116,139,0.1)',
+                                        color: t.is_active ? '#10b981' : '#64748b',
+                                        border: `1px solid ${t.is_active ? 'rgba(16,185,129,0.3)' : 'rgba(100,116,139,0.2)'}`,
+                                        fontWeight: 600, fontSize: '0.7rem', mb: 2, mr: 1
+                                    }}
+                                />
+
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                    <PeopleIcon sx={{ fontSize: 16, color: '#94a3b8' }} />
+                                    <Typography sx={{ color: '#94a3b8', fontSize: '0.85rem' }}>
+                                        {t.capacity} personas
+                                    </Typography>
+                                </Box>
+                                <Chip
+                                    label={t.location} size="small"
+                                    sx={{
+                                        bgcolor: loc.bg, color: loc.color, border: `1px solid ${loc.color}30`,
+                                        fontWeight: 500, fontSize: '0.7rem', mt: 1, textTransform: 'capitalize',
+                                    }}
+                                />
+                                {t.description && (
+                                    <Typography sx={{ color: '#475569', fontSize: '0.75rem', mt: 1.5 }}>
+                                        {t.description}
+                                    </Typography>
+                                )}
                             </Card>
                         </Grid>
                     );
@@ -173,7 +151,9 @@ export default function Tables() {
             </Grid>
 
             {/* Modal CRUD Mesa */}
-            <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: '16px', background: '#0f172a' } }}>
+            <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth PaperProps={{
+                sx: { borderRadius: '14px', background: '#0b0b12', border: '1px solid rgba(255,255,255,0.08)' },
+            }}>
                 <DialogTitle sx={{ fontWeight: 700 }}>{editTableId ? 'Editar Mesa' : 'Añadir Nueva Mesa'}</DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>

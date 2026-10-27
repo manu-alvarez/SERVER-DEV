@@ -71,7 +71,7 @@ export default function Tools() {
               <Switch
                 checked={config.enable_internet_search === 1}
                 onChange={(e) => toggleSearch(e.target.checked)}
-                color="secondary"
+                color="primary"
               />
             }
             label={

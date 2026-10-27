@@ -4,12 +4,12 @@ import {
     TableHead, TableRow, Chip, Tooltip,
 } from '@mui/material';
 import {
-    PhoneInTalk as CallsIcon,
     Timer as TimerIcon,
     PhoneDisabled as EmptyIcon,
     Assignment as NoteIcon,
 } from '@mui/icons-material';
 import { getCalls } from '../api';
+import { PageHeader } from '../components/PageShell';
 
 const resultConfig: Record<string, { label: string; color: string; bg: string }> = {
     'Reserva': { label: 'Reserva', color: '#10b981', bg: 'rgba(16,185,129,0.1)' },
@@ -34,72 +34,36 @@ export default function Calls() {
     };
 
     return (
-        <Box sx={{ animation: 'fadeInUp 0.4s ease-out' }}>
-            {/* Header MSB Premium Style */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, mb: 6 }}>
-                <Box sx={{
-                    width: 52, height: 52, borderRadius: 0,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'rgba(212, 175, 55, 0.05)',
-                    border: '1px solid rgba(212, 175, 55, 0.2)',
-                    boxShadow: '0 0 40px rgba(212, 175, 55, 0.05)',
-                }}>
-                    <CallsIcon sx={{ color: '#d4af37', fontSize: 28 }} />
-                </Box>
-                <Box>
-                    <Typography variant="h4" sx={{ 
-                        fontFamily: '"Playfair Display", serif', 
-                        fontWeight: 700, 
-                        color: '#d4af37', 
-                        letterSpacing: '1px' 
-                    }}>
-                        HISTORIAL DE LLAMADAS
-                    </Typography>
-                    <Typography variant="body2" sx={{ 
-                        color: 'rgba(255,255,255,0.5)', 
-                        letterSpacing: '3px',
-                        textTransform: 'uppercase',
-                        fontSize: '0.7rem' 
-                    }}>
-                        Conversaciones gestionadas por Nikolina AI
-                    </Typography>
-                </Box>
-            </Box>
+        <Box>
+            <PageHeader
+                title="Llamadas IA"
+                subtitle="Conversaciones gestionadas por Nikolina AI"
+            />
 
-            {/* Table MSB Glassmorphic Style */}
+            {/* Table — glass tokens + theme table overrides (gold uppercase heads) */}
             <TableContainer component={Paper} sx={{
-                borderRadius: 0,
-                backgroundImage: 'none',
-                backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                backdropFilter: 'blur(40px)',
-                border: '1px solid rgba(212, 175, 55, 0.15)',
-                animation: 'fadeInUp 0.6s ease-out 0.2s both',
-                boxShadow: '0 40px 80px rgba(0, 0, 0, 0.7)',
+                borderRadius: '14px',
+                bgcolor: 'rgba(255, 255, 255, 0.02)',
+                border: '1px solid rgba(255, 255, 255, 0.06)',
             }}>
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{ color: '#d4af37', fontFamily: '"Playfair Display", serif', fontWeight: 600, letterSpacing: '1px' }}>F. / HORA</TableCell>
-                            <TableCell sx={{ color: '#d4af37', fontFamily: '"Playfair Display", serif', fontWeight: 600, letterSpacing: '1px' }}>IDENTIDAD</TableCell>
-                            <TableCell sx={{ color: '#d4af37', fontFamily: '"Playfair Display", serif', fontWeight: 600, letterSpacing: '1px' }}>DURACIÓN</TableCell>
-                            <TableCell sx={{ color: '#d4af37', fontFamily: '"Playfair Display", serif', fontWeight: 600, letterSpacing: '1px' }}>RESULTADO</TableCell>
-                            <TableCell sx={{ color: '#d4af37', fontFamily: '"Playfair Display", serif', fontWeight: 600, letterSpacing: '1px' }}>RESUMEN</TableCell>
-                            <TableCell sx={{ color: '#d4af37', fontFamily: '"Playfair Display", serif', fontWeight: 600, letterSpacing: '1px' }}>PETICIONES / NOTAS</TableCell>
+                            <TableCell>F. / HORA</TableCell>
+                            <TableCell>IDENTIDAD</TableCell>
+                            <TableCell>DURACIÓN</TableCell>
+                            <TableCell>RESULTADO</TableCell>
+                            <TableCell>RESUMEN</TableCell>
+                            <TableCell>PETICIONES / NOTAS</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {calls.map((c, idx) => {
+                        {calls.map((c) => {
                             const res = resultConfig[c.result] || resultConfig.unknown;
                             return (
-                                <TableRow key={c.id} sx={{
-                                    animation: `fadeInUp 0.3s ease-out ${idx * 30}ms both`,
-                                    '&:hover': {
-                                        backgroundColor: 'rgba(212, 175, 55, 0.03) !important',
-                                    },
-                                    transition: 'all 0.2s ease',
-                                }}>
+                                <TableRow key={c.id} sx={{ transition: 'all 0.2s ease' }}>
                                     <TableCell>
-                                        <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: 'white' }}>
+                                        <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>
                                             {new Date(c.started_at).toLocaleDateString('es-ES')}
                                         </Typography>
                                         <Typography sx={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', fontFamily: '"JetBrains Mono", monospace' }}>
@@ -111,12 +75,12 @@ export default function Calls() {
                                     </TableCell>
                                     <TableCell>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                                            <TimerIcon sx={{ fontSize: 14, color: '#d4af37', opacity: 0.6 }} />
+                                            <TimerIcon sx={{ fontSize: 14, color: '#94a3b8' }} />
                                             <Typography sx={{
                                                 fontWeight: 600,
                                                 fontSize: '0.8rem',
                                                 fontFamily: '"JetBrains Mono", monospace',
-                                                color: c.duration_seconds > 60 ? '#d4af37' : 'rgba(255,255,255,0.5)',
+                                                color: c.duration_seconds > 60 ? '#ffffff' : 'rgba(255,255,255,0.5)',
                                             }}>
                                                 {formatDuration(c.duration_seconds)}
                                             </Typography>
@@ -124,16 +88,14 @@ export default function Calls() {
                                     </TableCell>
                                     <TableCell>
                                         <Chip
-                                            label={res.label.toUpperCase()}
+                                            label={res.label}
                                             size="small"
                                             sx={{
                                                 bgcolor: res.bg,
                                                 color: res.color,
                                                 border: `1px solid ${res.color}40`,
-                                                borderRadius: '2px',
-                                                fontWeight: 800,
-                                                fontSize: '0.65rem',
-                                                letterSpacing: '1px',
+                                                fontWeight: 600,
+                                                fontSize: '0.7rem',
                                             }}
                                         />
                                     </TableCell>
@@ -145,8 +107,7 @@ export default function Calls() {
                                                 maxWidth: 220,
                                                 overflow: 'hidden',
                                                 textOverflow: 'ellipsis',
-                                                whiteSpace: 'nowrap',
-                                                fontStyle: 'italic'
+                                                whiteSpace: 'nowrap'
                                             }}>
                                                 {c.summary || '—'}
                                             </Typography>
@@ -157,17 +118,17 @@ export default function Calls() {
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                 <NoteIcon sx={{ fontSize: 16, color: '#d4af37', opacity: 0.8 }} />
                                                 <Typography sx={{
-                                                    color: '#d4af37',
+                                                    color: 'rgba(255,255,255,0.7)',
                                                     fontSize: '0.75rem',
                                                     fontWeight: 500,
                                                     maxWidth: 250,
                                                     overflow: 'hidden',
                                                     textOverflow: 'ellipsis',
                                                     whiteSpace: 'nowrap',
-                                                    backgroundColor: 'rgba(212, 175, 55, 0.05)',
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.04)',
                                                     px: 1,
                                                     py: 0.2,
-                                                    borderRadius: '2px'
+                                                    borderRadius: '6px'
                                                 }}>
                                                     {c.notes}
                                                 </Typography>
@@ -184,7 +145,7 @@ export default function Calls() {
                                 <TableCell colSpan={6} align="center">
                                     <Box py={8} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                                         <EmptyIcon sx={{ fontSize: 48, color: 'rgba(212, 175, 55, 0.1)' }} />
-                                        <Typography sx={{ color: 'rgba(255,255,255,0.3)', letterSpacing: '2px' }}>PÁGINA SIN REGISTROS ACTIVOS</Typography>
+                                        <Typography sx={{ color: 'rgba(255,255,255,0.3)' }}>Sin llamadas registradas todavía</Typography>
                                     </Box>
                                 </TableCell>
                             </TableRow>

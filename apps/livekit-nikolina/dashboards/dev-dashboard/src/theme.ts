@@ -12,9 +12,9 @@ export const darkNeonTheme = createTheme({
             dark: '#a67c00',
         },
         secondary: {
-            main: '#06b6d4', // Engineering Cyan
-            light: '#22d3ee',
-            dark: '#0891b2',
+            main: '#94a3b8', // Neutral slate (unified: single gold accent + gray scale)
+            light: '#cbd5e1',
+            dark: '#64748b',
         },
         background: {
             default: '#050505',

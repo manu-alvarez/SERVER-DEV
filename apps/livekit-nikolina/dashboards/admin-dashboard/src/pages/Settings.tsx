@@ -3,11 +3,11 @@ import {
     Box, Typography, Paper, Grid, TextField, Button, Alert, Fade,
 } from '@mui/material';
 import {
-    Settings as SettingsIcon,
     Save as SaveIcon,
     CheckCircle as CheckIcon,
 } from '@mui/icons-material';
 import { getRestaurantInfo, updateRestaurantInfo } from '../api';
+import { PageHeader } from '../components/PageShell';
 
 export default function Settings() {
     const [info, setInfo] = useState<any>({});
@@ -33,24 +33,11 @@ export default function Settings() {
     };
 
     return (
-        <Box sx={{ maxWidth: '900px', animation: 'fadeInUp 0.4s ease-out' }}>
-            {/* Header */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4 }}>
-                <Box sx={{
-                    width: 42, height: 42, borderRadius: '12px',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(212,168,83,0.15) 100%)',
-                    border: '1px solid rgba(245,158,11,0.2)',
-                }}>
-                    <SettingsIcon sx={{ color: '#fbbf24', fontSize: 22 }} />
-                </Box>
-                <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 700 }}>Configuración</Typography>
-                    <Typography variant="body2" sx={{ color: '#64748b' }}>
-                        Datos del restaurante y horarios
-                    </Typography>
-                </Box>
-            </Box>
+        <Box sx={{ maxWidth: '900px' }}>
+            <PageHeader
+                title="Configuración"
+                subtitle="Datos del restaurante y horarios"
+            />
 
             <Fade in={saved}>
                 <Alert
@@ -68,10 +55,10 @@ export default function Settings() {
                 </Alert>
             </Fade>
 
-            <Paper sx={{ p: 4, borderRadius: '20px' }}>
+            <Paper sx={{ p: 3, borderRadius: '14px', bgcolor: 'rgba(255,255,255,0.02)' }}>
                 {/* Section: Info */}
-                <Typography variant="overline" sx={{ color: '#7c3aed', mb: 2, display: 'block' }}>
-                    Información General
+                <Typography variant="caption" color="text.secondary" fontWeight={700} letterSpacing="0.1em" sx={{ mb: 2, display: 'block' }}>
+                    INFORMACIÓN GENERAL
                 </Typography>
                 <Grid container spacing={3} sx={{ mb: 4 }}>
                     <Grid size={{ xs: 12, sm: 6 }}>
@@ -86,8 +73,8 @@ export default function Settings() {
                 </Grid>
 
                 {/* Section: Horarios */}
-                <Typography variant="overline" sx={{ color: '#3b82f6', mb: 2, display: 'block' }}>
-                    Horarios
+                <Typography variant="caption" color="text.secondary" fontWeight={700} letterSpacing="0.1em" sx={{ mb: 2, display: 'block' }}>
+                    HORARIOS
                 </Typography>
                 <Grid container spacing={3} sx={{ mb: 4 }}>
                     <Grid size={{ xs: 12, sm: 6 }}>
@@ -111,8 +98,8 @@ export default function Settings() {
                 </Grid>
 
                 {/* Section: Capacidad */}
-                <Typography variant="overline" sx={{ color: '#10b981', mb: 2, display: 'block' }}>
-                    Capacidad y Reglas
+                <Typography variant="caption" color="text.secondary" fontWeight={700} letterSpacing="0.1em" sx={{ mb: 2, display: 'block' }}>
+                    CAPACIDAD Y REGLAS
                 </Typography>
                 <Grid container spacing={3}>
                     <Grid size={{ xs: 12, sm: 6 }}>

@@ -19,7 +19,7 @@ import {
 const drawerWidth = 260;
 
 const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
+    { text: 'Vista General', icon: <DashboardIcon />, path: '/' },
     { text: 'Reservas', icon: <ReservationsIcon />, path: '/reservations' },
     { text: 'Mesas', icon: <TablesIcon />, path: '/tables' },
     { text: 'Carta', icon: <MenuBookIcon />, path: '/menu' },
@@ -58,13 +58,13 @@ export default function Layout() {
                     <Typography sx={{
                         fontFamily: '"Playfair Display", serif',
                         fontWeight: 700,
-                        fontSize: '1.1rem',
+                        fontSize: '1.05rem',
                         background: 'linear-gradient(135deg, #d4a853 0%, #e8c97a 50%, #d4a853 100%)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                         lineHeight: 1.2,
                     }}>
-                        MSB
+                        Admin Panel
                     </Typography>
                     <Typography sx={{
                         fontSize: '0.6rem',

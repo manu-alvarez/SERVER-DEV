@@ -9,11 +9,11 @@ import {
     Add as AddIcon,
     Edit as EditIcon,
     Delete as DeleteIcon,
-    Restaurant as RestaurantIcon,
     Star as StarIcon,
     FilterList as FilterIcon,
 } from '@mui/icons-material';
 import { getMenu, createMenuItem, updateMenuItem, deleteMenuItem } from '../api';
+import { PageHeader, StatTile } from '../components/PageShell';
 
 interface MenuItemData {
     id: number;
@@ -27,12 +27,12 @@ interface MenuItemData {
 }
 
 const CATEGORIES = [
-    { value: 'entrante', label: '🥗 Entrantes' },
-    { value: 'principal', label: '🍽️ Principales' },
-    { value: 'postre', label: '🍰 Postres' },
-    { value: 'bebida', label: '🍷 Bebidas' },
-    { value: 'tapa', label: '🧂 Tapas' },
-    { value: 'especial', label: '⭐ Especiales' },
+    { value: 'entrante', label: 'Entrantes' },
+    { value: 'principal', label: 'Principales' },
+    { value: 'postre', label: 'Postres' },
+    { value: 'bebida', label: 'Bebidas' },
+    { value: 'tapa', label: 'Tapas' },
+    { value: 'especial', label: 'Especiales' },
 ];
 
 const emptyItem: Omit<MenuItemData, 'id'> = {
@@ -119,31 +119,15 @@ export default function MenuPage() {
 
     return (
         <Box>
-            <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <RestaurantIcon sx={{ color: '#d4a853' }} /> Carta del Restaurante
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        Gestiona los platos, precios y alérgenos que Nikolina ofrece a los clientes
-                    </Typography>
-                </Box>
-                <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={handleAdd}
-                    sx={{
-                        background: 'linear-gradient(135deg, #d4a853 0%, #e8c97a 100%)',
-                        color: '#1a1a2e',
-                        fontWeight: 600,
-                        '&:hover': {
-                            background: 'linear-gradient(135deg, #e8c97a 0%, #d4a853 100%)',
-                        },
-                    }}
-                >
-                    Añadir Plato
-                </Button>
-            </Box>
+            <PageHeader
+                title="Carta"
+                subtitle="Gestiona los platos, precios y alérgenos que Nikolina ofrece a los clientes"
+                actions={
+                    <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
+                        Añadir Plato
+                    </Button>
+                }
+            />
 
             {alert && (
                 <Alert severity={alert.type} sx={{ mb: 2 }} onClose={() => setAlert(null)}>
@@ -152,24 +136,23 @@ export default function MenuPage() {
             )}
 
             {/* Stats */}
-            <Grid container spacing={2} sx={{ mb: 3 }}>
-                {[
-                    { label: 'Total Platos', value: stats.total, color: '#7c3aed' },
-                    { label: 'Disponibles', value: stats.available, color: '#10b981' },
-                    { label: 'Especiales', value: stats.specials, color: '#f59e0b' },
-                    { label: 'Categorías', value: stats.categories, color: '#3b82f6' },
-                ].map(s => (
-                    <Grid size={{ xs: 6, md: 3 }} key={s.label}>
-                        <Paper sx={{ p: 2, textAlign: 'center' }}>
-                            <Typography variant="h4" sx={{ fontWeight: 700, color: s.color }}>{s.value}</Typography>
-                            <Typography variant="body2" color="text.secondary">{s.label}</Typography>
-                        </Paper>
-                    </Grid>
-                ))}
+            <Grid container spacing={3} sx={{ mb: 3 }}>
+                <Grid size={{ xs: 6, md: 3 }}>
+                    <StatTile label="TOTAL PLATOS" value={stats.total} />
+                </Grid>
+                <Grid size={{ xs: 6, md: 3 }}>
+                    <StatTile label="DISPONIBLES" value={stats.available} />
+                </Grid>
+                <Grid size={{ xs: 6, md: 3 }}>
+                    <StatTile label="ESPECIALES" value={stats.specials} />
+                </Grid>
+                <Grid size={{ xs: 6, md: 3 }}>
+                    <StatTile label="CATEGORÍAS" value={stats.categories} />
+                </Grid>
             </Grid>
 
             {/* Filter */}
-            <Box sx={{ mb: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Box sx={{ mb: 2, display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
                 <FilterIcon sx={{ color: 'text.secondary' }} />
                 <Chip
                     label="Todos"
@@ -189,7 +172,11 @@ export default function MenuPage() {
             </Box>
 
             {/* Table */}
-            <TableContainer component={Paper}>
+            <TableContainer component={Paper} sx={{
+                borderRadius: '14px',
+                bgcolor: 'rgba(255, 255, 255, 0.02)',
+                border: '1px solid rgba(255, 255, 255, 0.06)',
+            }}>
                 <Table>
                     <TableHead>
                         <TableRow>
@@ -216,7 +203,7 @@ export default function MenuPage() {
                                     <TableCell>
                                         <Box>
                                             <Typography sx={{ fontWeight: 600 }}>
-                                                {Boolean(item.is_daily_special) && <StarIcon sx={{ fontSize: 16, color: '#f59e0b', mr: 0.5, verticalAlign: 'text-bottom' }} />}
+                                                {Boolean(item.is_daily_special) && <StarIcon sx={{ fontSize: 16, color: '#d4af37', mr: 0.5, verticalAlign: 'text-bottom' }} />}
                                                 {item.name}
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -227,7 +214,7 @@ export default function MenuPage() {
                                     <TableCell>
                                         <Chip label={getCategoryLabel(item.category)} size="small" variant="outlined" />
                                     </TableCell>
-                                    <TableCell sx={{ fontWeight: 600, color: '#10b981' }}>{item.price.toFixed(2)}€</TableCell>
+                                    <TableCell sx={{ fontWeight: 600 }}>{item.price.toFixed(2)}€</TableCell>
                                     <TableCell>
                                         {item.allergens ? (
                                             <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
@@ -248,7 +235,7 @@ export default function MenuPage() {
                                     </TableCell>
                                     <TableCell align="right">
                                         <Tooltip title="Editar">
-                                            <IconButton size="small" onClick={() => handleEdit(item)} sx={{ color: '#7c3aed' }}>
+                                            <IconButton size="small" onClick={() => handleEdit(item)} sx={{ color: 'text.secondary' }}>
                                                 <EditIcon fontSize="small" />
                                             </IconButton>
                                         </Tooltip>
@@ -266,9 +253,17 @@ export default function MenuPage() {
             </TableContainer>
 
             {/* Edit/Create Dialog */}
-            <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
+            <Dialog
+                open={dialogOpen}
+                onClose={() => setDialogOpen(false)}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{
+                    sx: { borderRadius: '14px', background: '#0b0b12', border: '1px solid rgba(255,255,255,0.08)' },
+                }}
+            >
                 <DialogTitle sx={{ fontWeight: 700 }}>
-                    {isNew ? '🍽️ Nuevo Plato' : '✏️ Editar Plato'}
+                    {isNew ? 'Nuevo Plato' : 'Editar Plato'}
                 </DialogTitle>
                 <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: '16px !important' }}>
                     <TextField
@@ -332,7 +327,7 @@ export default function MenuPage() {
                                     onChange={e => setEditingItem(prev => ({ ...prev, is_daily_special: e.target.checked }))}
                                 />
                             }
-                            label="⭐ Especial del día"
+                            label="Especial del día"
                         />
                     </Box>
                 </DialogContent>
@@ -342,11 +337,6 @@ export default function MenuPage() {
                         variant="contained"
                         onClick={handleSave}
                         disabled={!editingItem?.name}
-                        sx={{
-                            background: 'linear-gradient(135deg, #d4a853 0%, #e8c97a 100%)',
-                            color: '#1a1a2e',
-                            fontWeight: 600,
-                        }}
                     >
                         {isNew ? 'Añadir' : 'Guardar'}
                     </Button>

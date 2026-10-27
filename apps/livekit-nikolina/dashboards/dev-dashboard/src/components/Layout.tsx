@@ -66,26 +66,27 @@ export default function Layout() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Avatar sx={{
               bgcolor: 'transparent',
-              border: '2px solid rgba(124, 58, 237, 0.4)',
-              width: 36, height: 36,
+              border: '2px solid rgba(212, 168, 83, 0.5)',
+              width: 42, height: 42,
             }}>
-              <TerminalIcon sx={{ fontSize: 18, color: '#a78bfa' }} />
+              <TerminalIcon sx={{ fontSize: 22, color: '#d4a853' }} />
             </Avatar>
             <Box>
               <Typography sx={{
-                fontWeight: 700, fontSize: '0.95rem',
-                background: 'linear-gradient(135deg, #a78bfa 0%, #06b6d4 100%)',
+                fontFamily: '"Playfair Display", serif',
+                fontWeight: 700, fontSize: '1.05rem',
+                background: 'linear-gradient(135deg, #d4a853 0%, #e8c97a 50%, #d4a853 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 lineHeight: 1.2,
               }}>
-                DEV DASH
+                Dev Panel
               </Typography>
               <Typography sx={{
-                fontSize: '0.55rem', color: '#64748b',
+                fontSize: '0.6rem', color: '#64748b',
                 letterSpacing: '0.15em', textTransform: 'uppercase',
               }}>
-                MSB LiveKit
+                Restaurant
               </Typography>
             </Box>
           </Box>
@@ -117,16 +118,16 @@ export default function Layout() {
                   justifyContent: collapsed ? 'center' : 'flex-start',
                   transition: 'all 0.2s ease',
                   '&.Mui-selected': {
-                    bgcolor: 'rgba(124, 58, 237, 0.12)',
-                    borderLeft: collapsed ? 'none' : '3px solid #7c3aed',
-                    '&:hover': { bgcolor: 'rgba(124, 58, 237, 0.16)' },
+                    bgcolor: 'rgba(212, 175, 55, 0.08)',
+                    borderLeft: collapsed ? 'none' : '3px solid rgba(212, 175, 55, 0.7)',
+                    '&:hover': { bgcolor: 'rgba(212, 175, 55, 0.12)' },
                   },
                   '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.04)' },
                 }}
               >
                 <ListItemIcon sx={{
                   minWidth: collapsed ? 0 : 40,
-                  color: isActive ? '#a78bfa' : '#64748b',
+                  color: isActive ? 'rgba(212, 175, 55, 0.9)' : '#64748b',
                   transition: 'color 0.2s ease',
                 }}>
                   {item.icon}
@@ -144,8 +145,8 @@ export default function Layout() {
                 {isActive && !collapsed && (
                   <Box sx={{
                     width: 6, height: 6, borderRadius: '50%',
-                    bgcolor: '#7c3aed',
-                    boxShadow: '0 0 8px rgba(124, 58, 237, 0.6)',
+                    bgcolor: 'rgba(212, 175, 55, 0.9)',
+                    boxShadow: '0 0 8px rgba(212, 175, 55, 0.5)',
                   }} />
                 )}
               </ListItemButton>
@@ -228,7 +229,7 @@ export default function Layout() {
             )}
             <Breadcrumbs aria-label="breadcrumb">
               <MuiLink component={Link} to="/" underline="hover" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
-                Dev
+                Dev Panel
               </MuiLink>
               <Typography color="text.primary" sx={{ fontSize: '0.85rem', fontWeight: 600 }}>
                 {pageTitles[location.pathname] || 'Page'}
@@ -238,12 +239,12 @@ export default function Layout() {
 
           <Box sx={{
             px: 2, py: 0.5, borderRadius: '8px',
-            bgcolor: 'rgba(124, 58, 237, 0.08)',
-            border: '1px solid rgba(124, 58, 237, 0.2)',
+            bgcolor: 'rgba(212, 175, 55, 0.08)',
+            border: '1px solid rgba(212, 175, 55, 0.2)',
           }}>
             <Typography sx={{
               fontSize: '0.65rem', fontWeight: 700,
-              letterSpacing: '0.15em', color: '#a78bfa',
+              letterSpacing: '0.15em', color: 'rgba(212, 175, 55, 0.9)',
               fontFamily: '"JetBrains Mono", monospace',
             }}>
               DEV MODE

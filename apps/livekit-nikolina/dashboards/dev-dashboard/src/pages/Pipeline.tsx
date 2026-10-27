@@ -139,7 +139,7 @@ export default function Pipeline() {
                     size="small"
                     icon={<CheckCircleIcon />}
                     label="ACTIVO"
-                    sx={{ bgcolor: 'rgba(124,58,237,0.15)', color: '#a78bfa', fontWeight: 700 }}
+                    sx={{ bgcolor: 'rgba(16,185,129,0.1)', color: '#10b981', fontWeight: 700 }}
                   />
                 ) : (
                   <Tooltip title="Activar este pipeline">

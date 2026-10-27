@@ -7,12 +7,12 @@ import {
 import {
     Delete as DeleteIcon,
     Add as AddIcon,
-    BookOnline as ReservationsIcon,
     SearchOff as EmptyIcon,
 } from '@mui/icons-material';
 import { getReservations, cancelReservation, createReservation } from '../api';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { PageHeader } from '../components/PageShell';
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
     confirmed: { label: 'Confirmada', color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' },
@@ -73,39 +73,29 @@ export default function Reservations() {
     };
 
     return (
-        <Box sx={{ animation: 'fadeInUp 0.4s ease-out' }}>
+        <Box>
             {/* Header */}
-            <Box sx={{
-                display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' },
-                flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mb: 4,
-            }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Box sx={{
-                        width: 42, height: 42, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: 'linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(59,130,246,0.15) 100%)',
-                        border: '1px solid rgba(124,58,237,0.2)',
-                    }}>
-                        <ReservationsIcon sx={{ color: '#a78bfa', fontSize: 22 }} />
-                    </Box>
-                    <Box>
-                        <Typography variant="h4" sx={{ fontWeight: 700 }}>Reservas</Typography>
-                        <Typography variant="body2" sx={{ color: '#64748b' }}>
-                            {format(new Date(date), "EEEE, d MMM yyyy", { locale: es })}
-                        </Typography>
-                    </Box>
-                </Box>
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                    <TextField
-                        type="date" size="small" value={date} onChange={(e) => setDate(e.target.value)} sx={{ minWidth: 160 }}
-                    />
-                    <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpen}>
-                        Nueva Reserva
-                    </Button>
-                </Box>
-            </Box>
+            <PageHeader
+                title="Reservas"
+                subtitle={format(new Date(date), "EEEE, d MMM yyyy", { locale: es })}
+                actions={
+                    <>
+                        <TextField
+                            type="date" size="small" value={date} onChange={(e) => setDate(e.target.value)} sx={{ minWidth: 160 }}
+                        />
+                        <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpen}>
+                            Nueva Reserva
+                        </Button>
+                    </>
+                }
+            />
 
             {/* Table */}
-            <TableContainer component={Paper} sx={{ borderRadius: '20px', animation: 'fadeInUp 0.5s ease-out 0.1s both' }}>
+            <TableContainer component={Paper} sx={{
+                borderRadius: '14px',
+                bgcolor: 'rgba(255, 255, 255, 0.02)',
+                border: '1px solid rgba(255, 255, 255, 0.06)',
+            }}>
                 <Table>
                     <TableHead>
                         <TableRow>
@@ -119,10 +109,10 @@ export default function Reservations() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {reservations.map((r, idx) => {
+                        {reservations.map((r) => {
                             const st = statusConfig[r.status] || statusConfig.confirmed;
                             return (
-                                <TableRow key={r.id} sx={{ animation: `fadeInUp 0.3s ease-out ${idx * 50}ms both` }}>
+                                <TableRow key={r.id}>
                                     <TableCell><Typography sx={{ fontWeight: 700, fontSize: '0.95rem' }}>{r.time}</Typography></TableCell>
                                     <TableCell>{r.customer_name}</TableCell>
                                     <TableCell sx={{ color: '#94a3b8' }}>{r.customer_phone}</TableCell>
@@ -132,12 +122,7 @@ export default function Reservations() {
                                         />
                                     </TableCell>
                                     <TableCell>
-                                        <Box sx={{
-                                            width: 28, height: 28, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            bgcolor: 'rgba(124, 58, 237, 0.08)', border: '1px solid rgba(124, 58, 237, 0.15)', fontWeight: 700, fontSize: '0.8rem', color: '#a78bfa',
-                                        }}>
-                                            {r.num_guests}
-                                        </Box>
+                                        <Typography sx={{ fontWeight: 700, fontSize: '0.95rem' }}>{r.num_guests}</Typography>
                                     </TableCell>
                                     <TableCell>
                                         <Chip label={st.label} size="small" sx={{ bgcolor: st.bg, color: st.color, border: `1px solid ${st.color}30`, fontWeight: 600, fontSize: '0.7rem' }} />
@@ -168,7 +153,9 @@ export default function Reservations() {
             </TableContainer>
 
             {/* Modal Nueva Reserva */}
-            <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: '16px', background: '#0f172a' } }}>
+            <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth PaperProps={{
+                sx: { borderRadius: '14px', background: '#0b0b12', border: '1px solid rgba(255,255,255,0.08)' },
+            }}>
                 <DialogTitle sx={{ fontWeight: 700 }}>Añadir Reserva Manual</DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
