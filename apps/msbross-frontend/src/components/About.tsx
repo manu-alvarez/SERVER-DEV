@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Monitor, Code, Bot, BookOpen } from 'lucide-react';
+import Glow from './Glow';
 
 const SKILLS = [
   {
@@ -39,9 +40,9 @@ const SKILLS = [
 export default function About() {
   return (
     <section id="sobre-mi" className="relative py-24 lg:py-32 overflow-hidden bg-[#060B18]">
-      {/* Ambient lighting */}
-      <div className="absolute top-1/2 left-0 w-[550px] h-[550px] bg-blue-600/12 rounded-full blur-[140px] pointer-events-none -translate-y-1/2" />
-      <div className="absolute bottom-0 right-10 w-[550px] h-[550px] bg-cyan-600/12 rounded-full blur-[130px] pointer-events-none" />
+      {/* Ambient lighting — radial gradients (iOS-safe, no filter layers) */}
+      <Glow color="rgba(37, 99, 235, 0.12)" className="w-[550px] h-[550px] top-1/2 left-0 -translate-y-1/2" />
+      <Glow color="rgba(8, 145, 178, 0.12)" className="w-[550px] h-[550px] bottom-0 right-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-14 items-center">
@@ -148,8 +149,10 @@ export default function About() {
             transition={{ duration: 0.7 }}
             className="lg:col-span-6 relative flex items-center justify-center"
           >
-            {/* Soft ambient workstation glow behind image */}
-            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/18 via-blue-600/14 to-purple-600/10 rounded-full blur-[100px] pointer-events-none" />
+            {/* Soft ambient workstation glow behind image — radial gradients (iOS-safe) */}
+            <Glow color="rgba(6, 182, 212, 0.16)" className="inset-2" fade="78%" />
+            <Glow color="rgba(59, 130, 246, 0.12)" className="inset-6" fade="80%" />
+            <Glow color="rgba(147, 51, 234, 0.09)" className="inset-10" fade="85%" />
 
             {/* Workstation Container: Fused directly without box/border */}
             <div className="relative w-full overflow-visible flex items-center justify-center">

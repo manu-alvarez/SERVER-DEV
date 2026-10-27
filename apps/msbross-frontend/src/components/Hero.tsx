@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import ArchitectCockpit from './ArchitectCockpit';
+import Glow from './Glow';
 
 export default function Hero() {
   return (
@@ -9,22 +10,23 @@ export default function Hero() {
       className="relative min-h-[92dvh] sm:min-h-[92svh] flex items-center overflow-hidden pt-28 pb-16 bg-[#060B18]"
     >
       {/* Premium background image — real IT dev workstation */}
+      {/* NOTE: no CSS filter here — a filtered full-viewport layer is expensive
+          for iOS WebKit compositing; opacity already dims it enough. */}
       <div
         className="absolute inset-0 z-0 opacity-[0.16] pointer-events-none"
         style={{
           backgroundImage: `url('/workstation.jpg')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          filter: 'blur(2px) brightness(0.75) saturate(1.15)',
         }}
       />
       {/* Gradient overlay to guarantee text contrast over the photo */}
       <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#060B18] via-[#060B18]/70 to-transparent pointer-events-none" />
 
-      {/* Cinematic ambient background glow */}
-      <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-blue-600/15 rounded-full blur-[140px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
-      <div className="absolute top-1/3 right-1/4 w-[550px] h-[550px] bg-cyan-500/18 rounded-full blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-purple-600/12 rounded-full blur-[130px] pointer-events-none" />
+      {/* Cinematic ambient background glow — radial gradients (no filter layers) */}
+      <Glow color="rgba(37, 99, 235, 0.15)" className="w-[600px] h-[600px] top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2" />
+      <Glow color="rgba(6, 182, 212, 0.18)" className="w-[550px] h-[550px] top-1/3 right-1/4" />
+      <Glow color="rgba(147, 51, 234, 0.12)" className="w-[500px] h-[500px] bottom-10 right-10" />
 
       {/* Subtle background tech grid */}
       <div

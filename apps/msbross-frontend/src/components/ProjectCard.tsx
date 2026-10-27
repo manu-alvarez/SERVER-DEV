@@ -73,8 +73,10 @@ export default function ProjectCard({
         <div>
           <div className="flex items-start justify-between gap-3 relative z-10">
             {/* Project Icon Box */}
+            {/* Project Icon Box — [&>svg] sizing fixes WebKit's 300×150 default for
+               sizeless inline SVGs (Chrome stretches them, Safari does not) */}
             <div
-              className={`rounded-xl flex items-center justify-center shrink-0 shadow-lg transition-transform duration-300 group-hover:scale-105 text-white ${
+              className={`rounded-xl flex items-center justify-center shrink-0 shadow-lg transition-transform duration-300 group-hover:scale-105 text-white [&>svg]:w-6 [&>svg]:h-6 [&>svg]:shrink-0 ${
                 compact ? 'w-10 h-10' : 'w-12 h-12'
               }`}
               style={{ background: project.iconBg }}

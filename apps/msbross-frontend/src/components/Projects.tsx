@@ -4,6 +4,7 @@ import { FEATURED_PROJECTS, OTHER_PROJECTS, CATEGORIES } from '../data/projects'
 import type { Project } from '../data/projects';
 import ProjectCard from './ProjectCard';
 import ProjectModal from './ProjectModal';
+import Glow from './Glow';
 
 export default function Projects() {
   const [activeCategory, setActiveCategory] = useState('all');
@@ -21,9 +22,9 @@ export default function Projects() {
 
   return (
     <section id="proyectos" className="relative py-24 lg:py-32 bg-[#060B18] overflow-hidden">
-      {/* Ambient background glow */}
-      <div className="absolute top-20 right-10 w-[550px] h-[550px] bg-blue-600/15 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-20 left-10 w-[500px] h-[500px] bg-cyan-600/12 rounded-full blur-[130px] pointer-events-none" />
+      {/* Ambient background glow — radial gradients (iOS-safe) */}
+      <Glow color="rgba(37, 99, 235, 0.15)" className="w-[550px] h-[550px] top-20 right-10" />
+      <Glow color="rgba(8, 145, 178, 0.12)" className="w-[500px] h-[500px] bottom-20 left-10" />
 
       {/* Background tech grid */}
       <div

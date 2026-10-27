@@ -8,6 +8,8 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 
+import Glow from './Glow';
+
 export default function ArchitectCockpit() {
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -53,8 +55,9 @@ export default function ArchitectCockpit() {
 
   return (
     <div className="relative w-full max-w-[560px] perspective-[1200px] select-none">
-      {/* Soft Ambient Glow behind the card */}
-      <div className="absolute -inset-4 bg-gradient-to-tr from-cyan-500/15 via-blue-600/10 to-indigo-600/10 rounded-3xl blur-[75px] pointer-events-none" />
+      {/* Soft Ambient Glow behind the card — radial gradients (iOS-safe) */}
+      <Glow color="rgba(6, 182, 212, 0.13)" className="-inset-2" fade="75%" />
+      <Glow color="rgba(99, 102, 241, 0.10)" className="-right-8 -bottom-10 w-[420px] h-[420px]" fade="75%" />
 
       {/* 3D Tilted Card Container */}
       <motion.div

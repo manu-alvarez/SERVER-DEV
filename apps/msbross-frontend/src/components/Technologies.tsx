@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion';
 import { TECHNOLOGIES } from '../data/projects';
+import Glow from './Glow';
 
 export default function Technologies() {
   return (
     <section id="tecnologias" className="relative py-24 lg:py-32 overflow-hidden bg-[#060B18]">
-      {/* Ambient background glow */}
-      <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-cyan-600/12 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-10 right-1/4 w-[500px] h-[500px] bg-blue-600/12 rounded-full blur-[130px] pointer-events-none" />
+      {/* Ambient background glow — radial gradients (iOS-safe) */}
+      <Glow color="rgba(8, 145, 178, 0.12)" className="w-[500px] h-[500px] top-1/3 left-1/4" />
+      <Glow color="rgba(37, 99, 235, 0.12)" className="w-[500px] h-[500px] bottom-10 right-1/4" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-3xl mx-auto text-center mb-16">
@@ -54,7 +55,7 @@ export default function Technologies() {
               className="p-5 rounded-2xl bg-gradient-to-b from-[#0E1E3D]/90 to-[#0A1628]/95 border border-slate-800/80 hover:border-cyan-500/50 hover:shadow-xl hover:shadow-cyan-950/25 transition-all flex flex-col items-center justify-center gap-3 group cursor-default"
             >
               <div
-                className="w-12 h-12 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-center justify-center p-2.5 transition-transform group-hover:scale-110 shadow-inner"
+                className="w-12 h-12 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-center justify-center p-2.5 transition-transform group-hover:scale-110 shadow-inner [&>svg]:w-6 [&>svg]:h-6 [&>svg]:shrink-0"
                 dangerouslySetInnerHTML={{ __html: tech.svg }}
               />
               <span className="text-xs sm:text-sm font-bold text-slate-300 group-hover:text-white transition-colors text-center">

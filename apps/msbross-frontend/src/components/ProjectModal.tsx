@@ -62,7 +62,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
 
               <div className="flex items-start gap-4">
                 <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-lg text-white"
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-lg text-white [&>svg]:w-6 [&>svg]:h-6 [&>svg]:shrink-0"
                   style={{ background: project.iconBg }}
                   dangerouslySetInnerHTML={{ __html: project.iconSvg }}
                 />

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Send, CheckCircle, AlertCircle, Mail, MessageSquare } from 'lucide-react';
+import Glow from './Glow';
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
@@ -35,9 +36,9 @@ export default function Contact() {
 
   return (
     <section id="contacto" className="relative py-24 lg:py-32 bg-[#060B18] overflow-hidden">
-      {/* Ambient background glow */}
-      <div className="absolute top-1/2 right-10 w-[550px] h-[550px] bg-blue-600/12 rounded-full blur-[140px] pointer-events-none -translate-y-1/2" />
-      <div className="absolute bottom-10 left-10 w-[500px] h-[500px] bg-cyan-600/12 rounded-full blur-[130px] pointer-events-none" />
+      {/* Ambient background glow — radial gradients (iOS-safe) */}
+      <Glow color="rgba(37, 99, 235, 0.12)" className="w-[550px] h-[550px] top-1/2 right-10 -translate-y-1/2" />
+      <Glow color="rgba(8, 145, 178, 0.12)" className="w-[500px] h-[500px] bottom-10 left-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">

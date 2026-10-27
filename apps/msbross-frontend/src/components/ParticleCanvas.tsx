@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Particle {
   x: number;
@@ -16,15 +16,23 @@ const isSafariIOS = () => {
 
 export default function ParticleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  // iOS WebKit composite landmine: a full-viewport `position: fixed` canvas
+  // plus the page's painted tiles regularly breaks on iPhone (content
+  // vanishes while scrolling, slow first paint) — and ALL iOS browsers
+  // (Safari/Chrome/Brave) share that same WebKit engine. The particles are
+  // barely visible on a phone screen anyway, so mobile skips the canvas
+  // entirely and keeps the (now filter-free) glow gradients.
+  const [enabled] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 768);
 
   useEffect(() => {
+    if (!enabled) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
-    let animationFrameId: number;
+    let animationFrameId: number = 0;
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
@@ -139,13 +147,20 @@ export default function ParticleCanvas() {
 
     render();
 
+    // Accessibility: honor prefers-reduced-motion with a single static frame
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      cancelAnimationFrame(animationFrameId);
+    }
+
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [enabled]);
+
+  if (!enabled) return null;
 
   return (
     <canvas
