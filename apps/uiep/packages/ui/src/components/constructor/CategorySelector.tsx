@@ -83,14 +83,14 @@ function SelectGroup({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-700 mb-1">{label}</label>
+      <label className="block text-[11px] font-medium text-slate-400 mb-1">{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-uiep-500"
+        className="w-full px-2.5 py-1.5 text-xs border border-slate-800 rounded-lg bg-slate-900 text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
       >
         {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
+          <option key={opt.value} value={opt.value} className="bg-slate-900 text-slate-200">
             {opt.label}
           </option>
         ))}
@@ -116,8 +116,11 @@ export function CategorySelector() {
   } = useConstructorStore();
 
   return (
-    <div className="space-y-3">
-      <h2 className="text-sm font-semibold text-gray-900">Configuration</h2>
+    <div className="space-y-3 pt-2 border-t border-slate-800/80">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-300">Configuration</h2>
+        <span className="text-[10px] text-slate-500 font-mono">PARAMETERS</span>
+      </div>
       <SelectGroup label="Entity Type" value={entityType} onChange={(v) => setEntityType(v as EntityType)} options={ENTITY_TYPES} />
       <SelectGroup label="Abstraction Level" value={abstractionLevel} onChange={(v) => setAbstractionLevel(v as AbstractionLevel)} options={ABSTRACTION_LEVELS} />
       <SelectGroup label="Framework" value={framework} onChange={(v) => setFramework(v as Framework)} options={FRAMEWORKS} />

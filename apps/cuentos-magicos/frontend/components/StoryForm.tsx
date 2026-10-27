@@ -133,7 +133,7 @@ export default function StoryForm({ initialContentType = "text_image_audio" }: S
       }
 
       const data = await res.json();
-      router.push(`/stories/detail?id=${data.story_id}`);
+      router.push(`/app/cuentos-magicos/stories/detail/?id=${data.story_id}`);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Error desconocido";
       setError(message);

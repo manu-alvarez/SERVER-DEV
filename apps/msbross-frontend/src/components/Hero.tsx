@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowDown, Download, ArrowRight } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 import ArchitectCockpit from './ArchitectCockpit';
 
 export default function Hero() {
@@ -78,30 +78,6 @@ export default function Hero() {
               Creo soluciones digitales que conectan tecnología, inteligencia artificial y personas.
               Desde la infraestructura hasta la experiencia de usuario, siempre en evolución.
             </motion.p>
-
-            {/* Action Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.32 }}
-              className="flex flex-wrap items-center gap-4 pt-2"
-            >
-              <a
-                href="#proyectos"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 text-white font-semibold text-sm shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
-              >
-                Ver proyectos
-                <ArrowRight size={17} />
-              </a>
-              <a
-                href="/app/cv/CV-Manuel_Alvarez_Dianez.pdf"
-                download="CV-Manuel_Alvarez_Dianez.pdf"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-slate-900/80 backdrop-blur-md text-slate-200 font-semibold text-sm border border-slate-700/80 hover:border-cyan-400/60 hover:text-white hover:bg-slate-800/80 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer shadow-lg shadow-black/20"
-              >
-                <Download size={17} />
-                Descargar CV
-              </a>
-            </motion.div>
 
             {/* Clean Stats Row (7+ Proyectos removed as requested) */}
             <motion.div

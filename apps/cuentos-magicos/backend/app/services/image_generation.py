@@ -37,7 +37,7 @@ async def _retry_with_backoff(func, max_retries: int = 3, base_delay: float = 5.
             raise
 
 
-async def generate_images_for_story(session: AsyncSession, story_id: str, auth_headers: dict = None) -> None:
+async def generate_images_for_story(session: AsyncSession, story_id: str) -> None:
     """Generate images for all chapters of a story using free providers."""
     logger.info(f"Generating images for story_id={story_id}")
 
@@ -204,16 +204,15 @@ async def _generate_huggingface(prompt: str, story_id: str, chapter_num: int,
 async def _generate_openai(prompt: str, story_id: str, chapter_num: int,
                            session: AsyncSession, auth_headers: dict = None) -> str:
     """Generate image using OpenAI DALL-E 3."""
-    from openai import OpenAI
-    # Direct API access — no proxy
-
-    client = OpenAI(
+    from openai import AsyncOpenAI
+    
+    client = AsyncOpenAI(
         api_key=settings.OPENAI_API_KEY,
-        base_url=None,
+        base_url="http://msbross-proxy:8080/_api/",
         default_headers=auth_headers
     )
 
-    response = client.images.generate(
+    response = await client.images.generate(
         model="dall-e-3",
         prompt=prompt,
         size="1024x1024",

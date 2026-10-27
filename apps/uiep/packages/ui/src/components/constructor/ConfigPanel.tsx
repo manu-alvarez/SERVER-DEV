@@ -65,22 +65,29 @@ function CheckboxGroup({
 }) {
   return (
     <div>
-      <h3 className="text-xs font-semibold text-gray-900 mb-2">{label}</h3>
+      <h3 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">{label}</h3>
       <div className="space-y-1">
-        {items.map((item) => (
-          <label
-            key={item.value}
-            className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-50 px-1 py-0.5 rounded"
-          >
-            <input
-              type="checkbox"
-              checked={selected.includes(item.value)}
-              onChange={() => onToggle(item.value)}
-              className="w-3.5 h-3.5 text-uiep-600 border-gray-300 rounded focus:ring-uiep-500"
-            />
-            {item.label}
-          </label>
-        ))}
+        {items.map((item) => {
+          const isChecked = selected.includes(item.value);
+          return (
+            <label
+              key={item.value}
+              className={`flex items-center gap-2.5 text-xs px-2 py-1.5 rounded-lg cursor-pointer transition-all ${
+                isChecked
+                  ? 'bg-blue-500/15 text-blue-300 font-medium border border-blue-500/30'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 border border-transparent'
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={() => onToggle(item.value)}
+                className="w-3.5 h-3.5 rounded bg-slate-900 border-slate-700 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-950"
+              />
+              <span>{item.label}</span>
+            </label>
+          );
+        })}
       </div>
     </div>
   );

@@ -80,7 +80,7 @@ async def generate_story(
 
     # --- ASYNCHRONOUS EXECUTION VIA CELERY ---
     # 1. Launch Text Generation Task
-    story_text_generation_task.delay(str(story.id), tier_limits, auth_headers)
+    story_text_generation_task.delay(str(story.id), tier_limits)
     
     return StoryGenerateResponse(
         story_id=str(story.id),

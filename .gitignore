@@ -1,5 +1,7 @@
 node_modules/
 dist/
+out/
+scratch/
 .next/
 .out/
 .env

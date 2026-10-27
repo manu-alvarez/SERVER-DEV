@@ -322,8 +322,7 @@ app.post('/api/contact', express.json(), (req, res) => {
 
 // ── Static SPAs ──
 const NEXT_APPS = [
-  'agent-builder-pro', 'agent-forge', 'app-generator', 'beca-laud',
-  'beca-laud-band', 'beca-laud-crm', 'combipro', 'cuadrante-horarios',
+  'agent-builder-pro', 'agent-forge', 'app-generator', 'combipro', 'cuadrante-horarios',
   'cuentos-magicos', 'cv', 'edelweiss', 'expositator-rte', 'gas-station',
   'iaprod-os', 'industrialpro', 'intercompiler', 'jartosdto',
   'livekit-nikolina', 'logisearch', 'logitrack', 'maya', 'moko-tools',
@@ -358,8 +357,7 @@ const DOMAIN_APP_MAP = {
   'edelweiss.manuelalvarez.dev': 'edelweiss',
   'cv.manuelalvarez.dev': 'cv',
   'uiep.manuelalvarez.dev': 'uiep',
-  'tarot.manuelalvarez.dev': 'tarot-rws',
-  'becalaud.manuelalvarez.dev': 'beca-laud'
+  'tarot.manuelalvarez.dev': 'tarot-rws'
 };
 
 app.use((req, res, next) => {
@@ -377,6 +375,9 @@ app.use((req, res, next) => {
     return res.redirect(302, 'https://trello.com/b/IRVpzuUt/logitrack-operaciones-de-almacen');
   }
 
+  if (host === 'nikolina.manuelalvarez.dev' && req.url.startsWith('/api')) {
+    req.url = `/_nikolina${req.url}`;
+  }
 
   const mappedApp = DOMAIN_APP_MAP[host];
   if (mappedApp && !req.url.startsWith('/api') && (!req.url.startsWith('/_') || req.url.startsWith('/_next'))) {

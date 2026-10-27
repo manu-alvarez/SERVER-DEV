@@ -242,61 +242,7 @@ export const OTHER_PROJECTS: Project[] = [
       'Tiradas guiadas: Carta del Día, Pasado-Presente-Futuro y Cruz Celta',
       'Interpretación interactiva de polaridades (derecha e invertida)'
     ]
-  },
-  {
-    id: 'beca-laud-personal',
-    name: 'Beca Laud — Artista & Vocal Coach',
-    subtitle: 'Sitio Web Oficial & Portfolio',
-    description: 'Web oficial de la cantante y coach vocal Rebeca Laud: reproductor musical multimedia, trayectoria artística, catálogo de servicios pedagógicos y reservas online.',
-    category: 'multimedia',
-    iconBg: 'linear-gradient(135deg, #EC4899, #F43F5E)',
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/><line x1="8" x2="16" y1="22"/></svg>`,
-    tech: ['React', 'CSS3', 'Audio Player', 'Vite'],
-    url: 'https://becalaud.manuelalvarez.dev',
-    status: 'live',
-    featured: false,
-    features: [
-      'Reproductor interactivo de pistas vocales y temas destacados',
-      'Sección de formación técnica para alumnos y programas de entrenamiento vocal',
-      'Integración con reservas y contacto directo por WhatsApp'
-    ]
-  },
-  {
-    id: 'beca-laud-band',
-    name: 'Beca Laud — Banda & Eventos',
-    subtitle: 'Música en Directo & Contratación',
-    description: 'Portal de promoción y contratación para eventos privados, bodas y festivales: repertorio de temas filtrable por género, vídeos de directos y formulario de caché.',
-    category: 'multimedia',
-    iconBg: 'linear-gradient(135deg, #F59E0B, #D97706)',
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>`,
-    tech: ['React', 'Tailwind', 'Multimedia', 'Vite'],
-    url: 'https://manuelalvarez.dev/app/beca-laud-band/',
-    status: 'live',
-    featured: false,
-    features: [
-      'Repertorio interactivo clasificado por estilos musicales (Pop, Rock, Soul, Boleros)',
-      'Galería de actuaciones en directo y vídeos promocionales de eventos',
-      'Calculadora de presupuesto estimativo para contratación según formato'
-    ]
-  },
-  {
-    id: 'beca-laud-crm',
-    name: 'Beca Laud — CRM & Gestión',
-    subtitle: 'Panel Administrativo & Clases',
-    description: 'Sistema interno de gestión para el control de alumnos de técnica vocal, calendario de sesiones, seguimiento de progreso y facturación de actuaciones.',
-    category: 'systems',
-    iconBg: 'linear-gradient(135deg, #3B82F6, #1D4ED8)',
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
-    tech: ['React', 'TypeScript', 'Dexie.js', 'Dashboard'],
-    url: 'https://manuelalvarez.dev/app/beca-laud-crm/',
-    status: 'live',
-    featured: false,
-    features: [
-      'Ficha individual de alumnos con registro de grabaciones y notas pedagógicas',
-      'Calendario sincronizado de clases semanales y bolos confirmados',
-      'Control de cobros mensuales y estados de facturación'
-    ]
-  },
+  }
 ];
 
 // 12 REAL Technologies representing Manuel's verified skillset (SMR + Full-Stack IA)

@@ -5,8 +5,6 @@ import {
   Briefcase,
   Code2,
   Sparkles,
-  FileText,
-  Mail,
   CheckCircle2,
 } from 'lucide-react';
 
@@ -183,7 +181,7 @@ export default function ArchitectCockpit() {
               {/* Block 4: Key ATS/Recruiter Filter Chips */}
               <div className="flex flex-wrap gap-1.5 pt-0.5">
                 {[
-                  'Linux / Windows',
+                  'macOS / Linux / Windows',
                   'SMR & Redes',
                   'Docker',
                   'TypeScript',
@@ -199,26 +197,6 @@ export default function ArchitectCockpit() {
                 ))}
               </div>
             </div>
-          </div>
-
-          {/* Bottom Bar: Direct Recruiter CTAs */}
-          <div className="mt-3.5 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-            <a
-              href="/app/cv/CV-Manuel_Alvarez_Dianez.pdf"
-              download="CV-Manuel_Alvarez_Dianez.pdf"
-              className="inline-flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 font-semibold transition-colors group cursor-pointer"
-            >
-              <FileText size={14} className="group-hover:scale-110 transition-transform" />
-              <span>Descargar Curriculum Vitae</span>
-            </a>
-
-            <a
-              href="#contacto"
-              className="inline-flex items-center gap-1.5 text-slate-300 hover:text-white font-medium transition-colors cursor-pointer"
-            >
-              <Mail size={13} className="text-cyan-400" />
-              <span>Contactar directamente</span>
-            </a>
           </div>
         </div>
       </motion.div>

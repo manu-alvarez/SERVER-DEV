@@ -14,8 +14,8 @@ function App() {
       <Navbar />
       <main className="relative z-10">
         <Hero />
-        <Projects />
         <About />
+        <Projects />
         <Technologies />
         <Contact />
       </main>

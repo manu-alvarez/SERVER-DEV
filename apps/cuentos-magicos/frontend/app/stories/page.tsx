@@ -29,7 +29,7 @@ export default function StoriesPage() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-10 pb-6 border-b border-amber-500/10">
           <div className="text-center sm:text-left">
             <Link
-              href="/"
+              href="/app/cuentos-magicos/"
               className="inline-flex items-center gap-1.5 text-xs md:text-sm font-bold text-amber-300 hover:text-amber-200 transition mb-3"
             >
               ← Volver al inicio
@@ -41,7 +41,7 @@ export default function StoriesPage() {
           </div>
           
           <Link
-            href="/create"
+            href="/app/cuentos-magicos/create/"
             className="magic-glow px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500 font-black text-sm md:text-base shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:brightness-110 active:scale-95 transition flex items-center gap-2 select-none"
           >
             ✨ ¡Nuevo Cuento!

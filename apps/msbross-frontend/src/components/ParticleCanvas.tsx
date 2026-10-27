@@ -50,18 +50,18 @@ export default function ParticleCanvas() {
     window.addEventListener('mouseleave', handleMouseLeave);
     window.addEventListener('resize', handleResize);
 
-    // Generate balanced particle count based on screen size
-    const particleCount = Math.min(Math.floor((width * height) / 18000), 75);
+    const isMobile = width < 768;
+    const particleCount = isMobile ? 20 : Math.min(Math.floor((width * height) / 20000), 60);
     const particles: Particle[] = [];
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.45,
-        vy: (Math.random() - 0.5) * 0.45,
-        radius: Math.random() * 1.6 + 0.8,
-        baseAlpha: Math.random() * 0.4 + 0.2,
+        vx: (Math.random() - 0.5) * (isMobile ? 0.3 : 0.45),
+        vy: (Math.random() - 0.5) * (isMobile ? 0.3 : 0.45),
+        radius: Math.random() * 1.5 + 0.8,
+        baseAlpha: Math.random() * 0.35 + 0.2,
       });
     }
 

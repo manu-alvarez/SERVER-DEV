@@ -99,7 +99,7 @@ async def generate_story_text(session: AsyncSession, story: Story, auth_headers:
         logger.info(f"Using cached story text for hash={prompt_hash[:12]}...")
         data = cached["payload"]
     else:
-        # Call LLM API
+        # Call LLM API with Provider Fallback to Ollama VPS
         client, api_model = _get_llm_client(provider, model)
 
         create_kwargs = dict(
@@ -143,8 +143,8 @@ def _get_llm_client(provider: str, model: str) -> tuple:
     """
     if provider == "gemini":
         client = OpenAI(
-            api_key=settings.GOOGLE_API_KEY,
-            base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+            api_key="proxy-token",
+            base_url="http://msbross-proxy:8080/_api/gemini/v1beta/openai/",
         )
         api_model = model or settings.GOOGLE_MODEL
     elif provider == "groq":

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Send, CheckCircle, AlertCircle, Mail, Download, MessageSquare } from 'lucide-react';
+import { Send, CheckCircle, AlertCircle, Mail, MessageSquare } from 'lucide-react';
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
@@ -79,18 +79,6 @@ export default function Contact() {
                   <a href="#tecnologias" className="block p-1.5 rounded-lg bg-slate-900/60 hover:bg-slate-800">Tecnologías</a>
                   <a href="#contacto" className="block p-1.5 rounded-lg bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
                     Contacto
-                  </a>
-                </div>
-
-                {/* Mini CV Button */}
-                <div className="pt-2">
-                  <a
-                    href="/app/cv/CV-Manuel_Alvarez_Dianez.pdf"
-                    download="CV-Manuel_Alvarez_Dianez.pdf"
-                    className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-[11px] font-semibold hover:bg-slate-700 transition-colors"
-                  >
-                    <Download size={13} />
-                    Descargar CV
                   </a>
                 </div>
 

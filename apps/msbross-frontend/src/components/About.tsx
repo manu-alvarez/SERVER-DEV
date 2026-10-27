@@ -154,8 +154,10 @@ export default function About() {
             {/* Workstation Container: Fused directly without box/border */}
             <div className="relative w-full overflow-visible flex items-center justify-center">
               <img
-                src="./workstation.png"
+                src="./workstation.jpg"
                 alt="Manuel Álvarez — Puesto de Desarrollo e Infraestructura"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-auto object-contain filter contrast-105 brightness-100 select-none pointer-events-none drop-shadow-[0_10px_50px_rgba(6,182,212,0.12)]"
               />
             </div>

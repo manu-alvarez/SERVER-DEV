@@ -48,7 +48,7 @@ export default function HomePage() {
   const handleCreate = async () => {
     await playSpell();
     setTimeout(() => {
-      router.push(`/create?type=${buildContentType()}`);
+      router.push(`/app/cuentos-magicos/create/?type=${buildContentType()}`);
     }, 300);
   };
 
@@ -141,7 +141,7 @@ export default function HomePage() {
           </button>
           
           <Link
-            href="/stories"
+            href="/app/cuentos-magicos/stories/"
             onClick={handleLibraryClick}
             className="theme-card px-8 py-5 rounded-[2rem] border-3 border-amber-400/30 bg-amber-950/40 font-extrabold text-lg flex items-center gap-2 hover:bg-amber-950/80 transition duration-300"
           >
