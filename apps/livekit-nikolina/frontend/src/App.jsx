@@ -2,9 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import {
     LiveKitRoom,
     RoomAudioRenderer,
+    VoiceAssistantControlBar,
     useVoiceAssistant,
     useRoomContext,
 } from '@livekit/components-react';
+import '@livekit/components-styles';
 import { RoomEvent, Track } from 'livekit-client';
 import { useLocalParticipant } from '@livekit/components-react';
 import './index.css';
@@ -127,7 +129,7 @@ export default function App() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     participant_identity: `Usuario_${Math.floor(Math.random() * 1000)}`,
-                    room_name: "msb-restaurante"
+                    room_name: "nikolina-room"
                 })
             });
             const data = await response.json();
@@ -185,6 +187,7 @@ export default function App() {
                                 </div>
 
                                 <div className="controls-row">
+                                    <VoiceAssistantControlBar />
                                     <MuteToggle />
                                     <button 
                                         className={`btn-toggle-sidebar ${sidebarVisible ? 'active' : ''}`}
