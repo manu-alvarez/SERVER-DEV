@@ -153,11 +153,11 @@ export default function Status() {
 
       <Paper sx={{ p: 2.5, borderRadius: '14px', bgcolor: 'rgba(0,0,0,0.35)' }}>
         <Typography variant="caption" color="text.secondary" fontWeight={700} letterSpacing="0.1em">
-          REGISTRO (journalctl livekit-agent · {logs.length})
+          REGISTRO EN VIVO (buffer del proceso · {logs.length})
         </Typography>
         {logs.length === 0 ? (
           <Typography variant="body2" color="text.secondary" mt={1}>
-            Sin registros disponibles — comprobar permisos journalctl del servicio.
+            Sin registros en el buffer todavía — refresca en unos segundos.
           </Typography>
         ) : (
           <List dense sx={{ maxHeight: 420, overflow: 'auto', fontFamily: '"JetBrains Mono", monospace' }}>
@@ -166,7 +166,7 @@ export default function Status() {
                 <ListItemText
                   primary={
                     <Typography component="span" sx={{ fontSize: 12, fontFamily: '"JetBrains Mono", monospace', display: 'flex', gap: 1 }}>
-                      <span style={{ color: '#64748b' }}>{(l.timestamp || '').slice(11, 19)}</span>
+                      <span style={{ color: '#64748b', minWidth: 64 }}>{l.timestamp || '—'}</span>
                       <span style={{
                         color: l.level === 'ERROR' ? '#f87171' : l.level === 'WARNING' ? '#facc15' : '#4ade80',
                         minWidth: 64,

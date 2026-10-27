@@ -20,6 +20,8 @@ import logging
 import os
 import shutil
 import subprocess
+import time
+from collections import deque
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from urllib.error import URLError
@@ -41,8 +43,47 @@ from src.api.routes import router as api_router
 
 load_dotenv()
 
+try:
+    import psutil  # real system metrics for /api/dev/status
+except ImportError:  # pragma: no cover - the API-hub image ships psutil 7.2.2
+    psutil = None
+
 logger = logging.getLogger("token-server")
 logging.basicConfig(level=logging.INFO)
+
+
+class RingLogHandler(logging.Handler):
+    """In-memory ring buffer of recent log records.
+
+    GET /api/dev/logs serves from this buffer: the API-hub container has
+    no sudo and no systemd, so journald is unreachable from inside it.
+    Keeping logs in-process is the source of truth that actually exists.
+    """
+
+    def __init__(self, capacity: int = 500):
+        super().__init__()
+        self.buffer: deque = deque(maxlen=capacity)
+
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            self.buffer.append(
+                {
+                    "timestamp": datetime.now().strftime("%H:%M:%S"),
+                    "level": record.levelname,
+                    "message": record.getMessage()[:500],
+                }
+            )
+        except Exception:  # noqa: BLE001
+            self.handleError(record)
+
+
+ring_log = RingLogHandler()
+logging.getLogger().addHandler(ring_log)  # app loggers (propagate to root)
+logging.getLogger("uvicorn.error").addHandler(ring_log)  # server lifecycle logs
+logging.getLogger("uvicorn.access").addHandler(ring_log)  # HTTP request logs
+
+# Process start reference: real uptime for GET /api/dev/status
+START_TS = time.time()
 
 app = FastAPI(title="MSB LiveKit Token Server")
 
@@ -484,66 +525,64 @@ async def reset_agent(current_user: str = Depends(get_current_user)):
 
 @app.get("/api/dev/status")
 def get_agent_status(current_user: str = Depends(get_current_user)):
-    # Uptime of the server process itself
-    uptime_raw = (
-        os.popen('ps -p $(pgrep -f "server.py") -o etimes= 2>/dev/null || echo 0')
-        .read()
-        .strip()
-    )
-    # Check if agent worker is also running
+    # True uptime: this uvicorn process imported the module at START_TS.
+    # (pgrep "server.py" never matches inside the container, where the
+    # entrypoint is `uvicorn main:app` → uptime always showed 0s.)
+    uptime_seconds = int(time.time() - START_TS)
+
+    # The agent worker runs as a separate process ("agent.py start").
     agent_running = os.popen('pgrep -f "agent.py start"').read().strip() != ""
 
-    try:
-        uptime_seconds = int(float(uptime_raw))
-    except (ValueError, TypeError):
-        uptime_seconds = 0
-
-    # Real System Metrics (cross-platform: macOS + Linux)
-    import platform
-    is_mac = platform.system() == "Darwin"
-    
+    # ── Real system metrics ────────────────────────────────────────────
+    # psutil instead of parsing `top`/`free`/`vm_stat` (that parsing never
+    # matched inside the container → 0% CPU / 0 GB permanently).
     cpu_usage = 0.0
-    try:
-        if is_mac:
-            cpu_raw = os.popen("ps -A -o %cpu | awk '{s+=$1} END {print s}'").read().strip()
-            cpu_usage = min(float(cpu_raw or 0), 100.0)
-        else:
-            cpu_usage = float(os.popen("top -bn1 | grep 'Cpu(s)' | sed 's/.*, *\\([0-9.]*\\)%* id.*/\\1/' | awk '{print 100 - $1}'").read().strip() or 0)
-    except: pass
-    
     mem_total, mem_used = 0.0, 0.0
-    try:
-        if is_mac:
-            import subprocess as _sp
-            page_size = int(_sp.check_output(["sysctl", "-n", "hw.pagesize"]).strip())
-            mem_total_bytes = int(_sp.check_output(["sysctl", "-n", "hw.memsize"]).strip())
-            vm_stat = _sp.check_output(["vm_stat"]).decode()
-            active = int([l for l in vm_stat.split('\n') if 'Pages active' in l][0].split(':')[1].strip().rstrip('.'))
-            wired = int([l for l in vm_stat.split('\n') if 'Pages wired' in l][0].split(':')[1].strip().rstrip('.'))
-            mem_total = round(mem_total_bytes / (1024**3), 1)
-            mem_used = round((active + wired) * page_size / (1024**3), 1)
-        else:
-            mem_info = os.popen("free -g | grep Mem").read().split()
-            if len(mem_info) >= 3:
-                mem_total = float(mem_info[1])
-                mem_used = float(mem_info[2])
-    except: pass
+    if psutil is not None:
+        try:
+            cpu_usage = psutil.cpu_percent(interval=0.3)  # real 300ms sample
+            vm = psutil.virtual_memory()
+            mem_total = round(vm.total / (1024**3), 1)
+            mem_used = round((vm.total - vm.available) / (1024**3), 1)
+        except Exception:  # noqa: BLE001
+            pass
+    if not cpu_usage and not mem_total:
+        try:  # kernel truth via /proc, no psutil required
+            with open("/proc/meminfo") as f:
+                info = {
+                    k.strip(): int(v.strip().split()[0])
+                    for k, v in (line.split(":", 1) for line in f if ":" in line)
+                }
+            mem_total = round(info["MemTotal"] / 1024**2, 1)
+            mem_used = round((info["MemTotal"] - info["MemAvailable"]) / 1024**2, 1)
 
-    active_rooms = 0
-    try:
-        if is_mac:
-            active_rooms = int(os.popen("lsof -i :7880 2>/dev/null | grep ESTABLISHED | wc -l").read().strip() or 0)
-        else:
-            active_rooms = int(os.popen("netstat -an | grep :7880 | grep ESTABLISHED | wc -l").read().strip() or 0)
-    except: pass
+            def _cpu_sample() -> tuple[int, int]:
+                with open("/proc/stat") as f:
+                    vals = [int(x) for x in f.readline().split()[1:9]]
+                busy = sum(vals) - vals[3] - vals[4]  # idle + iowait excluded
+                return busy, sum(vals)
+
+            b0, t0 = _cpu_sample()
+            time.sleep(0.25)
+            b1, t1 = _cpu_sample()
+            if t1 > t0:
+                cpu_usage = round(min(100.0, (b1 - b0) / (t1 - t0) * 100.0), 1)
+        except Exception:  # noqa: BLE001
+            pass
+
+    # Sessions come from call_log (DB), not from netstat hacks: 7880 socket
+    # connections inside this container are not "active rooms".
+    call_metrics = db.get_call_telemetry()
 
     api_latency = 0
     try:
-        import time as _t
-        _start = _t.monotonic()
-        urlopen("http://host.docker.internal:8001/api/health", timeout=2)
-        api_latency = int((_t.monotonic() - _start) * 1000)
-    except: pass
+        _start = time.monotonic()
+        # Self-probe via localhost: `host.docker.internal` does not resolve
+        # for this container → "n/d" before. /api/health checks DB too.
+        urlopen("http://127.0.0.1:8001/api/health", timeout=2)
+        api_latency = int((time.monotonic() - _start) * 1000)
+    except Exception:  # noqa: BLE001
+        api_latency = 0  # health route unreachable (real, not n/d placeholder)
 
     config = db.get_llm_config()
     active_pipeline = db.get_active_pipeline_config()
@@ -556,7 +595,10 @@ def get_agent_status(current_user: str = Depends(get_current_user)):
     return {
         "status": "active" if agent_running else "ready",
         "uptime_seconds": uptime_seconds,
-        "sessions_today": stats.get("total_calls", 0),
+        # REAL DB counters: calls whose started_at is today, and calls
+        # still in progress (ended_at NULL). Previously this field showed
+        # the all-time total (13) mislabeled as "today".
+        "sessions_today": call_metrics["calls_today"],
         "last_call": last_call_time,
         "model": config.get("model_name", "unknown") if config else "unknown",
         "voice": config.get("voice", "unknown") if config else "unknown",
@@ -566,77 +608,27 @@ def get_agent_status(current_user: str = Depends(get_current_user)):
         "metrics": {
             "cpu": cpu_usage,
             "memory": {"used": mem_used, "total": mem_total},
-            "active_sessions": active_rooms,
-            "latency": api_latency
+            # calls in progress right now (call_log rows without ended_at)
+            "active_sessions": call_metrics["active_calls"],
+            "latency": api_latency,
         }
     }
 
 
 @app.get("/api/dev/logs")
 def get_recent_logs(limit: int = 50, current_user: str = Depends(get_current_user)):
-    try:
-        result = subprocess.run(
-            [
-                "/usr/bin/sudo",
-                "/usr/bin/journalctl",
-                "-u",
-                "livekit-agent",
-                "-n",
-                str(limit),
-                "--no-pager",
-                "-o",
-                "json",
-            ],
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
+    """Recent logs from this process's in-memory ring buffer.
 
-        logs = []
-        if result.returncode == 0:
-            for line in result.stdout.strip().split("\n"):
-                if not line:
-                    continue
-                try:
-                    entry = json.loads(line)
-                    msg = entry.get("MESSAGE", "")
-                    rt_ts = entry.get("__REALTIME_TIMESTAMP")
-                    
-                    if rt_ts:
-                        # Convert microseconds string to datetime
-                        dt = datetime.fromtimestamp(int(rt_ts) / 1000000)
-                        ts_str = dt.strftime("%H:%M:%S")
-                    else:
-                        ts_str = "--:--:--"
-
-                    logs.append(
-                        {
-                            "timestamp": ts_str,
-                            "level": "ERROR"
-                            if "error" in msg.lower()
-                            else "WARNING"
-                            if "warn" in msg.lower()
-                            else "INFO",
-                            "message": msg[:500],
-                        }
-                    )
-                except Exception:  # noqa: BLE001
-                    continue
-
-        return (
-            logs
-            if logs
-            else [{"timestamp": "", "level": "INFO", "message": "No logs available"}]
-        )
-    except Exception as exc:  # noqa: BLE001
-        logger.error("Failed to get logs: %s", exc)
-        return [
-            {
-                "timestamp": "",
-                "level": "ERROR",
-                "message": f"Could not retrieve logs: {exc}",
-            }
-        ]
+    The API-hub container has no sudo and no systemd, so the previous
+    `/usr/bin/sudo journalctl` always failed with [Errno 2]. The source
+    of truth here is literally what this process logged. Returned in
+    chronological order, latest `limit` entries.
+    """
+    limit = max(1, min(int(limit), 500))
+    entries = list(ring_log.buffer)[-limit:]
+    return entries if entries else [
+        {"timestamp": "", "level": "INFO", "message": "No logs available"}
+    ]
 
 
 if __name__ == "__main__":
