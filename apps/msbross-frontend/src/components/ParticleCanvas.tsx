@@ -9,6 +9,11 @@ interface Particle {
   baseAlpha: number;
 }
 
+const isSafariIOS = () => {
+  const ua = navigator.userAgent;
+  return /iP(ad|hone|od)/.test(ua) && /Safari/.test(ua) && !/CriOS/.test(ua) && !/FxiOS/.test(ua);
+};
+
 export default function ParticleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -23,7 +28,6 @@ export default function ParticleCanvas() {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    // Mouse coordinates
     const mouse = {
       x: -1000,
       y: -1000,
@@ -50,82 +54,82 @@ export default function ParticleCanvas() {
     window.addEventListener('mouseleave', handleMouseLeave);
     window.addEventListener('resize', handleResize);
 
+    const safariIOS = isSafariIOS();
     const isMobile = width < 768;
-    const particleCount = isMobile ? 20 : Math.min(Math.floor((width * height) / 20000), 60);
+    // Reducir carga drásticamente en Safari iOS y móviles
+    const particleCount = safariIOS ? (isMobile ? 8 : 15) : (isMobile ? 15 : Math.min(Math.floor((width * height) / 20000), 40));
+    const maxDistance = safariIOS ? 80 : 120;
+    const mouseRadius = safariIOS ? 80 : 140;
+
+    mouse.radius = mouseRadius;
+
     const particles: Particle[] = [];
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * (isMobile ? 0.3 : 0.45),
-        vy: (Math.random() - 0.5) * (isMobile ? 0.3 : 0.45),
-        radius: Math.random() * 1.5 + 0.8,
-        baseAlpha: Math.random() * 0.35 + 0.2,
+        vx: (Math.random() - 0.5) * (isMobile ? 0.25 : 0.35),
+        vy: (Math.random() - 0.5) * (isMobile ? 0.25 : 0.35),
+        radius: Math.random() * 1.2 + 0.6,
+        baseAlpha: Math.random() * 0.3 + 0.15,
       });
     }
 
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Connect particles within proximity
-      const maxDistance = 120;
-      const mouseMaxDistance = mouse.radius;
-
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
-        // Move
         p.x += p.vx;
         p.y += p.vy;
 
-        // Wrap edges smoothly
         if (p.x < 0) p.x = width;
         else if (p.x > width) p.x = 0;
         if (p.y < 0) p.y = height;
         else if (p.y > height) p.y = 0;
 
-        // Particle - Mouse gravity reaction
         const dxMouse = mouse.x - p.x;
         const dyMouse = mouse.y - p.y;
         const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
 
-        if (distMouse < mouseMaxDistance) {
-          const force = (1 - distMouse / mouseMaxDistance) * 0.08;
+        if (distMouse < mouse.radius && mouse.x > 0) {
+          const force = (1 - distMouse / mouse.radius) * 0.06;
           p.x -= dxMouse * force;
           p.y -= dyMouse * force;
 
-          // Mouse connector line
-          const alpha = (1 - distMouse / mouseMaxDistance) * 0.35;
+          const alpha = (1 - distMouse / mouse.radius) * 0.3;
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(mouse.x, mouse.y);
           ctx.strokeStyle = `rgba(6, 182, 212, ${alpha})`;
-          ctx.lineWidth = 0.8;
+          ctx.lineWidth = 0.6;
           ctx.stroke();
         }
 
-        // Draw particle
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(56, 189, 248, ${p.baseAlpha})`;
         ctx.fill();
 
-        // Connect with other particles
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const dx = p.x - p2.x;
-          const dy = p.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+        // Solo conectar con otras partículas en desktop o no Safari para reducir carga
+        if (!safariIOS && !isMobile) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const p2 = particles[j];
+            const dx = p.x - p2.x;
+            const dy = p.y - p2.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < maxDistance) {
-            const alpha = (1 - dist / maxDistance) * 0.18;
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(59, 130, 246, ${alpha})`;
-            ctx.lineWidth = 0.6;
-            ctx.stroke();
+            if (dist < maxDistance) {
+              const alpha = (1 - dist / maxDistance) * 0.15;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = `rgba(59, 130, 246, ${alpha})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
           }
         }
       }
@@ -146,9 +150,9 @@ export default function ParticleCanvas() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0 opacity-70"
-      style={{ filter: 'blur(0.2px)' }}
+      className="fixed inset-0 pointer-events-none z-0 opacity-60"
       aria-hidden="true"
+      style={{ filter: 'none' }}
     />
   );
 }

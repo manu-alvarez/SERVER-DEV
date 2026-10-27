@@ -1,13 +1,24 @@
 import { motion } from 'framer-motion';
-import { ArrowDown } from 'lucide-react';
+import { ArrowDown, Crown } from 'lucide-react';
 import ArchitectCockpit from './ArchitectCockpit';
 
 export default function Hero() {
   return (
     <section
       id="inicio"
-      className="relative min-h-[92vh] flex items-center overflow-hidden pt-28 pb-16 bg-[#060B18]"
+      className="relative min-h-[92dvh] sm:min-h-[92svh] flex items-center overflow-hidden pt-28 pb-16 bg-[#060B18]"
     >
+      {/* Premium background image — croquetas premium restaurant */}
+      <div
+        className="absolute inset-0 z-0 opacity-[0.08] pointer-events-none"
+        style={{
+          backgroundImage: `url('/livekit-nikolina/assets/croquetas_premium_ib_rico_1774857333240.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'blur(1.5px) brightness(0.9)',
+        }}
+      />
+
       {/* Cinematic ambient background glow */}
       <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-blue-600/15 rounded-full blur-[140px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
       <div className="absolute top-1/3 right-1/4 w-[550px] h-[550px] bg-cyan-500/18 rounded-full blur-[130px] pointer-events-none" />
@@ -47,6 +58,10 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.08 }}
             >
+              <div className="flex items-center gap-3 mb-2">
+                <Crown size={28} className="text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
+                <span className="text-xs font-bold uppercase tracking-[0.2em] text-amber-300/80">Premium Portfolio</span>
+              </div>
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05]">
                 <span className="text-white block">Manuel</span>
                 <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent block">

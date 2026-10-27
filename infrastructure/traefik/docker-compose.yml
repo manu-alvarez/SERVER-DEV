@@ -40,6 +40,9 @@ services:
       - traefik.http.routers.traefik.tls.certresolver=myresolver
       - traefik.http.middlewares.auth.basicauth.users=admin:$$apr1$$Q3va5IaG$$1iyE9t2f3iZgf.x.7EkoA1
 
+      # Strip QUIC / HTTP3 advertising to prevent iOS Safari hangs over Tailscale (MTU 1280)
+      - traefik.http.middlewares.strip-quic.headers.customResponseHeaders.alt-svc=
+
       # Global security headers middleware
       - traefik.http.middlewares.sec-headers.headers.customFrameOptionsValue=SAMEORIGIN
       - traefik.http.middlewares.sec-headers.headers.contentTypeNosniff=true
