@@ -28,7 +28,7 @@ export default function Login() {
         <Box sx={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default' }}>
             <Paper elevation={3} sx={{ p: 4, width: '100%', maxWidth: 400 }}>
                 <Typography variant="h5" align="center" gutterBottom>
-                    Acceso Dev | IAPutaOS
+                    Acceso Admin | IAPutaOS
                 </Typography>
                 {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
                 <form onSubmit={handleSubmit}>

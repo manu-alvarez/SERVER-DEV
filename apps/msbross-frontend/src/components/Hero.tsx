@@ -8,16 +8,18 @@ export default function Hero() {
       id="inicio"
       className="relative min-h-[92dvh] sm:min-h-[92svh] flex items-center overflow-hidden pt-28 pb-16 bg-[#060B18]"
     >
-      {/* Premium background image — croquetas premium restaurant */}
+      {/* Premium background image — real IT dev workstation */}
       <div
-        className="absolute inset-0 z-0 opacity-[0.08] pointer-events-none"
+        className="absolute inset-0 z-0 opacity-[0.16] pointer-events-none"
         style={{
-          backgroundImage: `url('/livekit-nikolina/assets/croquetas_premium_ib_rico_1774857333240.png')`,
+          backgroundImage: `url('/workstation.jpg')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          filter: 'blur(1.5px) brightness(0.9)',
+          filter: 'blur(2px) brightness(0.75) saturate(1.15)',
         }}
       />
+      {/* Gradient overlay to guarantee text contrast over the photo */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-r from-[#060B18] via-[#060B18]/70 to-transparent pointer-events-none" />
 
       {/* Cinematic ambient background glow */}
       <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-blue-600/15 rounded-full blur-[140px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
