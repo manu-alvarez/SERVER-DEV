@@ -3,7 +3,7 @@ import axios from 'axios';
 // In production this should point to the public domain or VITE_API_URL
 // For now we use the relative path if served from the same Nginx,
 // or the direct domain for local development.
-const baseURL = import.meta.env.VITE_API_URL || 'https://livekit.alvarezconsult.com/api';
+const baseURL = import.meta.env.VITE_API_URL || 'https://nikolina.manuelalvarez.dev/api';
 
 export const api = axios.create({
     baseURL,
@@ -25,7 +25,7 @@ api.interceptors.response.use(
     (error) => {
         if (error.response && error.response.status === 401) {
             localStorage.removeItem('access_token');
-            window.location.href = '/admin/login';
+            window.location.href = '/app/admin-dashboard/login';
         }
         return Promise.reject(error);
     }

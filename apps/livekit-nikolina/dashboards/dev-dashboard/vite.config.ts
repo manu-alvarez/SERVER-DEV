@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/dev/',
+  base: '/app/dev-dashboard/',
   server: {
     port: 5175,
     proxy: {

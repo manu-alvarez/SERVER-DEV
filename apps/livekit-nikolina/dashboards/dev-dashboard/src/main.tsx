@@ -7,7 +7,7 @@ import App from './App'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter basename="/dev">
+    <BrowserRouter basename="/app/dev-dashboard">
       <ThemeProvider theme={darkNeonTheme}>
         <CssBaseline />
         <App />

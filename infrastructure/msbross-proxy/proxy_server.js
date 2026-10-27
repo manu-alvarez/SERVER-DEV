@@ -328,6 +328,7 @@ const NEXT_APPS = [
   'livekit-nikolina', 'logisearch', 'logitrack', 'maya', 'moko-tools',
   'msbross', 'multi-agent-orch', 'omnidev-os', 'perfume-ean', 'perfume-trading',
   'prompt-generator', 'tarot-maya', 'tarot-rws', 'taskflow', 'teringo',
+  'admin-dashboard', 'dev-dashboard',
   'traductor-pro', 'tu-energia-maya', 'uiep', 'web-restaurante-atenea',
   'it-english-coach', 'assistant'
 ];

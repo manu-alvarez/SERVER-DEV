@@ -28,7 +28,7 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body, html, #root {
+html {
     height: 100%;
     min-height: 100vh;
     width: 100%;
@@ -36,6 +36,27 @@ body, html, #root {
     color: var(--text-pure);
     font-family: 'Outfit', sans-serif;
     overflow-x: hidden;
+}
+
+/* body must be transparent: an opaque body background paints ABOVE
+   fixed negative z-index layers (.bg-atmosphere z:-2, body::before z:-1) */
+body {
+    height: 100%;
+    min-height: 100vh;
+    width: 100%;
+    background: transparent;
+    color: var(--text-pure);
+    font-family: 'Outfit', sans-serif;
+    overflow-x: hidden;
+}
+
+/* #root must NOT be opaque: bg-atmosphere (z-index:-2) paints BELOW
+   in-flow block backgrounds, so an opaque #root buries the photo. */
+#root {
+    height: 100%;
+    min-height: 100vh;
+    width: 100%;
+    background: transparent;
 }
 
 /* ============================================================
@@ -88,11 +109,11 @@ body, html, #root {
     position: fixed;
     inset: 0;
     background: 
-        linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.65)),
+        linear-gradient(rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.45)),
         url('/assets/luxury_bg.png');
     background-size: cover;
     background-position: center;
-    filter: blur(3px) brightness(0.55) saturate(1.3);
+    filter: blur(2.5px) brightness(0.82) saturate(1.3);
     z-index: -2;
     animation: bgDrift 40s ease-in-out infinite;
 }

@@ -1,8 +1,10 @@
 import axios from 'axios'
 import type { InternalAxiosRequestConfig } from 'axios'
 
+const baseURL = import.meta.env.VITE_API_URL || 'https://nikolina.manuelalvarez.dev/api'
+
 const api = axios.create({
-  baseURL: '/api/dev',
+  baseURL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -22,13 +24,13 @@ api.interceptors.response.use(
     (error) => {
         if (error.response && error.response.status === 401) {
             localStorage.removeItem('access_token');
-            window.location.href = '/dev/login';
+            window.location.href = '/app/dev-dashboard/login';
         }
         return Promise.reject(error);
     }
 );
 
-export const login = (data: URLSearchParams) => axios.post('/api/login', data, {
+export const login = (data: URLSearchParams) => axios.post(`${baseURL}/login`, data, {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
 });
 
@@ -76,12 +78,6 @@ export interface PipelineConfig {
   updated_at: string
 }
 
-export interface ProviderStatus {
-  name: string
-  status: 'online' | 'offline' | 'error'
-  latency?: number
-}
-
 export interface PipelineCatalogResponse {
   llm: { providers: string[], models: string[] }
   stt: { providers: string[], urls: Record<string, string> }
@@ -89,26 +85,12 @@ export interface PipelineCatalogResponse {
   realtime: { providers: string[], models: string[] }
 }
 
-// API response format from /providers/status
 export interface ProvidersResponse {
-  ollama?: {
-    available: boolean
-    url?: string
-    models?: string[]
-  }
-  kokoro?: {
-    available: boolean
-    url?: string
-  }
-  gemini?: {
-    available: boolean
-    note?: string
-  }
-  faster_whisper?: {
-    available: boolean
-    url?: string
-  }
-  [key: string]: any // allow other dynamic providers
+  ollama?: { available: boolean, url?: string, models?: string[] }
+  kokoro?: { available: boolean, url?: string }
+  gemini?: { available: boolean, note?: string }
+  faster_whisper?: { available: boolean, url?: string }
+  [key: string]: any
 }
 
 export interface LogEntry {
@@ -117,24 +99,40 @@ export interface LogEntry {
   message: string
 }
 
+export interface AgentStatusResponse {
+  status: string
+  uptime_seconds: number
+  sessions_today: number
+  last_call: string
+  model: string
+  voice: string
+  active_pipeline: string
+  metrics: {
+    cpu: number
+    memory: { used: number, total: number }
+    active_sessions: number
+    latency: number
+  }
+}
+
+const p = '/dev'
+
 export const devApi = {
-  getConfig: () => api.get<LLMConfig>('/llm-config'),
-  updateConfig: (config: Partial<LLMConfig>) => api.put('/llm-config', config),
-  getModels: () => api.get<ModelsResponse>('/models'),
-  getVoices: () => api.get<VoicesResponse>('/voices'),
-  getPrompt: () => api.get<LLMConfig>('/llm-config'),
-  updatePrompt: (prompt: string) => api.put('/llm-config', { system_prompt: prompt }),
-  resetAgent: () => api.post('/reset-agent'),
-  getStatus: () => api.get('/status'),
-  getLogs: () => api.get<LogEntry[]>('/logs'),
-  getPipelineConfig: () => api.get<PipelineConfig>('/pipeline-config'),
-  getAllPipelineConfigs: () => api.get<{ configs: PipelineConfig[] }>('/pipeline-configs'),
+  getConfig: () => api.get<LLMConfig>(`${p}/llm-config`),
+  updateConfig: (config: Partial<LLMConfig>) => api.put(`${p}/llm-config`, config),
+  getModels: () => api.get<ModelsResponse>(`${p}/models`),
+  getVoices: () => api.get<VoicesResponse>(`${p}/voices`),
+  resetAgent: () => api.post(`${p}/reset-agent`),
+  getStatus: () => api.get<AgentStatusResponse>(`${p}/status`),
+  getLogs: () => api.get<LogEntry[]>(`${p}/logs`),
+  getPipelineConfig: () => api.get<PipelineConfig>(`${p}/pipeline-config`),
+  getAllPipelineConfigs: () => api.get<{ configs: PipelineConfig[] }>(`${p}/pipeline-configs`),
   updatePipelineConfig: (id: number, config: Partial<PipelineConfig>) =>
-    api.put(`/pipeline-config/${id}`, config),
+    api.put(`${p}/pipeline-config/${id}`, config),
   activatePipeline: (id: number) =>
-    api.post(`/pipeline-config/${id}/activate`),
-  getProvidersStatus: () => api.get<ProvidersResponse>('/providers/status'),
-  getPipelineCatalog: () => api.get<PipelineCatalogResponse>('/pipeline-catalog'),
+    api.post(`${p}/pipeline-config/${id}/activate`),
+  getProvidersStatus: () => api.get<ProvidersResponse>(`${p}/providers/status`),
+  getPipelineCatalog: () => api.get<PipelineCatalogResponse>(`${p}/pipeline-catalog`),
 }
 
 export default api

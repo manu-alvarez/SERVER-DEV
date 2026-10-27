@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowDown, Crown } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 import ArchitectCockpit from './ArchitectCockpit';
 
 export default function Hero() {
@@ -60,10 +60,6 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.08 }}
             >
-              <div className="flex items-center gap-3 mb-2">
-                <Crown size={28} className="text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
-                <span className="text-xs font-bold uppercase tracking-[0.2em] text-amber-300/80">Premium Portfolio</span>
-              </div>
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05]">
                 <span className="text-white block">Manuel</span>
                 <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent block">
