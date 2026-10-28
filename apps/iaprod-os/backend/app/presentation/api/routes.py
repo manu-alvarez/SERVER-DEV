@@ -1,184 +1,126 @@
-import uuid
-import aiofiles
-import logging
-import os
-from fastapi import APIRouter, File, UploadFile, Request, HTTPException, Depends, BackgroundTasks
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request, Depends, status
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
-
-from app.core.config import settings
-from app.application.use_cases.chat_use_case import ChatUseCase
-from app.infrastructure.llm.groq_adapter import GroqAdapter
-from app.infrastructure.audio.tts_stt_adapter import GroqEdgeAudioAdapter
-from app.application.use_cases.memory_service import clear_history
-from app.domain.entities import AIResponse
-from app.infrastructure.tools.toolbox import analyze_vision_image
-from app.infrastructure.llm.gemini_adapter import GeminiAdapter
-from app.infrastructure.llm.fallback_adapter import FallbackLLMAdapter
-
-logger = logging.getLogger(__name__)
-router = APIRouter()
-
-TEMP_AUDIO_DIR = "temp_audio"
-os.makedirs(TEMP_AUDIO_DIR, exist_ok=True)
-
-import json
-
-def get_chat_usecase(request: Request) -> ChatUseCase:
-    # Always use injected keys from proxy
-    injected_groq = request.headers.get("x-injected-groq")
-    injected_gemini = request.headers.get("x-injected-google")
-    custom_keys_str = request.headers.get("x-user-custom-keys") or "{}"
-    
-    try:
-        custom_keys = json.loads(custom_keys_str)
-    except:
-        custom_keys = {}
-        
-    if injected_groq:
-        # God Mode bypasses fallback and uses the Admin proxy with Llama 3.3 70b
-        # Llama 3.3 70b has tool support so it matches GroqAdapter needs
-        llm = GroqAdapter(
-            api_key=injected_groq, 
-            base_url="https://api.groq.com/openai/v1",
-            model="llama-3.3-70b-versatile"
-        )
-    elif custom_keys.get("groq"):
-        llm = FallbackLLMAdapter(adapters=[
-            GroqAdapter(api_key=custom_keys.get("groq")),
-            GeminiAdapter(api_key=custom_keys.get("gemini") or None)
-        ])
-    else:
-        llm = FallbackLLMAdapter(adapters=[GeminiAdapter(), GroqAdapter()])
-        
-    return ChatUseCase(llm_adapter=llm, audio_adapter=GroqEdgeAudioAdapter())
-
-def get_audio_adapter() -> GroqEdgeAudioAdapter:
-    return GroqEdgeAudioAdapter()
-
-def _verify_api_key(request: Request):
-    expected = settings.IAPROD_API_KEY
-    if not expected: return
-    incoming = request.headers.get("x-api-key") or request.headers.get("X-API-KEY")
-    if incoming != expected: raise HTTPException(status_code=401, detail="Invalid API key")
-
-class TextCommandRequest(BaseModel):
-    text: str = Field(..., max_length=2000, description="The text command to execute")
-
-class VisionAnalyzeRequest(BaseModel):
-    image: str = Field(..., description="Base64 encoded image string")
-    source: str = Field("screenshot", max_length=50)
-    prompt: str = Field(None, max_length=1000)
-
-def _cleanup_temp_file(filepath: str):
-    try:
-        if os.path.exists(filepath):
-            os.remove(filepath)
-    except Exception as e:
-        logger.error(f"Failed to cleanup temp file {filepath}: {e}")
-
-@router.post("/api/voice-command", response_model=AIResponse)
-async def voice_command(
-    request: Request, 
-    background_tasks: BackgroundTasks,
-    audio_file: UploadFile = File(...), 
-    chat: ChatUseCase = Depends(get_chat_usecase)
-):
-    _verify_api_key(request)
-    temp_in = ""
-    try:
-        content = await audio_file.read()
-        if not content: return JSONResponse(status_code=400, content={"error": "Empty audio"})
-        
-        ext = "mp4" if audio_file.content_type and "mp4" in audio_file.content_type else "webm"
-        temp_in = os.path.join(TEMP_AUDIO_DIR, f"in_{uuid.uuid4().hex[:8]}.{ext}")
-        
-        async with aiofiles.open(temp_in, "wb") as f: 
-            await f.write(content)
-        
-        response = await chat.execute_voice(temp_in)
-        return response.model_dump()
-    except HTTPException: 
-        raise
-    except Exception as e:
-        logger.exception("Voice execution error")
-        return JSONResponse(status_code=500, content={"transcript": "Error", "error": str(e), "emotion": "error"})
-    finally:
-        if temp_in:
-            background_tasks.add_task(_cleanup_temp_file, temp_in)
-
-@router.post("/api/text-command", response_model=AIResponse)
-async def text_command(request: Request, body: TextCommandRequest, chat: ChatUseCase = Depends(get_chat_usecase)):
-    _verify_api_key(request)
-    try: 
-        response = await chat.execute_text(body.text)
-        return response.model_dump()
-    except HTTPException: 
-        raise
-    except Exception as e:
-        logger.exception("Text execution error")
-        return JSONResponse(status_code=500, content={"transcript": "Error", "error": str(e), "emotion": "error"})
-
-@router.post("/api/vision-analyze")
-async def vision_analyze(request: Request, body: VisionAnalyzeRequest, audio: GroqEdgeAudioAdapter = Depends(get_audio_adapter)):
-    _verify_api_key(request)
-    try:
-        analysis, vision_url = await analyze_vision_image(body.image, body.prompt, body.source)
-        audio_url = None
-        try: 
-            audio_url = await audio.generate_speech(analysis)
-        except Exception as tts_err: 
-            logger.warning(f"TTS generation failed during vision analysis: {tts_err}")
-            
-        return {"response": analysis, "vision_url": vision_url, "audio_url": audio_url, "emotion": "thinking"}
-    except HTTPException: 
-        raise
-    except Exception as e:
-        logger.exception("Vision analysis error")
-        return JSONResponse(status_code=500, content={"response": f"Error: {e}", "emotion": "error"})
-
+from pydantic import BaseModel
+from typing import Optional, Dict, Any
+import base64
+import os
+import tempfile
 import httpx
 
-CLOUD_MODELS = [
-    {"id": "gm/gemini-3.5-flash", "name": "Gemini 3.5 Flash", "provider": "Gemini", "free": True},
-    {"id": "gm/gemini-3.1-pro", "name": "Gemini 3.1 Pro", "provider": "Gemini", "free": True},
-    {"id": "gm/gemini-3.1-flash-lite", "name": "Gemini 3.1 Flash Lite", "provider": "Gemini", "free": True},
-    {"id": "gr/llama-3.3-70b-versatile", "name": "Llama 3.3 70B", "provider": "Groq", "free": True},
-    {"id": "gr/llama-3.1-8b-instant", "name": "Llama 3.1 8B Instant", "provider": "Groq", "free": True},
-    {"id": "gr/mixtral-8x7b-32768", "name": "Mixtral 8x7B", "provider": "Groq", "free": True},
-    {"id": "or/deepseek/deepseek-chat:free", "name": "DeepSeek V3", "provider": "OpenRouter", "free": True},
-    {"id": "or/google/gemma-3-27b-it:free", "name": "Gemma 3 27B", "provider": "OpenRouter", "free": True},
-]
+from app.core.config import settings
+from app.core.groq_client import groq_client
+from app.application.chat_use_case import ChatUseCase
+from app.application.memory_service import memory_service
+from app.application.tool_dispatcher import tool_dispatcher
+from app.infrastructure.llm.groq_adapter import GroqAdapter
+from app.infrastructure.llm.gemini_adapter import GeminiAdapter
+from app.infrastructure.llm.fallback_adapter import FallbackLLMAdapter
+from app.infrastructure.audio.tts_stt_adapter import GroqEdgeAudioAdapter
+from app.infrastructure.sandbox.docker_sandbox import run_python_in_sandbox
+from app.auth.jwt import require_user, get_current_user, create_access_token
+from app.middleware.rate_limit import limiter
 
-OLLAMA_BASE_URL = "http://100.100.2.10:11434"
+router = APIRouter()
+
+# Instanciar adaptadores (singleton simple)
+groq_adapter = GroqAdapter()
+gemini_adapter = GeminiAdapter()
+fallback_adapter = FallbackLLMAdapter([groq_adapter, gemini_adapter])
+audio_adapter = GroqEdgeAudioAdapter()
+chat_usecase = ChatUseCase(fallback_adapter, audio_adapter)
+tool_dispatcher.chat_usecase = chat_usecase  # inyección si fuera necesario
+
+class TextCommand(BaseModel):
+    text: str
+
+class VaultUpdate(BaseModel):
+    key: str
+    value: str
+
+@router.get("/health")
+@limiter.limit("60/minute")
+def health(request: Request):
+    return {"status": "ok", "service": "iaprod-os-backend"}
+
+@router.post("/api/register")
+@limiter.limit("10/minute")
+def register(request: Request, email: str = Form(...), password: str = Form(...)):
+    # Registro local simple (sin DB externa por ahora; se conectará a PostgreSQL en siguiente fase)
+    token = create_access_token({"sub": email, "role": "user"})
+    return {"access_token": token, "token_type": "bearer"}
+
+@router.post("/api/login")
+@limiter.limit("20/minute")
+def login(request: Request, email: str = Form(...), password: str = Form(...)):
+    # Login local simple
+    token = create_access_token({"sub": email, "role": "user"})
+    return {"access_token": token, "token_type": "bearer"}
+
+@router.post("/api/text-command")
+@limiter.limit("30/minute")
+async def text_command(request: Request, payload: TextCommand, current_user: Optional[Dict[str, Any]] = Depends(get_current_user)):
+    if len(payload.text) > 2000:
+        raise HTTPException(status_code=400, detail="Texto demasiado largo")
+    response = await chat_usecase.execute_text(payload.text)
+    return response
+
+@router.post("/api/voice-command")
+@limiter.limit("20/minute")
+async def voice_command(request: Request, file: UploadFile = File(...), current_user: Optional[Dict[str, Any]] = Depends(get_current_user)):
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
+    tmp.write(await file.read())
+    tmp.close()
+    try:
+        response = await chat_usecase.execute_voice(tmp.name)
+        return response
+    finally:
+        os.unlink(tmp.name)
+
+@router.post("/api/vision-analyze")
+@limiter.limit("20/minute")
+async def vision_analyze(request: Request, image: str = Form(...), source: str = Form("upload"), prompt: str = Form("Analiza esta imagen"), current_user: Optional[Dict[str, Any]] = Depends(get_current_user)):
+    try:
+        image_bytes = base64.b64decode(image)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Imagen base64 inválida")
+    result = await tool_dispatcher.handle_tool_call({
+        "name": "analyze_vision_image",
+        "arguments": {"image_base64": image, "source": source, "prompt": prompt},
+    })
+    return result
 
 @router.get("/api/models")
-async def get_models():
-    ollama_models = []
-    try:
-        async with httpx.AsyncClient(timeout=3.0) as client:
-            res = await client.get(f"{OLLAMA_BASE_URL}/api/tags")
-            if res.status_code == 200:
-                data = res.json()
-                for m in data.get("models", []):
-                    name = m.get("name", "")
-                    display = name.replace(":", " ").replace("-", " ").title()
-                    ollama_models.append({
-                        "id": f"ol/{name}",
-                        "name": display,
-                        "provider": "Ollama",
-                        "free": True,
-                    })
-    except Exception as e:
-        logger.warning(f"Could not reach Ollama at {OLLAMA_BASE_URL}: {e}")
-    return CLOUD_MODELS + ollama_models
+@limiter.limit("30/minute")
+def models(request: Request):
+    return {
+        "cloud": ["groq-llama-3.3-70b", "gemini-3.5-flash", "openrouter-mix"],
+        "local": ["ollama-models-disponibles"],
+    }
 
 @router.post("/api/clear-memory")
-async def clear_memory(request: Request):
-    _verify_api_key(request)
-    clear_history()
-    return {"status": "success", "message": "Memory cleared"}
+@limiter.limit("10/minute")
+def clear_memory(request: Request, current_user: Optional[Dict[str, Any]] = Depends(get_current_user)):
+    memory_service.clear_history()
+    return {"status": "cleared"}
+
+@router.post("/api/vault-update")
+@limiter.limit("10/minute")
+async def vault_update(request: Request, payload: VaultUpdate, current_user: Optional[Dict[str, Any]] = Depends(get_current_user)):
+    """Endpoint llamado desde el frontend (triggerNeuralBridge) para actualizar el vault local."""
+    # Almacenar en memoria local (se conectará a PostgreSQL/Redis en siguiente fase)
+    from app.core.config import settings as s
+    if not hasattr(s, "_vault"):
+        s._vault = {}
+    s._vault[payload.key] = payload.value
+    return {"status": "updated", "key": payload.key}
 
 @router.get("/api/status")
-async def status(): 
-    return {"status": "online"}
+@limiter.limit("60/minute")
+def status(request: Request):
+    return {"status": "online", "user": bool(current_user) if (current_user := get_current_user(request)) else False}
+
+@router.post("/api/execute-python")
+@limiter.limit("10/minute")
+async def execute_python(request: Request, code: str = Form(...), current_user: Optional[Dict[str, Any]] = Depends(get_current_user)):
+    stdout, stderr = run_python_in_sandbox(code)
+    return {"stdout": stdout, "stderr": stderr}

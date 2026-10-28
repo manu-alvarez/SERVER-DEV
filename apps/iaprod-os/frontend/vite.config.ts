@@ -1,28 +1,26 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite';
+import tailwindcss from '@tailwindcss/vite'
+import path from 'node:path'
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
   base: './',
-  build: {
-    outDir: 'dist',
-    assetsDir: 'assets',
+  plugins: [react(), tailwindcss()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
   },
   server: {
-    host: true,
     port: 5173,
+    host: true,
     proxy: {
-      '/api': {
-        target: 'http://localhost:8006',
-        changeOrigin: true
-      },
-      '/status': {
-        target: 'http://localhost:8006/health',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/status/, '')
-      }
-    }
-  }
+      '/api': 'http://localhost:8006',
+      '/_iaprod': 'http://localhost:8006',
+    },
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+  },
 })

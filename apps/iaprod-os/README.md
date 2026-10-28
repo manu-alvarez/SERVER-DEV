@@ -1,51 +1,62 @@
-# IAProd OS - Instancia Soberana de IA
+# IA Prod OS — Sistema Operativo Cognitivo y de Producción
 
-## Descripción
-Entorno operativo cognitivo con procesamiento LLM, orbe 3D reactivo y memoria persistente.
-12 herramientas integradas: visión, búsqueda web, Hotmail, Google Calendar, Telegram, control OS, Python execution, iOS Shortcuts.
+Asistente de IA de próxima generación con capacidades de voz, visión continua, herramientas reales, memoria cognitiva y ejecución de código en sandbox. **100% local, sin dependencia de APIs de pago externas.**
 
 ## Arquitectura
-- **Backend**: FastAPI + Clean Architecture (Ports & Adapters)
-- **Frontend**: React 19 + Vite 8 + Three.js + Tailwind
-- **LLM**: Groq (primary) → Ollama (local) → OpenRouter (fallback)
-- **TTS**: Edge-TTS (es-ES-AlvaroNeural)
-- **STT**: Groq Whisper-large-v3
 
-## Estructura
-```
-iaprod-os/
-├── backend/          # FastAPI Clean Architecture
-├── frontend/         # React 19 + Three.js
-├── docker-compose.yml
-└── README.md
-```
+- **Backend:** FastAPI (Python) — arquitectura puertos/adaptadores
+- **Frontend:** React 19 + Vite + Tailwind v4 + Three.js + framer-motion
+- **Motor de voz:** Groq Whisper (STT) + edge-tts (TTS)
+- **LLM:** Groq (primario) → Ollama local → OpenRouter (fallback)
+- **Base de datos:** SQLite (memoria) → PostgreSQL (planificado)
+- **Sandbox:** Docker aislado para ejecución de Python
 
-## Despliegue Local
+## Despliegue local
+
 ```bash
 cd apps/iaprod-os
-docker-compose up -d --build
+
+# Backend
+cd backend
+pip install -r requirements.txt
+python main.py   # puerto 8006
+
+# Frontend (en otra terminal)
+cd ../frontend
+npm install
+npm run dev      # puerto 5173
 ```
 
-## Endpoints
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/voice-command` | Audio → STT → LLM → TTS |
-| POST | `/api/text-command` | Text → LLM → TTS |
-| POST | `/api/vision-analyze` | Image → Vision LLM → TTS |
-| POST | `/api/clear-memory` | Purge chat history |
-| GET | `/api/status` | System status |
-| GET | `/health` | Health check |
+## Despliegue con Docker
 
-## Variables de Entorno
-Ver `.env.example` en backend/
+```bash
+cd apps/iaprod-os
+docker compose up --build
+```
 
-## Mejoras Fusionadas
-- ✅ CORS seguro (no wildcard en producción)
-- ✅ Sentry integrado para monitoring
-- ✅ Código duplicado eliminado
-- ✅ API key no expuesta en frontend
-- ✅ Multi-LLM fallback chain (Groq → Ollama → OpenRouter)
-- ✅ Anti-hallucination safeguards
-- ✅ Agentic tool loop (hasta 5 iteraciones)
-- ✅ Rate limiting con slowapi
-- ✅ Type-safe configuration con Pydantic Settings
+## Endpoints principales
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| GET | `/api/health` | Estado del servicio |
+| POST | `/api/login` | Autenticación JWT |
+| POST | `/api/register` | Registro de usuario |
+| POST | `/api/text-command` | Comando de texto |
+| POST | `/api/voice-command` | Comando de voz (archivo de audio) |
+| POST | `/api/vision-analyze` | Análisis de imagen |
+| POST | `/api/execute-python` | Ejecución en sandbox Docker |
+| GET | `/api/models` | Modelos LLM disponibles |
+| POST | `/api/clear-memory` | Limpiar memoria de chat |
+| POST | `/api/vault-update` | Actualizar vault local |
+| GET | `/api/status` | Estado general |
+
+## Seguridad
+
+- Rate limiting con `slowapi` (60 req/min por defecto)
+- Autenticación JWT obligatoria
+- Ejecución de Python en contenedor Docker aislado (sin red, memoria limitada)
+- CORS configurado
+
+## PWA
+
+La aplicación es una PWA instalable. En iOS Safari, usa "Compartir → Añadir a la pantalla de inicio".

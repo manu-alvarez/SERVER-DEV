@@ -8,6 +8,7 @@ import os
 
 from app.core.config import settings
 from app.presentation.api.routes import router
+from app.middleware.rate_limit import apply_rate_limiting
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -39,6 +40,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="IAProd OS Core API", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=settings.get_cors_origins(), allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+apply_rate_limiting(app)
 app.include_router(router)
 
 @app.get("/health")
