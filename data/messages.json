@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1791586551926",
+    "date": "2026-10-09T22:55:51.926Z",
+    "ip": "90.68.49.4",
+    "name": "Audit Bot",
+    "email": "test@manuelalvarez.dev",
+    "subject": "Deployment Test",
+    "message": "Verifying production contact endpoint."
+  },
+  {
+    "id": "1791586044330",
+    "date": "2026-10-09T22:47:24.331Z",
+    "ip": "90.68.49.4",
+    "name": "Manuel Test",
+    "email": "test@manuelalvarez.dev",
+    "subject": "Mensaje desde manuelalvarez.dev",
+    "message": "Probando endpoint de contacto"
+  }
+]

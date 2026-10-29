@@ -1,0 +1,17 @@
+{
+  "name": "IA Prod OS",
+  "short_name": "IAProdOS",
+  "description": "Sistema Operativo Cognitivo y de Producción — Asistente de voz, visión, herramientas y memoria, 100% local.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#02040a",
+  "theme_color": "#22d3ee",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/orb.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

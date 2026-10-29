@@ -87,6 +87,14 @@ function getVaultKey(provider) {
 app.use(compression({ level: 6, threshold: 1024 }));
 
 // ── Security Headers ──
+
+// Anti-cache headers for UIEP and IA Prod OS frontends
+if (req.hostname === 'uiep.manuelalvarez.dev' || req.hostname === 'iaprod.manuelalvarez.dev') {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+}
 app.use((req, res, next) => {
   const csp = [
     "default-src 'self'",
@@ -380,7 +388,9 @@ app.use((req, res, next) => {
     req.url = `/_nikolina${req.url}`;
   }
 
-  const mappedApp = DOMAIN_APP_MAP[host];
+  
+
+const mappedApp = DOMAIN_APP_MAP[host];
   if (mappedApp && !req.url.startsWith('/api') && (!req.url.startsWith('/_') || req.url.startsWith('/_next'))) {
     if (req.url === '/') {
       req.url = `/app/${mappedApp}/`;
@@ -506,6 +516,7 @@ app.use('/app/elitescout', createProxyMiddleware({
   }
 }));
 
+app.use("/_uiep", createProxyMiddleware(proxyOpts("http://uiep-backend:4000", "/_uiep")));
 app.use('/_iaprod',        createProxyMiddleware(proxyOpts('http://iaprod-backend:8006', '/_iaprod')));
 app.use('/_itenglish',     createProxyMiddleware(proxyOpts('http://it-english-backend:8787', '/_itenglish')));
 app.use('/_cuentosmagicos',createProxyMiddleware(proxyOpts('http://cuentos-magicos-backend:8007', '/_cuentosmagicos')));
