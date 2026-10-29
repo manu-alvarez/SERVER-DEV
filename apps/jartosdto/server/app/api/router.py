@@ -17,12 +17,10 @@ api_router = APIRouter()
 settings = get_settings()
 
 def _get_api_keys(req: Request) -> dict:
-    """Helper to extract API keys considering GodMode injection from proxy and user custom keys."""
+    """Helper to extract API keys from proxy-injected headers and user custom keys."""
     keys = {}
-    is_godmode = req.headers.get("x-godmode-active") == "true"
     
-    # 1. Start with injected headers (highest priority if GodMode)
-    if is_godmode:
+    # 1. Always read injected headers from proxy
         if req.headers.get("x-injected-openai"): keys["openai"] = req.headers.get("x-injected-openai")
         if req.headers.get("x-injected-anthropic"): keys["anthropic"] = req.headers.get("x-injected-anthropic")
         if req.headers.get("x-injected-google"): keys["gemini"] = req.headers.get("x-injected-google")
@@ -30,7 +28,7 @@ def _get_api_keys(req: Request) -> dict:
         if req.headers.get("x-injected-openrouter"): keys["openrouter"] = req.headers.get("x-injected-openrouter")
         if req.headers.get("x-injected-tavily"): keys["tavily"] = req.headers.get("x-injected-tavily")
         
-    # 2. Add user custom keys from frontend (if not already set by GodMode)
+    # 2. Add user custom keys from frontend
     custom_keys_str = req.headers.get("x-user-custom-keys") or req.headers.get("x-custom-api-keys") or "{}"
     try:
         custom_keys = json.loads(custom_keys_str)
@@ -45,19 +43,17 @@ def _get_api_keys(req: Request) -> dict:
 @api_router.get("/models/")
 async def get_models(req: Request):
     api_keys = _get_api_keys(req)
-    is_godmode = req.headers.get("x-godmode-active") == "true"
 
     models = []
     
-    if is_godmode:
         # En God Mode, inyectamos los modelos premium estáticos directamente
         models.extend([
-            {"id": "openai:gpt-4o", "provider": "openai", "display_name": "OpenAI: GPT-4o (God Mode)", "is_vision": True, "is_thinking": False},
-            {"id": "anthropic:claude-3-5-sonnet-latest", "provider": "anthropic", "display_name": "Anthropic: Claude 3.5 Sonnet (God Mode)", "is_vision": True, "is_thinking": False},
-            {"id": "gemini:gemini-3.5-flash", "provider": "google", "display_name": "Gemini: 3.5 Flash (God Mode)", "is_vision": True, "is_thinking": False},
-            {"id": "gemini:gemini-2.5-pro", "provider": "google", "display_name": "Gemini: 2.5 Pro (God Mode)", "is_vision": True, "is_thinking": True},
-            {"id": "groq:deepseek-r1-distill-llama-70b", "provider": "groq", "display_name": "Groq: DeepSeek R1 (God Mode)", "is_vision": False, "is_thinking": True},
-            {"id": "groq:llama-3.3-70b-versatile", "provider": "groq", "display_name": "Groq: Llama 3.3 70B (God Mode)", "is_vision": False, "is_thinking": False}
+            {"id": "openai:gpt-4o", "provider": "openai", "display_name": "OpenAI: GPT-4o (Premium)", "is_vision": True, "is_thinking": False},
+            {"id": "anthropic:claude-3-5-sonnet-latest", "provider": "anthropic", "display_name": "Anthropic: Claude 3.5 Sonnet (Premium)", "is_vision": True, "is_thinking": False},
+            {"id": "gemini:gemini-3.5-flash", "provider": "google", "display_name": "Gemini: 3.5 Flash (Premium)", "is_vision": True, "is_thinking": False},
+            {"id": "gemini:gemini-2.5-pro", "provider": "google", "display_name": "Gemini: 2.5 Pro (Premium)", "is_vision": True, "is_thinking": True},
+            {"id": "groq:deepseek-r1-distill-llama-70b", "provider": "groq", "display_name": "Groq: DeepSeek R1 (Premium)", "is_vision": False, "is_thinking": True},
+            {"id": "groq:llama-3.3-70b-versatile", "provider": "groq", "display_name": "Groq: Llama 3.3 70B (Premium)", "is_vision": False, "is_thinking": False}
         ])
     
     async with httpx.AsyncClient(timeout=10.0) as client:
@@ -230,7 +226,7 @@ async def get_agents():
         "id": "orchestrator",
         "name": "Inteligencia Central",
         "description": "Cerebro supremo y orquestador del ecosistema.",
-        "system_prompt": "Eres la Inteligencia Central Orquestadora (Godmode).",
+        "system_prompt": "Eres la Inteligencia Central Orquestadora.",
         "tools": ["webSearch", "executeCode"],
         "is_public": True,
       }
@@ -293,9 +289,8 @@ async def chat_completions(req: Request, body: ChatRequest):
     """
     Handles RAG chat and connects to the user's selected model using their custom API keys.
     """
-    # 1. Parse API keys considering GodMode
+    # 1. Parse API keys
     api_keys = _get_api_keys(req)
-    is_godmode = req.headers.get("x-godmode-active") == "true"
         
     user_query = body.messages[-1].content
     

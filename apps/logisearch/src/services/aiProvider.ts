@@ -148,10 +148,7 @@ async function sendWithRetry(
             let finalUrl = url
             const finalHeaders = { ...headers }
 
-            const godmodeToken = localStorage.getItem('msbross_godmode_token');
-            const userKeys = localStorage.getItem('msbross_user_api_key');
-            if (godmodeToken) finalHeaders['x-godmode-token'] = godmodeToken;
-            if (userKeys) finalHeaders['x-user-custom-keys'] = userKeys;
+
 
             if (provider.name === 'Gemini' && !IS_PROXY) {
                 finalUrl = `${url}?key=${key}`
@@ -208,13 +205,10 @@ export async function sendToAI(prompt: string): Promise<string> {
     const openRouterKeys = getOpenRouterKeys()
     const groqKeys = getGroqKeys()
 
-    const hasGodmode = typeof localStorage !== 'undefined' && localStorage.getItem('msbross_godmode_token');
-    const hasUserKeys = typeof localStorage !== 'undefined' && localStorage.getItem('msbross_user_api_key');
-    
-    // Si tenemos modo Dios o claves personalizadas, inyectamos un array dummy para que intente al menos una petición
-    if ((hasGodmode || hasUserKeys) && geminiKeys.length === 0) geminiKeys.push('dummy_key');
-    if ((hasGodmode || hasUserKeys) && openRouterKeys.length === 0) openRouterKeys.push('dummy_key');
-    if ((hasGodmode || hasUserKeys) && groqKeys.length === 0) groqKeys.push('dummy_key');
+    // Proxy always injects vault keys — add dummy keys so the fallback chain attempts each provider
+    if (IS_PROXY && geminiKeys.length === 0) geminiKeys.push('proxy_injected');
+    if (IS_PROXY && openRouterKeys.length === 0) openRouterKeys.push('proxy_injected');
+    if (IS_PROXY && groqKeys.length === 0) groqKeys.push('proxy_injected');
 
     const errors: string[] = []
 

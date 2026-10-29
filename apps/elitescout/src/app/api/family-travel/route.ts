@@ -101,10 +101,10 @@ async function groqExtract(searchResults: any[], apiKey: string, customHeaders?:
     url: r.url || "",
   }));
 
-  const isGodMode = customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]);
-  const url = isGodMode ? "http://127.0.0.1:8080/_api/groq/chat/completions" : "https://api.groq.com/openai/v1/chat/completions";
+  const useProxy = true;
+  const url = useProxy ? "http://127.0.0.1:8080/_api/groq/chat/completions" : "https://api.groq.com/openai/v1/chat/completions";
   const headers: any = {
-    "Authorization": `Bearer ${isGodMode ? "dummy_key" : apiKey}`,
+    "Authorization": `Bearer ${useProxy ? "dummy_key" : apiKey}`,
     "Content-Type": "application/json",
     ...customHeaders,
   };
@@ -182,8 +182,8 @@ function heuristicFamilyScore(amenities: string[], name = "", hotelName = ''): n
 }
 
 async function geminiRequest(prompt: string, key: string, customHeaders?: Record<string, string>): Promise<string> {
-  const isGodMode = customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]);
-  const url = isGodMode
+  const useProxy = true;
+  const url = useProxy
     ? `http://127.0.0.1:8080/_api/gemini/v1beta/models/gemini-3.5-flash:generateContent?key=dummy_key`
     : `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${key}`;
     
@@ -205,9 +205,9 @@ async function geminiRequest(prompt: string, key: string, customHeaders?: Record
 }
 
 async function openrouterScore(destinations: AIDestination[], apiKey: string, customHeaders?: Record<string, string>): Promise<{ name: string; familyScore: number; familyNotes: string }[] | null> {
-  if (!apiKey && !(customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]))) return null;
-  const isGodMode = customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]);
-  const url = isGodMode ? "http://127.0.0.1:8080/_api/openrouter" : "https://openrouter.ai/api/v1/chat/completions";
+  if (!apiKey) return null; // Proxy injects keys
+  const useProxy = true;
+  const url = useProxy ? "http://127.0.0.1:8080/_api/openrouter" : "https://openrouter.ai/api/v1/chat/completions";
   
   try {
     const res = await fetchWithTimeout(
@@ -215,7 +215,7 @@ async function openrouterScore(destinations: AIDestination[], apiKey: string, cu
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${isGodMode ? "dummy_key" : apiKey}`,
+          Authorization: `Bearer ${useProxy ? "dummy_key" : apiKey}`,
           "Content-Type": "application/json",
           ...customHeaders,
         },
@@ -253,10 +253,10 @@ Responde SOLO JSON array [{ "name", "familyScore", "familyNotes" }].
 Datos: ${JSON.stringify(destinations, null, 2)}`;
 
   let text = "";
-  const hasGodMode = customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]);
-  if (geminiKeys.length > 0 || hasGodMode) {
-    for (let attempt = 0; attempt < (hasGodMode ? 1 : geminiKeys.length); attempt++) {
-      const key = hasGodMode ? "dummy" : geminiKeys[attempt % geminiKeys.length];
+  const useProxy = true;
+  if (geminiKeys.length > 0 || useProxy) {
+    for (let attempt = 0; attempt < (useProxy ? 1 : geminiKeys.length); attempt++) {
+      const key = useProxy ? "dummy" : geminiKeys[attempt % geminiKeys.length];
       await new Promise((r) => setTimeout(r, attempt * 500));
       try {
         text = await geminiRequest(prompt, key, customHeaders);
@@ -307,10 +307,10 @@ async function fetchRealFlightPrices(destinations: AIDestination[], dateFrom: st
     });
     if (!res.ok) return priceMap;
     const data = await res.json();
-    const isGodMode = customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]);
-    const groq = await fetchWithTimeout(isGodMode ? "http://127.0.0.1:8080/_api/groq/chat/completions" : "https://api.groq.com/openai/v1/chat/completions", {
+    const useProxy = true;
+    const groq = await fetchWithTimeout(useProxy ? "http://127.0.0.1:8080/_api/groq/chat/completions" : "https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
-      headers: { Authorization: `Bearer ${isGodMode ? "dummy" : groqKey}`, "Content-Type": "application/json", ...customHeaders },
+      headers: { Authorization: `Bearer ${useProxy ? "dummy" : groqKey}`, "Content-Type": "application/json", ...customHeaders },
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
         messages: [
@@ -355,10 +355,10 @@ async function fetchRealTrainPrices(destinations: AIDestination[], tavilyKey: st
     });
     if (!res.ok) return priceMap;
     const data = await res.json();
-    const isGodMode = customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]);
-    const groq = await fetchWithTimeout(isGodMode ? "http://127.0.0.1:8080/_api/groq/chat/completions" : "https://api.groq.com/openai/v1/chat/completions", {
+    const useProxy = true;
+    const groq = await fetchWithTimeout(useProxy ? "http://127.0.0.1:8080/_api/groq/chat/completions" : "https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
-      headers: { Authorization: `Bearer ${isGodMode ? "dummy" : groqKey}`, "Content-Type": "application/json", ...customHeaders },
+      headers: { Authorization: `Bearer ${useProxy ? "dummy" : groqKey}`, "Content-Type": "application/json", ...customHeaders },
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
         messages: [
@@ -425,12 +425,11 @@ export async function POST(req: NextRequest) {
     const openrouterKey = process.env.OPENROUTER_KEY || "";
 
     const customHeaders: Record<string, string> = {};
-    if (req.headers.get("x-godmode-token")) customHeaders["x-godmode-token"] = req.headers.get("x-godmode-token") as string;
     if (req.headers.get("x-user-custom-keys")) customHeaders["x-user-custom-keys"] = req.headers.get("x-user-custom-keys") as string;
-    const hasGodMode = !!(customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"]);
+    const useProxy = true;
 
     if (!tavilyKey) throw new Error("TAVILY_API_KEY is not configured on server.");
-    if (!groqKey && !hasGodMode) throw new Error("GROQ_API_KEY is not configured on server.");
+    if (!groqKey && !useProxy) throw new Error("GROQ_API_KEY is not configured on server.");
 
     const accomFilter = accommodationType && accommodationType !== "all" ? ` ${accommodationType}` : "";
     const searchQuery = destination

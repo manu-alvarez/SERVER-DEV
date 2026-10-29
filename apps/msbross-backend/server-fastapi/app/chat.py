@@ -72,14 +72,11 @@ def build_request(model_id: str, messages: list[dict], keys: dict) -> tuple[str,
         key = keys.get("gm", [None])[0]
         if not key:
             return None
-        is_gemini_native = True
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{real_model}:streamGenerateContent?key={key}"
-        gemini_contents = []
-        for m in messages:
-            role = "user" if m["role"] in ("user", "system") else "model"
-            gemini_contents.append({"role": role, "parts": [{"text": m["content"]}]})
-        payload = {"contents": gemini_contents, "generationConfig": {"temperature": 1.0, "maxOutputTokens": 4096}}
-        return url, headers, json.dumps(payload).encode(), is_gemini_native
+        # Usamos el proxy unificado para heredar la rotación y el fallback
+        url = "http://msbross-proxy:8080/_api/llm/chat/completions"
+        headers["Authorization"] = f"Bearer {key}"
+        payload = {"model": real_model, "messages": messages, "stream": True, "max_tokens": 4096, "temperature": 0.7}
+        return url, headers, json.dumps(payload).encode(), False
 
     elif prefix == "gr/":
         key = keys.get("or", [None])[0]

@@ -126,7 +126,6 @@ async def get_public_token(request: Request):
         
     room_name = f"atenea-{os.urandom(4).hex()}"
     
-    godmode_token = request.headers.get("x-godmode-token", "")
     custom_keys = request.headers.get("x-user-custom-keys", "")
 
     token = AccessToken(api_key, api_secret) \
@@ -135,8 +134,6 @@ async def get_public_token(request: Request):
         .with_grants(VideoGrants(room_join=True, room=room_name))
         
     metadata = {}
-    if godmode_token:
-        metadata["x-godmode-token"] = godmode_token
     if custom_keys:
         metadata["x-user-custom-keys"] = custom_keys
         

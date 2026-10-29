@@ -12,7 +12,6 @@ import type { CompareRequest, CompareApiResponse } from "@/types/api";
 
 export async function POST(req: NextRequest) {
     const customHeaders: Record<string, string> = {};
-    if (req.headers.get("x-godmode-token")) customHeaders["x-godmode-token"] = req.headers.get("x-godmode-token") as string;
     if (req.headers.get("x-user-custom-keys")) customHeaders["x-user-custom-keys"] = req.headers.get("x-user-custom-keys") as string;
 
     try {

@@ -6,7 +6,6 @@ import { useOddsApi } from './hooks/useOddsApi';
 import SettingsPanel from './components/SettingsPanel';
 import ComboResults from './components/ComboResults';
 import HistoryPanel from './components/HistoryPanel';
-import GodModeListener from './components/GodModeListener';
 import ApiConfigModal from './components/ApiConfigModal';
 import { Match, Pick, Combo } from './types';
 
@@ -87,11 +86,9 @@ export default function App() {
   const [combos, setCombos] = useState<Combo[]>([]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  const godmodeToken = typeof window !== 'undefined' ? localStorage.getItem('msbross_godmode_token') : null;
   const userKeys = typeof window !== 'undefined' ? localStorage.getItem('msbross_user_api_key') : null;
 
   const activeApiKey = apiKey || (import.meta as any).env.VITE_ODDS_API_KEY || '';
-  const hasAccess = !!activeApiKey || !!godmodeToken || !!userKeys;
 
   // The Renderer & Networker: Data is fetched via TanStack Query and validated with Zod
   const { data: matches = [], isLoading, isFetching, refetch, isError, error } = useOddsApi(selectedLeagues, activeApiKey);
@@ -143,7 +140,6 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen pb-16">
-      <GodModeListener />
       <div className="bg-orbs-container">
         <div className="orb orb-1"></div><div className="orb orb-2"></div><div className="orb orb-3"></div>
       </div>

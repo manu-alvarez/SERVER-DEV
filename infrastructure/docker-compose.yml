@@ -129,6 +129,7 @@ services:
       - REDIS_URL=redis://jartosdto-redis:6379/0
     volumes:
       - /home/ubuntu/MSBrossAI/apps/cuentos-magicos/backend:/app
+      - /home/ubuntu/MSBrossAI/apps/cuentos-magicos/storage:/storage
     healthcheck:
       test: ["CMD", "python3", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8007/health').status == 200 else 1)"]
       interval: 30s
@@ -152,6 +153,7 @@ services:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@msbross-cuentos-db:5432/cuentos_magicos
     volumes:
       - /home/ubuntu/MSBrossAI/apps/cuentos-magicos/backend:/app
+      - /home/ubuntu/MSBrossAI/apps/cuentos-magicos/storage:/storage
 
   elitescout-backend:
     <<: *backend

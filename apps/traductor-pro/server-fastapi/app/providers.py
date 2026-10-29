@@ -27,8 +27,8 @@ def create_openai() -> AIProvider:
 
 def create_gemini() -> AIProvider:
     return AIProvider(
-        AsyncOpenAI(api_key=settings.google_api_key, base_url="https://generativelanguage.googleapis.com/v1beta/openai/"),
-        "gemini-3.1-flash-lite",
+        AsyncOpenAI(api_key=settings.google_api_key, base_url="http://msbross-proxy:8080/_api/llm/"),
+        "gemini-1.5-flash",
     )
 
 

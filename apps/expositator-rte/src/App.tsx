@@ -7,7 +7,6 @@ import { VisionDropzone } from './components/VisionDropzone';
 import { TribunalLogs } from './components/TribunalLogs';
 import { MetricsPanel } from './components/MetricsPanel';
 import { useState } from 'react';
-import GodModeListener from './components/GodModeListener';
 import ApiConfigModal from './components/ApiConfigModal';
 
 function App() {
@@ -84,7 +83,6 @@ function App() {
 
   return (
     <>
-      <GodModeListener />
       <ApiConfigModal isOpen={isApiModalOpen} onClose={() => setIsApiModalOpen(false)} />
       {/* Background Orbs */}
       <div className="bg-orbs-container">

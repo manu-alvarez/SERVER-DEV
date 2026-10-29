@@ -129,6 +129,7 @@ services:
       - REDIS_URL=redis://jartosdto-redis:6379/0
     volumes:
       - /home/ubuntu/MSBrossAI/apps/cuentos-magicos/backend:/app
+      - /home/ubuntu/MSBrossAI/apps/cuentos-magicos/storage:/storage
     healthcheck:
       test: ["CMD", "python3", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8007/health').status == 200 else 1)"]
       interval: 30s
@@ -152,6 +153,7 @@ services:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@msbross-cuentos-db:5432/cuentos_magicos
     volumes:
       - /home/ubuntu/MSBrossAI/apps/cuentos-magicos/backend:/app
+      - /home/ubuntu/MSBrossAI/apps/cuentos-magicos/storage:/storage
 
   elitescout-backend:
     <<: *backend
@@ -166,11 +168,6 @@ services:
       - PORT=8003
     volumes:
       - /home/ubuntu/MSBrossAI/apps/elitescout:/app
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8003/app/elitescout"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   gas-station-backend:
     <<: *backend
@@ -181,11 +178,6 @@ services:
       - PORT=3005
     volumes:
       - /home/ubuntu/MSBrossAI/apps/gas-station/backend:/app
-    healthcheck:
-      test: ["CMD", "python3", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:3005/health').status == 200 else 1)"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   iaprod-backend:
     <<: *backend
@@ -199,12 +191,20 @@ services:
     volumes:
       - /home/ubuntu/MSBrossAI/apps/iaprod-os/backend:/app
       - /var/run/docker.sock:/var/run/docker.sock
-    healthcheck:
-      test: ["CMD", "python3", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8006/health').status == 200 else 1)"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
+
+  uiep-backend:
+    build:
+      context: ../apps/uiep/backend
+      dockerfile: Dockerfile
+    container_name: uiep-backend
+    restart: unless-stopped
+    networks:
+      - msbross_net
+    expose:
+      - "4000"
+    environment:
+      - PORT=4000
   industrialpro-backend:
     <<: *backend
     container_name: industrialpro-backend
@@ -214,11 +214,6 @@ services:
       - PORT=8002
     volumes:
       - /home/ubuntu/MSBrossAI/apps/industrialpro/backend:/app
-    healthcheck:
-      test: ["CMD", "python3", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8002/health').status == 200 else 1)"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   jartosdto-backend:
     <<: *backend
@@ -232,11 +227,8 @@ services:
         condition: service_healthy
       jartosdto-minio:
         condition: service_healthy
-    env_file:
-      - /home/ubuntu/MSBrossAI/apps/jartosdto/.env
     environment:
       - PORT=8010
-      - OLLAMA_BASE_URL=http://100.100.2.10:11434
     volumes:
       - /home/ubuntu/MSBrossAI/apps/jartosdto/server:/app
 
@@ -272,11 +264,6 @@ services:
       - PORT=8001
     volumes:
       - /home/ubuntu/MSBrossAI/apps/livekit-nikolina/server:/app
-    healthcheck:
-      test: ["CMD", "python3", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8001/health').status == 200 else 1)"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   nikolina-agent:
     <<: *backend
@@ -315,18 +302,15 @@ services:
     <<: *backend
     container_name: traductor-backend
     image: msbross-traductor-backend:granian
-    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8004
+    command: python -m granian app.main:app --host 0.0.0.0 --port 8004 --interface asgi
     environment:
       - PORT=8004
       - OLLAMA_BASE_URL=http://100.100.2.10:11434/v1
       - OLLAMA_MODEL=qwen2.5:3b
+    env_file:
+      - /home/ubuntu/MSBrossAI/apps/traductor-pro/.env
     volumes:
       - /home/ubuntu/MSBrossAI/apps/traductor-pro/server-fastapi:/app
-    healthcheck:
-      test: ["CMD", "python3", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8004/health').status == 200 else 1)"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
     labels:
       - traefik.enable=true
       - traefik.http.routers.traductor-api.rule=Host(`traductor.manuelalvarez.dev`) && PathPrefix(`/_traductor`)
@@ -341,15 +325,10 @@ services:
     <<: *backend
     container_name: it-english-backend
     image: node:22-bookworm-slim
-    command: sh -c "npm install && node server.js"
-    working_dir: /app
+    command: node server.js
+    working_dir: /app/apps/it-english-coach
     volumes:
-      - /home/ubuntu/MSBrossAI/apps/it-english-coach:/app
-    healthcheck:
-      test: ["CMD", "node", "-e", "const h=require('http');h.get('http://localhost:8787/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - /home/ubuntu/MSBrossAI:/app
 
   # ──────────────────────────────────────────────
   # STATIC APPS VIA MSBROSS PROXY (Node.js :8080)
@@ -372,7 +351,7 @@ services:
       - /home/ubuntu/MSBrossAI:/app
     labels:
       - traefik.enable=true
-      - traefik.http.routers.msbross-proxy-root.rule=Host(`manuelalvarez.dev`) || Host(`appgen.manuelalvarez.dev`) || Host(`assistant.manuelalvarez.dev`) || Host(`combipro.manuelalvarez.dev`) || Host(`cv.manuelalvarez.dev`) || Host(`edelweiss.manuelalvarez.dev`) || Host(`expositator.manuelalvarez.dev`) || Host(`gasstation.manuelalvarez.dev`) || Host(`iaprod.manuelalvarez.dev`) || Host(`industrial.manuelalvarez.dev`) || Host(`itenglish.manuelalvarez.dev`) || Host(`jartosdto.manuelalvarez.dev`) || Host(`logisearch.manuelalvarez.dev`) || Host(`logitrack.manuelalvarez.dev`) || Host(`mano.manuelalvarez.dev`) || Host(`maya.manuelalvarez.dev`) || Host(`mokotools.manuelalvarez.dev`) || Host(`nikolina.manuelalvarez.dev`) || Host(`taskflow.manuelalvarez.dev`) || Host(`traductor.manuelalvarez.dev`) || Host(`cuentos.manuelalvarez.dev`) || Host(`elitescout.manuelalvarez.dev`) || Host(`atenea.manuelalvarez.dev`)
+      - traefik.http.routers.msbross-proxy-root.rule=Host(`manuelalvarez.dev`) || Host(`appgen.manuelalvarez.dev`) || Host(`assistant.manuelalvarez.dev`) || Host(`combipro.manuelalvarez.dev`) || Host(`cv.manuelalvarez.dev`) || Host(`edelweiss.manuelalvarez.dev`) || Host(`expositator.manuelalvarez.dev`) || Host(`gasstation.manuelalvarez.dev`) || Host(`iaprod.manuelalvarez.dev`) || Host(`industrial.manuelalvarez.dev`) || Host(`itenglish.manuelalvarez.dev`) || Host(`jartosdto.manuelalvarez.dev`) || Host(`logisearch.manuelalvarez.dev`) || Host(`logitrack.manuelalvarez.dev`) || Host(`mano.manuelalvarez.dev`) || Host(`maya.manuelalvarez.dev`) || Host(`mokotools.manuelalvarez.dev`) || Host(`nikolina.manuelalvarez.dev`) || Host(`taskflow.manuelalvarez.dev`) || Host(`traductor.manuelalvarez.dev`) || Host(`cuentos.manuelalvarez.dev`) || Host(`elitescout.manuelalvarez.dev`) || Host(`atenea.manuelalvarez.dev`) || Host(`uiep.manuelalvarez.dev`) || Host(`tarot.manuelalvarez.dev`)
       - traefik.http.routers.msbross-proxy-root.entrypoints=websecure
       - traefik.http.routers.msbross-proxy-root.tls.certresolver=myresolver
       - traefik.http.routers.msbross-proxy-root.service=msbross-proxy-svc
@@ -405,11 +384,6 @@ services:
     volumes:
       - /home/ubuntu/MSBrossAI/apps/web-restaurante-atenea:/app
       - /home/ubuntu/MSBrossAI/apps/web-restaurante-atenea/data:/app/data
-    healthcheck:
-      test: ["CMD", "python3", "-c", "import urllib.request; exit(0 if urllib.request.urlopen('http://localhost:8009/health').status == 200 else 1)"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
 
 # ──────────────────────────────────────────────
@@ -438,7 +412,7 @@ services:
     container_name: perfume-trading
     image: msbross-perfume:latest
     environment:
-      - SKIP_AUTH=true  # NOTA: Auth deshabilitado intencionalmente (app demo)
+      - SKIP_AUTH=true
     labels:
       - traefik.enable=true
       - traefik.http.routers.perfume.rule=Host(`perfume.manuelalvarez.dev`) && PathPrefix(`/app/perfume-trading`)
@@ -487,7 +461,7 @@ services:
       - traefik.http.routers.portainer.tls.certresolver=myresolver
       - traefik.http.services.portainer.loadbalancer.server.port=9000
       - traefik.http.routers.portainer.middlewares=admin-auth
-      - traefik.http.middlewares.admin-auth.basicauth.users=admin:$$apr1$$Q3va5IaG$$1iyE9t2f3iZgf.x.7EkoA1
+      - traefik.http.middlewares.admin-auth.basicauth.users=admin:$$apr1$$tsube.dv$$ntEzPeXD8lwJK5E5SQbGF1
 
   uptime-kuma:
     <<: *common
@@ -504,3 +478,4 @@ services:
       - traefik.http.routers.kuma.middlewares=admin-auth
       - traefik.http.services.kuma.loadbalancer.server.port=3001
 
+version: '3.8'

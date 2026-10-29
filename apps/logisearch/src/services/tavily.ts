@@ -17,12 +17,7 @@ interface TavilyResponse {
 
 // Core search function
 export async function searchWeb(query: string, maxResults: number = 5): Promise<TavilyResponse> {
-  const godmodeToken = localStorage.getItem('msbross_godmode_token');
-  const userKeys = localStorage.getItem('msbross_user_api_key');
-  
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (godmodeToken) headers['x-godmode-token'] = godmodeToken;
-  if (userKeys) headers['x-user-custom-keys'] = userKeys;
   
   // Use proxy if not localhost, otherwise direct API if dev
   const baseUrl = typeof window !== 'undefined' && window.location.hostname !== 'localhost'

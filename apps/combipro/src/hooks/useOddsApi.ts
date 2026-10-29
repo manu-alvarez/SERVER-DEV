@@ -8,19 +8,14 @@ const ODDS_API_BASE = typeof window !== 'undefined' && window.location.hostname 
   : 'https://api.the-odds-api.com/v4/sports'; // Fallback for local dev if not using proxy
 
 const fetchOdds = async (leagues: string[], apiKey: string): Promise<Match[]> => {
-  // If GodMode token or user keys are in localStorage, send them
-  const godmodeToken = localStorage.getItem('msbross_godmode_token');
   const userKeys = localStorage.getItem('msbross_user_api_key');
   
-  // We don't require apiKey if we might use GodMode
-  if (!apiKey && !godmodeToken && leagues.length === 0) return [];
+  if (!apiKey && leagues.length === 0) return [];
   
   const promises = leagues.map(async (league) => {
-    // Note: apiKey could be empty if relying purely on GodMode/custom keys injected
     const url = `${ODDS_API_BASE}/${league}/odds/?regions=eu&markets=h2h,totals&oddsFormat=decimal${apiKey ? '&apiKey=' + apiKey : ''}`;
     
     const headers: Record<string, string> = {};
-    if (godmodeToken) headers['x-godmode-token'] = godmodeToken;
     if (userKeys) headers['x-user-custom-keys'] = userKeys;
     
     const res = await fetch(url, { headers });
@@ -80,12 +75,11 @@ const fetchOdds = async (leagues: string[], apiKey: string): Promise<Match[]> =>
 };
 
 export function useOddsApi(leagues: string[], apiKey: string) {
-  const godmodeToken = typeof window !== 'undefined' ? localStorage.getItem('msbross_godmode_token') : null;
   const userKeys = typeof window !== 'undefined' ? localStorage.getItem('msbross_user_api_key') : null;
-  const hasKey = !!apiKey || !!godmodeToken || !!userKeys;
+  const hasKey = !!apiKey || !!userKeys;
 
   return useQuery({
-    queryKey: ['odds', leagues, apiKey, godmodeToken],
+    queryKey: ['odds', leagues, apiKey],
     queryFn: () => fetchOdds(leagues, apiKey),
     enabled: hasKey && leagues.length > 0,
     staleTime: 1000 * 60 * 5, // 5 minutes

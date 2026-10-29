@@ -916,6 +916,32 @@ class RestaurantDB:
         finally:
             conn.close()
 
+    def get_call_telemetry(self) -> dict:
+        """Call counters read straight from call_log.
+
+        - calls_today: rows whose started_at date is today (UTC — the
+          column is CURRENT_TIMESTAMP, so the comparison uses date('now')).
+        - active_calls: rows without ended_at STARTED IN THE RECENT PAST
+          (last hour). Historical rows also lack ended_at (the agent never
+          backfilled that column), so an unbounded "ended_at IS NULL"
+          would label old records "in progress" — not real.
+        """
+        conn = self._get_conn()
+        try:
+            row = conn.execute(
+                "SELECT "
+                " SUM(CASE WHEN date(started_at) = date('now') THEN 1 ELSE 0 END) AS calls_today,"
+                " SUM(CASE WHEN (ended_at IS NULL OR ended_at = '')"
+                "          AND started_at >= datetime('now', '-1 hour') THEN 1 ELSE 0 END) AS active_calls"
+                " FROM call_log"
+            ).fetchone()
+            return {
+                "calls_today": row["calls_today"] or 0,
+                "active_calls": row["active_calls"] or 0,
+            }
+        finally:
+            conn.close()
+
     def get_recent_calls(self, minutes: int = 60) -> list[dict]:
         """Get calls from the last N minutes for short-term memory injection."""
         conn = self._get_conn()

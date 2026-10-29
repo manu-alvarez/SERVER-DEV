@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#02040a"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
+<title>IAProd OS — Sistema Operativo Cognitivo</title>
+<link rel="manifest" href="./manifest.json?v=2"><link rel="apple-touch-icon" href="./orb.png?v=2"><link rel="icon" type="image/png" href="./orb.png?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        ink: '#02040a', 'ink-deep': '#000205', 'ink-panel': 'rgba(2,4,10,0.7)', 'ink-glass': 'rgba(15,23,42,0.55)',
+        cyan: '#22d3ee', purple: '#a78bfa', amber: '#fbbf24', rose: '#f472b6',
+        surface: 'rgba(15,23,42,0.5)', borderSubtle: 'rgba(255,255,255,0.06)'
+      },
+      fontFamily: { display: ['Space Grotesk','sans-serif'], mono: ['JetBrains Mono','monospace'], body: ['Inter','sans-serif'] },
+      animation: { 'pulse-slow': 'pulse 4s cubic-bezier(0.4,0,0.6,1) infinite', 'float': 'float 8s ease-in-out infinite', 'orb-glow': 'orb-glow 5s ease-in-out infinite alternate' }
+    }
+  }
+}
+</script>
+<style>
+  @keyframes float { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-18px) rotate(3deg)} }
+  @keyframes orb-glow { 0%{box-shadow:0 0 30px rgba(34,211,238,0.25),inset 0 0 20px rgba(167,139,250,0.2)} 100%{box-shadow:0 0 60px rgba(34,211,238,0.45),inset 0 0 30px rgba(167,139,250,0.35)} }
+  .mesh { background: radial-gradient(at 30% 25%, rgba(34,211,238,0.12) 0%, transparent 60%), radial-gradient(at 70% 75%, rgba(167,139,250,0.12) 0%, transparent 60%), linear-gradient(160deg,#02040a 0%,#000205 100%); }
+  .glass-panel { background: rgba(15,23,42,0.55); backdrop-filter: blur(28px) saturate(150%); -webkit-backdrop-filter: blur(28px) saturate(150%); border: 1px solid rgba(255,255,255,0.08); border-radius: 28px; box-shadow: 0 12px 48px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05); }
+  .glass-input { background: rgba(2,4,10,0.65); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; color: #f8fafc; }
+  .glass-input:focus { border-color: #22d3ee; outline: none; box-shadow: 0 0 0 3px rgba(34,211,238,0.15); }
+  .btn-primary { background: linear-gradient(135deg,#22d3ee,#a78bfa); color: #02040a; font-weight: 800; box-shadow: 0 0 25px rgba(34,211,238,0.3); }
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .text-gradient { background: linear-gradient(135deg,#22d3ee,#a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+</style>
+</head>
+<body class="bg-ink text-slate-100 font-body antialiased selection:bg-cyan/30 overflow-x-hidden mesh">
+
+<!-- Ambient orbs -->
+<div class="fixed top-[15%] left-[10%] w-72 h-72 rounded-full bg-cyan/10 blur-[120px] animate-float pointer-events-none z-0"></div>
+<div class="fixed bottom-[10%] right-[15%] w-96 h-96 rounded-full bg-purple/10 blur-[150px] animate-float pointer-events-none z-0" style="animation-delay:-4s"></div>
+<div class="fixed top-[35%] right-[-10%] w-[35vw] h-[35vw] rounded-full bg-amber/5 blur-[110px] animate-orb-glow pointer-events-none z-0"></div>
+
+<header class="relative z-10 flex items-center justify-between px-8 py-7">
+  <div class="flex items-center gap-3.5">
+    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-cyan to-purple shadow-xl shadow-cyan/25 flex items-center justify-center ring-1 ring-white/12 glow-cyan">
+      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5"/><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke-linecap="round"/></svg>
+    </div>
+    <div>
+      <h1 class="font-display text-xl font-bold tracking-tight text-white leading-none">IAProd <span class="text-cyan text-xs font-medium tracking-wide opacity-80">OS</span></h1>
+      <p class="text-[11px] text-slate-400 mt-0.5">Sistema Operativo Cognitivo · v2.0</p>
+    </div>
+  </div>
+  <nav class="flex items-center gap-2 text-xs font-medium text-slate-300">
+    <a href="#" class="px-2.5 py-1.5 rounded-xl bg-white/4 border border-white/10 hover:border-cyan/40 hover:text-cyan transition">Orb</a>
+    <a href="#" class="px-2.5 py-1.5 rounded-xl bg-white/4 border border-white/10 hover:border-cyan/40 hover:text-cyan transition">Chat</a>
+    <a href="#" class="px-2.5 py-1.5 rounded-xl bg-white/4 border border-white/10 hover:border-cyan/40 hover:text-cyan transition">Vision</a>
+    <a href="#" class="px-2.5 py-1.5 rounded-xl bg-white/4 border border-white/10 hover:border-cyan/40 hover:text-cyan transition">Memory</a>
+    <span class="ml-2 px-2.5 py-0.5 text-[10px] font-bold bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20">● ONLINE</span>
+  </nav>
+</header>
+
+<main class="relative z-10 max-w-6xl mx-auto px-6 py-12 grid lg:grid-cols-12 gap-8">
+
+  <!-- LEFT: Status / Control -->
+  <section class="lg:col-span-3 glass-panel p-7 space-y-6">
+    <div>
+      <h2 class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-500 mb-2">Status</h2>
+      <div class="flex items-center gap-3"><div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_rgba(52,211,153,0.6)]"></div><h3 class="font-display text-lg font-bold text-white">System Ready</h3></div>
+      <p class="text-xs text-slate-400 leading-relaxed mt-2">Sistema operativo cognitivo en línea. Listo para directivas de producción.</p>
+    </div>
+    <div class="space-y-2 pt-4 border-t border-white/10">
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Modelo activo</span><span class="text-cyan font-mono">Gemini 3.5 Flash</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Modo</span><span class="text-white">C2 Cluster</span></div>
+      <div class="flex justify-between text-xs"><span class="text-slate-400">Latencia</span><span class="text-amber">~120ms</span></div>
+    </div>
+    <button onclick="injectCmd()" id="cmdBtn" class="btn-primary w-full py-4 px-5 text-xs font-extrabold uppercase tracking-widest rounded-2xl shadow-lg shadow-cyan/25 transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed">⚡ Inject Command</button>
+    <p class="text-[10px] text-slate-500 mt-3 text-center">Voz · Visión · Herramientas · Memoria</p>
+  </section>
+
+  <!-- CENTER: Orb / Chat -->
+  <section class="lg:col-span-6 relative min-h-[540px] glass-panel p-7 flex flex-col overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-cyan/[0.05] to-purple/[0.05] pointer-events-none"></div>
+    <div class="flex-1 flex flex-col items-center justify-center z-10 space-y-7">
+      <div class="relative w-52 h-52 mb-10" style="animation: float 10s ease-in-out infinite;">
+        <div class="absolute inset-0 rounded-full bg-gradient-to-b from-cyan/30 to-purple/30 blur-[80px]"></div>
+        <div class="absolute inset-6 rounded-full bg-gradient-to-br from-cyan/20 to-purple/20 border border-white/10 flex items-center justify-center glow-cyan orb-glow">
+          <svg class="w-18 h-18 text-cyan drop-shadow-[0_0_20px_rgba(34,211,238,0.9)]" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5"/><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke-linecap="round"/></svg>
+        </div>
+        <div class="absolute -inset-6 rounded-full border border-cyan/20 animate-pulse"></div>
+      </div>
+      <h3 class="font-display text-3xl font-bold text-gradient tracking-tight mb-3">IAProd OS</h3>
+      <p class="text-sm text-slate-400 max-w-sm text-center leading-relaxed">Sistema operativo cognitivo. Voz, visión, herramientas, memoria — operativo y preparado en todo momento.</p>
+    </div>
+    <div class="relative z-10 mt-auto pt-4 border-t border-white/10">
+      <div class="flex gap-2">
+        <input id="chatInput" type="text" placeholder="Ask IAProd OS or inject command..." class="flex-1 px-4 py-3 text-sm bg-ink-deep/80 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan/50 text-white placeholder-slate-500 font-body" onkeydown="if(event.key==='Enter')sendCmd()">
+        <button onclick="sendCmd()" class="px-5 py-3 bg-cyan text-ink font-extrabold text-xs rounded-2xl shadow-lg shadow-cyan/25 hover:bg-amber transition">Send</button>
+      </div>
+      <div id="chatOutput" class="mt-4 text-xs text-slate-300 font-mono min-h-[80px]"></div>
+    </div>
+  </section>
+
+  <!-- RIGHT: Memory / Capabilities -->
+  <section class="lg:col-span-3 glass-panel p-7 space-y-5">
+    <div>
+      <h4 class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-500">Memory / Vault</h4>
+      <div class="space-y-2 text-xs text-slate-300 font-mono">
+        <div class="p-2.5 bg-ink-deep/60 rounded-xl border border-white/5 flex justify-between items-center"><span>Working Memory</span><span class="text-cyan">● active</span></div>
+        <div class="p-2.5 bg-ink-deep/60 rounded-xl border border-white/5 flex justify-between items-center"><span>Episodic Memory</span><span class="text-cyan">● active</span></div>
+        <div class="p-2.5 bg-ink-deep/60 rounded-xl border border-white/5 flex justify-between items-center"><span>Graph Memory</span><span class="text-purple">● indexed</span></div>
+      </div>
+    </div>
+    <div class="space-y-2 pt-4 border-t border-white/10">
+      <h4 class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-500">Capabilities</h4>
+      <div class="flex flex-wrap gap-1.5">
+        <span class="px-2.5 py-1 text-[10px] bg-cyan/10 text-cyan rounded-full border border-cyan/20">Vision</span>
+        <span class="px-2.5 py-1 text-[10px] bg-purple/10 text-purple rounded-full border border-purple/20">Voice</span>
+        <span class="px-2.5 py-1 text-[10px] bg-amber/10 text-amber rounded-full border border-amber/20">Code</span>
+        <span class="px-2.5 py-1 text-[10px] bg-rose/10 text-rose rounded-full border border-rose/20">Adversarial</span>
+        <span class="px-2.5 py-1 text-[10px] bg-slate/10 text-slate-300 rounded-full border border-slate/20">MCP</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+function sendCmd(){
+  const input=document.getElementById('chatInput').value.trim();
+  const out=document.getElementById('chatOutput');
+  const btn=document.getElementById('cmdBtn');
+  if(!input){out.innerHTML='<div class="text-red-400 text-xs font-mono">⚠ Write a command first.</div>';return;}
+  btn.disabled=true;btn.innerText='⚡ Processing...';
+  out.innerHTML='<div class="text-cyan text-xs font-mono mb-1"><span>▶</span> '+input+'</div><div class="text-amber text-xs font-mono">IAProd OS: Processing directive...</div>';
+  document.getElementById('chatInput').value='';
+  fetch('/_iaprod/api/text-command',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({command:input})})
+    .then(r=>r.json()).then(d=>{
+      out.innerHTML+='<div class="text-slate-300 text-xs font-mono mt-1"><b>IAProd OS:</b> '+(d.result||'Directive processed.')+'</div>';
+    }).catch(e=>{out.innerHTML+='<div class="text-red-400 text-xs font-mono">❌ Error: '+e.message+'</div>';})
+    .finally(()=>{btn.disabled=false;btn.innerText='⚡ Inject Command';});
+}
+function injectCmd(){document.getElementById('chatInput').value='Analyze system status and optimize memory allocation.';sendCmd();}
+</script>
+</body>
+</html>

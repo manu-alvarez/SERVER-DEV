@@ -249,7 +249,7 @@ export default function StoriesListClient({ initialStories = [], totalCount = 0 
             Intenta cambiar los filtros o busca un nombre diferente. ¡O crea un nuevo cuento mágico!
           </p>
           <Link
-            href="/create"
+            href="/app/cuentos-magicos/create/"
             onClick={playChime}
             className="inline-block px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-sm font-black shadow-lg hover:brightness-110 active:scale-95 transition"
           >
@@ -268,7 +268,7 @@ export default function StoriesListClient({ initialStories = [], totalCount = 0 
               >
                 {/* Book Link */}
                 <Link
-                  href={`/stories/detail?id=${story.id}`}
+                  href={`/app/cuentos-magicos/stories/detail/?id=${story.id}`}
                   onClick={playChime}
                   onMouseEnter={playBubble}
                   className={`w-32 sm:w-36 md:w-44 h-52 sm:h-56 md:h-64 rounded-2xl bg-gradient-to-b ${gradient} shadow-md group-hover:shadow-[0_20px_35px_rgba(0,0,0,0.6)] border-2 border-white/10 group-hover:border-white/30 transition-all duration-300 transform group-hover:-translate-y-6 group-hover:rotate-3 group-hover:scale-105 flex flex-col justify-between p-3 select-none relative overflow-hidden active:scale-98`}

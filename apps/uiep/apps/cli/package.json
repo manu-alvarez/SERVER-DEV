@@ -1,0 +1,26 @@
+{
+  "name": "@uiep/cli",
+  "version": "0.1.0",
+  "private": true,
+  "bin": {
+    "uiep": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc && node -e \"fs.chmodSync('./dist/index.js', '755')\"",
+    "dev": "tsc --watch",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@uiep/design-engine": "workspace:*",
+    "@uiep/framework-adapter": "workspace:*",
+    "@uiep/meta-generator": "workspace:*",
+    "@uiep/entity-registry": "workspace:*",
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  }
+}

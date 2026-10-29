@@ -470,7 +470,7 @@ export default function StoryPlayer({ story, chapters }: StoryPlayerProps) {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Link
-              href="/stories"
+              href="/app/cuentos-magicos/stories/"
               className="no-print inline-flex items-center gap-1 text-xs font-bold text-amber-300 hover:text-amber-200 transition"
               onClick={playBubble}
             >

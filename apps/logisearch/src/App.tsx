@@ -22,7 +22,6 @@ import CostAnalyzer from './components/CostAnalyzer'
 import DunnageGuide from './components/DunnageGuide'
 import EmailTemplates from './components/EmailTemplates'
 import ToolSelector from './components/ToolSelector'
-import GodModeListener from './components/GodModeListener'
 import ApiConfigModal from './components/ApiConfigModal'
 import { saveSearch, saveRFQ } from './lib/storage'
 import { createTrelloCard } from './services/trello'
@@ -198,7 +197,6 @@ function App() {
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <GodModeListener />
       <AppBar position="sticky">
         <Toolbar sx={{ maxWidth: 1200, width: '100%', mx: 'auto', px: { xs: 2, md: 3 } }}>
           <Box onClick={handleHome} sx={{ width: 40, height: 40, borderRadius: 2.5, background: 'linear-gradient(135deg, #00E5FF, #00B8D4)', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1.5, cursor: 'pointer' }}>

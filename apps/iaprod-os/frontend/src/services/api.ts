@@ -18,7 +18,6 @@ export const ApiService = {
   },
 
   async sendTextCommand(text: string): Promise<string> {
-    const adminToken = typeof window !== 'undefined' ? localStorage.getItem('msbross_godmode_token') : null;
     const customKeys = typeof window !== 'undefined' ? localStorage.getItem('msbross_user_api_key') : null;
     
     const headers: Record<string, string> = {
@@ -26,8 +25,6 @@ export const ApiService = {
       'x-api-key': API_KEY
     };
     
-    if (adminToken) headers['x-godmode-token'] = adminToken;
-    if (customKeys) headers['x-user-custom-keys'] = customKeys;
 
     const res = await fetch(`${API_BASE}/text-command`, {
       method: 'POST',
@@ -43,7 +40,6 @@ export const ApiService = {
   },
 
   async analyzeVision(base64Image: string, source: 'upload' | 'camera', prompt: string): Promise<string> {
-    const adminToken = typeof window !== 'undefined' ? localStorage.getItem('msbross_godmode_token') : null;
     const customKeys = typeof window !== 'undefined' ? localStorage.getItem('msbross_user_api_key') : null;
     
     const headers: Record<string, string> = {
@@ -51,8 +47,6 @@ export const ApiService = {
       'x-api-key': API_KEY
     };
     
-    if (adminToken) headers['x-godmode-token'] = adminToken;
-    if (customKeys) headers['x-user-custom-keys'] = customKeys;
 
     const res = await fetch(`${API_BASE}/vision-analyze`, {
       method: 'POST',

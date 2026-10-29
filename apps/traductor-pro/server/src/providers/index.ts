@@ -8,16 +8,10 @@ export interface AIProvider {
 export class GroqProvider implements AIProvider {
   private client: OpenAI;
 
-  constructor(customHeaders?: Record<string, string>) {
-    let baseURL = 'https://api.groq.com/openai/v1';
-    const isGodMode = customHeaders && (customHeaders['x-godmode-token'] || customHeaders['x-user-custom-keys']);
-    if (isGodMode) {
-      baseURL = 'http://127.0.0.1:8080/_api/groq';
-    }
+  constructor() {
     this.client = new OpenAI({
-      apiKey: process.env.GROQ_API_KEY || 'dummy_key',
-      baseURL,
-      defaultHeaders: isGodMode ? customHeaders : undefined,
+      apiKey: process.env.GROQ_API_KEY || 'not_set',
+      baseURL: 'https://api.groq.com/openai/v1',
     });
   }
 
@@ -33,16 +27,9 @@ export class GroqProvider implements AIProvider {
 export class OpenAIProvider implements AIProvider {
   private client: OpenAI;
 
-  constructor(customHeaders?: Record<string, string>) {
-    let baseURL = 'https://api.openai.com/v1';
-    const isGodMode = customHeaders && (customHeaders['x-godmode-token'] || customHeaders['x-user-custom-keys']);
-    if (isGodMode) {
-      baseURL = 'http://127.0.0.1:8080/_api/openai';
-    }
+  constructor() {
     this.client = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY || 'dummy_key',
-      baseURL: isGodMode ? baseURL : undefined,
-      defaultHeaders: isGodMode ? customHeaders : undefined,
+      apiKey: process.env.OPENAI_API_KEY || 'not_set',
     });
   }
 
@@ -58,16 +45,10 @@ export class OpenAIProvider implements AIProvider {
 export class GeminiProvider implements AIProvider {
   private client: OpenAI;
 
-  constructor(customHeaders?: Record<string, string>) {
-    let baseURL = 'https://generativelanguage.googleapis.com/v1beta/openai/';
-    const isGodMode = customHeaders && (customHeaders['x-godmode-token'] || customHeaders['x-user-custom-keys']);
-    if (isGodMode) {
-      baseURL = 'http://127.0.0.1:8080/_api/gemini';
-    }
+  constructor() {
     this.client = new OpenAI({
-      apiKey: process.env.GOOGLE_API_KEY || 'dummy_key',
-      baseURL,
-      defaultHeaders: isGodMode ? customHeaders : undefined,
+      apiKey: process.env.GOOGLE_API_KEY || 'not_set',
+      baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
     });
   }
 
@@ -76,23 +57,17 @@ export class GeminiProvider implements AIProvider {
   }
 
   getDefaultModel(): string {
-    return 'gemini-3.1-flash-lite';
+    return 'gemini-3.6-flash';
   }
 }
 
-export class OpenRouterProvider implements AIProvider {
+export class MistralProvider implements AIProvider {
   private client: OpenAI;
 
-  constructor(customHeaders?: Record<string, string>) {
-    let baseURL = 'https://openrouter.ai/api/v1';
-    const isGodMode = customHeaders && (customHeaders['x-godmode-token'] || customHeaders['x-user-custom-keys']);
-    if (isGodMode) {
-      baseURL = 'http://127.0.0.1:8080/_api/openrouter';
-    }
+  constructor() {
     this.client = new OpenAI({
-      apiKey: process.env.OPENROUTER_API_KEY || 'dummy_key',
-      baseURL,
-      defaultHeaders: isGodMode ? customHeaders : undefined,
+      apiKey: process.env.MISTRAL_API_KEY || 'not_set',
+      baseURL: 'https://api.mistral.ai/v1',
     });
   }
 
@@ -101,7 +76,26 @@ export class OpenRouterProvider implements AIProvider {
   }
 
   getDefaultModel(): string {
-    return 'meta-llama/llama-3.3-70b-instruct';
+    return 'mistral-small-latest';
+  }
+}
+
+export class NvidiaProvider implements AIProvider {
+  private client: OpenAI;
+
+  constructor() {
+    this.client = new OpenAI({
+      apiKey: process.env.NVIDIA_API_KEY || 'not_set',
+      baseURL: 'https://integrate.api.nvidia.com/v1',
+    });
+  }
+
+  get chat() {
+    return this.client.chat;
+  }
+
+  getDefaultModel(): string {
+    return 'nvidia/llama-3.1-nemotron-ultra-253b-v1';
   }
 }
 
@@ -111,7 +105,7 @@ export class OllamaProvider implements AIProvider {
   constructor() {
     this.client = new OpenAI({
       apiKey: 'ollama',
-      baseURL: process.env.OLLAMA_BASE_URL || 'http://100.100.2.10:11434/v1',
+      baseURL: process.env.OLLAMA_BASE_URL || 'http://172.20.0.1:11434/v1',
     });
   }
 
@@ -125,19 +119,21 @@ export class OllamaProvider implements AIProvider {
 }
 
 export class ProviderFactory {
-  static create(provider: string, customHeaders?: Record<string, string>): AIProvider {
+  static create(provider: string): AIProvider {
     switch (provider) {
       case 'openai':
-        return new OpenAIProvider(customHeaders);
+        return new OpenAIProvider();
       case 'gemini':
-        return new GeminiProvider(customHeaders);
-      case 'openrouter':
-        return new OpenRouterProvider(customHeaders);
+        return new GeminiProvider();
+      case 'mistral':
+        return new MistralProvider();
+      case 'nvidia':
+        return new NvidiaProvider();
       case 'ollama':
-        return new OllamaProvider(); // Local LLM, no proxy needed
+        return new OllamaProvider();
       case 'groq':
       default:
-        return new GroqProvider(customHeaders);
+        return new GroqProvider();
     }
   }
 }

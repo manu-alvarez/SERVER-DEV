@@ -1,60 +1,89 @@
 #!/bin/bash
 
 # ==============================================================================
-# MSBROSS ECOSYSTEM - DATABASE AUTOMATED BACKUP SCRIPT
+# MSBROSS ECOSYSTEM - BACKUP COMPLETO (BBDD + ESTADO DE SERVICIOS)
 # ==============================================================================
-# Este script extrae un dump de las bases de datos críticas alojadas en Docker,
-# las comprime y elimina los backups con más de 7 días de antigüedad.
-# 
-# Uso recomendado en crontab (Diario a las 03:00 AM):
-# 0 3 * * * /home/ubuntu/MSBrossAI/scripts/ops/backup_databases.sh >> /var/log/msbross_backups.log 2>&1
+# Corregido 2026-09-07: pg_dump apuntaba a la BD "postgres" vacía en vez de
+# las BDs reales. Ahora incluye además backups de estado (MinIO, Redis,
+# Uptime-Kuma, Portainer, certs Traefik).
+#
+# Cron: 0 3 * * * /home/ubuntu/MSBrossAI/scripts/ops/backup_databases.sh >> /var/log/msbross_backups.log 2>&1
 # ==============================================================================
 
-BACKUP_DIR="/home/ubuntu/backups/databases"
+BACKUP_DIR="/home/ubuntu/backups"
+DB_DIR="$BACKUP_DIR/databases"
+STATE_DIR="$BACKUP_DIR/state"
 DATE=$(date +"%Y-%m-%d_%H-%M-%S")
 RETENTION_DAYS=7
+ERRORS=0
 
-# Crear el directorio de backups si no existe
-mkdir -p "$BACKUP_DIR"
+mkdir -p "$DB_DIR" "$STATE_DIR"
 
 echo "=================================================="
-echo "Iniciando Backup de BBDD: $DATE"
+echo "Iniciando Backup completo: $DATE"
 echo "=================================================="
 
-# Función genérica para hacer backup de Postgres en Docker
+# ---------- 1. BASES DE DATOS POSTGRES ----------
 backup_postgres() {
     local CONTAINER_NAME=$1
     local DB_USER=$2
     local DB_NAME=$3
-    
-    local FILENAME="${CONTAINER_NAME}_${DATE}.sql.gz"
-    local FILEPATH="${BACKUP_DIR}/${FILENAME}"
 
-    echo "[*] Iniciando volcado de contenedor: $CONTAINER_NAME..."
-    
-    # Se ejecuta pg_dump dentro del contenedor y se comprime al vuelo
-    if docker exec -t "$CONTAINER_NAME" pg_dump -U "$DB_USER" -Fc "$DB_NAME" > "$FILEPATH"; then
-        echo "[✓] Éxito: $FILENAME generado."
+    local FILENAME="${CONTAINER_NAME}_${DB_NAME}_${DATE}.dump"
+    local FILEPATH="${DB_DIR}/${FILENAME}"
+
+    echo "[*] pg_dump $CONTAINER_NAME -> BD: $DB_NAME ..."
+    if docker exec "$CONTAINER_NAME" pg_dump -U "$DB_USER" -Fc "$DB_NAME" > "$FILEPATH"; then
+        local size=$(stat -c%s "$FILEPATH")
+        echo "[OK] $FILENAME (${size} bytes)"
     else
-        echo "[X] ERROR: Falló el backup de $CONTAINER_NAME"
-        # Eliminar archivo corrupto o incompleto
+        echo "[ERROR] Falló el backup de $CONTAINER_NAME/$DB_NAME"
         rm -f "$FILEPATH"
+        ERRORS=$((ERRORS+1))
     fi
 }
 
-# 1. Cuentos Mágicos
-backup_postgres "msbross-cuentos-db" "postgres" "postgres"
+backup_postgres "msbross-cuentos-db"   "postgres"  "cuentos_magicos"
+backup_postgres "msbross-elitescout-db" "postgres" "family_travel"
+backup_postgres "jartosdto-postgres"   "jartosdto" "jartosdto"
 
-# 2. EliteScout
-backup_postgres "msbross-elitescout-db" "postgres" "postgres"
+# ---------- 2. ESTADO DE SERVICIOS ----------
+backup_state() {
+    local NAME=$1
+    local CMD=$2
+    local FILEPATH="${STATE_DIR}/${NAME}_${DATE}.tar.gz"
+    echo "[*] Estado: $NAME ..."
+    if eval "$CMD" > "$FILEPATH"; then
+        local size=$(stat -c%s "$FILEPATH")
+        echo "[OK] ${NAME}_${DATE}.tar.gz (${size} bytes)"
+    else
+        echo "[ERROR] Falló backup de estado: $NAME"
+        rm -f "$FILEPATH"
+        ERRORS=$((ERRORS+1))
+    fi
+}
 
-# 3. JartosDTO
-backup_postgres "jartosdto-postgres" "jartosdto" "jartosdto"
+# Redis: forzar save a disco antes de copiar
+docker exec jartosdto-redis redis-cli BGSAVE >/dev/null 2>&1
+sleep 2
 
+backup_state "jartosdto-minio"   "tar czf - -C /var/lib/docker/volumes/jartosdto-minio-data/_data ."
+backup_state "jartosdto-redis"   "tar czf - -C /var/lib/docker/volumes/jartosdto-redis-data/_data ."
+backup_state "uptime-kuma"       "tar czf - -C /var/lib/docker/volumes/uptime-kuma-data/_data ."
+backup_state "portainer"         "tar czf - -C /var/lib/docker/volumes/portainer_data/_data ."
+backup_state "traefik-certs"     "tar czf - -C /opt/traefik acme.json"
+
+# ---------- 3. LIMPIEZA ----------
 echo "--------------------------------------------------"
-echo "Limpieza de backups antiguos (>${RETENTION_DAYS} días)..."
+echo "Limpieza (>${RETENTION_DAYS} días)..."
+find "$DB_DIR"    -type f \( -name "*.dump" -o -name "*.sql.gz" \) -mtime +$RETENTION_DAYS -exec rm -f {} \;
+find "$STATE_DIR" -type f -name "*.tar.gz" -mtime +$RETENTION_DAYS -exec rm -f {} \;
 
-find "$BACKUP_DIR" -type f -name "*.sql.gz" -mtime +$RETENTION_DAYS -exec rm -f {} \;
-
-echo "[✓] Proceso de backup completado."
 echo "=================================================="
+if [ "$ERRORS" -eq 0 ]; then
+    echo "[FIN] Backup completado sin errores."
+else
+    echo "[FIN] Backup completado con $ERRORS ERRORES (revisar arriba)."
+fi
+echo "=================================================="
+exit $ERRORS

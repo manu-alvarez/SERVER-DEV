@@ -1,30 +1,26 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Layout from './components/Layout';
-import Home from './pages/Home';
-import Bots from './pages/Bots';
-import Apps from './pages/Apps';
-import Architecture from './pages/Architecture';
-import Contact from './pages/Contact';
-import Profile from './pages/Profile';
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import Projects from './components/Projects';
+import About from './components/About';
+import Technologies from './components/Technologies';
+import Contact from './components/Contact';
+import Footer from './components/Footer';
+import ParticleCanvas from './components/ParticleCanvas';
 
 function App() {
-  if (window.location.hostname === 'maya.manuelalvarez.dev') {
-    window.location.href = 'https://manu-alvarez.github.io/TuEnergiaMaya/';
-    return null;
-  }
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="bots" element={<Bots />} />
-          <Route path="apps" element={<Apps />} />
-          <Route path="architecture" element={<Architecture />} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="contact" element={<Contact />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <div className="relative min-h-screen bg-[#060B18] text-[#F1F5F9] selection:bg-cyan-500/30 selection:text-white">
+      <ParticleCanvas />
+      <Navbar />
+      <main className="relative z-10">
+        <Hero />
+        <About />
+        <Projects />
+        <Technologies />
+        <Contact />
+      </main>
+      <Footer />
+    </div>
   );
 }
 

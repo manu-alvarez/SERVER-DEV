@@ -36,7 +36,6 @@ export interface TavilySearchResult {
  * Check if Tavily API key is configured.
  */
 export function isTavilyConfigured(customHeaders?: Record<string, string>): boolean {
-  if (customHeaders && (customHeaders["x-godmode-token"] || customHeaders["x-user-custom-keys"])) return true;
   return !!process.env.TAVILY_API_KEY;
 }
 
@@ -53,8 +52,8 @@ async function tavilySearch(
     customHeaders?: Record<string, string>;
   } = {}
 ): Promise<TavilyResult[]> {
-  const isGodMode = options.customHeaders && (options.customHeaders["x-godmode-token"] || options.customHeaders["x-user-custom-keys"]);
-  const apiKey = isGodMode ? "dummy" : process.env.TAVILY_API_KEY;
+  const useProxy = !!options.customHeaders && !!options.customHeaders["x-user-custom-keys"];
+  const apiKey = useProxy ? "dummy" : process.env.TAVILY_API_KEY;
   if (!apiKey) return [];
 
   const { searchDepth = "basic", maxResults = 10, includeDomains, excludeDomains } = options;
@@ -75,7 +74,7 @@ async function tavilySearch(
       body.exclude_domains = excludeDomains;
     }
 
-    const url = isGodMode ? "http://127.0.0.1:8080/_api/tavily/search" : TAVILY_API_URL;
+    const url = useProxy ? "http://127.0.0.1:8080/_api/tavily/search" : TAVILY_API_URL;
     const response = await fetch(url, {
       method: "POST",
       headers: {

@@ -5,7 +5,6 @@ import { Navbar } from "@/components/layout/Navbar";
 import "./globals.css";
 
 import { ServiceWorkerRegister } from "@/components/ui/ServiceWorkerRegister";
-import GodModeListener from "@/components/ui/GodModeListener";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://msbross.me/app/elitescout"),
@@ -42,7 +41,6 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <Providers>
-          <GodModeListener />
           <ServiceWorkerRegister />
           <Navbar />
           <main className="min-h-screen">{children}</main>

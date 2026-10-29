@@ -169,7 +169,7 @@ export function ChatContainer() {
               aria-label="System status indicator"
             />
             <span className="text-[10px] text-white/30 uppercase tracking-widest">
-              MSBrOSs GODMODE LEVEL 99 // {isGenerating ? 'GENERANDO...' : isListening ? 'ESCUCHANDO...' : 'SISTEMA EN LÍNEA'}
+              MSBrOSs SISTEMA CENTRAL // {isGenerating ? 'GENERANDO...' : isListening ? 'ESCUCHANDO...' : 'SISTEMA EN LÍNEA'}
             </span>
           </div>
         </div>
