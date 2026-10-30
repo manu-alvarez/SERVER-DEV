@@ -1,7 +1,7 @@
 {
   "llm_proxy": {
     "base_url": "http://localhost:4000/v1",
-    "api_key": "sk-litellm-proxy-b5e28a4a4dd0b3ac3fc8990a9f37a6ff61fd833e16002f340f54b13dd70bfdc1",
+    "api_key": "sk-litellm-REDACTED-ROTATE-ME",
     "models": [
       "openai/gpt-4o",
       "openai/gpt-4o-mini",

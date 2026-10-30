@@ -12,12 +12,12 @@ fi
 
 # Export environment for Pi
 export LLM_API_BASE="http://localhost:4000/v1"
-export LLM_API_KEY="sk-litellm-proxy-b5e28a4a4dd0b3ac3fc8990a9f37a6ff61fd833e16002f340f54b13dd70bfdc1"
+export LLM_API_KEY="sk-litellm-REDACTED-ROTATE-ME"
 export LLM_MODEL="openai/gpt-4o-mini"
 export LLM_PROVIDER="litellm"
 
 # Alternative: if Pi uses OpenAI-compatible format
-export OPENAI_API_KEY="sk-litellm-proxy-b5e28a4a4dd0b3ac3fc8990a9f37a6ff61fd833e16002f340f54b13dd70bfdc1"
+export OPENAI_API_KEY="sk-litellm-REDACTED-ROTATE-ME"
 export OPENAI_BASE_URL="http://localhost:4000/v1"
 
 echo "✅ LiteLLM proxy configured for Pi"

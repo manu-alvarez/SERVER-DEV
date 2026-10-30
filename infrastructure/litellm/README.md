@@ -57,7 +57,7 @@ cp opencode-config.json ~/.config/opencode/providers/litellm.json
 
 O usa variables de entorno:
 ```bash
-export OPENAI_API_KEY="sk-litellm-proxy-b5e28a4a4dd0b3ac3fc8990a9f37a6ff61fd833e16002f340f54b13dd70bfdc1"
+export OPENAI_API_KEY="sk-litellm-REDACTED-ROTATE-ME"
 export OPENAI_BASE_URL="http://localhost:4000/v1"
 ```
 
@@ -70,7 +70,7 @@ cp pi-config.json ~/.pi/config.json
 O variables de entorno:
 ```bash
 export LLM_API_BASE="http://localhost:4000/v1"
-export LLM_API_KEY="sk-litellm-proxy-b5e28a4a4dd0b3ac3fc8990a9f37a6ff61fd833e16002f340f54b13dd70bfdc1"
+export LLM_API_KEY="sk-litellm-REDACTED-ROTATE-ME"
 export LLM_MODEL="openai/gpt-4o-mini"
 ```
 
@@ -82,7 +82,7 @@ Cambia en cada `.env` de app:
 - OPENAI_API_KEY=sk-proj-...
 - ANTHROPIC_API_KEY=sk-ant-...
 - GOOGLE_API_KEY=AQ...
-+ OPENAI_API_KEY=sk-litellm-proxy-b5e28a4a4dd0b3ac3fc8990a9f37a6ff61fd833e16002f340f54b13dd70bfdc1
++ OPENAI_API_KEY=sk-litellm-REDACTED-ROTATE-ME
 + OPENAI_BASE_URL=http://localhost:4000/v1
 + ANTHROPIC_BASE_URL=http://localhost:4000/v1
 + GOOGLE_BASE_URL=http://localhost:4000/v1

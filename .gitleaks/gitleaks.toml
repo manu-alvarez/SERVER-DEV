@@ -14,6 +14,14 @@ paths = [
   ".next/",
   "dist/",
   ".git/",
+  # Deployed compiled frontends and sourcemaps shipped to browsers (build artifacts, public by design).
+  "www/app/",
+  "\\.js\\.map$",
+]
+# Benign code identifiers that look like env-style secrets (minified/typed code artifacts).
+regexes = [
+  '''create_access_token''',
+  '''startsAsVariableToken''',
 ]
 
 [[rules]]
