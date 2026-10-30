@@ -5,7 +5,8 @@
   "description": "Universal Intelligence Engineering Platform",
   "workspaces": [
     "packages/*",
-    "apps/*"
+    "apps/*",
+    "backend"
   ],
   "scripts": {
     "dev": "turbo dev",

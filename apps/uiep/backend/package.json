@@ -2,14 +2,27 @@
   "name": "uiep-backend",
   "version": "1.0.0",
   "private": true,
-  "main": "server.js",
-  "scripts": { "start": "node server.js" },
+  "description": "UIEP HTTP backend — Express façade over @uiep/design-engine (runPipeline). Fase 0: real engine integration preserving the /_uiep HTTP contract.",
+  "main": "dist/server.js",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "node --test dist/tests"
+  },
   "dependencies": {
-    "express": "^4.21.2",
+    "@uiep/design-engine": "workspace:*",
+    "@uiep/entity-schema": "workspace:*",
     "cors": "^2.8.5",
-    "helmet": "^8.0.0",
+    "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
-    "zod": "^3.24.1",
-    "uuid": "^11.0.3"
+    "helmet": "^8.0.0",
+    "uuid": "^11.0.3",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
   }
 }
