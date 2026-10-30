@@ -6,7 +6,7 @@ import Generator from './pages/Generator'
 import MCP from './pages/MCP'
 import Adversarial from './pages/Adversarial'
 import Settings from './pages/Settings'
-import LogIn from './pages/LogIn'
+import LogIn from './pages/Login'
 
 export const router = createBrowserRouter([
   {
