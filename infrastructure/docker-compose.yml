@@ -466,4 +466,22 @@ services:
       - traefik.http.routers.kuma.middlewares=admin-auth
       - traefik.http.services.kuma.loadbalancer.server.port=3001
 
+  # ──────────────────────────────────────────────
+  # UIEP — INTELLIGENCE ENGINEERING PLATFORM
+  # Backend (Express, node:22-alpine) — servido por el proxy en /_uiep
+  # Despliegue real verificado: build desde apps/uiep/backend, red msbross_net,
+  # alias DNS uiep-backend, sin puertos publicados al host.
+  # ──────────────────────────────────────────────
+
+  uiep-backend:
+    <<: *backend
+    build:
+      context: ../apps/uiep/backend
+      dockerfile: Dockerfile
+    image: msbrossai-uiep-backend
+    container_name: uiep-backend
+    environment:
+      - PORT=4000
+      - NODE_ENV=production
+
 version: '3.8'

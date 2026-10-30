@@ -1,33 +1,29 @@
-version: '3.8'
+# UIEP — compose homologado con el despliegue real en el VPS (octubre 2026).
+#
+# - El frontend NO corre como contenedor: se sirve como estático desde
+#   www/app/uiep vía msbross-proxy (no existe servicio uiep-web en producción).
+# - El backend se construye desde apps/uiep/backend (node:22-alpine, Dockerfile
+#   simple que copia server.js). El Dockerfile.backend del monorepo (node:20 +
+#   dist) NO es el que corre en producción, pese a aparecer en versiones previas.
+# - Backend en la red externa msbross_net con alias DNS `uiep-backend`;
+#   el proxy lo consulta en http://uiep-backend:4000 para la ruta API /_uiep.
+# - Sin puertos publicados al host (acceso solo interno de red Docker);
+#   el host lo expone a través de Traefik -> proxy:8080.
 
 services:
   uiep-backend:
     build:
-      context: ..
-      dockerfile: Dockerfile.backend
-    ports:
-      - "4000:4000"
+      context: ./backend
+      dockerfile: Dockerfile
+    image: msbrossai-uiep-backend
+    container_name: uiep-backend
+    restart: unless-stopped
     environment:
       - PORT=4000
       - NODE_ENV=production
-    restart: unless-stopped
     networks:
-      - uiep-net
-
-  uiep-web:
-    build:
-      context: ../apps/web
-      dockerfile: Dockerfile.web
-    ports:
-      - "3000:80"
-    environment:
-      - VITE_API_URL=http://localhost:4000
-    restart: unless-stopped
-    depends_on:
-      - uiep-backend
-    networks:
-      - uiep-net
+      - msbross_net
 
 networks:
-  uiep-net:
-    driver: bridge
+  msbross_net:
+    external: true
