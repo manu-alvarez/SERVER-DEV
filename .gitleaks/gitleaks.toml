@@ -17,6 +17,9 @@ paths = [
   # Deployed compiled frontends and sourcemaps shipped to browsers (build artifacts, public by design).
   "www/app/",
   "\\.js\\.map$",
+  # LiteLLM local-macOS service config/docs (not deployed on VPS). Placeholder keys
+  # (sk-litellm-proxy-..., sk-litellm-master-key) trip the loose env-secret rule constantly.
+  "infrastructure/litellm/",
 ]
 # Benign code identifiers that look like env-style secrets (minified/typed code artifacts).
 regexes = [
