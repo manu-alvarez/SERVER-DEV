@@ -70,14 +70,16 @@ export interface GenerateResponse {
 
 function toPipelineInput(req: GenerateRequest): PipelineInput {
   const input: PipelineInput = { goal: req.goal };
+  // El framework explícito se respeta INDEPENDIENTEMENTE del type (Fase 0.1):
+  // el early-return anterior lo descartaba cuando type venía omitido.
+  if (req.framework) {
+    input.targetFrameworks = [REQUEST_FRAMEWORK_TO_ENGINE[req.framework]];
+  }
   if (!req.type) {
     // type omitido → delega en la heurística de inferencia del motor (intent.ts).
     return input;
   }
   input.entityType = REQUEST_TYPE_TO_ENTITY_TYPE[req.type];
-  if (req.framework) {
-    input.targetFrameworks = [REQUEST_FRAMEWORK_TO_ENGINE[req.framework]];
-  }
   return input;
 }
 

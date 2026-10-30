@@ -93,3 +93,21 @@ test('GET /api/templates — catálogo del demo intacto', async () => {
   assert.ok(Array.isArray(templates) && templates.length === 3, '3 templates');
   assert.ok(templates[0].id && templates[0].name && 'variables' in templates[0], 'campos del contrato');
 });
+
+test('POST /api/generate — framework explícito respetado sin type (regresión Fase 0.1)', async () => {
+  const { status, json } = await postGenerate({ goal: 'Analista de datos con reportes', framework: 'langgraph' });
+  assert.equal(status, 200);
+  assert.equal(json.engine.intent.framework, 'langgraph', 'framework llega al motor aunque type esté omitido');
+  const config = json.engine.generation.artifacts.find((a: { name: string }) => a.name === 'config.json');
+  assert.ok(config.content.includes('langgraph'), 'artefacto refleja el framework solicitado');
+});
+
+test('POST /api/generate — openai mapea a openai-agents en el motor', async () => {
+  const { json } = await postGenerate({ goal: 'Agente de soporte', framework: 'openai' });
+  assert.equal(json.engine.intent.framework, 'openai-agents');
+});
+
+test('POST /api/generate — custom se respeta', async () => {
+  const { json } = await postGenerate({ goal: 'Sistema a medida', framework: 'custom' });
+  assert.equal(json.engine.intent.framework, 'custom');
+});

@@ -1,4 +1,5 @@
 export { runPipeline } from './pipeline';
+export { UnsupportedFrameworkError } from './pipeline';
 export type { PipelineInput, PipelineResult } from './pipeline';
 export { analyzeIntent } from './pipeline/intent';
 export type { IntentAnalysisInput, IntentAnalysisResult } from './pipeline/intent';

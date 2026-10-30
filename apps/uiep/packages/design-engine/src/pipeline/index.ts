@@ -1,4 +1,5 @@
 import { analyzeIntent, type IntentAnalysisInput, type IntentAnalysisResult } from './intent';
+export { UnsupportedFrameworkError } from './intent';
 import { synthesizeArchitecture, type ArchitectureSynthesisResult } from './architecture';
 import { factoryEntity, type EntityFactoryResult } from './factory';
 import { verifyEntity, type VerificationResult } from './verification';

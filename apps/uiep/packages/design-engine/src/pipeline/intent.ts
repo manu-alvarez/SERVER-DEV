@@ -1,5 +1,13 @@
 import { v4 as uuid } from 'uuid';
-import type { EntityType, AbstractionLevel, Framework, DeploymentType, AutonomyLevel, QualityLevel } from '@uiep/entity-schema';
+import {
+  FrameworkSchema,
+  type AbstractionLevel,
+  type AutonomyLevel,
+  type DeploymentType,
+  type EntityType,
+  type Framework,
+  type QualityLevel,
+} from '@uiep/entity-schema';
 
 export interface IntentAnalysisInput {
   goal: string;
@@ -29,6 +37,36 @@ export interface IntentAnalysisResult {
 const DEFAULT_FRAMEWORK: Framework = 'openai-agents';
 const DEFAULT_DEPLOYMENT: DeploymentType = 'local';
 const DEFAULT_QUALITY: QualityLevel = 'professional';
+
+/** Catálogo de frameworks que el motor puede seleccionar (fuente única: entity-schema). */
+const SUPPORTED_FRAMEWORKS: readonly string[] = FrameworkSchema.options;
+
+/** Error explícito cuando se solicita un framework fuera del catálogo soportado (Fase 0.1). */
+export class UnsupportedFrameworkError extends Error {
+  readonly name = 'UnsupportedFrameworkError';
+  constructor(readonly requested: string) {
+    super(
+      `Unsupported framework '${requested}'. Supported frameworks: ${SUPPORTED_FRAMEWORKS.join(', ')}`
+    );
+  }
+}
+
+/**
+ * Resolución de framework (Fase 0.1 — selección explícita):
+ * - Con targetFrameworks explícito: se respeta el PRIMERO, validado contra el catálogo
+ *   de entity-schema. Sin fallback silencioso: si no está soportado → UnsupportedFrameworkError.
+ * - Sin selección explícita: heurística por defecto del motor (DEFAULT_FRAMEWORK).
+ */
+function resolveFramework(input: IntentAnalysisInput): Framework {
+  const requested = input.targetFrameworks?.[0];
+  if (!requested) {
+    return DEFAULT_FRAMEWORK;
+  }
+  if (!SUPPORTED_FRAMEWORKS.includes(requested)) {
+    throw new UnsupportedFrameworkError(requested);
+  }
+  return requested;
+}
 
 function inferEntityType(goal: string): EntityType {
   const lower = goal.toLowerCase();
@@ -111,7 +149,7 @@ function assessRisks(input: IntentAnalysisInput, entityType: EntityType): string
 export function analyzeIntent(input: IntentAnalysisInput): IntentAnalysisResult {
   const entityType = input.entityType || inferEntityType(input.goal);
   const abstractionLevel = input.abstractionLevel || inferAbstractionLevel(input.goal);
-  const framework = input.targetFrameworks?.[0] || DEFAULT_FRAMEWORK;
+  const framework = resolveFramework(input);
   const autonomyLevel = inferAutonomyLevel(input.goal);
   const constraints = extractConstraints(input);
   const risks = assessRisks(input, entityType);

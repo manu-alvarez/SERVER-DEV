@@ -203,6 +203,9 @@ function generateDocumentation(
 ## Overview
 ${intent.goal}
 
+## Framework
+${intent.framework}
+
 ## Architecture
 ${arch.architecture.patterns.join(', ')} pattern.
 
