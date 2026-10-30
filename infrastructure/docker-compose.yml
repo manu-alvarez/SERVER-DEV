@@ -469,15 +469,16 @@ services:
   # ──────────────────────────────────────────────
   # UIEP — INTELLIGENCE ENGINEERING PLATFORM
   # Backend (Express, node:22-alpine) — servido por el proxy en /_uiep
-  # Despliegue real verificado: build desde apps/uiep/backend, red msbross_net,
-  # alias DNS uiep-backend, sin puertos publicados al host.
+  # Despliegue real: build del monorepo apps/uiep con dockerfile backend/Dockerfile
+  # (Fase 0: multi-stage, workspace pnpm), red msbross_net, alias DNS uiep-backend,
+  # sin puertos publicados al host.
   # ──────────────────────────────────────────────
 
   uiep-backend:
     <<: *backend
     build:
-      context: ../apps/uiep/backend
-      dockerfile: Dockerfile
+      context: ../apps/uiep
+      dockerfile: backend/Dockerfile
     image: msbrossai-uiep-backend
     container_name: uiep-backend
     environment:

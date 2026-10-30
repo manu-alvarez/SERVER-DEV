@@ -1,0 +1,13 @@
+# Contexto de build = apps/uiep (compose) — excluye artefactos generados:
+# el Dockerfile compila TODO desde cero dentro del contenedor (pnpm --frozen-lockfile).
+node_modules
+**/node_modules
+dist
+**/dist
+.turbo
+**/.turbo
+**/*.tsbuildinfo
+**/.DS_Store
+**/*.log
+.env
+.env.*

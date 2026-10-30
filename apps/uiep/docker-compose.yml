@@ -13,8 +13,8 @@
 services:
   uiep-backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     image: msbrossai-uiep-backend
     container_name: uiep-backend
     restart: unless-stopped
