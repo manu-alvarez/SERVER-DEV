@@ -87,15 +87,14 @@ function getVaultKey(provider) {
 app.use(compression({ level: 6, threshold: 1024 }));
 
 // ── Security Headers ──
-
-// Anti-cache headers for UIEP and IA Prod OS frontends
-if (req.hostname === 'uiep.manuelalvarez.dev' || req.hostname === 'iaprod.manuelalvarez.dev') {
+app.use((req, res, next) => {
+  // Anti-cache headers for UIEP and IA Prod OS frontends
+  if (req.hostname === 'uiep.manuelalvarez.dev' || req.hostname === 'iaprod.manuelalvarez.dev') {
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
     res.setHeader('Surrogate-Control', 'no-store');
-}
-app.use((req, res, next) => {
+  }
   const csp = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com",
@@ -388,9 +387,7 @@ app.use((req, res, next) => {
     req.url = `/_nikolina${req.url}`;
   }
 
-  
-
-const mappedApp = DOMAIN_APP_MAP[host];
+  const mappedApp = DOMAIN_APP_MAP[host];
   if (mappedApp && !req.url.startsWith('/api') && (!req.url.startsWith('/_') || req.url.startsWith('/_next'))) {
     if (req.url === '/') {
       req.url = `/app/${mappedApp}/`;
