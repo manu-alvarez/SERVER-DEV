@@ -330,6 +330,7 @@ app.post('/api/contact', express.json(), (req, res) => {
 // ── Static SPAs ──
 const NEXT_APPS = [
   'combipro', 'cuentos-magicos', 'cv', 'gas-station',
+    'admin-dashboard', 'dev-dashboard',
   'livekit-nikolina', 'logisearch', 'maya', 'tarot-rws', 'teringo',
   'uiep', 'foz-soundpro'
 ];
