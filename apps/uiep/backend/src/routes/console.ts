@@ -1,5 +1,6 @@
 import type { Express, Request, Response } from 'express';
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
+import rateLimit from 'express-rate-limit';
 import { EntityIdSchema } from '@uiep/agent-spec';
 import { listToolSpecs } from '../services/tool-registry.service';
 import { listSpecs } from '../services/spec-registry.service';
@@ -48,6 +49,23 @@ const SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 h
 const CSRF_HEADER = 'x-uiep-console';
 const ID_RE = /^[a-z0-9-]{3,80}$/;
 const RUN_ID_RE = /^run-[a-z0-9-]{3,80}$/;
+
+/** Límites anti fuerza bruta del login de consola (Fase 4.2), por IP.
+ *  El proxy edge (Traefik) reemplaza el X-Forwarded-For entrante por la IP
+ *  real del cliente y el backend confía SOLO en el bridge docker
+ *  (PRODUCTION_TRUST_PROXY): el contador es por cliente, no por proxy. */
+function envLimit(name: string, fallback: number): number {
+  const v = Number(process.env[name]);
+  return Number.isFinite(v) && v > 0 ? v : fallback;
+}
+
+const loginLimiter = rateLimit({
+  windowMs: envLimit('LOGIN_RATE_LIMIT_WINDOW_MS', 15 * 60 * 1000),
+  limit: envLimit('LOGIN_RATE_LIMIT_MAX', 5),
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'too_many_attempts', message: 'demasiados intentos de login; reintenta cuando expire la ventana' },
+});
 
 function readCookie(req: Request, name: string): string | null {
   const header = req.headers.cookie;
@@ -192,7 +210,7 @@ function summarizeRun(run: RunLike) {
 export function registerConsoleRoute(app: Express): void {
   /* ── Autenticación de consola ───────────────────────────────────────────── */
 
-  app.post('/api/console/auth/login', (req, res) => {
+  app.post('/api/console/auth/login', loginLimiter, (req, res) => {
     const configured = consolePassword();
     if (!configured) {
       return void res.status(503).json({ error: 'console_disabled' });
