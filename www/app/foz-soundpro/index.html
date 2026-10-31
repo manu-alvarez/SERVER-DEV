@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FoZ SoundPro — Beatmaker AI Studio v1.2</title>
+  <meta name="description" content="Estación modular de producción musical digital asistida por IA para Rap, Hip Hop, Trap y música electrónica. Kit de 16 voces, Trackpad FX, grabación con beat y bases importadas.">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0b10">
+
+  <!-- Iconos premium (logo + PNG generados: pestaña, PWA e iOS) -->
+  <link rel="icon" type="image/svg+xml" href="icons/logo.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FoZ SoundPro">
+
+  <!-- Open Graph / Twitter: la imagen al compartir enlaces (URL absoluta GitHub Pages) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="FoZ SoundPro">
+  <meta property="og:title" content="FoZ SoundPro — Beatmaker AI Studio">
+  <meta property="og:description" content="Estación modular de producción musical asistida por IA: 16 voces, Trackpad FX, grabación con beat y bases importadas. 100% offline, 0 €.">
+  <meta property="og:image" content="https://manu-alvarez.github.io/FoZ-SoundPro/icons/icon-512.png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+  <meta property="og:image:alt" content="Logo de FoZ SoundPro">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="FoZ SoundPro — Beatmaker AI Studio">
+  <meta name="twitter:description" content="Estación modular de producción musical asistida por IA. 16 voces, Trackpad FX, Record Studio y bases. 0 €, sin configuración complicada.">
+  <meta name="twitter:image" content="https://manu-alvarez.github.io/FoZ-SoundPro/icons/icon-512.png">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="studio-app">
+
+  <!-- ===================================================================== -->
+  <!-- BARRA DE TRANSPORTE SUPERIOR (GLOBAL)                                  -->
+  <!-- ===================================================================== -->
+  <header class="transport-bar" role="banner">
+    <div class="transport-brand">
+      <img class="brand-logo-img" src="icons/logo.svg" alt="FoZ SoundPro" width="34" height="34" draggable="false">
+      <div class="brand-info">
+        <h1 class="brand-title">FoZ SoundPro</h1>
+        <span class="brand-subtitle">Beatmaker AI Studio</span>
+      </div>
+    </div>
+
+    <!-- Controles de Transporte de Audio -->
+    <div class="transport-controls" role="toolbar" aria-label="Controles de reproducción">
+      <button id="btn-play-pause" class="btn-transport btn-primary" title="Reproducir / Pausar (Espacio)" aria-label="Reproducir">
+        <span class="transport-icon">▶</span>
+        <span class="transport-label">PLAY</span>
+      </button>
+
+      <button id="btn-stop" class="btn-transport btn-secondary" title="Detener (Espacio)" aria-label="Detener">
+        <span class="transport-icon">⏹</span>
+        <span class="transport-label">STOP</span>
+      </button>
+
+      <!-- Metrónomo -->
+      <button id="btn-metronome" class="btn-transport btn-subtle" title="Activar/Desactivar Metrónomo" aria-label="Metrónomo">
+        <span class="transport-icon">🔔</span>
+        <span class="transport-label">METRO</span>
+      </button>
+
+      <!-- Display Digital de Posición y Compás -->
+      <div class="transport-time-display" title="Posición actual de compás y pulso">
+        <span id="display-bar" class="led-bar">BAR 1</span>
+        <span id="display-step" class="led-step">PULSO 1.1</span>
+      </div>
+
+      <!-- BPM y Tempo -->
+      <div class="tempo-control-group">
+        <label for="input-bpm" class="control-label">BPM</label>
+        <div class="tempo-stepper">
+          <button id="btn-bpm-down" class="btn-step" aria-label="Reducir BPM">-</button>
+          <input type="number" id="input-bpm" min="30" max="300" value="90" aria-label="Tempo en BPM">
+          <button id="btn-bpm-up" class="btn-step" aria-label="Aumentar BPM">+</button>
+        </div>
+      </div>
+
+      <!-- Swing -->
+      <div class="swing-control-group">
+        <label for="range-swing" class="control-label">SWING <span id="label-swing-val">10%</span></label>
+        <input type="range" id="range-swing" min="0" max="0.75" step="0.05" value="0.10" aria-label="Factor de Swing">
+      </div>
+
+      <!-- Master Volume -->
+      <div class="volume-control-group">
+        <label for="range-master-vol" class="control-label">MASTER</label>
+        <input type="range" id="range-master-vol" min="0" max="1.2" step="0.05" value="0.85" aria-label="Volumen Master">
+      </div>
+
+      <!-- Resolución del patrón (16/32/64 pasos) -->
+      <div class="steps-control-group">
+        <label for="select-steps-count" class="control-label">PASOS</label>
+        <select id="select-steps-count" class="form-select select-compact" title="Longitud del patrón (pasos)">
+          <option value="16">16</option>
+          <option value="32">32</option>
+          <option value="64">64</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Visualizador Master y Acciones Rápidas -->
+    <div class="transport-actions">
+      <canvas id="master-visualizer" width="160" height="38" title="Analizador de espectro master"></canvas>
+      <div class="export-quick-buttons">
+        <button id="btn-quick-export-wav" class="btn-action btn-accent-blue" title="Exportar patrón como archivo WAV PCM 16b (con base y FX del trackpad si están activos)">
+          <span>💾 WAV</span>
+        </button>
+        <button id="btn-quick-export-midi" class="btn-action btn-accent-pink" title="Exportar patrón como archivo MIDI SMF1">
+          <span>🎵 MIDI</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- CONTENEDOR PRINCIPAL: SIDEBAR + WORKSPACE                             -->
+  <!-- ===================================================================== -->
+  <div class="studio-layout">
+
+    <!-- Navegación lateral de módulos -->
+    <nav class="studio-sidebar" role="navigation" aria-label="Módulos del estudio">
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <button class="nav-button active" data-tab="tab-sequencer" id="nav-btn-sequencer">
+            <span class="nav-icon">🥁</span>
+            <span class="nav-text">Secuenciador</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-button" data-tab="tab-trackpad" id="nav-btn-trackpad">
+            <span class="nav-icon">🕹️</span>
+            <span class="nav-text">Trackpad FX</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-button" data-tab="tab-pads" id="nav-btn-pads">
+            <span class="nav-icon">🎛️</span>
+            <span class="nav-text">Pads</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-button" data-tab="tab-vocal" id="nav-btn-vocal">
+            <span class="nav-icon">🎙️</span>
+            <span class="nav-text">Record Studio</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-button" data-tab="tab-bases" id="nav-btn-bases">
+            <span class="nav-icon">💿</span>
+            <span class="nav-text">Bases</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-button" data-tab="tab-ai" id="nav-btn-ai">
+            <span class="nav-icon">🤖</span>
+            <span class="nav-text">Asistente IA</span>
+            <span class="ai-status-dot offline" id="sidebar-ai-indicator" title="Estado de IA Local"></span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-button" data-tab="tab-projects" id="nav-btn-projects">
+            <span class="nav-icon">📁</span>
+            <span class="nav-text">Proyectos</span>
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-button" data-tab="tab-diagnostics" id="nav-btn-diagnostics">
+            <span class="nav-icon">🔧</span>
+            <span class="nav-text">Diagnóstico</span>
+          </button>
+        </li>
+      </ul>
+
+      <!-- Estado inferior de la barra lateral -->
+      <div class="sidebar-status-card">
+        <div class="status-row">
+          <span class="status-label">Motor de Audio:</span>
+          <span class="status-badge badge-green" id="badge-audio-status">Listo</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">IA Local:</span>
+          <span class="status-badge badge-gray" id="badge-ai-status">Offline</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Kit:</span>
+          <span class="status-val">16 voces sync</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Plataformas:</span>
+          <span class="status-val">Win · mac · Linux</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Área de Trabajo Principal (Vistas tabuladas) -->
+    <main class="studio-workspace" role="main">
+
+      <!-- ================================================================= -->
+      <!-- TAB 1: SECUENCIADOR DE BATERÍA (BEATMAKER)                        -->
+      <!-- ================================================================= -->
+      <section id="tab-sequencer" class="studio-tab-panel active">
+        <div class="panel-header">
+          <div class="panel-title-area">
+            <h2 class="panel-title">Secuenciador por Pasos (16 Voces Sintéticas)</h2>
+            <p class="panel-description">Programa el ritmo por pasos, cambia la velocity con Shift+Clic y usa el 📂 de cada fila para cargar tu propia muestra local.</p>
+          </div>
+
+          <!-- Barra de Presets Rápidos (inyectada por JS: 8 kits v1.1) -->
+          <div class="preset-quick-bar" id="preset-quick-bar"></div>
+        </div>
+
+        <!-- Indicador Superior de Pasos / Regla de Tiempo -->
+        <div class="sequencer-scroll-wrap">
+          <div class="sequencer-timeline-header">
+            <div class="track-header-spacer">Instrumento / Controles</div>
+            <div class="steps-timeline" id="steps-timeline">
+              <!-- Marcadores generados dinámicamente por JS (1.1, 1.2, 1.3, 1.4, 2.1...) -->
+            </div>
+          </div>
+
+          <!-- Cuadrícula de Pistas del Secuenciador -->
+          <div class="sequencer-grid" id="sequencer-grid">
+            <!-- Las filas de pistas e interruptores de 16 pasos se inyectan dinámicamente -->
+          </div>
+        </div>
+
+        <!-- Barra inferior de acciones del secuenciador -->
+        <div class="sequencer-footer-bar">
+          <div class="footer-info">
+            <span id="footer-project-name">Proyecto: Boom Bap Clásico</span>
+            <span class="footer-separator">•</span>
+            <span>Canal Percusión GM: 10</span>
+            <span class="footer-separator">•</span>
+            <span>Resolución: 480 PPQ</span>
+          </div>
+          <div class="footer-actions">
+            <button id="btn-export-wav-dialog" class="btn-action btn-accent-blue">Exportar Audio WAV</button>
+            <button id="btn-export-midi-dialog" class="btn-action btn-accent-pink">Exportar Archivo MIDI</button>
+          </div>
+        </div>
+
+        <input type="file" id="input-sample-file" accept="audio/*,.wav,.mp3,.m4a,.aac,.ogg,.oga,.flac" style="display: none;">
+        <input type="file" id="input-sample-folder" webkitdirectory directory multiple accept="audio/*,.wav,.mp3,.m4a,.aac,.ogg,.oga,.flac" style="display: none;">
+        <button id="btn-kit-import" class="btn-action" title="Importar kit CC0 (carpeta) — session-only">📂 Kit (carpeta)</button>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- TAB 2: TRACKPAD FX (PAD XY MULTITÁCTIL)                           -->
+      <!-- ================================================================= -->
+      <section id="tab-trackpad" class="studio-tab-panel">
+        <div class="panel-header">
+          <div class="panel-title-area">
+            <h2 class="panel-title">Trackpad FX — Pad de Efectos XY</h2>
+            <p class="panel-description">Eje X = filtro Lowpass/Highpass (120 Hz → 18 kHz). Eje Y = saturación Tape o Eco sincronizado al BPM. Multitáctil, con presets por estilo.</p>
+          </div>
+          <div class="ai-connection-indicator-card">
+            <span class="indicator-icon">🎚️</span>
+            <span id="trackpad-state">Filtro abierto • Neutro</span>
+          </div>
+        </div>
+
+        <div class="trackpad-layout-grid">
+          <!-- Pad principal -->
+          <div class="trackpad-card trackpad-pad-card">
+            <canvas id="trackpad-canvas" class="trackpad-canvas" width="800" height="480"
+                    title="Toca y arrastra (ratón o táctil). Doble toque en el centro = reset. Eje X: filtro. Eje Y: FX vertical."></canvas>
+            <div class="trackpad-axes-hint">
+              <span>← X: LP/HP Filtro →</span>
+              <span>↑ Y: más FX (Tape/Echo) ↓</span>
+            </div>
+          </div>
+
+          <!-- Controles del pad -->
+          <div class="trackpad-card">
+            <h3 class="card-heading">Mapeo del Pad</h3>
+
+            <div class="form-group">
+              <label for="select-map-x">Eje X (filtro):</label>
+              <select id="select-map-x" class="form-select">
+                <option value="lowpass">Lowpass (apaga los agudos)</option>
+                <option value="highpass">Highpass (apaga los graves)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="select-map-y">Eje Y (efecto):</label>
+              <select id="select-map-y" class="form-select">
+                <option value="tape">Tape Drive (saturación analógica)</option>
+                <option value="echo">Echo (eco de corchea sincronizado al BPM)</option>
+              </select>
+            </div>
+
+            <div class="trackpad-toggles">
+              <button id="btn-latch" class="btn-secondary" title="Al soltar el pad vuelve al neutro (estilo pedal CC). Dos toques en el centro del pad también resetean.">MOMENTÁNEO</button>
+              <button id="btn-in-export" class="btn-secondary" title="Si está activo, el estado del pad en el momento del export se hornea en el WAV offline">HORNEAR EN WAV</button>
+              <button id="btn-reset-pad" class="btn-secondary" title="Devuelve el pad al estado neutro (filtro abierto, sin FX)">RESET</button>
+            </div>
+
+            <div class="prompt-chips-container trackpad-preset-bar">
+              <span class="chips-label">Estilos:</span>
+              <button class="btn-pad-preset" data-padpreset="clean">Clean</button>
+              <button class="btn-pad-preset" data-padpreset="trap_lush">Trap Lush</button>
+              <button class="btn-pad-preset" data-padpreset="boombap">Boom Bap Dusty</button>
+              <button class="btn-pad-preset" data-padpreset="drill_dark">Drill Dark</button>
+            </div>
+
+            <div class="trackpad-notes">
+              <h3 class="card-heading">Cómo funciona:</h3>
+              <ul>
+                <li>Es <strong>multitáctil</strong>: funciona con dedos en pantalla táctil o arrastrando el ratón.</li>
+                <li>El FX se aplica al bus master del beat (todas las voces), no al instrumento individual.</li>
+                <li>El eco se re-sincroniza al BPM del proyecto en cada cambio de tempo.</li>
+                <li>El estado queda guardado en el proyecto (.foz / LocalStorage) y opcionalmente horneado en el export WAV.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- TAB 2B: PADS — CAJA DE RITMOS 4X4 (FASE 9.2)                      -->
+      <!-- ================================================================= -->
+      <section id="tab-pads" class="studio-tab-panel">
+        <div class="panel-header">
+          <div class="panel-title-area">
+            <h2 class="panel-title">Pads — Caja de Ritmos 4×4</h2>
+            <p class="panel-description">Golpea las 16 voces de la sesión en directo, multitáctil o con teclado (1234 · QWER · ASDF · ZXCV). Con el transporte en marcha y REC activo, cada golpe escribe su paso y su velocity en el secuenciador. El Trackpad FX activo procesa los golpes en vivo y queda aplicado al soltar (salvo modo MOMENTÁNEO).</p>
+          </div>
+        </div>
+
+        <div class="module-card pads-card">
+          <div class="pads-controls">
+            <button id="btn-pads-rec" class="btn-secondary" title="Con el transporte en marcha, cada golpe se programa en el paso actual del secuenciador">● REC EN VIVO: OFF</button>
+            <div class="pads-vel-group">
+              <span class="control-label">VELOCITY</span>
+              <input type="range" id="pads-velocity" min="0.1" max="1" step="0.05" value="0.85">
+              <span id="pads-velocity-val" class="pads-vel-val">85%</span>
+            </div>
+          </div>
+
+          <div class="pads-grid" id="pads-grid">
+            <!-- Los 16 pads se generan desde project.tracks (nombre, color y muestras locales) -->
+          </div>
+
+          <div class="trackpad-notes">
+            <h3 class="card-heading">Cómo funciona:</h3>
+            <ul>
+              <li>Cada pad corresponde a una pista del secuenciador en el mismo orden: si cargaste una <strong>muestra local</strong> por pista, el pad la usa (vía Sample Studio).</li>
+              <li><strong>Grabación en vivo:</strong> PLAY verde en marcha + REC activo → cada golpe se anota en el paso actual (solo pasos apagados: repetir no borra).</li>
+              <li><strong>FX en vivo:</strong> si mueves el Trackpad XY, los golpes pasan por filtro/tape/eco; al soltar el FX queda fijado en modo latch.</li>
+              <li>El teclado 1234/QWER/ASDF/ZXCV replica los pads; cada pad muestra su tecla en la esquina.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- TAB 3: RECORD STUDIO (GRABACIÓN CON CADENA PRO)                   -->
+      <!-- ================================================================= -->
+      <section id="tab-vocal" class="studio-tab-panel">
+        <div class="panel-header">
+          <div class="panel-title-area">
+            <h2 class="panel-title">Record Studio — Grabación con Beat</h2>
+            <p class="panel-description">Graba tu voz sobre el beat con cadena profesional (HPF, EQ 3 bandas, compresor, reverb y eco). Salida WAV PCM 16-bit determinista con pre-roll de cuenta.</p>
+          </div>
+        </div>
+
+        <div class="rec-studio-grid">
+          <!-- Cadena de voz -->
+          <div class="rec-card">
+            <h3 class="card-heading">🎤 Cadena de Voz</h3>
+
+            <div class="form-group">
+              <label for="rec-device">Dispositivo de entrada:</label>
+              <select id="rec-device" class="form-select">
+                <option value="">Dispositivo por defecto del sistema</option>
+              </select>
+              <button id="btn-open-mic" class="btn-secondary rec-open-btn">🔓 Activar Micrófono</button>
+            </div>
+
+            <div class="form-group">
+              <label for="rec-gain">Ganancia de entrada (<span id="rec-gain-label">x1.0</span>):</label>
+              <input type="range" id="rec-gain" min="0" max="4" step="0.05" value="1.0">
+            </div>
+
+            <div class="form-group rec-meter-group">
+              <label>Nivel de entrada (VU):</label>
+              <div class="rec-meter-track"><div id="rec-meter-fill" class="rec-meter-fill"></div></div>
+              <canvas id="mic-canvas" class="mic-canvas" width="360" height="90"></canvas>
+            </div>
+
+            <div class="trackpad-toggles">
+              <button id="rec-monitor-toggle" class="btn-secondary" title="Escuchar tu voz por los altavoces. ¡Usa auriculares para evitar el acople!">MONITOR</button>
+              <button id="rec-gate-toggle" class="btn-secondary" title="Noise gate aplicado offline sobre la toma: silencia el fondo en las pausas">GATE TOMA</button>
+            </div>
+          </div>
+
+          <!-- Procesado -->
+          <div class="rec-card">
+            <h3 class="card-heading">🎛 Procesado</h3>
+
+            <div class="form-group">
+              <label for="rec-hpf">Filtro pasa-altos (HPF):</label>
+              <select id="rec-hpf" class="form-select">
+                <option value="20">20 Hz (off)</option>
+                <option value="40">40 Hz</option>
+                <option value="60">60 Hz</option>
+                <option value="80" selected>80 Hz (voz)</option>
+                <option value="120">120 Hz</option>
+                <option value="160">160 Hz</option>
+                <option value="200">200 Hz (cortante)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="rec-eq-low">EQ Graves (180 Hz, ±12 dB):</label>
+              <input type="range" id="rec-eq-low" min="-12" max="12" step="0.5" value="0">
+            </div>
+            <div class="form-group">
+              <label for="rec-eq-mid">EQ Medios (1.2 kHz, ±12 dB):</label>
+              <input type="range" id="rec-eq-mid" min="-12" max="12" step="0.5" value="0">
+            </div>
+            <div class="form-group">
+              <label for="rec-eq-high">EQ Agudos (3.6 kHz, ±12 dB):</label>
+              <input type="range" id="rec-eq-high" min="-12" max="12" step="0.5" value="0">
+            </div>
+
+            <div class="form-group">
+              <label for="rec-comp">Compresor:</label>
+              <select id="rec-comp" class="form-select">
+                <option value="off">Off (sin compresión)</option>
+                <option value="suave">Suave (3:1)</option>
+                <option value="rap" selected>Rap (6:1)</option>
+                <option value="agresivo">Agresivo (8:1)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="rec-reverb">Reverb (sala sintética):</label>
+              <input type="range" id="rec-reverb" min="0" max="1" step="0.05" value="0">
+            </div>
+            <div class="form-group">
+              <label for="rec-echo">Eco (delay 240 ms):</label>
+              <input type="range" id="rec-echo" min="0" max="1" step="0.05" value="0">
+            </div>
+          </div>
+
+          <!-- Grabación -->
+          <div class="rec-card rec-transport-card">
+            <h3 class="card-heading">⏺ Grabación</h3>
+
+            <div class="rec-mode-row">
+              <div class="form-group">
+                <label for="rec-mode">Qué grabar:</label>
+                <select id="rec-mode" class="form-select">
+                  <option value="voz+beat" selected>Voz + Beat</option>
+                  <option value="voz">Solo voz (micro)</option>
+                  <option value="beat">Solo beat (sin micro)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="rec-preroll">Pre-roll (cuenta):</label>
+                <select id="rec-preroll" class="form-select">
+                  <option value="0">Sin cuenta</option>
+                  <option value="1" selected>1 compás</option>
+                  <option value="2">2 compases</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="rec-offset">Ajuste fino voz vs. beat (<span id="rec-offset-label">0 ms</span>):</label>
+              <input type="range" id="rec-offset" min="-150" max="150" step="5" value="0"
+                     title="Nudge de la toma tras grabar: positivo recorta el inicio, negativo antepone silencio">
+            </div>
+
+            <div id="rec-countdown" class="rec-countdown">PULSA GRABAR</div>
+
+            <div class="rec-buttons">
+              <button id="btn-record-start" class="btn-record-main">
+                <span class="record-dot"></span>
+                <span>GRABAR</span>
+              </button>
+              <button id="btn-record-stop" class="btn-secondary" disabled>DETENER</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tomas -->
+        <div class="rec-card rec-takes-card">
+          <h3 class="card-heading">📼 Tomas grabadas (IndexedDB — sin lím. de disco del navegador)</h3>
+          <div id="takes-container" class="takes-container"></div>
+        </div>
+
+        <div class="vocal-notes-card">
+          <h3>Consejos de Grabación:</h3>
+          <ul>
+            <li>El navegador solicitará permiso de micrófono la primera vez; el permiso se recuerda por dominio.</li>
+            <li>Usa auriculares: si activas MONITOR sin ellos, la voz puede entrar dos veces (acople).</li>
+            <li>La cuenta de pre-roll se sincroniza por reloj de audio (no por reloj de sistema) para evitar deriva.</li>
+            <li>Salida: WAV PCM 16-bit idéntico en macOS y Windows (captura PCM, no codifica el SO).</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- TAB 4: BASES IMPORTADAS                                           -->
+      <!-- ================================================================= -->
+      <section id="tab-bases" class="studio-tab-panel">
+        <div class="panel-header">
+          <div class="panel-title-area">
+            <h2 class="panel-title">Base Library — Bases / Instrumentales</h2>
+            <p class="panel-description">Importa MP3/M4A/WAV/Ogg/FLAC locales como instrumentales sobre el beat. Se sincronizan con el transporte y se hornean en el export WAV.</p>
+          </div>
+        </div>
+
+        <div class="base-layout-grid">
+          <div class="base-card">
+            <h3 class="card-heading">⬇ Importar Audio</h3>
+            <div class="base-import-buttons">
+              <button id="btn-import-base" class="btn-primary">📂 Importar Bases (MP3/M4A/WAV/Ogg/FLAC)</button>
+              <button id="btn-import-m3u" class="btn-secondary">📃 Importar Manifiesto .m3u / .m3u8</button>
+            </div>
+            <input type="file" id="input-base-files" accept="audio/*,.mp3,.m4a,.wav,.ogg,.oga,.flac" multiple style="display: none;">
+            <input type="file" id="input-base-m3u" accept=".m3u,.m3u8,text/plain,audio/x-mpegurl" style="display: none;">
+
+            <p class="base-info" id="base-catalog-info">Importa un .m3u/.m3u8 (con #EXTM3U) como catálogo, o directamente tus MP3/WAV.</p>
+
+            <div class="base-note">
+              <strong>Nota M3U:</strong> el manifiesto se usa como catálogo local (títulos y orden) que enlaza con los archivos que importes por nombre. No se reproduce streaming remoto: la app funciona 100% offline.
+            </div>
+          </div>
+
+          <div class="base-card">
+            <h3 class="card-heading">🎚 Mezcla de la Base</h3>
+            <div class="form-group">
+              <label for="base-gain">Volumen de la base (0 – 1.5):</label>
+              <input type="range" id="base-gain" min="0" max="1.5" step="0.05" value="0.85">
+            </div>
+            <div class="form-group">
+              <label for="base-fade-in">Fade-in (segundos):</label>
+              <input type="range" id="base-fade-in" min="0" max="4" step="0.25" value="0">
+            </div>
+            <div class="form-group">
+              <label for="base-fade-out">Fade-out (segundos, en export):</label>
+              <input type="range" id="base-fade-out" min="0" max="4" step="0.25" value="0">
+            </div>
+            <div class="form-group base-loop-group">
+              <label for="base-loop">
+                <input type="checkbox" id="base-loop" checked> Buclar la base al terminar
+              </label>
+            </div>
+            <button id="btn-base-preview" class="btn-secondary">▶ Escuchar</button>
+            <p class="base-info">Al pulsar PLAY en el transporte, la base activa arranca junto al beat; al parar, se detiene con él.</p>
+          </div>
+        </div>
+
+        <div class="base-card base-list-card">
+          <h3 class="card-heading">💿 Biblioteca de Bases</h3>
+          <div id="base-list" class="base-list"></div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- TAB 5: ASISTENTE MUSICAL CON IA LOCAL                             -->
+      <!-- ================================================================= -->
+      <section id="tab-ai" class="studio-tab-panel">
+        <div class="panel-header">
+          <div class="panel-title-area">
+            <h2 class="panel-title">Asistente Musical con IA Local</h2>
+            <p class="panel-description">Genera y modifica patrones mediante Ollama (puente local o directo por Tailscale), APIs del propio usuario o el motor heurístico offline.</p>
+          </div>
+          <div class="ai-connection-indicator-card" id="ai-bridge-status-card">
+            <span class="indicator-icon">🔌</span>
+            <span id="ai-bridge-status-text">Comprobando conexión con Ollama...</span>
+          </div>
+        </div>
+
+        <div class="ai-assistant-grid">
+          <!-- Columna izquierda: Entrada de Prompt -->
+          <div class="ai-card ai-input-card">
+            <h3 class="card-heading">Instrucción para el Asistente</h3>
+
+            <div class="form-group">
+              <label for="ai-genre-select">Género Musical:</label>
+              <select id="ai-genre-select" class="form-select">
+                <option value="trap">Trap Moderno (140 BPM)</option>
+                <option value="boombap">Boom Bap Clásico (90 BPM)</option>
+                <option value="drill">UK / NY Drill (142 BPM)</option>
+                <option value="lofi">Lo-Fi Hip Hop (85 BPM)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="ai-prompt-input">Descripción del Patrón o Variación:</label>
+              <textarea id="ai-prompt-input" class="form-textarea" rows="4" placeholder="Ejemplo: Genera un beat de trap oscuro con bombo agresivo en síncopa, palmas en el pulso 3 y rolls rápidos de hi-hat..."></textarea>
+            </div>
+
+            <!-- Sugerencias Rápidas de Prompt -->
+            <div class="prompt-chips-container">
+              <span class="chips-label">Plantillas:</span>
+              <button class="btn-prompt-chip" data-prompt="Patrón de Boom Bap con bombo espaciado y swing pesado">Boom Bap Pesado</button>
+              <button class="btn-prompt-chip" data-prompt="Ritmo de Trap con redobles continuos de hi-hat en semicorcheas y bajo 808 largo">Trap Banger</button>
+              <button class="btn-prompt-chip" data-prompt="Drill con caja desplazada al compás 3 y hi-hats sincopados">Drill Neoyorquino</button>
+            </div>
+
+            <div class="ai-actions-bar">
+              <button id="btn-generate-ai" class="btn-primary btn-large">
+                <span class="btn-icon">⚡</span>
+                <span id="btn-generate-text">Generar Patrón</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Columna derecha: Previsualización y Explicación -->
+          <div class="ai-card ai-output-card">
+            <h3 class="card-heading">Resultado y Razonamiento Musical</h3>
+
+            <div id="ai-empty-state" class="ai-empty-placeholder">
+              <span class="placeholder-icon">🎼</span>
+              <p>Introduce una instrucción o selecciona un estilo y pulsa <strong>Generar Patrón</strong>.</p>
+              <p class="placeholder-subtext">El asistente evaluará la cadencia, el tempo y los instrumentos del canal GM 10.</p>
+            </div>
+
+            <div id="ai-result-content" class="ai-result-view" style="display: none;">
+              <div class="ai-result-meta">
+                <span class="meta-tag" id="ai-result-genre">Trap</span>
+                <span class="meta-tag" id="ai-result-bpm">140 BPM</span>
+                <span class="meta-tag" id="ai-result-source">Ollama Local</span>
+              </div>
+
+              <div class="ai-explanation-box">
+                <p id="ai-result-explanation">Explicación musical...</p>
+              </div>
+
+              <div class="ai-preview-grid-container">
+                <h4 class="preview-heading">Previsualización de Pistas:</h4>
+                <div id="ai-mini-grid" class="ai-mini-grid"></div>
+              </div>
+
+              <div class="ai-apply-actions">
+                <button id="btn-apply-ai-pattern" class="btn-primary">
+                  <span>✔ Aplicar al Secuenciador</span>
+                </button>
+                <button id="btn-export-ai-midi" class="btn-secondary">
+                  <span>Descargar como MIDI</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- TAB 6: GESTIÓN DE PROYECTOS Y PRESETS                             -->
+      <!-- ================================================================= -->
+      <section id="tab-projects" class="studio-tab-panel">
+        <div class="panel-header">
+          <div class="panel-title-area">
+            <h2 class="panel-title">Gestión de Proyectos & Presets</h2>
+            <p class="panel-description">Guarda tu trabajo, exporta archivos nativos .foz (esquema 1.1) o carga proyectos y estilos completos.</p>
+          </div>
+        </div>
+
+        <div class="projects-layout-grid">
+          <!-- Proyecto Actual -->
+          <div class="project-card">
+            <h3 class="card-heading">Sesión Activa</h3>
+            <div class="form-group">
+              <label for="project-name-input">Nombre del Proyecto:</label>
+              <input type="text" id="project-name-input" class="form-input" value="Mi Beat FoZ">
+            </div>
+
+            <div class="project-actions-grid">
+              <button id="btn-save-project-local" class="btn-secondary">
+                <span>💾 Guardar en Navegador</span>
+              </button>
+              <button id="btn-export-project-file" class="btn-primary">
+                <span>⬇ Descargar Archivo .foz</span>
+              </button>
+              <button id="btn-trigger-import-project" class="btn-secondary">
+                <span>⬆ Importar Archivo .foz</span>
+              </button>
+              <button id="btn-new-project" class="btn-danger">
+                <span>📄 Crear Proyecto Nuevo</span>
+              </button>
+            </div>
+            <input type="file" id="input-import-file" accept=".foz,application/json" style="display: none;">
+          </div>
+
+          <!-- Catálogo de Presets Integrados -->
+          <div class="project-card">
+            <h3 class="card-heading">Catálogo de Presets de Estilo</h3>
+            <div class="presets-list" id="presets-catalog-container">
+              <!-- Inyectado por JS desde FoZProjectManager -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- TAB 7: DIAGNÓSTICO, LMMS Y CONFIGURACIÓN                          -->
+      <!-- ================================================================= -->
+      <section id="tab-diagnostics" class="studio-tab-panel">
+        <div class="panel-header">
+          <div class="panel-title-area">
+            <h2 class="panel-title">Diagnóstico del Sistema y Puente Local</h2>
+            <p class="panel-description">Estado de los componentes de audio, compatibilidad con Windows y puente con Ollama y LMMS.</p>
+          </div>
+        </div>
+
+        <div class="diagnostics-cards-grid">
+          <!-- Estado Web Audio -->
+          <div class="diag-card">
+            <h3 class="card-heading">🔊 Subsistema Web Audio</h3>
+            <table class="diag-table">
+              <tr><td>Estado del Contexto:</td><td id="diag-audio-state">No inicializado</td></tr>
+              <tr><td>Frecuencia de Muestreo:</td><td id="diag-audio-samplerate">44100 Hz</td></tr>
+              <tr><td>Latencia de Salida:</td><td id="diag-audio-latency">-</td></tr>
+              <tr><td>Sintetizador Nativo:</td><td>Activo (16 instrumentos)</td></tr>
+              <tr><td>Exportador WAV:</td><td>OfflineAudioContext (16-bit PCM)</td></tr>
+              <tr><td>Bus de FX del Trackpad:</td><td>Filtro + Tape Drive + Echo</td></tr>
+            </table>
+          </div>
+
+          <!-- Estado Local Bridge / Ollama -->
+          <div class="diag-card">
+            <h3 class="card-heading">🤖 FoZ Local Bridge & Ollama</h3>
+            <table class="diag-table">
+              <tr><td>URL del Puente:</td><td><code id="diag-bridge-url">http://127.0.0.1:8765</code></td></tr>
+              <tr><td>Estado del Puente:</td><td id="diag-bridge-status">Desconectado</td></tr>
+              <tr><td>Modelos Detectados:</td><td id="diag-bridge-models">Ninguno (Modo reglas)</td></tr>
+              <tr><td>Soporte LMMS:</td><td id="diag-lmms-status">Comprobando...</td></tr>
+            </table>
+            <div class="diag-actions">
+              <button id="btn-recheck-bridge" class="btn-secondary">Volver a Comprobar Puente</button>
+            </div>
+          </div>
+
+          <!-- Proveedores de IA (puente / Ollama directo / API del usuario) -->
+          <div class="diag-card full-width">
+            <h3 class="card-heading">🧠 Proveedores de IA (Puente · Ollama · API propia)</h3>
+            <p class="diag-note">
+              Prioridad de generación: <strong>proveedor activo online</strong> → primer proveedor disponible →
+              <strong>motor heurístico offline</strong>. Diagnóstico honesto por sondeo:
+              🟢 <em>online</em> (acceso completo con CORS) · 🟡 <em>alcanzable</em> (la red responde pero el
+              navegador no puede leerla: falta <code>OLLAMA_ORIGINS</code> o hay bloqueo HTTPS→HTTP) ·
+              🔴 <em>no accesible</em> · 🔑 <em>clave denegada</em>.
+            </p>
+
+            <div id="ai-provider-list" class="ai-provider-list"></div>
+
+            <div class="ai-prov-add-form">
+              <h4 class="prov-subheading">Añadir proveedor</h4>
+              <div class="ai-prov-form-row">
+                <select id="ai-prov-kind" class="form-select" title="Tipo de proveedor">
+                  <option value="bridge">Puente local (FoZ Local Bridge)</option>
+                  <option value="ollama" selected>Ollama directo (Tailscale / red local)</option>
+                  <option value="openai">API compatible OpenAI (clave propia)</option>
+                </select>
+                <input type="text" id="ai-prov-name" class="form-input" maxlength="80" placeholder="Nombre (ej. Ollama Servidor 1)">
+                <input type="text" id="ai-prov-url" class="form-input" maxlength="200" placeholder="http://100.100.2.10:11434">
+              </div>
+              <div class="ai-prov-form-row">
+                <input type="password" id="ai-prov-key" class="form-input" maxlength="300" placeholder="API key (solo para tipo OpenAI) — se guarda SOLO en este navegador" autocomplete="off">
+                <input type="text" id="ai-prov-model" class="form-input" maxlength="120" placeholder="Modelo preferido (opcional, ej. qwen3.5:4b)">
+                <button id="btn-ai-prov-add" class="btn-primary">➕ Añadir</button>
+              </div>
+              <p class="diag-note api-key-note">🔐 La API key <strong>nunca</strong> sale de este navegador ni viaja por el puente: solo se usa en la llamada HTTPS directa a tu API.</p>
+            </div>
+
+            <div class="ai-prov-pull-form">
+              <h4 class="prov-subheading">Descargar modelo (pull) en Ollama</h4>
+              <div class="ai-prov-form-row">
+                <input type="text" id="ai-pull-model" class="form-input" maxlength="120" placeholder="Modelo a descargar (ej. qwen3.5:4b o llamusic/llamusic:latest)">
+                <select id="ai-pull-target" class="form-select" title="Servidor Ollama destino"></select>
+                <button id="btn-ai-pull" class="btn-secondary">⬇ Descargar</button>
+              </div>
+              <p class="diag-note" id="ai-pull-status">La descarga puede tardar varios minutos según el tamaño del modelo (GB).</p>
+            </div>
+
+            <p id="ai-prov-status" class="diag-note">Proveedores: comprobando...</p>
+          </div>
+
+          <!-- Instrucciones multiplataforma -->
+          <div class="diag-card full-width">
+            <h3 class="card-heading">💻 Instrucciones multiplataforma (Windows · macOS · Linux)</h3>
+            <div class="diag-guide-content">
+              <p><strong>1 — Uso autónomo sin instalación (las tres plataformas):</strong></p>
+              <ol>
+                <li>Descomprime <code>FoZ_SoundPro_Portable_v1.1.zip</code> en cualquier carpeta.</li>
+                <li>Lanza el archivo de arranque de tu sistema:
+                  <strong>Windows</strong> → <code>start_windows.bat</code> (doble clic) ·
+                  <strong>macOS</strong> → <code>start_mac.sh</code> (doble clic o <code>sh start_mac.sh</code>) ·
+                  <strong>Linux</strong> → <code>sh start_linux.sh</code> (o <code>chmod +x start_linux.sh &amp;&amp; ./start_linux.sh</code>).</li>
+                <li>El lanzador arranca un servidor web local libre de colisiones, y abre el estudio en el navegador.</li>
+                <li>Sin estas herramientas, todo funciona igual a coste 0 y sin conexión: síntesis de 16 voces, secuenciador 16/32/64 pasos, Trackpad FX, grabación sobre beat, bases importadas y exports WAV/MIDI.</li>
+              </ol>
+
+              <p><strong>2 — Conexión opcional con IA (Ollama):</strong></p>
+              <ul>
+                <li>Instala Ollama en <em>cualquiera</em> de las tres plataformas desde <code>ollama.com</code> (no la empaquetamos: descarga del fabricante).</li>
+                <li>Inicia el puente local: <code>python3 scripts/automation/local_bridge.py</code> (Windows: <code>python scripts\automation\local_bridge.py</code>). Es la ruta recomendada: el puente traduce Ollama ↔ navegador sin tocar CORS.</li>
+                <li>Alternativa directa: en Ollama define <code>OLLAMA_ORIGINS</code> permitiendo tu origen local para que el navegador pueda leer los modelos directamente (útil en red Tailscale).</li>
+                <li>Si falta un modelo, descárgalo desde esta misma página con el botón <em>Descargar (pull)</em> de la tarjeta de arriba.</li>
+              </ul>
+
+              <p><strong>3 — Opcional LMMS (arreglos y mezcla multipista):</strong></p>
+              <ul>
+                <li>Si LMMS está instalado, el puente lo detecta automáticamente y esta tabla lo muestra.</li>
+                <li>Importa los archivos MIDI exportados en LMMS 1.2.2 para arreglos orquestales o mezcla multipista avanzada.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Modal / Notificación flotante de confirmación -->
+  <div id="toast-notification" class="toast-notification" role="alert" aria-live="polite"></div>
+
+  <!-- Scripts del núcleo (el ORDEN importa: constantes → motor → módulos → app) -->
+  <script src="js/constants.js"></script>
+  <script src="js/audio-engine.js"></script>
+  <script src="js/midi-engine.js"></script>
+  <script src="js/project-manager.js"></script>
+  <script src="js/sequencer.js"></script>
+  <script src="js/sampler.js"></script>
+  <script src="js/trackpad.js"></script>
+  <script src="js/pads.js"></script>
+  <script src="js/base-library.js"></script>
+  <script src="js/rec-studio.js"></script>
+  <script src="js/ai-assistant.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- Service Worker para soporte offline PWA -->
+  <script>
+    if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => {
+          console.log('Service Worker omitido en este entorno:', err.message);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

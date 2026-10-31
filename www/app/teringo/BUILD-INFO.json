@@ -1,0 +1,7 @@
+{
+  "project": "teringo-mailops-ai",
+  "source": "https://github.com/manu-alvarez/MSB (apps/teringo)",
+  "sourceCommit": "c9b70e416f67969afd975ea23599def2912838a4",
+  "builtAt": "2026-10-31T19:20:36Z",
+  "deployedTo": "www/app/teringo (VPS manuelalvarez.dev)"
+}

@@ -329,51 +329,27 @@ app.post('/api/contact', express.json(), (req, res) => {
 
 // ── Static SPAs ──
 const NEXT_APPS = [
-  'agent-builder-pro', 'agent-forge', 'app-generator', 'combipro', 'cuadrante-horarios',
-  'cuentos-magicos', 'cv', 'edelweiss', 'expositator-rte', 'gas-station',
-  'iaprod-os', 'industrialpro', 'intercompiler', 'jartosdto',
-  'livekit-nikolina', 'logisearch', 'logitrack', 'maya', 'moko-tools',
-  'msbross', 'multi-agent-orch', 'omnidev-os', 'perfume-ean', 'perfume-trading',
-  'prompt-generator', 'tarot-maya', 'tarot-rws', 'taskflow', 'teringo',
-  'admin-dashboard', 'dev-dashboard',
-  'traductor-pro', 'tu-energia-maya', 'uiep', 'web-restaurante-atenea',
-  'it-english-coach', 'assistant'
+  'combipro', 'cuentos-magicos', 'cv', 'gas-station',
+  'livekit-nikolina', 'logisearch', 'maya', 'tarot-rws', 'teringo',
+  'uiep', 'foz-soundpro'
 ];
 
 const DOMAIN_APP_MAP = {
-  'iaprod.manuelalvarez.dev': 'iaprod-os',
-  'jartosdto.manuelalvarez.dev': 'jartosdto',
-  'traductor.manuelalvarez.dev': 'traductor-pro',
-  'industrial.manuelalvarez.dev': 'industrialpro',
   'combipro.manuelalvarez.dev': 'combipro',
   'cuentos.manuelalvarez.dev': 'cuentos-magicos',
   'gasstation.manuelalvarez.dev': 'gas-station',
-  'elitescout.manuelalvarez.dev': 'elitescout',
   'nikolina.manuelalvarez.dev': 'livekit-nikolina',
-  'appgen.manuelalvarez.dev': 'app-generator',
-  'expositator.manuelalvarez.dev': 'expositator-rte',
-  'itenglish.manuelalvarez.dev': 'it-english-coach',
   'logisearch.manuelalvarez.dev': 'logisearch',
-  // 'logitrack.manuelalvarez.dev': 'logisearch',
-  'mano.manuelalvarez.dev': 'msbross',
-  'mokotools.manuelalvarez.dev': 'moko-tools',
-  'assistant.manuelalvarez.dev': 'assistant',
-  // 'manuelalvarez.dev': 'assistant', // root serves static from www/
   'maya.manuelalvarez.dev': 'maya',
-  'atenea.manuelalvarez.dev': 'web-restaurante-atenea',
-  'taskflow.manuelalvarez.dev': 'taskflow',
-  'edelweiss.manuelalvarez.dev': 'edelweiss',
   'cv.manuelalvarez.dev': 'cv',
   'uiep.manuelalvarez.dev': 'uiep',
-  'tarot.manuelalvarez.dev': 'tarot-rws'
+  'tarot.manuelalvarez.dev': 'tarot-rws',
+  'teringo.manuelalvarez.dev': 'teringo',
+  'foz.manuelalvarez.dev': 'foz-soundpro'
 };
 
 app.use((req, res, next) => {
   const host = req.hostname;
-
-  if (host === 'mano.manuelalvarez.dev') {
-    return res.redirect(302, 'https://play.google.com/store/apps/details?id=com.manoelectricaazul.app');
-  }
 
   if (host === 'maya.manuelalvarez.dev') {
     return res.redirect(302, 'https://manu-alvarez.github.io/TuEnergiaMaya/');

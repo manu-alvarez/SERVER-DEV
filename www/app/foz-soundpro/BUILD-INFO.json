@@ -1,0 +1,8 @@
+{
+  "project": "foz-soundpro",
+  "source": "https://github.com/manu-alvarez/FoZ-SoundPro (web/)",
+  "sourceCommit": "38db6b6262989772111a1ae560a3669bd652c21e",
+  "builtAt": "2026-10-31T19:21:10Z",
+  "deployedTo": "www/app/foz-soundpro (VPS manuelalvarez.dev)",
+  "ghPages": "https://manu-alvarez.github.io/FoZ-SoundPro/"
+}
