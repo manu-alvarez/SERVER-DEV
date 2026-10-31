@@ -11,7 +11,6 @@ import {
   listSessions,
   loadRun,
   loadSession,
-  listSessionRuns,
 } from '../services/agent-runtime-store.service';
 import { createSession, startAgentRun } from '../services/agent-runtime.service';
 
@@ -334,12 +333,22 @@ export function registerConsoleRoute(app: Express): void {
     if (!ID_RE.test(id)) {
       return void res.status(400).json({ error: { id: ['formato de sessionId inválido'] } });
     }
-    Promise.all([loadSession(id), listSessionRuns(id)])
-      .then(([session, runs]) => {
+    loadSession(id)
+      .then(async (session) => {
         if (!session) {
           return void res.status(404).json({ error: 'session_not_found' });
         }
-        res.json({ ...session, runs });
+        // Resúmenes COMPLETOS (durationMs/iteraciones/tools): la proyección
+        // mínima de Fase 3 no basta para el inspector — cargamos el registro.
+        const detailed = await Promise.all(
+          session.runExecutionIds.map((rid) => loadRun(rid).then((r) => (r ? summarizeRun(r) : null))),
+        );
+        res.json({
+          ...session,
+          runs: detailed.filter((r) => r !== null),
+          messageCount: session.messages.length,
+          runCount: session.runExecutionIds.length,
+        });
       })
       .catch((err) => {
         console.error('[UIEP] console_session_get_failed', err);
