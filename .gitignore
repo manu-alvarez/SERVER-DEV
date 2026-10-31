@@ -31,3 +31,6 @@ www/app/*/out/
 
 # Binary artifact (build output copy)
 www/app/**/harry_potter.mp3
+
+# duplicados de sincronización iCloud (conflictos "* 2.*")
+* 2.*

@@ -7,7 +7,7 @@ Bienvenido al monorepo principal del ecosistema digital **MSBrossAI**. Este repo
 El ecosistema está construido bajo una arquitectura de microservicios y despliegues contenerizados con Docker, orquestados por un proxy inverso dual (Traefik + Node.js).
 
 ### Capas Principales:
-1. **Frontend Principal (React + Vite)**: Un dashboard unificado que actúa como hub para todas las aplicaciones (ubicado en `apps/msbross-frontend`). Servido directamente desde `/var/www/manuelalvarez/` vía NGINX en el VPS.
+1. **Frontends estáticos (SPA)**: las apps compiladas viven en `www/app/<app>/` del repo y las sirve el msbross-proxy (con cabeceras anti-cache). El directorio `/var/www/manuelalvarez/` del host queda como legado (nginx del host **inactivo**).
 2. **Traefik (Reverse Proxy de Nivel 1)**: Maneja el tráfico entrante (`*.manuelalvarez.dev`), la terminación SSL (Let's Encrypt) y el balanceo de carga.
 3. **MSBross Proxy (Node.js - Nivel 2)**: Situado en `infrastructure/msbross-proxy`, se encarga de servir las aplicaciones estáticas de React/Vue compiladas en `www/app/` y redirigir las peticiones API a los contenedores Docker internos.
 4. **Backend Services (Docker)**: Múltiples contenedores (PostgreSQL, Redis, MinIO, Python/NodeJS APIs) corriendo en la red segura de Docker `msbross-network`.
@@ -16,7 +16,7 @@ El ecosistema está construido bajo una arquitectura de microservicios y desplie
 
 ## 🌐 Mapeo de Dominios y Aplicaciones (24 Apps)
 
-El ecosistema alberga actualmente **24 aplicaciones funcionales**, categorizadas por área de negocio y uso.
+El ecosistema alberga actualmente **25+ despliegues funcionales**, categorizadas por área de negocio y uso.
 
 | Aplicación | Subdominio (`*.manuelalvarez.dev`) | Tipo de Despliegue |
 | :--- | :--- | :--- |
@@ -44,6 +44,23 @@ El ecosistema alberga actualmente **24 aplicaciones funcionales**, categorizadas
 | **App Generator** | `appgenerator` | App Estática |
 | **Expositator RTE** | `expositator` | App Estática |
 | **MSBross Voice** | `msbross-voice` | Docker (Python) Directo Traefik |
+| **UIEP 1.0** | `uiep` | **Plataforma de agentes** (Docker + Ollama + RAG + workflows) |
+
+---
+
+## 📚 Documentación
+
+| Documento | Contenido |
+|---|---|
+| [`docs/VPS-INVENTARIO.md`](docs/VPS-INVENTARIO.md) | Inventario real del VPS: servicios, docker, almacenamiento, seguridad, limpieza |
+| [`docs/RUNBOOK.md`](docs/RUNBOOK.md) | Operación: despliegue por tipo, backup, recuperación/rollback, salud |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Arquitectura del ecosistema |
+| [`apps/uiep/README.md`](apps/uiep/README.md) | **UIEP 1.0** — plataforma de ingeniería de agentes (matriz de rollback incluida) |
+| [`apps/uiep/docs/`](apps/uiep/docs/) | Fases 0→9 de UIEP + ADR de límites |
+| `LA_BIBLIA.md` | Contexto histórico del ecosistema |
+| `docs/PROJECT_STANDARDS.md` · `docs/SECURITY.md` | Estándares del repo |
+
+**UIEP 1.0.0** (congelada, tag `uiep-1.0.0`): agentes ejecutables con RAG y memoria, workflows multiagente con diseñador visual, integraciones HTTP/MCP/webhooks, y observabilidad con quality gate automático. Desplegada en `https://uiep.manuelalvarez.dev`.
 
 ---
 
@@ -51,9 +68,9 @@ El ecosistema alberga actualmente **24 aplicaciones funcionales**, categorizadas
 
 El despliegue está automatizado mediante **GitHub Actions** (`.github/workflows/deploy.yml`).
 
-1. Un push a `main` dispara el workflow.
-2. Construye el frontend principal con `npm run build`.
-3. Sincroniza la carpeta `dist/` vía `rsync` al VPS de Contabo.
+1. Un push a `main` dispara el workflow de despliegue del frontend principal (build + `rsync`).
+2. El resto de servicios se despliegan según el [RUNBOOK](docs/RUNBOOK.md) (SSH + docker compose por proyecto; UIEP incluye verificación del binario servido).
+3. `Secret Scan` (gitleaks) corre en cada push — verdes requeridos.
 
 ### ⚠️ Requisitos para el CI/CD (GitHub Secrets)
 Para que el despliegue automático funcione sin errores de conexión SSH, los siguientes **Secrets** deben estar configurados en el repositorio de GitHub (`Settings > Secrets and variables > Actions`):
