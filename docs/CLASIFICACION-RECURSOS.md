@@ -126,3 +126,32 @@ y mantenimiento reducida), no el espacio.
 3. Script único `infrastructure/backup/backup-all.sh` + extensión del pull script.
 4. Restauración PROBADA por motor (no basta el dump): verificar con contenedor
    aislado (el patrón UIEP).
+
+---
+
+# REGISTRO EJECUTADO — MISIÓN 04 (31-oct-2026, autorización controlada)
+
+## Retiradas ejecutadas (con backup previo externo)
+
+| Fase | Recurso retirado | Detalle |
+|---|---|---|
+| 1 | Contenedores por compose (12): traductor, industrialpro, atenea, it-english, it-coach-agent, elitescout-backend, elitescout-db, jartosdto×4, msbross-backend, llm-admin-proxy | compose limpio + `up -d --remove-orphans` (volúmenes de datos PRESERVADOS) |
+| 1 | iaprod-backend (manual, sin compose) | rm por nombre |
+| 1 | Imágenes por tag exacto (10): iaprod, traductor, industrial, atenea, msbross(granian), jartosdto(4,1G), pgvector, minio, node:22-bookworm-slim, oven/bun | ~6,5 GB liberados |
+| 2 | Estáticos históricos (16 dirs www/app): uiep-web, msbross, admin/dev-dashboard, app-generator, assistant, logitrack, iaprod-os, industrialpro, edelweiss, expositator-rte, taskflow, moko-tools, tarot-maya, web-restaurante-atenea, jartosdto, traductor-pro | git rm (reversible); repos GH y Pages intactos |
+| 2 | Incorporados: **teringo** (desde MSB@c9b70e4) y **foz-soundpro** (desde FoZ-SoundPro@38db6b6) con BUILD-INFO.json | nuevos hosts en proxy+traefik |
+| 3 | Regla ufw 8765 | reversa: `sudo ufw allow from 172.16.0.0/12 to any port 8765 proto tcp` |
+| 3 | /var/www/manuelalvarez (legado) | movido a backups/retiradas-20261031/var-www-manuelalvarez-legacy |
+| 3 | .cloudflared completo (5 credenciales + config) | movido a backups/retiradas-20261031/cloudflared-retirado — **la revocación en el dashboard de Cloudflare = acción del propietario** (los secretos de túnel NO se copiaron al Mac) |
+
+## Estado FINAL verificado
+
+| Verificación | Resultado |
+|---|---|
+| Contenedores | **11** (uiep-backend, msbross-proxy, traefik, cuentos×3, jartosdto-redis [compartido cuentos], gas-station, nikolina×2, portainer, uptime-kuma) — todos `unless-stopped`, proyecto compose unificado |
+| Los 10 dominios | manuelalvarez.dev 200 · uiep 200 · maya 302→Pages · logisearch 200 · nikolina 200 · **teringo 200** · **foz 200** · combipro 200 · cuentos 200 · gasstation 200 · tarot 200 |
+| UIEP 1.0.0 | imagen `4ea095d6f29a` intacta · volumen de datos intacto · health 200 · consola operativa |
+| GitHub Pages | 5 sites sin cambios (TuEnergiaMaya, tarot-rws, FoZ, Tarot-Maya, github.io) |
+| Datos protegidos | dumps pg (elitescout/jartosdto/cuentos) + minio/redis/atenea → VPS + iCloud; restauración pg PROBADA |
+| Disco | 46-52% (49 GB libres) — antes 98% |
+| Pendientes de decisión | cv (D) · jartosdto (D: no seleccionado con datos) · revocación CF-side de túneles (propietario) |
