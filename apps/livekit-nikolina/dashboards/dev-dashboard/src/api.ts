@@ -136,3 +136,27 @@ export const devApi = {
 }
 
 export default api
+
+
+/** Métodos trasplantados del admin-dashboard (misma API del servidor) */
+export const getStats = (date?: string) => api.get('/stats', { params: { date } });
+export const getReservations = (date?: string, status?: string) => api.get('/reservations', { params: { date, status } });
+export const createReservation = (data: any) => api.post('/reservations', data);
+export const cancelReservation = (id: number) => api.delete(`/reservations/${id}`);
+
+export const getRestaurantInfo = () => api.get('/restaurant');
+export const updateRestaurantInfo = (data: any) => api.put('/restaurant', data);
+
+export const getTables = (active_only = false) => api.get('/tables', { params: { active_only } });
+export const createTable = (data: any) => api.post('/tables', data);
+export const updateTable = (id: number, data: any) => api.put(`/tables/${id}`, data);
+export const deleteTable = (id: number) => api.delete(`/tables/${id}`);
+
+export const getCalls = (limit = 50) => api.get('/calls', { params: { limit } });
+
+
+/** Menú (API del servidor) */
+export const getMenu = (category?: string, available_only = true) => api.get('/menu', { params: { category, available_only } });
+export const createMenuItem = (data: any) => api.post('/menu', data);
+export const updateMenuItem = (id: number, data: any) => api.put(`/menu/${id}`, data);
+export const deleteMenuItem = (id: number) => api.delete(`/menu/${id}`);

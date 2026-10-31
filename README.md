@@ -16,7 +16,7 @@ El ecosistema está construido bajo una arquitectura de microservicios y desplie
 
 ## 🌐 Mapeo de Dominios y Aplicaciones (24 Apps)
 
-El ecosistema alberga actualmente **25+ despliegues funcionales**, categorizadas por área de negocio y uso.
+El ecosistema alberga una **selección de 10 proyectos** (6 principales + 4 secundarios) + utilidades de operación. **Nota (31-oct, Misión 04)**: los despliegues históricos no seleccionados fueron RETIRADOS del VPS (sus repos GH y Pages permanecen intactos): iaprod-os, industrialpro, traductor-pro, it-english-coach, atenea, edelweiss, taskflow, moko-tools, logitrack, app-generator, assistant, msbross, tarot-maya, jartosdto (stack+estático), uiep-web. El catálogo vivo: `data/proyectos.json`., categorizadas por área de negocio y uso.
 
 | Aplicación | Subdominio (`*.manuelalvarez.dev`) | Tipo de Despliegue |
 | :--- | :--- | :--- |

@@ -152,6 +152,14 @@ export default function App() {
                     <header className="app-header">
                         <h1 className="luxury-title">RESTAURANTE MSB</h1>
                         <p className="luxury-subtitle">MALASOMBRABROSS LUXURY</p>
+                        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '14px' }}>
+                            <a href="https://nikolina.manuelalvarez.dev/app/admin-dashboard/" className="btn-luxury" style={{ textDecoration: 'none', fontSize: '14px' }}>
+                                Administración
+                            </a>
+                            <a href="https://nikolina.manuelalvarez.dev/app/dev-dashboard/" className="btn-luxury" style={{ textDecoration: 'none', fontSize: '14px' }}>
+                                Desarrollo
+                            </a>
+                        </div>
                     </header>
 
                     {!token ? (
