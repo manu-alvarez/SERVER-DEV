@@ -1,6 +1,7 @@
 export { runPipeline } from './pipeline';
 export { UnsupportedFrameworkError } from './pipeline';
 export type { PipelineInput, PipelineResult } from './pipeline';
+export { deriveAgentSpec } from './spec/derive';
 export { analyzeIntent } from './pipeline/intent';
 export type { IntentAnalysisInput, IntentAnalysisResult } from './pipeline/intent';
 export { synthesizeArchitecture } from './pipeline/architecture';
