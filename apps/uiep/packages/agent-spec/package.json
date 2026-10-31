@@ -1,0 +1,22 @@
+{
+  "name": "@uiep/agent-spec",
+  "version": "0.1.0",
+  "private": true,
+  "description": "UIEP AgentSpec v1 — versioned, framework-agnostic contract for intelligent entities. The spec describes WHAT the system is; adapters decide HOW it runs.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "zod": "^3.24.0"
+  }
+}

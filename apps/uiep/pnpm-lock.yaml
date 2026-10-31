@@ -112,6 +112,9 @@ importers:
 
   backend:
     dependencies:
+      '@uiep/agent-spec':
+        specifier: workspace:^
+        version: link:../packages/agent-spec
       '@uiep/design-engine':
         specifier: workspace:*
         version: link:../packages/design-engine
@@ -150,6 +153,12 @@ importers:
         specifier: ^5.7.0
         version: 5.9.3
 
+  packages/agent-spec:
+    dependencies:
+      zod:
+        specifier: ^3.24.0
+        version: 3.25.76
+
   packages/auth-system:
     dependencies:
       uuid:
@@ -165,6 +174,9 @@ importers:
 
   packages/design-engine:
     dependencies:
+      '@uiep/agent-spec':
+        specifier: workspace:^
+        version: link:../agent-spec
       '@uiep/entity-schema':
         specifier: workspace:*
         version: link:../entity-schema
