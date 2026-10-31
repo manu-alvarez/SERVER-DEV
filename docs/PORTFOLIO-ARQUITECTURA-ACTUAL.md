@@ -76,7 +76,7 @@ flowchart LR
 | 3 | **LogiSearch** | `manu-alvarez/LogiSearch` + monorepo `apps/logisearch` | ✅ estático `www/app/logisearch` | `logisearch.manuelalvarez.dev` (+alias `logitrack`) | ❌ sin Pages | **Activo** (VPS) — backend no identificado como contenedor propio |
 | 4 | **Nikolina AI** | monorepo `apps/livekit-nikolina` | ✅ 3 contenedores + PM2 livekit | `nikolina.manuelalvarez.dev` | ❌ | **Activo** (necesita backend obligatorio) |
 | 5 | **FoZ SoundPro** | `manu-alvarez/FoZ-SoundPro` | ❌ (ni estático ni contenedor ni host) | — | ✅ `main` → **URL viva** (`…/FoZ-SoundPro/`, "Beatmaker AI Studio v1.2") | **Solo Pages** |
-| 6 | **Teringo MailOps AI** | **NO ENCONTRADO** (ni repo GH, ni VPS, ni repo local) | ❌ | — | — | **Desconocido** — punto abierto |
+| 6 | **Teringo MailOps AI / CockPit** | `manu-alvarez/MSB` → `apps/teringo/` (main, push 13-oct) | ❌ (no desplegado en VPS) | — | ✅ **PAGES VIVA** `manu-alvarez.github.io/MSB/apps/teringo/` (PWA vanilla: audio espacial + WebGL + triage con Ollama LOCAL del visitante — sin backend) | **Activo solo Pages** — incorporable al portfolio sin bloqueo |
 | 7 | **CombiPro** | `manu-alvarez/CombiPro` + monorepo `apps/combipro` | ✅ estático `www/app/combipro` | `combipro.manuelalvarez.dev` | ❌ sin Pages | **Activo** (VPS) |
 | 8 | **Cuentos Mágicos** | monorepo `apps/cuentos-magicos` | ✅ backend + celery + postgres + estático | `cuentos.manuelalvarez.dev` | ❌ | **Activo** (app completa con backend) |
 | 9 | **GasStation** | monorepo `apps/gas-station` | ✅ backend + estático | `gasstation.manuelalvarez.dev` | ❌ | **Activo** (con backend) |
@@ -201,6 +201,51 @@ VPS. `scripts/build/sync_www.sh` automatiza la copia de los builds de apps DEL
 monorepo (no de los repos externos). **Riesgo trazable**: sin registro de qué commit
 del repo origen generó cada artefacto (trazabilidad de versión débil en los
 duplicados).
+
+## 10c. MISIÓN 03 — Teringo RESUELTO + estados reales verificados
+
+### Teringo MailOps AI / Teringo CockPit — LOCALIZADO (corrección del veredicto)
+
+El proyecto EXISTE y está PUBLICADO: `https://manu-alvarez.github.io/MSB/apps/teringo/`
+(200 verificado). Proviene del repositorio **`manu-alvarez/MSB`** ("Mission Control
+Dashboard & Catálogo Centralizado", main, último push 13-oct) — el mismo repo que
+sirve el dashboard de misión (admin-dashboard/dev-dashboard).
+
+**Ficha técnica** (inspección del repo, sin modificarlo):
+- `apps/teringo/` = PWA **estática vanilla** (index.html + app.js 25 KB + styles.css
+  + manifest/icons PWA: icon-192/512, apple-touch-icon). Sin build step, sin
+  framework.
+- Cabecera del código: "TERINGO NEURAL COCKPIT — FRONTIER V.2026 · Motor de
+  Interacción, Audio Espacial Háptico, Partículas WebGL y Triage Real".
+- Config embebida: `OLLAMA_BASE: 'http://localhost:11434'` + `ACTIVE_MODEL:
+  'qwen3.5:4b'` — **la IA la pone el Ollama LOCAL del visitante** (diseño
+  local-first): por eso funciona en Pages sin backend. En un despliegue VPS la parte
+  de IA seguiría apuntando al localhost del CLIENTE (no al del servidor) salvo
+  adaptación.
+- Sin backend, sin base de datos, sin credenciales, sin secretos.
+
+**Conclusión**: Teringo = demo estática viviendo en la Pages del repo MSB. Su
+incorporación al portfolio es directa (enlazar la URL de Pages) y opcionalmente un
+estático en el VPS (copiar la carpeta a `www/app/teringo/` desde el repo MSB, con
+BUILD-INFO de versión) — decisión menor, sin bloqueo técnico.
+
+### Estados verificados de dominios "históricos" (curl, lectura)
+
+| Dominio | Estado real |
+|---|---|
+| `mapfre` / `perfume` / `txafitness`.manuelalvarez.dev | **404** — sin contenedor, sin router activo detrás (el README antiguo los describía como proxies directos a puertos 3333/3011/3456 que no existen en los 25 contenedores) |
+| `msbross.me` | **200 — servido por Cloudflare** (header `server: cloudflare`; el repo `MSBross.me` de GitHub no tiene Pages) — contenido propio ("MSBrossAI • Ecosistema Digital Personal"), **ajeno al VPS**; el túnel `e77340ca` (msbross.me→proxy) no participa |
+| `cloudflared` | NO corre en absoluto (ni el túnel de msbross.me ni el de teringo) — los dos túneles están INACTIVOS |
+
+### Postura de resiliencia (verificada)
+
+- Las **25 restart policies = `unless-stopped`** (todas las apps reinician con el
+  host; solo una parada manual las deja caídas).
+- El puerto **8765** en ufw = regla residual (ningún proceso escucha detrás) —
+  candidato a retirar del firewall con aprobación.
+- La credencial del túnel teringo (secreto expuesto en la sesión de investigación
+  de la MISIÓN 02) — el túnel está inactivo; **rotación pendiente de decisión** (se
+  hace desde el dashboard de Cloudflare; no afecta a ningún servicio en marcha).
 
 ## 11. Conclusiones y cuestiones que requieren decisión
 

@@ -81,7 +81,7 @@ destino definido hasta aclarar dónde vive (§10).
 | LogiSearch | vps-static | ninguno; aclarar si tiene backend (hoy llama a APIs — verificar en su ficha) |
 | Nikolina AI | vps-docker + PM2 LiveKit | ninguno |
 | FoZ SoundPro | **gh-pages** (sin backend; v1.2 viva) | ninguno (opción futura: estático en VPS si se quiere en dominio propio) |
-| Teringo MailOps AI / CockPit | **por definir** (no localizado) | bloqueado hasta aclarar origen |
+| Teringo MailOps AI / CockPit | **gh-pages (PWA en MSB/apps/teringo)** + opción estático VPS | resuelto (Misión 03): el proyecto vive en el repo MSB; incorporación directa al catálogo |
 | CombiPro | vps-static | ninguno (opción futura: Pages si se quiere demo pública) |
 | Cuentos Mágicos | vps-docker + estático | ninguno |
 | GasStation | vps-docker + estático | ninguno |
@@ -157,12 +157,18 @@ vigilar) · divergencia de versiones en duplicados sin BUILD-INFO · msbross.me 
 (túnel parado) · secret de túnel teringo expuesto en conversación (rotar el túnel).
 
 **Decisiones pendientes del propietario**:
-1. ¿Dónde está Teringo MailOps AI / CockPit? (bloquea su incorporación al portfolio)
+1. ~~¿Dónde está Teringo?~~ **RESUELTO (Misión 03)**: vive como PWA en la Pages del
+   repo `MSB` (`/apps/teringo/`, con IA vía Ollama local del visitante). Decisión
+   menor: enlazar la demo de Pages en el catálogo y/o desplegar el estático en VPS.
 2. ¿Destino del portfolio duplicado en github.io? (conservar como demo / retirar del
    enlazado / actualizarlo)
 3. ¿Copia externa de los Postgres de otros proyectos? (mismo patrón que UIEP)
-4. ¿msbross.me se mantiene (reactivar túnel) o se retira del mapa?
-5. Aprobación de las ETAPAS de abajo.
+4. ¿msbross.me se mantiene (reactivar túnel) o se retira del mapa? (NOTA Misión 03:
+   hoy responde desde **Cloudflare** con contenido propio, ajeno al VPS)
+5. Aprobación del **plan de retirada de históricos** (`docs/CLASIFICACION-RECURSOS.md`
+   §4) con backups previos obligatorios.
+6. Rotación del secreto del túnel Teringo (expuesto en sesión de investigación) desde
+   el dashboard de Cloudflare.
 
 ## 11. Plan de ejecución por etapas (propuesta — NO ejecutada)
 
