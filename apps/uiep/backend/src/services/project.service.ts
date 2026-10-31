@@ -165,9 +165,23 @@ export async function installTemplate(templateId: string): Promise<{ ok: boolean
   }
   for (const doc of tpl.knowledge ?? []) {
     const { createSource, ingestSource } = await import('./ingestion.service');
-    const created = await createSource({ type: 'text', title: doc.title, text: doc.text });
+    const { listSources } = await import('./knowledge-store.service');
+    // IDEMPOTENCIA: si ya existe una fuente con ese título (instalación
+    // previa), se REUTILIZA en vez de crear otra copia (las copias diluyen
+    // el topK de recuperación).
+    const existing = (await listSources()).find((s) => s.title === doc.title);
+    const created = existing
+      ? { ok: true as const, source: { sourceId: existing.sourceId, title: doc.title, type: existing.type } }
+      : await createSource({ type: 'text', title: doc.title, text: doc.text });
     if (created.ok) {
-      await ingestSource(created.source.sourceId);
+      const ingested = await ingestSource(created.source.sourceId);
+      if (!ingested.ok && ingested.reason !== 'invalid_state') {
+        // intenta re-ingerir por si quedó en failed/pending
+        const retry = await ingestSource(created.source.sourceId);
+        if (!retry.ok) {
+          details.push(`knowledge:${doc.title}:ingesta_fallida`);
+        }
+      }
       for (const agentSpecId of doc.bindTo ?? []) {
         const current = (await getBindings())[agentSpecId] ?? [];
         await setBindingsForAgent(agentSpecId, [...new Set([...current, created.source.sourceId])]);
