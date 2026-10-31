@@ -1,4 +1,4 @@
-import { AgentSpecV1Schema, type AgentSpecV1, type ToolSpecV1 } from '@uiep/agent-spec';
+import { AgentSpecV1Schema, type AgentSpecV1, type ToolSpecV1, type ModelProfileV1 } from '@uiep/agent-spec';
 import {
   describeProfile,
   modelCapabilities,
@@ -24,7 +24,7 @@ import {
 } from './agent-runtime-store.service';
 
 /**
- * agent-runtime — Fase 3 (P0).
+ * agent-runtime — Fase 3 (P0), Fase 4 (ejecución asíncrona para la UI).
  *
  * Runtime de ejecución de AgentSpecs: agnóstico de proveedor y de framework.
  * Bucle secuencial de agentes individuales: contexto (spec) + mensajes + tools
@@ -34,6 +34,15 @@ import {
  * Límites aplicados (env, con defaults): RUNTIME_MAX_ITERATIONS (16),
  * RUNTIME_TIMEOUT_MS (180000), RUNTIME_MAX_INPUT_CHARS (4000),
  * RUNTIME_MAX_CONTEXT_CHARS (24000).
+ *
+ * Doble superficie con EL MISMO motor (semántica idéntica):
+ *  - runAgent()      → ejecuta de forma síncrona y devuelve el registro final
+ *                      (API protegida clásica, Fase 3: contrato intacto).
+ *  - startAgentRun() → prepara y PERSISTE el registro 'running', despacha el
+ *                      bucle en background y devuelve executionId al momento;
+ *                      el cliente hace polling hasta estado terminal
+ *                      (Control Center: ejecuciones largas + polling; el
+ *                      turno sobrevive a recargas del navegador).
  */
 
 function envLimit(name: string, fallback: number): number {
@@ -134,7 +143,32 @@ export type RunAgentResult =
 const MAX_TOOLDEFS = 64;
 const MAX_TOOLCALLS_PER_ITER = 8;
 
-export async function runAgent(sessionId: string, rawInput: string): Promise<RunAgentResult> {
+/** Contexto precalculado de un turno (todo lo resuelto en la fase de preparación). */
+interface RunContext {
+  spec: AgentSpecV1;
+  profile: ModelProfileV1;
+  systemContent: string;
+  wantsTools: boolean;
+  toolsSupported: boolean;
+  toolDefs: RuntimeChatTool[];
+  maxIterations: number;
+  maxContextChars: number;
+  deadline: number;
+}
+
+type PreRun =
+  | { ok: false; reason: 'session_not_found' | 'input_too_large' }
+  // ctx null ⇒ el registro quedó YA FINALIZADO (spec inválido / perfil no resoluble).
+  | { ok: true; record: AgentRunRecord; session: AgentSessionRecord; ctx: RunContext | null };
+
+/**
+ * Fase de preparación: valida entrada, crea el registro 'running' persistido
+ * (con la sesión avanzada), resuelve spec + perfil y anuncia las tools. Si
+ * algo falla en esta fase, el registro queda terminado con el motivo y ctx
+ * null — el resultado (síncrono o asíncrono) es un run failed real, nunca
+ * simulado.
+ */
+async function prepareRun(sessionId: string, rawInput: string): Promise<PreRun> {
   const session = await loadSession(sessionId);
   if (!session) {
     return { ok: false, reason: 'session_not_found' };
@@ -174,12 +208,17 @@ export async function runAgent(sessionId: string, rawInput: string): Promise<Run
   await saveSession(session);
 
   if (!specOk || !spec) {
-    return finalizeRun(preview, session, 'failed', ['agent_spec_invalid']);
+    return { ok: true, record: await finalizeRun(preview, 'failed', ['agent_spec_invalid']), session, ctx: null };
   }
 
   const profile = await resolveModelRef(spec.spec.model.profile);
   if (!profile.ok) {
-    return finalizeRun(preview, session, 'failed', [`profile_not_resolvable: ${profile.message}`]);
+    return {
+      ok: true,
+      record: await finalizeRun(preview, 'failed', [`profile_not_resolvable: ${profile.message}`]),
+      session,
+      ctx: null,
+    };
   }
   const descriptor = describeProfile(profile.profile);
   preview.profileUsed = {
@@ -221,6 +260,9 @@ export async function runAgent(sessionId: string, rawInput: string): Promise<Run
       }
     }
   }
+  // Persistir profileUsed pronto: la consola hace polling del run 'running'
+  // y así ve modelo/endpoint resueltos sin esperar el resultado final.
+  await saveRun(preview);
 
   const systemContent = [
     `[Rol] ${spec.spec.identity.role}`,
@@ -228,6 +270,32 @@ export async function runAgent(sessionId: string, rawInput: string): Promise<Run
     `[Instrucciones]`,
     spec.spec.instructions.system,
   ].join('\n');
+
+  return {
+    ok: true,
+    record: preview,
+    session,
+    ctx: {
+      spec,
+      profile: profile.profile,
+      systemContent,
+      wantsTools,
+      toolsSupported,
+      toolDefs,
+      maxIterations,
+      maxContextChars,
+      deadline,
+    },
+  };
+}
+
+/** Bucle del runtime — motor único, desnudo ante síncrono/asíncrono. */
+async function executeRun(
+  preview: AgentRunRecord,
+  session: AgentSessionRecord,
+  ctx: RunContext,
+): Promise<{ ok: true; record: AgentRunRecord }> {
+  const { spec, profile, maxContextChars, maxIterations, deadline } = ctx;
 
   let status: RunStatus = 'failed';
   let finalText: string | undefined;
@@ -240,7 +308,7 @@ export async function runAgent(sessionId: string, rawInput: string): Promise<Run
       break;
     }
     const conversation: RuntimeChatMessage[] = [
-      { role: 'system', content: systemContent },
+      { role: 'system', content: ctx.systemContent },
       ...session.messages
         .filter((m) => m.role !== 'system')
         .map((m) =>
@@ -249,13 +317,13 @@ export async function runAgent(sessionId: string, rawInput: string): Promise<Run
             : { role: m.role as 'user' | 'assistant', content: m.content },
         ),
     ];
-    // Límite de tamaño de contexto: recorta MORES históricos que quepan.
+    // Límite de tamaño de contexto: recorta MENSAJES históricos que no quepan.
     if (conversation.reduce((n, m) => n + m.content.length, 0) > maxContextChars) {
       while (conversation.length > 2 && conversation.reduce((n, m) => n + m.content.length, 0) > maxContextChars) {
         conversation.splice(1, 1);
       }
       if (conversation.reduce((n, m) => n + m.content.length, 0) > maxContextChars) {
-        return finalizeRun(preview, session, 'failed', ['context_too_large']);
+        return { ok: true, record: await finalizeRun(preview, 'failed', ['context_too_large']) };
       }
     }
     iterations = i;
@@ -266,18 +334,19 @@ export async function runAgent(sessionId: string, rawInput: string): Promise<Run
       timedOut = true;
       break;
     }
-    const chat = await providerChat(profile.profile, {
+    const chat = await providerChat(profile, {
       messages: conversation,
-      tools: wantsTools && toolsSupported ? toolDefs : undefined,
+      tools: ctx.wantsTools && ctx.toolsSupported ? ctx.toolDefs : undefined,
       numPredict: 256,
       temperature: 0,
       timeoutMs: Math.min(remainingMs, 120000),
     });
     if (!chat.ok) {
-      return finalizeRun(preview, session, 'failed', [`provider_error: ${chat.error}`]);
+      return { ok: true, record: await finalizeRun(preview, 'failed', [`provider_error: ${chat.error}`]) };
     }
     if (chat.toolCalls.length > 0) {
       const toolMessages: RuntimeChatMessage[] = [];
+      let stopForApproval = false;
       for (const call of chat.toolCalls.slice(0, MAX_TOOLCALLS_PER_ITER)) {
         const decision = await authorizeToolCall(spec, call.name);
         if (!decision.authorized) {
@@ -288,9 +357,7 @@ export async function runAgent(sessionId: string, rawInput: string): Promise<Run
             content: JSON.stringify({ error: decision.reason }),
           });
           if (decision.reason === 'requires_approval') {
-            return finalizeRun(preview, session, 'requires_approval', [
-              `herramienta '${call.name}' en security.approvalRequired del spec`,
-            ]);
+            stopForApproval = true;
           }
           continue;
         }
@@ -317,11 +384,19 @@ export async function runAgent(sessionId: string, rawInput: string): Promise<Run
         ),
       );
       await saveSession(session);
+      if (stopForApproval) {
+        return {
+          ok: true,
+          record: await finalizeRun(preview, 'requires_approval', [
+            'herramienta en security.approvalRequired del spec: se detiene la ejecución',
+          ]),
+        };
+      }
       continue;
     }
     // Respuesta final del modelo (sin llamadas de herramienta).
     finalText = chat.content;
-    status = wantsTools && !toolsSupported ? 'completed_without_tools' : 'completed';
+    status = ctx.wantsTools && !ctx.toolsSupported ? 'completed_without_tools' : 'completed';
     break;
   }
 
@@ -342,15 +417,55 @@ export async function runAgent(sessionId: string, rawInput: string): Promise<Run
     preview.result.text = finalText;
   }
   await saveSession(session);
-  return finalizeRunRecord(preview, status);
+  return { ok: true, record: await finalizeRunRecord(preview, status) };
 }
 
-function finalizeRun(
-  record: AgentRunRecord,
-  session: AgentSessionRecord,
-  status: RunStatus,
-  errors: string[],
-): Promise<{ ok: true; record: AgentRunRecord }> {
+/* ── Superficie síncrona (API protegida Fase 3, contrato intacto) ─────────── */
+
+export async function runAgent(sessionId: string, rawInput: string): Promise<RunAgentResult> {
+  const pre = await prepareRun(sessionId, rawInput);
+  if (!pre.ok) {
+    return pre;
+  }
+  if (!pre.ctx) {
+    return { ok: true, record: pre.record };
+  }
+  return executeRun(pre.record, pre.session, pre.ctx);
+}
+
+/* ── Superficie asíncrona (Control Center: ejecuciones largas + polling) ──── */
+
+export type StartAgentRunResult =
+  | { ok: false; reason: 'session_not_found' | 'input_too_large' }
+  | { ok: true; executionId: string; status: RunStatus };
+
+/**
+ * Despacha el turno en background y devuelve el executionId al momento.
+ * El cliente hace polling del registro hasta estado terminal; si el proceso
+ * muriera a mitad, el sweep de arranque marca el run como failed
+ * (runtime_restarted) — nunca se simula un resultado.
+ */
+export async function startAgentRun(sessionId: string, rawInput: string): Promise<StartAgentRunResult> {
+  const pre = await prepareRun(sessionId, rawInput);
+  if (!pre.ok) {
+    return pre;
+  }
+  if (!pre.ctx) {
+    return { ok: true, executionId: pre.record.executionId, status: pre.record.status };
+  }
+  void executeRun(pre.record, pre.session, pre.ctx).catch((err) => {
+    console.error('[UIEP] async_run_failed', err);
+    // Persiste el fallo impensado (la promesa huérfana no debe perder el run).
+    void finalizeRun(pre.record, 'failed', [`run_error: ${(err as Error).message || 'error desconocido'}`]).catch(
+      () => undefined,
+    );
+  });
+  return { ok: true, executionId: pre.record.executionId, status: pre.record.status };
+}
+
+/* ── Finalización ─────────────────────────────────────────────────────────── */
+
+function finalizeRun(record: AgentRunRecord, status: RunStatus, errors: string[]): Promise<AgentRunRecord> {
   record.status = status;
   record.errors.push(...errors);
   return finalizeRunRecord(record, status);
@@ -359,10 +474,10 @@ function finalizeRun(
 async function finalizeRunRecord(
   record: AgentRunRecord,
   status: RunStatus,
-): Promise<{ ok: true; record: AgentRunRecord }> {
+): Promise<AgentRunRecord> {
   record.status = status;
   record.finishedAt = new Date().toISOString();
   record.result.durationMs = Date.now() - Date.parse(record.startedAt);
   await saveRun(record);
-  return { ok: true, record };
+  return record;
 }

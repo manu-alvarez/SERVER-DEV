@@ -130,6 +130,85 @@ export async function loadRun(executionId: string): Promise<AgentRunRecord | nul
   }
 }
 
+/* ── Listados (Fase 4 — Control Center) ───────────────────────────────────── */
+/**
+ * MVP sobre ficheros JSON: readdir + parse (el volumen es pequeño). El
+ * orden por antigüedad usa startedAt/createdAt del documento. La migración a
+ * repositorios estructurados (Fase 4.1, si la carga lo justifica) reemplazará
+ * estos escaneos sin cambiar la interfaz.
+ */
+
+export async function listSessions(limit = 25): Promise<AgentSessionRecord[]> {
+  await ensure();
+  const files = (await fs.readdir(SESSIONS_DIR)).filter((f) => f.endsWith('.json'));
+  const sessions: AgentSessionRecord[] = [];
+  for (const file of files) {
+    try {
+      sessions.push(JSON.parse(await fs.readFile(path.join(SESSIONS_DIR, file), 'utf8')) as AgentSessionRecord);
+    } catch {
+      // fichero corrupto: se ignora, no bloquea el listado
+    }
+  }
+  sessions.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  return sessions.slice(0, Math.max(1, limit));
+}
+
+export async function countSessions(): Promise<number> {
+  await ensure();
+  return (await fs.readdir(SESSIONS_DIR)).filter((f) => f.endsWith('.json')).length;
+}
+
+export async function listRuns(limit = 25): Promise<AgentRunRecord[]> {
+  await ensure();
+  const files = (await fs.readdir(RUNS_DIR)).filter((f) => f.endsWith('.json'));
+  const runs: AgentRunRecord[] = [];
+  for (const file of files) {
+    try {
+      runs.push(JSON.parse(await fs.readFile(path.join(RUNS_DIR, file), 'utf8')) as AgentRunRecord);
+    } catch {
+      // fichero corrupto: se ignora, no bloquea el listado
+    }
+  }
+  runs.sort((a, b) => (b.startedAt || '').localeCompare(a.startedAt || ''));
+  return runs.slice(0, Math.max(1, limit));
+}
+
+export async function countRuns(): Promise<number> {
+  await ensure();
+  return (await fs.readdir(RUNS_DIR)).filter((f) => f.endsWith('.json')).length;
+}
+
+/**
+ * Al arrancar el runtime, las ejecuciones que quedaron en 'running' tras un
+ * reinicio (crash, deploy) nunca alcanzarán estado terminal por sí solas: se
+ * marcan explícitamente como fallidas con la causa. Nunca simula un resultado.
+ */
+export async function sweepInterruptedRuns(): Promise<number> {
+  await ensure();
+  const files = (await fs.readdir(RUNS_DIR)).filter((f) => f.endsWith('.json'));
+  let swept = 0;
+  for (const file of files) {
+    const full = path.join(RUNS_DIR, file);
+    try {
+      const run = JSON.parse(await fs.readFile(full, 'utf8')) as AgentRunRecord;
+      if (run.status !== 'running') {
+        continue;
+      }
+      run.status = 'failed';
+      run.errors.push('runtime_restarted: la ejecución quedó en running tras reiniciar el contenedor');
+      if (!run.finishedAt) {
+        run.finishedAt = new Date().toISOString();
+        run.result.durationMs = Date.now() - Date.parse(run.startedAt);
+      }
+      await writeAtomic(full, run);
+      swept += 1;
+    } catch {
+      // fichero corrupto: no se toca
+    }
+  }
+  return swept;
+}
+
 /** Ejecuciones de una sesión (resumen por marcas temporales). */
 export async function listSessionRuns(sessionId: string): Promise<
   Array<{ executionId: string; status: RunStatus; startedAt: string; finishedAt?: string }>

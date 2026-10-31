@@ -20,6 +20,21 @@ export async function listTools(): Promise<SpecSummary[]> {
   return listSpecs({ kind: 'Tool' });
 }
 
+/** ToolSpecs COMPLETOS (Fase 4 — Control Center): la gestión de autorizaciones
+ *  necesita permisos, adapter y esquema, no el resumen. Documentos ya validados
+ *  al registrarse; aquí se filtra por kind con defensa adicional. */
+export async function listToolSpecs(): Promise<ToolSpecV1[]> {
+  const summaries = await listSpecs({ kind: 'Tool' });
+  const tools: ToolSpecV1[] = [];
+  for (const summary of summaries) {
+    const envelope = await getLatestSpec(summary.id);
+    if (envelope && (envelope as { kind?: string }).kind === 'Tool') {
+      tools.push(envelope as unknown as ToolSpecV1);
+    }
+  }
+  return tools;
+}
+
 export async function getToolSpec(id: string): Promise<ToolSpecV1 | null> {
   const envelope = await getLatestSpec(id);
   if (!envelope || (envelope as { kind?: string }).kind !== 'Tool') {
