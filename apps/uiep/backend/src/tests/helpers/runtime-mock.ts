@@ -16,8 +16,9 @@ export function startRuntimeMock(): Promise<{ server: Server; url: string }> {
       res.end(JSON.stringify({ models: [{ name: 'mock-model', capabilities: ['completion', 'tools'] }] }));
       return;
     }
-    // Fase 5 — embeddings mock DETERMINISTAS (4 dims): 'rojo'→[1,0,0,0],
-    // 'azul'→[0,1,0,0], 'verde'→[0,0,1,0], resto→[0,0,0,1]. Batch o unitario.
+    // Fase 5.2 — embeddings mock DETERMINISTAS (6 dims, ortogonales por tema):
+    // rojo/azul/verde/naranja/violeta/gris → cada documento del corpus tiene
+    // su propia dirección; temas desconocidos caen en un bucket aparte.
     if (req.method === 'POST' && req.url === '/api/embed') {
       let raw = '';
       req.on('data', (c) => (raw += c));
@@ -32,10 +33,11 @@ export function startRuntimeMock(): Promise<{ server: Server; url: string }> {
         const inputs = Array.isArray(body.input) ? body.input : [body.input ?? ''];
         const vectorFor = (text: string): number[] => {
           const t = text.toLowerCase();
-          if (t.includes('rojo')) return [1, 0, 0, 0];
-          if (t.includes('azul')) return [0, 1, 0, 0];
-          if (t.includes('verde')) return [0, 0, 1, 0];
-          return [0, 0, 0, 1];
+          const topics = ['rojo', 'azul', 'verde', 'naranja', 'violeta', 'gris'];
+          const idx = topics.findIndex((k) => t.includes(k));
+          const v = [0, 0, 0, 0, 0, 0];
+          v[idx >= 0 ? idx : 5] = 1; // desconocido comparte bucket con 'gris'
+          return v;
         };
         res.end(JSON.stringify({ model: 'mock-embed', embeddings: inputs.map(vectorFor) }));
       });
@@ -98,7 +100,9 @@ export function startRuntimeMock(): Promise<{ server: Server; url: string }> {
         if (systemMsg.includes('[Contexto de conocimiento recuperado')) {
           const recover = /RECOVER:\s*([^\n\]]+)/.exec(systemMsg)?.[1]?.trim();
           if (recover) {
-            res.end(JSON.stringify({ message: { role: 'assistant', content: `FACT: ${recover}` }, done: true }));
+            // [1] = el primer fragmento inyectado (determinista en el corpus):
+            // el modelo de prueba emite cita para las métricas de Fase 5.2.
+            res.end(JSON.stringify({ message: { role: 'assistant', content: `FACT: ${recover} [1]` }, done: true }));
             return;
           }
         }

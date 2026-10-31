@@ -11,7 +11,9 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "node --test \"dist/tests/**/*.test.js\""
+    "test": "node --test \"dist/tests/**/*.test.js\"",
+    "eval:rag": "node --test dist/tests/rag-eval.test.js",
+    "eval:rag:real": "RAG_EVAL_PROVIDER=real node --test dist/tests/rag-eval.test.js"
   },
   "dependencies": {
     "@uiep/agent-spec": "workspace:^",

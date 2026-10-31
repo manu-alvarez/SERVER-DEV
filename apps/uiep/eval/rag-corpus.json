@@ -1,0 +1,46 @@
+{
+  "$comment": "Corpus de referencia del RAG (Fase 5.2) — versionado junto al código. Cada documento trata un TEMA único; cada pregunta apunta a su documento relevante. En CI las métricas se calculan con el proveedor de embeddings MOCK (determinista, keywords: rojo/azul/verde/naranja/violeta/gris) — mide el MECANISMO (fragmentación, índice, ranking, umbral). Con RAG_EVAL_PROVIDER=real (VPS) se evalúa con nomic-embed-text real — mide la CALIDAD semántica con el mismo corpus. Umbrales del gate: RAG_EVAL_MIN_RECALL_AT_K / RAG_EVAL_MIN_MRR / RAG_EVAL_MIN_PRECISION_AT_K (defaults 0.9/0.9/0.3).",
+  "version": "1.0.0",
+  "docs": [
+    {
+      "id": "doc-rojo",
+      "title": "Manual del equipo rojo",
+      "text": "Manual del equipo rojo. RECOVER: la clave de la sala del equipo rojo es 4471. El equipo rojo se aloja en el rack inferior y responde al color rojo en los test de integración."
+    },
+    {
+      "id": "doc-azul",
+      "title": "Política de copias (azul)",
+      "text": "Política de copias de seguridad del equipo azul. RECOVER: las copias del sistema azul se ejecutan a las 04:17 con retención de 14 días. El color azul identifica la línea de backups."
+    },
+    {
+      "id": "doc-verde",
+      "title": "Procedimiento de despliegue (verde)",
+      "text": "Procedimiento de despliegue del canal verde. RECOVER: el despliegue verde requiere ancla de rollback y build verificado antes de subir. Verde es el color del pipeline de despliegue."
+    },
+    {
+      "id": "doc-naranja",
+      "title": "Contactos de guardia (naranja)",
+      "text": "Contactos de guardia del equipo naranja. RECOVER: la guardia naranja atiende incidencias con el teléfono interno 5511. Naranja es el color del equipo de guardia."
+    },
+    {
+      "id": "doc-violeta",
+      "title": "Red interna (violeta)",
+      "text": "Red interna del segmento violeta. RECOVER: la VLAN violeta usa el rango documentado en la tabla 3 y su gateway violeta es fijo. Violeta identifica la red interna."
+    },
+    {
+      "id": "doc-gris",
+      "title": "Mantenimiento programado (gris)",
+      "text": "Ventana de mantenimiento del servidor gris. RECOVER: el servidor gris se apaga el primer domingo de mes a las 02:00. Gris es el color del nodo de mantenimiento."
+    }
+  ],
+  "questions": [
+    { "q": "¿Cuál es la clave de la sala del equipo rojo?", "relevantDocIds": ["doc-rojo"], "answerMustContain": ["4471"] },
+    { "q": "¿Cuándo se ejecutan las copias del sistema azul y con qué retención?", "relevantDocIds": ["doc-azul"], "answerMustContain": ["04:17"] },
+    { "q": "¿Qué exige el procedimiento de despliegue verde antes de subir?", "relevantDocIds": ["doc-verde"], "answerMustContain": ["rollback"] },
+    { "q": "¿Qué teléfono atiende la guardia naranja?", "relevantDocIds": ["doc-naranja"], "answerMustContain": ["5511"] },
+    { "q": "¿Dónde está documentado el rango de la red violeta?", "relevantDocIds": ["doc-violeta"], "answerMustContain": ["tabla 3"] },
+    { "q": "¿Cuándo se apaga el servidor gris para mantenimiento?", "relevantDocIds": ["doc-gris"], "answerMustContain": ["primer domingo"] }
+  ],
+  "agentId": "rag-eval-agent",
+  "topK": 3
+}
