@@ -6,6 +6,7 @@ import { registerHealthRoute } from './routes/health';
 import { registerGenerateRoute } from './routes/generate';
 import { registerTemplatesRoute } from './routes/templates';
 import { registerMcpRoute } from './routes/mcp';
+import { registerSpecsRoute } from './routes/specs';
 
 /**
  * createApp — construye la aplicación Express sin abrir socket (independiente
@@ -51,6 +52,7 @@ export function createApp(options: { trustProxy?: string | number | boolean } = 
   registerGenerateRoute(app);
   registerTemplatesRoute(app);
   registerMcpRoute(app);
+  registerSpecsRoute(app);
 
   return app;
 }

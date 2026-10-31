@@ -1,4 +1,5 @@
-import { runPipeline, type PipelineInput, type PipelineResult } from '@uiep/design-engine';
+import { runPipeline, deriveAgentSpec, type PipelineInput, type PipelineResult } from '@uiep/design-engine';
+import type { AgentSpecV1 } from '@uiep/agent-spec';
 import type { EntityType, Framework } from '@uiep/entity-schema';
 import type { GenerateRequest } from '../schemas';
 
@@ -66,6 +67,8 @@ export interface GenerateResponse {
   createdAt: string;
   /** Aditivo, no consumido por el frontend actual: PipelineResult completo de runPipeline(). */
   engine: PipelineResult;
+  /** Aditivo (Fase 1): AgentSpec v1 derivado del resultado del motor y validado contra @uiep/agent-spec. */
+  agentSpec?: AgentSpecV1;
 }
 
 function toPipelineInput(req: GenerateRequest): PipelineInput {
@@ -136,5 +139,6 @@ export function runGenerate(req: GenerateRequest): GenerateResponse {
         : [],
     createdAt: new Date().toISOString(),
     engine: result,
+    agentSpec: deriveAgentSpec(result),
   };
 }

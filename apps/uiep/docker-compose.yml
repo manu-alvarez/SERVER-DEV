@@ -21,9 +21,14 @@ services:
     environment:
       - PORT=4000
       - NODE_ENV=production
+    volumes:
+      - uiep-backend-data:/app/data
     networks:
       - msbross_net
 
 networks:
   msbross_net:
     external: true
+
+volumes:
+  uiep-backend-data:

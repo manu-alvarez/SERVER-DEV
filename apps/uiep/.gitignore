@@ -10,3 +10,6 @@ dist/
 .DS_Store
 coverage/
 .vitest/
+
+# registro local de specs (Fase 1, dev)
+backend/data/
