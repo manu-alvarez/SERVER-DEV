@@ -138,6 +138,8 @@ interface FormState {
   system: string
   profile: string
   maxIterations: number
+  memoryEnabled: boolean
+  memoryStrategy: 'none' | 'semantic'
   tools: ToolRow[]
 }
 
@@ -152,6 +154,8 @@ function emptyForm(): FormState {
     system: '',
     profile: '',
     maxIterations: 8,
+    memoryEnabled: false,
+    memoryStrategy: 'none',
     tools: [],
   }
 }
@@ -193,6 +197,8 @@ export function AgentEditor({ specId }: { specId: string | null }): ReactNode {
             system: spec.instructions?.system ?? '',
             profile: spec.model?.profile ?? '',
             maxIterations: spec.orchestration?.maxIterations ?? 8,
+            memoryEnabled: spec.memory?.enabled ?? false,
+            memoryStrategy: (spec.memory?.strategy as 'none' | 'semantic') ?? 'none',
             tools: [],
           })
           // Sincronizar tools con el documento cargado (por id).
@@ -241,6 +247,10 @@ export function AgentEditor({ specId }: { specId: string | null }): ReactNode {
       tools: form.tools
         .filter((t) => t.enabled)
         .map((t) => ({ id: t.tool.metadata.id, permissions: t.permissions.length > 0 ? t.permissions : ['*'] })),
+      memory: {
+        enabled: form.memoryEnabled && form.memoryStrategy !== 'none',
+        strategy: form.memoryEnabled ? form.memoryStrategy : 'none',
+      },
       orchestration: { mode: 'single-agent', maxIterations: form.maxIterations },
       security: {
         approvalRequired: form.tools.filter((t) => t.enabled && t.approval).map((t) => t.tool.metadata.id),
@@ -446,6 +456,27 @@ export function AgentEditor({ specId }: { specId: string | null }): ReactNode {
         )}
       </Section>
 
+      {/* Memoria (Knowledge & Memory, Fase 5) */}
+      <Section title="Memoria (Knowledge & Memory)">
+        <Stack spacing={1.4}>
+          <Stack direction="row" sx={{ alignItems: 'center', gap: 1.6 }}>
+            <Switch checked={form.memoryEnabled} onChange={(e) => set({ memoryEnabled: e.target.checked, memoryStrategy: e.target.checked ? (form.memoryStrategy === 'none' ? 'semantic' : form.memoryStrategy) : 'none' })} />
+            <Typography fontSize={14}>Memoria semántica (Knowledge Base)</Typography>
+          </Stack>
+          {form.memoryEnabled && (
+            <>
+              <TextField select label="estrategia" value={form.memoryStrategy} onChange={(e) => set({ memoryStrategy: e.target.value as 'none' | 'semantic' })} sx={{ width: 320 }}>
+                <MenuItem value="semantic">semantic — recupera fragmentos del Knowledge Base autorizado a este agente</MenuItem>
+              </TextField>
+              <Typography variant="caption" color="text.secondary">
+                La inyección de contexto ocurre por turno (deny-by-default sobre las fuentes autorizadas en «Conocimiento»).
+                Un fallo del subsistema degrada con nota explícita — nunca bloquea el turno.
+              </Typography>
+            </>
+          )}
+        </Stack>
+      </Section>
+
       {/* Límites */}
       <Section title="Límites de ejecución">
         <Box sx={{ width: 420 }}>
@@ -536,6 +567,7 @@ interface AgentSpecPartial {
   instructions?: { system?: string }
   model?: { profile?: string }
   tools?: AgentToolDecl[]
+  memory?: { enabled?: boolean; strategy?: string }
   security?: { approvalRequired?: string[] }
   orchestration?: { mode?: string; maxIterations?: number }
 }
@@ -549,6 +581,7 @@ interface AgentSpecDocShape {
     model: { profile: string }
     instructions: { system: string }
     tools: AgentToolDecl[]
+    memory: { enabled: boolean; strategy: 'none' | 'semantic' }
     orchestration: { mode: string; maxIterations: number }
     security: { approvalRequired: string[] }
     evaluation: Record<string, never>

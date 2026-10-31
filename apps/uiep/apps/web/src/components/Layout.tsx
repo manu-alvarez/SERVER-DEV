@@ -25,6 +25,7 @@ import SmartToyIcon from '@mui/icons-material/SmartToy'
 import ChatIcon from '@mui/icons-material/Forum'
 import MemoryIcon from '@mui/icons-material/Memory'
 import BuildIcon from '@mui/icons-material/BuildCircle'
+import KnowledgeIcon from '@mui/icons-material/AutoStories'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import LogoutIcon from '@mui/icons-material/Logout'
@@ -35,6 +36,7 @@ const NAV = [
   { to: '/', icon: <DashboardIcon sx={{ color: 'text.secondary' }} />, label: 'Dashboard' },
   { to: '/agents', icon: <SmartToyIcon sx={{ color: 'text.secondary' }} />, label: 'Agentes' },
   { to: '/playground', icon: <ChatIcon sx={{ color: 'text.secondary' }} />, label: 'Playground' },
+  { to: '/knowledge', icon: <KnowledgeIcon sx={{ color: 'text.secondary' }} />, label: 'Conocimiento' },
   { to: '/models', icon: <MemoryIcon sx={{ color: 'text.secondary' }} />, label: 'Modelos' },
   { to: '/tools', icon: <BuildIcon sx={{ color: 'text.secondary' }} />, label: 'Herramientas' },
 ]

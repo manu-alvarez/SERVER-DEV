@@ -26,7 +26,7 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(method: 'GET' | 'POST', path: string, body?: unknown): Promise<T> {
+async function request<T>(method: 'GET' | 'POST' | 'DELETE', path: string, body?: unknown): Promise<T> {
   const headers: Record<string, string> = { 'content-type': 'application/json' }
   if (method !== 'GET') {
     headers[CSRF_HEADER] = '1'
@@ -112,10 +112,20 @@ export interface RunRecord {
     toolExecutions: ToolExecution[]
     iterations: number
     durationMs?: number
+    retrievals?: KnowledgeRetrievalRef[]
   }
   errors: string[]
   startedAt: string
   finishedAt?: string
+}
+
+/** Fase 5 — trazabilidad conocimiento: fragmento inyectado → fuente. */
+export interface KnowledgeRetrievalRef {
+  sourceId: string
+  title: string
+  ref: string
+  chunkIdx: number
+  score: number
 }
 
 export interface RunSummary {
@@ -129,6 +139,7 @@ export interface RunSummary {
   iterations: number
   toolCount: number
   toolFailures: number
+  retrievalCount?: number
   textPreview: string
 }
 
@@ -203,6 +214,39 @@ export interface InvocationDescriptor extends ProviderCallDescriptor {
   costTier: string | null
 }
 
+/* ── Knowledge (Fase 5) ──────────────────────────────────────────────────── */
+
+export type KnowledgeSourceStatus = 'pending' | 'ingesting' | 'ingested' | 'failed'
+
+export interface KnowledgeSource {
+  sourceId: string
+  type: 'text' | 'url'
+  ref: string
+  title: string
+  status: KnowledgeSourceStatus
+  error?: string
+  hash?: string
+  chunkCount: number
+  dims?: number
+  createdAt: string
+  ingestedAt?: string
+}
+
+export interface KnowledgeHit {
+  sourceId: string
+  title: string
+  ref: string
+  chunkIdx: number
+  score: number
+  text: string
+}
+
+export interface KnowledgeQueryResult {
+  ok: boolean
+  hits: KnowledgeHit[]
+  dims: number
+}
+
 /* ── Endpoints ─────────────────────────────────────────────────────────────── */
 
 export const api = {
@@ -228,6 +272,20 @@ export const api = {
       `/api/console/runtime/sessions/${sessionId}/run`,
       { input },
     ),
+
+  /* Knowledge (Fase 5 — consola) */
+  knowledge: {
+    sources: () => get<KnowledgeSource[]>('/api/console/knowledge/sources'),
+    create: (input: { type: 'text' | 'url'; title?: string; ref?: string; text?: string }) =>
+      post<KnowledgeSource>('/api/console/knowledge/sources', input),
+    ingest: (sourceId: string) =>
+      post<{ source: KnowledgeSource; skipped: boolean }>(`/api/console/knowledge/sources/${sourceId}/ingest`),
+    remove: (sourceId: string) => request<{ deleted: boolean }>('DELETE', `/api/console/knowledge/sources/${sourceId}`),
+    bindings: () => get<Record<string, string[]>>('/api/console/knowledge/bindings'),
+    setBindings: (agentSpecId: string, sourceIds: string[]) =>
+      post<{ bound: boolean }>(`/api/console/knowledge/bindings/${agentSpecId}`, { sourceIds }),
+    query: (query: string, topK?: number) => post<KnowledgeQueryResult>('/api/console/knowledge/query', { query, topK }),
+  },
 
   /* Públicos (contratos de Fases 1-2, sin cambios) */
   specs: {

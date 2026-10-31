@@ -128,6 +128,26 @@ export default function RunDialog({ executionId, onClose }: { executionId: strin
               </Box>
             )}
 
+            {run.result.retrievals && run.result.retrievals.length > 0 && (
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                  Conocimiento inyectado (trazabilidad → fuente)
+                </Typography>
+                <Stack spacing={0.8}>
+                  {run.result.retrievals.map((r, i) => (
+                    <Stack key={i} direction="row" sx={{ alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                      <Chip size="small" color="primary" variant="status" label={`[${i + 1}]`} />
+                      <Typography fontSize={13.4}>{r.title}</Typography>
+                      <Chip size="small" variant="outlined" label={`fragmento #${r.chunkIdx}`} />
+                      <Chip size="small" variant="outlined" label={`similitud ${r.score}`} />
+                      <Chip size="small" variant="outlined" label={`src ${r.sourceId}`} />
+                      {r.ref && <Typography variant="caption" color="text.secondary" noWrap maxWidth={240}>{r.ref}</Typography>}
+                    </Stack>
+                  ))}
+                </Stack>
+              </Box>
+            )}
+
             {run.result.text && (
               <Box>
                 <Typography variant="subtitle2" color="text.secondary" gutterBottom>

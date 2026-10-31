@@ -4,6 +4,7 @@ import AppLayout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import { AgentEditor, AgentList } from './pages/Agents'
 import Playground from './pages/Playground'
+import Knowledge from './pages/Knowledge'
 import Models from './pages/Models'
 import Tools from './pages/Tools'
 
@@ -23,6 +24,7 @@ export default function App(): ReactNode {
           <Route path="/agents/:id/edit" element={<AgentEditorRouter />} />
           <Route path="/playground" element={<Playground />} />
           <Route path="/playground/:sessionId" element={<Playground />} />
+          <Route path="/knowledge" element={<Knowledge />} />
           <Route path="/models" element={<Models />} />
           <Route path="/tools" element={<Tools />} />
           <Route path="*" element={<Navigate to="/" replace />} />
