@@ -96,7 +96,7 @@ export type WorkflowStructureResult = { ok: true } | { ok: false; errors: string
  */
 export function validateWorkflowStructure(spec: { spec: WorkflowSpecInput }): WorkflowStructureResult {
   const errors: string[] = [];
-  const byId = new Map<string, WorkflowNode>();
+  const byId = new Map<string, WorkflowNodeInput>();
   for (const node of spec.spec.nodes) {
     if (byId.has(node.id)) {
       errors.push(`nodo duplicado: ${node.id}`);
