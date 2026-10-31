@@ -364,7 +364,12 @@ app.use((req, res, next) => {
   }
 
   const mappedApp = DOMAIN_APP_MAP[host];
-  if (mappedApp && !req.url.startsWith('/api') && (!req.url.startsWith('/_') || req.url.startsWith('/_next'))) {
+  // Fase Misión 07: las rutas GLOBALES de apps estáticas (/app/<nombre>/…)
+  // se sirven desde www/app/<nombre> en CUALQUIER host — no se reescriben
+  // como subrutas del app del host (los dashboards de Nikolina viven así).
+  const globalApp = req.url.match(/^\/app\/([a-z0-9-]+)/);
+  const isGlobalAppPath = globalApp && NEXT_APPS.includes(globalApp[1]);
+  if (mappedApp && !isGlobalAppPath && !req.url.startsWith('/api') && (!req.url.startsWith('/_') || req.url.startsWith('/_next'))) {
     if (req.url === '/') {
       req.url = `/app/${mappedApp}/`;
     } else if (!req.url.startsWith(`/app/${mappedApp}`)) {
