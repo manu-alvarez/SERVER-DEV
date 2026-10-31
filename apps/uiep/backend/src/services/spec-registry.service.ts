@@ -47,6 +47,26 @@ export async function saveSpec(spec: SpecEnvelope): Promise<void> {
   await fs.rename(tmp, file);
 }
 
+/**
+ * Historial de versiones de un spec (Fase 9 — lifecycle): todas las
+ * versiones registradas para un id, de más nueva a más vieja.
+ */
+export async function listSpecVersions(id: string): Promise<SpecEnvelope[]> {
+  await ensureDir();
+  const safe = id.replace(/[^a-zA-Z0-9-]/g, '');
+  const files = (await fs.readdir(SPECS_DIR)).filter((f) => f.startsWith(`${safe}@`) && f.endsWith('.json'));
+  const docs: SpecEnvelope[] = [];
+  for (const file of files) {
+    try {
+      docs.push(JSON.parse(await fs.readFile(path.join(SPECS_DIR, file), 'utf8')) as SpecEnvelope);
+    } catch {
+      /* corrupto: ignorar */
+    }
+  }
+  docs.sort((a, b) => (b.metadata.version ?? '').localeCompare(a.metadata.version ?? ''));
+  return docs;
+}
+
 export interface SpecSummary {
   id: string;
   name: string;

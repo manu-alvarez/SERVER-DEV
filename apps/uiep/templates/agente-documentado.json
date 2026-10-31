@@ -1,0 +1,29 @@
+{
+  "id": "agente-documentado",
+  "title": "Agente con conocimiento documental",
+  "description": "Blueprint: agente con memoria semántica que responde desde una fuente documental de ejemplo (con cita [n]). Incluye el documento de ejemplo y su binding.",
+  "specs": [
+    {
+      "apiVersion": "uiep.io/v1",
+      "kind": "Agent",
+      "metadata": { "id": "tpl-agente-documentado", "name": "Agente documentado (plantilla)", "version": "1.0.0", "description": "Responde desde su fuente de conocimiento con referencias [n]." },
+      "spec": {
+        "identity": { "role": "asistente documentado", "objective": "Responder EXCLUSIVAMENTE con el contexto recuperado, citando [n]." },
+        "model": { "profile": "default" },
+        "instructions": { "system": "Usa SOLO el contexto de conocimiento recuperado. Cita la referencia [n]. Si no hay contexto, di que no dispones de esa información." },
+        "tools": [],
+        "memory": { "enabled": true, "strategy": "semantic" },
+        "orchestration": { "mode": "single-agent", "maxIterations": 4 },
+        "security": { "approvalRequired": [] },
+        "evaluation": {}
+      }
+    }
+  ],
+  "knowledge": [
+    {
+      "title": "Plantilla: documento de ejemplo",
+      "text": "Documento de ejemplo del agente documentado.\n\nRECOVER: el código de ejemplo de esta plantilla es TPL-0001.",
+      "bindTo": ["tpl-agente-documentado"]
+    }
+  ]
+}

@@ -9,6 +9,7 @@ import MemoryPage from './pages/Memory'
 import Workflows from './pages/Workflows'
 import Integrations from './pages/Integrations'
 import Observability from './pages/Observability'
+import Project from './pages/Project'
 import Models from './pages/Models'
 import Tools from './pages/Tools'
 
@@ -33,6 +34,7 @@ export default function App(): ReactNode {
           <Route path="/workflows" element={<Workflows />} />
           <Route path="/integrations" element={<Integrations />} />
           <Route path="/observability" element={<Observability />} />
+          <Route path="/project" element={<Project />} />
           <Route path="/models" element={<Models />} />
           <Route path="/tools" element={<Tools />} />
           <Route path="*" element={<Navigate to="/" replace />} />

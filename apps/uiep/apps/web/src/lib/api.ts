@@ -319,6 +319,16 @@ export interface WorkflowRunSummary {
 
 /* ── Integraciones (Fase 7) ──────────────────────────────────────────────── */
 
+/** Forma de ENTRADA del WorkflowSpec (pre-defaults) — espejo del contrato. */
+export type WorkflowSpecInput = {
+  start: string
+  nodes: Array<
+    | { id: string; type: 'agent'; agentSpecId: string; input: string; retries?: number; timeoutMs?: number }
+    | { id: string; type: 'condition'; input: string; check: { op: 'contains' | 'equals' | 'not_empty' | 'starts_with'; value: string; caseSensitive: boolean }; then: string; else: string }
+    | { id: string; type: 'parallel'; branches: string[] }
+  >
+}
+
 export interface IntegrationSummary {
   id: string
   name: string
@@ -386,6 +396,11 @@ export const api = {
     runDetail: (runId: string) => get<WorkflowRunRecord>(`/api/console/workflow-runs/${runId}`),
     cancel: (runId: string) => post<{ cancelling: boolean }>(`/api/console/workflow-runs/${runId}/cancel`),
     resume: (runId: string) => post<{ resumed: boolean }>(`/api/console/workflow-runs/${runId}/resume`),
+  },
+
+  templates: {
+    list: () => get<Array<{ id: string; title: string; description: string; kind: string }>>('/api/console/templates'),
+    install: (id: string) => post<{ ok: boolean; details?: string[] }>(`/api/console/templates/${id}/install`),
   },
 
   /* Integraciones (Fase 7 — consola) */

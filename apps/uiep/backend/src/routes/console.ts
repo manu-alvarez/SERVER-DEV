@@ -3,7 +3,7 @@ import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import rateLimit from 'express-rate-limit';
 import { EntityIdSchema, validateSpec } from '@uiep/agent-spec';
 import { listToolSpecs } from '../services/tool-registry.service';
-import { listSpecs, getLatestSpec, saveSpec } from '../services/spec-registry.service';
+import { listSpecs, getLatestSpec, saveSpec, listSpecVersions } from '../services/spec-registry.service';
 import { resolveModelRef, modelCapabilities } from '../services/model-gateway.service';
 import {
   countRuns,
@@ -30,6 +30,7 @@ import { loadWorkflow, startWorkflowRun, cancelWorkflowRun, resumeWorkflowRun } 
 import { listWorkflowRuns, loadWorkflowRun } from '../services/workflow-store.service';
 import { listIntegrations, getIntegration, integrationHealth } from '../services/integration.service';
 import { mcpListTools } from '../services/mcp-client.service';
+import { exportProject, importProject, cloneAgentSpec, installTemplate, listTemplates, type ProjectBundle } from '../services/project.service';
 import { createSession, startAgentRun } from '../services/agent-runtime.service';
 
 /**
@@ -972,6 +973,100 @@ export function registerConsoleRoute(app: Express): void {
       .catch((err) => {
         console.error('[UIEP] console_integration_get_failed', err);
         res.status(500).json({ error: 'integration_get_failed' });
+      });
+  });
+
+  /* ── Proyecto & Templates (Fase 9): reproducibilidad entre instalaciones ── */
+
+  app.get('/api/console/project', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    exportProject()
+      .then((bundle) => res.json(bundle))
+      .catch((err) => {
+        console.error('[UIEP] console_project_export_failed', err);
+        res.status(500).json({ error: 'project_export_failed' });
+      });
+  });
+
+  app.post('/api/console/project/import', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const body = (req.body ?? {}) as { bundle?: unknown };
+    const bundle = (body.bundle ?? body) as ProjectBundle | undefined;
+    if (!bundle || typeof bundle !== 'object' || !Array.isArray((bundle as ProjectBundle).specs)) {
+      return void res.status(400).json({ error: 'bundle_invalid' });
+    }
+    importProject(bundle)
+      .then((r) => {
+        audit({ actor: { kind: 'console' }, action: 'project.import', detail: { specs: r.specsImported, knowledge: r.knowledgeImported, errors: r.errors.length } });
+        res.json(r);
+      })
+      .catch((err) => {
+        console.error('[UIEP] console_project_import_failed', err);
+        res.status(500).json({ error: 'project_import_failed' });
+      });
+  });
+
+  app.get('/api/console/templates', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    listTemplates()
+      .then((t) => res.json(t))
+      .catch(() => res.json([]));
+  });
+
+  app.post('/api/console/templates/:id/install', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!/^[a-z0-9-]{3,80}$/.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    installTemplate(id)
+      .then((r) => (r.ok ? res.json(r) : res.status(r.reason === 'template_not_found' ? 404 : 422).json(r)))
+      .catch((err) => {
+        console.error('[UIEP] console_template_install_failed', err);
+        res.status(500).json({ error: 'template_install_failed' });
+      });
+  });
+
+  /* ── Lifecycle de agentes (Fase 9): versiones y clonado ─────────────────── */
+
+  app.get('/api/console/agents/:id/versions', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!ID_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    listSpecVersions(id)
+      .then((docs) => res.json(docs.map((d) => ({ id: d.metadata.id, version: d.metadata.version, createdAt: d.metadata.createdAt ?? null, description: d.metadata.description ?? null }))))
+      .catch((err) => {
+        console.error('[UIEP] console_agent_versions_failed', err);
+        res.status(500).json({ error: 'agent_versions_failed' });
+      });
+  });
+
+  app.post('/api/console/agents/:id/clone', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    const body = (req.body ?? {}) as { newId?: unknown };
+    if (!ID_RE.test(id) || typeof body.newId !== 'string') {
+      return void res.status(400).json({ error: { newId: ['falta newId válido (slug)'] } });
+    }
+    cloneAgentSpec(id, body.newId)
+      .then((r) => (r.ok ? res.status(201).json({ cloned: true, newId: body.newId, version: r.version }) : res.status(r.reason === 'agent_not_found' ? 404 : 400).json({ error: r.reason })))
+      .catch((err) => {
+        console.error('[UIEP] console_agent_clone_failed', err);
+        res.status(500).json({ error: 'agent_clone_failed' });
       });
   });
 }

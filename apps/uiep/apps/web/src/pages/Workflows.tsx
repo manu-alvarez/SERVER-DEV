@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   Chip,
-  IconButton,
   LinearProgress,
   Paper,
   Stack,
@@ -23,6 +22,7 @@ import ErrorIcon from '@mui/icons-material/ErrorRounded'
 import PendingIcon from '@mui/icons-material/ScheduleRounded'
 import SkipIcon from '@mui/icons-material/SkipNextRounded'
 import { api, ApiError, type SpecSummary, type WorkflowNodeStep, type WorkflowRunRecord, type WorkflowRunSummary } from '../lib/api'
+import WorkflowDesigner from './WorkflowDesigner'
 import { fmtDate, fmtDuration } from '../theme'
 
 /**
@@ -44,6 +44,7 @@ export default function Workflows(): ReactNode {
   const [runs, setRuns] = useState<WorkflowRunSummary[]>([])
   const [openRun, setOpenRun] = useState<string | null>(null)
   const [runDetail, setRunDetail] = useState<WorkflowRunRecord | null>(null)
+  const [designer, setDesigner] = useState<{ open: boolean; specId: string | null }>({ open: false, specId: null })
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   /* Editor */
@@ -142,6 +143,19 @@ export default function Workflows(): ReactNode {
     }
   }
 
+  /* Diseñador visual (Fase 9) */
+  if (designer.open) {
+    return (
+      <WorkflowDesigner
+        specId={designer.specId}
+        onDone={() => {
+          setDesigner({ open: false, specId: null })
+          load()
+        }}
+      />
+    )
+  }
+
   const act = async (fn: () => Promise<unknown>) => {
     setActionError(null)
     try {
@@ -157,12 +171,10 @@ export default function Workflows(): ReactNode {
       <Stack direction="row" sx={{ alignItems: 'center' }}>
         <Typography variant="h4">Workflows</Typography>
         <Box sx={{ flexGrow: 1 }} />
-        <Button onClick={() => void openEditor(null)} startIcon={<PlayIcon sx={{ transform: 'rotate(180deg)' }} />}>
-          Nuevo workflow
+        <Button onClick={() => setDesigner({ open: true, specId: null })} startIcon={<PlayIcon sx={{ transform: 'rotate(180deg)' }} />}>
+          Diseñador visual
         </Button>
-        <Tooltip title="Recargar">
-          <IconButton onClick={load}><RefreshIcon /></IconButton>
-        </Tooltip>
+        <Button onClick={load} startIcon={<RefreshIcon />}>Recargar</Button>
       </Stack>
       <Typography color="text.secondary" fontSize={14.6} maxWidth={860}>
         Motor de orquestación propio y determinista: nodos <code>agent</code> (pipeline completo del agente),
@@ -208,7 +220,10 @@ export default function Workflows(): ReactNode {
                 <Typography variant="h6" fontSize={15.5}>{w.name} <code style={{ opacity: 0.65, fontSize: 12 }}>{w.id}</code></Typography>
                 <Chip size="small" variant="outlined" label={`v${w.version}`} />
                 <Box sx={{ flexGrow: 1 }} />
-                <Button size="small" onClick={() => void openEditor(w.id)}>Editar</Button>
+                <Button size="small" onClick={() => void openEditor(w.id)}>JSON</Button>
+                <Button size="small" startIcon={<PlayIcon />} onClick={() => setDesigner({ open: true, specId: w.id })}>
+                  Diseñar
+                </Button>
                 <Button
                   size="small"
                   variant="contained"
