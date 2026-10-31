@@ -11,6 +11,8 @@ import { getToolSpec, validateToolArguments, executeTool, type ToolContext } fro
 import { getLatestSpec, saveSpec } from './spec-registry.service';
 import { retrieveForAgent, type RetrievalHit } from './retrieval.service';
 import { retrieveMemories, type MemoryHit } from './memory-store.service';
+import { audit, recordMetric } from './observability.service';
+import { tryAcquireAgentSlot, releaseAgentSlot } from './reliability.service';
 import {
   listSessionRuns,
   loadRun,
@@ -375,6 +377,8 @@ async function executeRun(
   let finalText: string | undefined;
   let iterations = 0;
   let timedOut = false;
+  const tokens = { prompt: 0, completion: 0 };
+  let sawTokens = false;
 
   for (let i = 1; i <= maxIterations; i += 1) {
     if (Date.now() > deadline) {
@@ -417,6 +421,12 @@ async function executeRun(
     });
     if (!chat.ok) {
       return { ok: true, record: await finalizeRun(preview, 'failed', [`provider_error: ${chat.error}`]) };
+    }
+    // Fase 8 — consumo acumulado del turno (si el proveedor lo expone).
+    if (chat.tokens) {
+      tokens.prompt += chat.tokens.prompt;
+      tokens.completion += chat.tokens.completion;
+      sawTokens = true;
     }
     if (chat.toolCalls.length > 0) {
       const toolMessages: RuntimeChatMessage[] = [];
@@ -504,6 +514,9 @@ async function executeRun(
     }
   }
   await saveSession(session);
+  if (sawTokens) {
+    preview.result.tokens = { ...tokens };
+  }
   return { ok: true, record: await finalizeRunRecord(preview, status) };
 }
 
@@ -523,7 +536,7 @@ export async function runAgent(sessionId: string, rawInput: string): Promise<Run
 /* ── Superficie asíncrona (Control Center: ejecuciones largas + polling) ──── */
 
 export type StartAgentRunResult =
-  | { ok: false; reason: 'session_not_found' | 'input_too_large' }
+  | { ok: false; reason: 'session_not_found' | 'input_too_large' | 'concurrency_limit' }
   | { ok: true; executionId: string; status: RunStatus };
 
 /**
@@ -533,20 +546,37 @@ export type StartAgentRunResult =
  * (runtime_restarted) — nunca se simula un resultado.
  */
 export async function startAgentRun(sessionId: string, rawInput: string): Promise<StartAgentRunResult> {
+  // Fase 8 — backpressure GLOBAL (todo el proceso): sin slot libre → 429
+  // aguas arriba. El slot se sostiene hasta que el turno en background
+  // TERMINA (no al despacharlo).
+  if (!tryAcquireAgentSlot()) {
+    return { ok: false, reason: 'concurrency_limit' };
+  }
   const pre = await prepareRun(sessionId, rawInput);
   if (!pre.ok) {
+    releaseAgentSlot();
     return pre;
   }
+  audit({ actor: { kind: 'system' }, action: 'agent.run.start', correlation: { sessionId, agentRunId: pre.record.executionId }, detail: { agentSpecId: String(pre.record.agentSpecId), inputChars: rawInput.length } });
   if (!pre.ctx) {
+    releaseAgentSlot();
     return { ok: true, executionId: pre.record.executionId, status: pre.record.status };
   }
-  void executeRun(pre.record, pre.session, pre.ctx).catch((err) => {
-    console.error('[UIEP] async_run_failed', err);
-    // Persiste el fallo impensado (la promesa huérfana no debe perder el run).
-    void finalizeRun(pre.record, 'failed', [`run_error: ${(err as Error).message || 'error desconocido'}`]).catch(
-      () => undefined,
-    );
-  });
+  const startedAt = Date.now();
+  void executeRun(pre.record, pre.session, pre.ctx)
+    .then((r) => {
+      recordMetric('agent', String(pre.record.agentSpecId), { ok: r.record.status.startsWith('completed'), latencyMs: Date.now() - startedAt, error: r.record.status.startsWith('completed') ? undefined : r.record.status });
+      audit({ actor: { kind: 'system' }, action: 'agent.run.finish', correlation: { sessionId, agentRunId: pre.record.executionId }, detail: { status: r.record.status, durationMs: r.record.result.durationMs, tokens: r.record.result.tokens } });
+    })
+    .catch((err) => {
+      console.error('[UIEP] async_run_failed', err);
+      recordMetric('agent', String(pre.record.agentSpecId), { ok: false, latencyMs: Date.now() - startedAt, error: String(err).slice(0, 120) });
+      // Persiste el fallo impensado (la promesa huérfana no debe perder el run).
+      void finalizeRun(pre.record, 'failed', [`run_error: ${(err as Error).message || 'error desconocido'}`]).catch(
+        () => undefined,
+      );
+    })
+    .finally(() => releaseAgentSlot());
   return { ok: true, executionId: pre.record.executionId, status: pre.record.status };
 }
 

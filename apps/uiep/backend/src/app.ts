@@ -13,6 +13,7 @@ import { registerKnowledgeRoute } from './routes/knowledge';
 import { registerWorkflowRoutes } from './routes/workflows';
 import { registerMcpServer } from './routes/mcp-server';
 import { registerHooksRoute } from './routes/hooks';
+import { registerObservabilityRoute } from './routes/observability';
 import { registerConsoleRoute } from './routes/console';
 
 /**
@@ -66,6 +67,7 @@ export function createApp(options: { trustProxy?: string | number | boolean } = 
   registerWorkflowRoutes(app);
   registerMcpServer(app);
   registerHooksRoute(app);
+  registerObservabilityRoute(app);
   registerConsoleRoute(app);
 
   return app;

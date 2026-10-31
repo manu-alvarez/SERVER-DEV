@@ -1,4 +1,5 @@
 import { getLatestSpec, listSpecs } from './spec-registry.service';
+import { audit, recordMetric } from './observability.service';
 import type { IntegrationSpecV1 } from '@uiep/agent-spec';
 
 /**
@@ -105,6 +106,8 @@ export async function callIntegration(spec: IntegrationSpecV1, opts: { method: s
   const started = Date.now();
   const st = breakerState(spec.metadata.id);
   if (st.open) {
+    recordMetric('integration', spec.metadata.id, { ok: false, latencyMs: 0, error: 'circuit_open' });
+    audit({ actor: { kind: 'system' }, action: 'integration.call.circuit_open', correlation: { integrationId: spec.metadata.id }, detail: { retryInSec: Math.ceil(st.retryInMs / 1000) } });
     return { ok: false, error: `circuit_open_retry_in_${Math.ceil(st.retryInMs / 1000)}s`, durationMs: 0 };
   }
   const base = spec.spec.baseUrl.replace(/\/+$/, '');
@@ -129,10 +132,13 @@ export async function callIntegration(spec: IntegrationSpecV1, opts: { method: s
   }
   if (!res.ok) {
     const opened = breakerFailure(spec.metadata.id);
+    recordMetric('integration', spec.metadata.id, { ok: false, latencyMs: Date.now() - started, error: `status_${res.status}` });
+    audit({ actor: { kind: 'system' }, action: 'integration.call.error', correlation: { integrationId: spec.metadata.id }, detail: { status: res.status, circuitOpened: opened } });
     return { ok: false, status: res.status, error: `connector_status_${res.status}${opened ? '_circuit_opened' : ''}`, durationMs: Date.now() - started };
   }
   breakerSuccess(spec.metadata.id);
   const buf = await res.arrayBuffer();
+  recordMetric('integration', spec.metadata.id, { ok: true, latencyMs: Date.now() - started });
   return { ok: true, status: res.status, body: Buffer.from(buf).toString('utf8').slice(0, 100_000), durationMs: Date.now() - started };
 }
 

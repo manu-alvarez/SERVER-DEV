@@ -84,7 +84,7 @@ export interface RuntimeChatTool {
 }
 
 export type ProviderChatResult =
-  | { ok: true; content: string; toolCalls: Array<{ name: string; arguments: unknown }> }
+  | { ok: true; content: string; toolCalls: Array<{ name: string; arguments: unknown }>; tokens?: { prompt: number; completion: number } }
   | { ok: false; error: string };
 
 function normalizeToolArgs(args: unknown): unknown {
@@ -145,6 +145,8 @@ export async function providerChat(
     }
     const parsed = (await res.json()) as {
       message?: { content?: string; tool_calls?: Array<{ function?: { name?: string; arguments?: unknown } }> };
+      prompt_eval_count?: number;
+      eval_count?: number;
     };
     const toolCalls = (parsed.message?.tool_calls ?? [])
       .map((c) => ({
@@ -152,7 +154,13 @@ export async function providerChat(
         arguments: normalizeToolArgs(c.function?.arguments),
       }))
       .filter((c) => c.name.length > 0);
-    return { ok: true, content: (parsed.message?.content ?? '').trim(), toolCalls };
+    // Fase 8 — consumo: tokens reales del proveedor cuando los expone
+    // (ollama: prompt_eval_count/eval_count); ausentes → undefined.
+    const tokens =
+      typeof parsed.prompt_eval_count === 'number' && typeof parsed.eval_count === 'number'
+        ? { prompt: parsed.prompt_eval_count, completion: parsed.eval_count }
+        : undefined;
+    return { ok: true, content: (parsed.message?.content ?? '').trim(), toolCalls, tokens };
   } catch (err) {
     const code = (err as { cause?: { code?: string } }).cause?.code;
     return { ok: false, error: code || (err as Error).message || 'provider_error' };

@@ -103,6 +103,8 @@ const ASYNC_ADAPTERS: Record<string, (input: Record<string, unknown>, ctx: ToolC
   'http-call': (parsed, ctx, tool) =>
     (async () => {
       const { getIntegration, callIntegration } = await import('./integration.service');
+      const { idempotencyKey, lookupIdempotent, recordIdempotent } = await import('./reliability.service');
+      const { audit, recordMetric } = await import('./observability.service');
       const config = tool.spec.execution.config ?? {};
       const integrationId = config.integrationId ?? '';
       const spec = integrationId ? await getIntegration(integrationId) : null;
@@ -114,10 +116,29 @@ const ASYNC_ADAPTERS: Record<string, (input: Record<string, unknown>, ctx: ToolC
         return { ok: false, error: 'invalid_method', detail: method };
       }
       const body = method === 'GET' ? undefined : { input: ctx.input, ...parsed };
+      // Fase 8 — IDEMPOTENCIA: clave determinista (integración+método+path+
+      // hash del body). Un resultado COMPLETADO se REPRODUCE sin repetir el
+      // efecto externo (el escenario de la reanudación de workflows); un
+      // resultado INCERTO (fallo de red tras enviar) se re-ejecuta con aviso
+      // explícito — nunca se simula un éxito.
+      const key = idempotencyKey({ integrationId, method, path: config.path, body });
+      const prior = await lookupIdempotent(key);
+      if (prior?.outcome === 'completed') {
+        audit({ actor: { kind: 'agent', id: ctx.agentSpecId }, action: 'integration.call.replayed', correlation: { integrationId, agentRunId: ctx.executionId, toolName: tool.metadata.id }, detail: { key } });
+        return { ok: true, result: { status: prior.result?.status ?? 200, body: (prior.result?.body ?? '').slice(0, 4000), durationMs: 0, idempotentReplay: true } };
+      }
       const r = await callIntegration(spec, { method, path: config.path, body });
+      recordMetric('tool', tool.metadata.id, { ok: r.ok, latencyMs: r.durationMs, error: r.error });
+      audit({ actor: { kind: 'agent', id: ctx.agentSpecId }, action: 'integration.call', correlation: { integrationId, agentRunId: ctx.executionId, toolName: tool.metadata.id }, detail: { method, path: config.path ?? '', status: r.status, ok: r.ok } });
       if (!r.ok) {
+        // Fallo de RED (sin status) tras haber enviado → resultado INCIERTO:
+        // el efecto pudo llegar; NO se cachea como completado.
+        if (r.error?.startsWith('connector_error') && r.status === undefined) {
+          await recordIdempotent(key, 'uncertain');
+        }
         return { ok: false, error: r.error ?? 'connector_failed', detail: `status=${r.status ?? '-'} ${r.durationMs}ms` };
       }
+      await recordIdempotent(key, 'completed', { status: r.status, body: r.body });
       return { ok: true, result: { status: r.status, body: (r.body ?? '').slice(0, 4000), durationMs: r.durationMs } };
     })(),
   // Fase 7 — cliente MCP: descubre/ejecuta herramientas del servidor MCP de

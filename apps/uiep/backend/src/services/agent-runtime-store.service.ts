@@ -68,6 +68,8 @@ export interface AgentRunRecord {
     /** Fase 5.1: citas emitidas por el modelo, validadas contra los fragmentos
      *  existentes (verified=false → el modelo citó una referencia inexistente). */
     citations?: Array<{ ref: number; verified: boolean; sourceId: string | null; chunkIdx: number | null; score: number | null }>;
+    /** Fase 8: consumo real del proveedor cuando lo expone (ollama). */
+    tokens?: { prompt: number; completion: number };
   };
   errors: string[];
   startedAt: string;

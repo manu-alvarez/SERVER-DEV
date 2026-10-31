@@ -24,6 +24,8 @@ import {
 import { createSource, ingestSource } from '../services/ingestion.service';
 import { queryAll } from '../services/retrieval.service';
 import { listAll as listAllMemories, deleteMemory, isExpired } from '../services/memory-store.service';
+import { audit, recordMetric, snapshotMetrics, auditTail, logStructured } from '../services/observability.service';
+import { globalSlots } from '../services/reliability.service';
 import { loadWorkflow, startWorkflowRun, cancelWorkflowRun, resumeWorkflowRun } from '../services/workflow-runtime.service';
 import { listWorkflowRuns, loadWorkflowRun } from '../services/workflow-store.service';
 import { listIntegrations, getIntegration, integrationHealth } from '../services/integration.service';
@@ -246,6 +248,7 @@ export function registerConsoleRoute(app: Express): void {
     const expectedBuf = Buffer.from(configured);
     const providedBuf = Buffer.from(password);
     if (providedBuf.length !== expectedBuf.length || !timingSafeEqual(providedBuf, expectedBuf)) {
+      audit({ actor: { kind: 'console' }, action: 'login.failed' });
       // Espera fija al fallo: no deja medir el timing de la comparación.
       void sleep(700).then(() => {
         if (!res.writableEnded) {
@@ -254,6 +257,7 @@ export function registerConsoleRoute(app: Express): void {
       });
       return;
     }
+    audit({ actor: { kind: 'console' }, action: 'login.ok' });
     const issued = issueToken();
     setSessionCookie(res, req, issued.token);
     res.json({ authenticated: true, expiresAt: issued.expiresAt });
@@ -473,7 +477,9 @@ export function registerConsoleRoute(app: Express): void {
     startAgentRun(sessionId, body.input)
       .then((result) => {
         if (!result.ok) {
-          return void res.status(result.reason === 'session_not_found' ? 404 : 413).json({ error: result.reason });
+          return void res
+            .status(result.reason === 'session_not_found' ? 404 : result.reason === 'concurrency_limit' ? 429 : 413)
+            .json({ error: result.reason });
         }
         res.status(202).json({ executionId: result.executionId, status: result.status });
       })
@@ -560,6 +566,7 @@ export function registerConsoleRoute(app: Express): void {
         if (!deleted) {
           return void res.status(404).json({ error: 'source_not_found' });
         }
+        audit({ actor: { kind: 'console' }, action: 'knowledge.source.delete', correlation: { targetId: id } });
         res.json({ deleted: true });
       })
       .catch((err) => {
@@ -690,6 +697,7 @@ export function registerConsoleRoute(app: Express): void {
         if (!deleted) {
           return void res.status(404).json({ error: 'memory_not_found' });
         }
+        audit({ actor: { kind: 'console' }, action: 'memory.delete', correlation: { targetId: id } });
         res.json({ deleted: true });
       })
       .catch((err) => {
@@ -967,3 +975,5 @@ export function registerConsoleRoute(app: Express): void {
       });
   });
 }
+
+export { consoleAuth, guard };
