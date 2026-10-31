@@ -1,0 +1,2 @@
+# Config local de despliegue (tokens de runtime, secretos) — nunca en el repo.
+.env
