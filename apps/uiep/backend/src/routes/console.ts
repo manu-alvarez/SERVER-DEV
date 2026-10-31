@@ -1,9 +1,9 @@
 import type { Express, Request, Response } from 'express';
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import rateLimit from 'express-rate-limit';
-import { EntityIdSchema } from '@uiep/agent-spec';
+import { EntityIdSchema, validateSpec } from '@uiep/agent-spec';
 import { listToolSpecs } from '../services/tool-registry.service';
-import { listSpecs } from '../services/spec-registry.service';
+import { listSpecs, getLatestSpec, saveSpec } from '../services/spec-registry.service';
 import { resolveModelRef, modelCapabilities } from '../services/model-gateway.service';
 import {
   countRuns,
@@ -24,6 +24,8 @@ import {
 import { createSource, ingestSource } from '../services/ingestion.service';
 import { queryAll } from '../services/retrieval.service';
 import { listAll as listAllMemories, deleteMemory, isExpired } from '../services/memory-store.service';
+import { loadWorkflow, startWorkflowRun, cancelWorkflowRun, resumeWorkflowRun } from '../services/workflow-runtime.service';
+import { listWorkflowRuns, loadWorkflowRun } from '../services/workflow-store.service';
 import { createSession, startAgentRun } from '../services/agent-runtime.service';
 
 /**
@@ -693,4 +695,173 @@ export function registerConsoleRoute(app: Express): void {
         res.status(500).json({ error: 'memory_delete_failed' });
       });
   });
+
+  /* ── Workflows (Fase 6): delegación directa ─────────────────────────────── */
+
+  app.post('/api/console/workflows', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const result = validateSpec(req.body);
+    if (!result.ok) {
+      return void res.status(400).json({ error: result.errors });
+    }
+    if (result.kind !== 'Workflow') {
+      return void res.status(400).json({ error: { kind: ['este endpoint registra solo WorkflowSpecs'] } });
+    }
+    saveSpec(result.spec)
+      .then(() => res.status(201).json({ stored: true, id: result.spec.metadata.id, version: result.spec.metadata.version }))
+      .catch((err) => {
+        console.error('[UIEP] console_workflow_save_failed', err);
+        res.status(500).json({ error: 'workflow_save_failed' });
+      });
+  });
+
+  app.get('/api/console/workflows', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    listSpecs({ kind: 'Workflow' })
+      .then((w) => res.json(w))
+      .catch((err) => {
+        console.error('[UIEP] console_workflow_list_failed', err);
+        res.status(500).json({ error: 'workflow_list_failed' });
+      });
+  });
+
+  app.get('/api/console/workflows/:id', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!ID_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    loadWorkflow(id)
+      .then((loaded) => {
+        if (!loaded.ok) {
+          return void res.status(404).json({ error: loaded.reason, errors: loaded.errors });
+        }
+        res.json(loaded.spec);
+      })
+      .catch((err) => {
+        console.error('[UIEP] console_workflow_get_failed', err);
+        res.status(500).json({ error: 'workflow_get_failed' });
+      });
+  });
+
+  app.post('/api/console/workflows/:id/run', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!ID_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    const body = (req.body ?? {}) as { input?: unknown };
+    if (typeof body.input !== 'string' || body.input.trim().length === 0) {
+      return void res.status(400).json({ error: { input: ['falta la entrada del workflow'] } });
+    }
+    startWorkflowRun(id, body.input)
+      .then((result) => {
+        if (!result.ok) {
+          return void res
+            .status(result.reason === 'concurrency_limit' ? 429 : result.reason === 'input_too_large' ? 413 : 404)
+            .json({ error: result.reason, errors: result.errors });
+        }
+        res.status(202).json({ workflowRunId: result.workflowRunId });
+      })
+      .catch((err) => {
+        console.error('[UIEP] console_workflow_run_failed', err);
+        res.status(500).json({ error: 'workflow_run_failed' });
+      });
+  });
+
+  app.get('/api/console/workflow-runs', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    listWorkflowRuns(25)
+      .then((runs) =>
+        res.json(
+          runs.map((r) => ({
+            workflowRunId: r.workflowRunId,
+            workflowId: r.workflowId,
+            workflowVersion: r.workflowVersion,
+            status: r.status,
+            input: r.input.slice(0, 120),
+            output: r.output?.slice(0, 160),
+            nodesDone: Object.values(r.steps).filter((s) => s.status === 'completed').length,
+            nodesTotal: r.order.length,
+            errors: r.errors.slice(0, 2),
+            startedAt: r.startedAt,
+            finishedAt: r.finishedAt,
+          })),
+        ),
+      )
+      .catch((err) => {
+        console.error('[UIEP] console_workflow_runs_failed', err);
+        res.status(500).json({ error: 'workflow_runs_failed' });
+      });
+  });
+
+  app.get('/api/console/workflow-runs/:id', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    loadWorkflowRun(String(req.params.id))
+      .then((run) => {
+        if (!run) {
+          return void res.status(404).json({ error: 'run_not_found' });
+        }
+        res.json(run);
+      })
+      .catch((err) => {
+        console.error('[UIEP] console_workflow_run_get_failed', err);
+        res.status(500).json({ error: 'workflow_run_get_failed' });
+      });
+  });
+
+  const consoleCancel = (req: { params: { id: string } }, res: Parameters<typeof guard>[0]): void => {
+    if (!guard(res, consoleAuth(req as never))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!/^wfr-[a-z0-9-]{3,80}$/.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de workflowRunId inválido'] } });
+    }
+    cancelWorkflowRun(id)
+      .then((r) => {
+        if (!r.ok) {
+          return void res.status(409).json({ error: r.reason });
+        }
+        res.json({ cancelling: true });
+      })
+      .catch((err) => {
+        console.error('[UIEP] console_workflow_cancel_failed', err);
+        res.status(500).json({ error: 'workflow_cancel_failed' });
+      });
+  };
+  const consoleResume = (req: { params: { id: string } }, res: Parameters<typeof guard>[0]): void => {
+    if (!guard(res, consoleAuth(req as never))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!/^wfr-[a-z0-9-]{3,80}$/.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de workflowRunId inválido'] } });
+    }
+    resumeWorkflowRun(id)
+      .then((r) => {
+        if (!r.ok) {
+          return void res.status(409).json({ error: r.reason });
+        }
+        res.json({ resumed: true });
+      })
+      .catch((err) => {
+        console.error('[UIEP] console_workflow_resume_failed', err);
+        res.status(500).json({ error: 'workflow_resume_failed' });
+      });
+  };
+  app.post('/api/console/workflow-runs/:id/cancel', consoleCancel);
+  app.post('/api/console/workflow-runs/:id/resume', consoleResume);
 }

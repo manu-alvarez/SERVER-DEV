@@ -10,6 +10,7 @@ import { createServer, type Server } from 'node:http';
  * resultado de herramienta → respuesta final 'MADE'; sin tools → 'PLAIN'.
  */
 export function startRuntimeMock(): Promise<{ server: Server; url: string }> {
+  const failOnceSeen = new Set<string>(); // Fase 6: tokens [FAIL_ONCE:] ya vistos
   const server = createServer((req, res) => {
     if (req.method === 'GET' && req.url === '/api/tags') {
       res.setHeader('content-type', 'application/json');
@@ -56,12 +57,35 @@ export function startRuntimeMock(): Promise<{ server: Server; url: string }> {
         }
         const messages = body.messages ?? [];
         const last = messages[messages.length - 1];
+        const systemMsg = messages.find((m) => m.role === 'system')?.content ?? '';
         const match = /\[(LOOP_CALL|TOOL_CALL):([a-zA-Z0-9-]+)\]/.exec(
           messages.filter((m) => m.role === 'user').map((m) => m.content ?? '').join('\n'),
         );
         if (last && last.role === 'user' && (last.content ?? '').includes('[FAIL_PROVIDER]')) {
           res.statusCode = 500;
           res.end(JSON.stringify({ error: 'fail_provider' }));
+          return;
+        }
+        // Fase 6 — [FAIL_ONCE:<token>]: falla SOLO la primera vez (por token)
+        // y después responde SAY → prueba de reintentos y REANUDACIÓN.
+        const failOnceMatch = /FAIL_ONCE:([a-zA-Z0-9-]+)/.exec(
+          messages.filter((m) => m.role === 'user').map((m) => m.content ?? '').join('\n'),
+        );
+        if (failOnceMatch && !failOnceSeen.has(failOnceMatch[1])) {
+          failOnceSeen.add(failOnceMatch[1]);
+          res.statusCode = 500;
+          res.end(JSON.stringify({ error: `fail_once_${failOnceMatch[1]}` }));
+          return;
+        }
+        // [SAY:<texto>]: eco determinista SOLO sin contexto inyectado — el
+        // backbone de los tests de flujo (transferencia entre nodos).
+        const hasInjectedContext =
+          systemMsg.includes('[Contexto de conocimiento recuperado') || systemMsg.includes('[Memoria del agente');
+        const sayMatch = /\[SAY:([^\]]+)\]/.exec(
+          messages.filter((m) => m.role === 'user').map((m) => m.content ?? '').join('\n'),
+        );
+        if (sayMatch && !hasInjectedContext && last && last.role === 'user') {
+          res.end(JSON.stringify({ message: { role: 'assistant', content: sayMatch[1] }, done: true }));
           return;
         }
         const callResponse = (name: string) => {
@@ -92,11 +116,10 @@ export function startRuntimeMock(): Promise<{ server: Server; url: string }> {
           res.end(JSON.stringify({ message: { role: 'assistant', content: 'MADE' }, done: true }));
           return;
         }
-        // Fase 5 — eco semántico: si el system inyectó contexto de conocimiento
-        // (marcador), el modelo "responde" con el fragmento recuperado que
-        // contiene 'RECOVER:' — prueba el viaje chunk→contexto→modelo.
-        // Fase 5.1 — igual para el bloque de MEMORIA del agente ([M1] …).
-        const systemMsg = messages.find((m) => m.role === 'system')?.content ?? '';
+        // Fase 5 — eco semántico (systemMsg ya declarado arriba): si el system
+        // inyectó contexto de conocimiento, el modelo "responde" con el
+        // fragmento recuperado que contiene 'RECOVER:' — prueba el viaje
+        // chunk→contexto→modelo. Fase 5.1 — igual para [M1] de memoria.
         if (systemMsg.includes('[Contexto de conocimiento recuperado')) {
           const recover = /RECOVER:\s*([^\n\]]+)/.exec(systemMsg)?.[1]?.trim();
           if (recover) {

@@ -5,5 +5,7 @@ export { ModelProfileV1Schema, ProviderSchema, ProfileCapabilitySchema } from '.
 export type { ModelProfileV1, ModelProvider } from './model-profile.schema';
 export { ToolSpecV1Schema, ToolParamSchema, ToolInputSchemaSchema, ToolAdapterSchema, validateToolInput } from './tool.schema';
 export type { ToolSpecV1, ToolParam, ToolInputSchema } from './tool.schema';
+export { WorkflowSpecV1Schema, WorkflowNodeSchema, WorkflowCheckOpSchema, validateWorkflowStructure } from './workflow.schema';
+export type { WorkflowSpecV1, WorkflowNode, WorkflowNodeAgent, WorkflowNodeCondition, WorkflowNodeParallel, WorkflowCheckOp, WorkflowStructureResult, WorkflowNodeInput, WorkflowSpecInput } from './workflow.schema';
 export { validateAgentSpec, parseAgentSpec, validateSpec, parseSpec, SUPPORTED_SPEC_VERSIONS } from './validate';
 export type { SpecValidationResult, AnySpec, AnySpecValidationResult } from './validate';

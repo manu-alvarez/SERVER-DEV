@@ -2,6 +2,7 @@ import type { ZodError } from 'zod';
 import { AgentSpecV1Schema, type AgentSpecV1 } from './agent.schema';
 import { ModelProfileV1Schema, type ModelProfileV1 } from './model-profile.schema';
 import { ToolSpecV1Schema, type ToolSpecV1 } from './tool.schema';
+import { WorkflowSpecV1Schema, validateWorkflowStructure, type WorkflowSpecV1 } from './workflow.schema';
 import { API_VERSION } from './common.schema';
 
 /** Versiones de esquema que este paquete sabe interpretar. Un documento con otra
@@ -13,12 +14,13 @@ export type SpecValidationResult =
   | { ok: true; spec: AgentSpecV1 }
   | { ok: false; errors: Record<string, string[]> };
 
-export type AnySpec = AgentSpecV1 | ModelProfileV1 | ToolSpecV1;
+export type AnySpec = AgentSpecV1 | ModelProfileV1 | ToolSpecV1 | WorkflowSpecV1;
 
 export type AnySpecValidationResult =
   | { ok: true; kind: 'Agent'; spec: AgentSpecV1 }
   | { ok: true; kind: 'ModelProfile'; spec: ModelProfileV1 }
   | { ok: true; kind: 'Tool'; spec: ToolSpecV1 }
+  | { ok: true; kind: 'Workflow'; spec: WorkflowSpecV1 }
   | { ok: false; errors: Record<string, string[]> };
 
 function issuesToErrors(error: ZodError): Record<string, string[]> {
@@ -77,9 +79,20 @@ export function validateSpec(input: unknown): AnySpecValidationResult {
       ? { ok: true, kind: 'Tool', spec: parsed.data }
       : { ok: false, errors: issuesToErrors(parsed.error) };
   }
+  if (kind === 'Workflow') {
+    const parsed = WorkflowSpecV1Schema.safeParse(input);
+    if (!parsed.success) {
+      return { ok: false, errors: issuesToErrors(parsed.error) };
+    }
+    const structure = validateWorkflowStructure(parsed.data);
+    if (!structure.ok) {
+      return { ok: false, errors: { structure: structure.errors } };
+    }
+    return { ok: true, kind: 'Workflow', spec: parsed.data };
+  }
   return {
     ok: false,
-    errors: { kind: [`kind desconocido: ${String(kind)} (esperados: Agent, ModelProfile, Tool)`] },
+    errors: { kind: [`kind desconocido: ${String(kind)} (esperados: Agent, ModelProfile, Tool, Workflow)`] },
   };
 }
 
