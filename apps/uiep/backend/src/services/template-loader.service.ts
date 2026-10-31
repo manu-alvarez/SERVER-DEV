@@ -9,7 +9,7 @@ import type { TemplateInfo } from './project.service';
  * binding — ejemplos funcionales, no pósters.
  */
 
-const TEMPLATES_DIR = path.resolve(__dirname, '../../../templates');
+const TEMPLATES_DIR = path.resolve(__dirname, '../../templates');
 
 interface TemplateFile {
   id: string
