@@ -27,7 +27,8 @@ import MemoryIcon from '@mui/icons-material/Memory'
 import BuildIcon from '@mui/icons-material/BuildCircle'
 import KnowledgeIcon from '@mui/icons-material/AutoStories'
 import HistoryIcon from '@mui/icons-material/ManageHistory'
-import WorkflowIcon from '@mui/icons-material/AccountTree'
+import AccountTreeIcon from '@mui/icons-material/AccountTree'
+import ExpandIcon from '@mui/icons-material/ExpandMoreRounded'
 import IntegrationsIcon from '@mui/icons-material/Extension'
 import ObsIcon from '@mui/icons-material/Insights'
 import ProjectIcon from '@mui/icons-material/FolderCopy'
@@ -37,18 +38,21 @@ import LogoutIcon from '@mui/icons-material/Logout'
 import { useConsole } from '../store'
 import { useState } from 'react'
 
-const NAV = [
-  { to: '/', icon: <DashboardIcon sx={{ color: 'text.secondary' }} />, label: 'Dashboard' },
-  { to: '/agents', icon: <SmartToyIcon sx={{ color: 'text.secondary' }} />, label: 'Agentes' },
-  { to: '/playground', icon: <ChatIcon sx={{ color: 'text.secondary' }} />, label: 'Playground' },
-  { to: '/knowledge', icon: <KnowledgeIcon sx={{ color: 'text.secondary' }} />, label: 'Conocimiento' },
-  { to: '/memory', icon: <HistoryIcon sx={{ color: 'text.secondary' }} />, label: 'Memoria' },
-  { to: '/workflows', icon: <WorkflowIcon sx={{ color: 'text.secondary' }} />, label: 'Workflows' },
-  { to: '/integrations', icon: <IntegrationsIcon sx={{ color: 'text.secondary' }} />, label: 'Integraciones' },
-  { to: '/observability', icon: <ObsIcon sx={{ color: 'text.secondary' }} />, label: 'Observabilidad' },
-  { to: '/project', icon: <ProjectIcon sx={{ color: 'text.secondary' }} />, label: 'Proyecto' },
+const NAV_TRABAJO = [
+  { to: '/agents', icon: <SmartToyIcon sx={{ color: 'text.secondary' }} />, label: 'Tus agentes' },
+  { to: '/playground', icon: <ChatIcon sx={{ color: 'text.secondary' }} />, label: 'Conversar' },
+  { to: '/workflows', icon: <AccountTreeIcon sx={{ color: 'text.secondary' }} />, label: 'Flujos' },
+  { to: '/knowledge', icon: <KnowledgeIcon sx={{ color: 'text.secondary' }} />, label: 'Saber' },
+]
+
+const NAV_AVANZADO = [
   { to: '/models', icon: <MemoryIcon sx={{ color: 'text.secondary' }} />, label: 'Modelos' },
   { to: '/tools', icon: <BuildIcon sx={{ color: 'text.secondary' }} />, label: 'Herramientas' },
+  { to: '/integrations', icon: <IntegrationsIcon sx={{ color: 'text.secondary' }} />, label: 'Integraciones' },
+  { to: '/memory', icon: <HistoryIcon sx={{ color: 'text.secondary' }} />, label: 'Memoria' },
+  { to: '/observability', icon: <ObsIcon sx={{ color: 'text.secondary' }} />, label: 'Observabilidad' },
+  { to: '/sistema', icon: <DashboardIcon sx={{ color: 'text.secondary' }} />, label: 'Sistema' },
+  { to: '/project', icon: <ProjectIcon sx={{ color: 'text.secondary' }} />, label: 'Proyecto' },
 ]
 
 const DRAWER_WIDTH = 232
@@ -149,6 +153,7 @@ function LoginGate(): ReactNode {
 }
 
 export default function AppLayout(): ReactNode {
+  const [avanzado, setAvanzado] = useState(false)
   const { status, logout, expiresAt, refresh } = useConsole()
   const navigate = useNavigate()
 
@@ -198,7 +203,7 @@ export default function AppLayout(): ReactNode {
           >
             <Toolbar />
             <List sx={{ px: 1.2, pt: 2 }}>
-              {NAV.map((item) => (
+              {NAV_TRABAJO.map((item) => (
                 <ListItemButton
                   key={item.to}
                   component={NavLink}
@@ -215,6 +220,36 @@ export default function AppLayout(): ReactNode {
                 </ListItemButton>
               ))}
             </List>
+            <Stack
+              direction="row"
+              onClick={() => setAvanzado((v) => !v)}
+              sx={{ px: 2.2, pt: 2.4, pb: 0.8, alignItems: 'center', cursor: 'pointer', '&:hover': { opacity: 0.85 } }}
+            >
+              <Typography variant="caption" sx={{ fontWeight: 700, letterSpacing: '0.08em', color: 'text.secondary' }}>
+                AVANZADO
+              </Typography>
+              <ExpandIcon fontSize="small" sx={{ ml: 'auto', color: 'text.secondary', transform: avanzado ? 'rotate(180deg)' : 'none', transition: 'transform .2s' }} />
+            </Stack>
+            {avanzado && (
+              <List sx={{ px: 1.2 }} disablePadding>
+                {NAV_AVANZADO.map((item) => (
+                  <ListItemButton
+                    key={item.to}
+                    component={NavLink}
+                    to={item.to}
+                    sx={{
+                      borderRadius: 2,
+                      mb: 0.4,
+                      pl: 3,
+                      '&.active': { bgcolor: 'rgba(124,140,255,0.12)', '& .MuiListItemText-primary': { color: 'primary.main', fontWeight: 600 }, '& svg': { color: 'primary.main' } },
+                    }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 38 }}>{item.icon}</ListItemIcon>
+                    <ListItemText primary={item.label} primaryTypographyProps={{ fontSize: 14 }} />
+                  </ListItemButton>
+                ))}
+              </List>
+            )}
             <Box sx={{ mt: 'auto', p: 2 }}>
               <Typography variant="caption" color="text.secondary" component={Link} to="/tools" display="block">
                 motor: agent-spec v1 · runtime v0.3
