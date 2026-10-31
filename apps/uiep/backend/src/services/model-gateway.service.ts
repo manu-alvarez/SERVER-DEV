@@ -58,6 +58,123 @@ export async function seedDefaultModelProfile(): Promise<'seeded' | 'already_pre
   }
 }
 
+/* ────────────────────────────────────────────────────────────────────────────
+ * Fase 3 — primitivas de runtime: capacidades del modelo y chat con tools.
+ * El runtime NO habla directamente con el proveedor: usa estas abstracciones
+ * agnósticas del proveedor (el adaptador concreto sigue en este módulo).
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+export interface RuntimeChatMessage {
+  role: 'system' | 'user' | 'assistant' | 'tool';
+  content: string;
+  /** Solo role 'tool': herramienta que produjo el resultado. */
+  toolName?: string;
+  /** Solo 'assistant' (historial): llamadas de herramienta ya ejecutadas. */
+  toolCalls?: Array<{ name: string; arguments: unknown }>;
+}
+
+export interface RuntimeChatTool {
+  type: 'function';
+  function: {
+    name: string;
+    description: string;
+    /** Subconjunto JSON Schema del contrato ToolSpec. */
+    parameters: Record<string, unknown>;
+  };
+}
+
+export type ProviderChatResult =
+  | { ok: true; content: string; toolCalls: Array<{ name: string; arguments: unknown }> }
+  | { ok: false; error: string };
+
+function normalizeToolArgs(args: unknown): unknown {
+  if (typeof args === 'string') {
+    try {
+      return JSON.parse(args);
+    } catch {
+      return {};
+    }
+  }
+  return args ?? {};
+}
+
+/** Chat agnóstico (Ollama hoy): mensajes, tools opcionales (llamada de
+ *  herramientas estándar), think:false para modelos reasoning, límites
+ *  temporales. Devuelve contenido Y/ declaraciones de llamada a herramientas. */
+export async function providerChat(
+  profile: ModelProfileV1,
+  opts: {
+    messages: RuntimeChatMessage[];
+    tools?: RuntimeChatTool[];
+    numPredict?: number;
+    temperature?: number;
+    timeoutMs?: number;
+  },
+): Promise<ProviderChatResult> {
+  try {
+    const body: Record<string, unknown> = {
+      model: profile.spec.model,
+      messages: opts.messages.map((m) => {
+        if (m.role === 'tool') {
+          return { role: 'tool', content: m.content, name: m.toolName };
+        }
+        if (m.role === 'assistant' && m.toolCalls) {
+          return {
+            role: 'assistant',
+            content: m.content,
+            tool_calls: m.toolCalls.map((c) => ({ function: { name: c.name, arguments: c.arguments } })),
+          };
+        }
+        return { role: m.role, content: m.content };
+      }),
+      stream: false,
+      think: false,
+      options: { num_predict: opts.numPredict ?? 256, temperature: opts.temperature ?? 0 },
+    };
+    if (opts.tools && opts.tools.length > 0) {
+      body.tools = opts.tools;
+    }
+    const res = await fetch(`${getProviderBase(profile)}/api/chat`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(opts.timeoutMs ?? 120000),
+    });
+    if (!res.ok) {
+      return { ok: false, error: `provider_status_${res.status}` };
+    }
+    const parsed = (await res.json()) as {
+      message?: { content?: string; tool_calls?: Array<{ function?: { name?: string; arguments?: unknown } }> };
+    };
+    const toolCalls = (parsed.message?.tool_calls ?? [])
+      .map((c) => ({
+        name: String(c.function?.name ?? ''),
+        arguments: normalizeToolArgs(c.function?.arguments),
+      }))
+      .filter((c) => c.name.length > 0);
+    return { ok: true, content: (parsed.message?.content ?? '').trim(), toolCalls };
+  } catch (err) {
+    const code = (err as { cause?: { code?: string } }).cause?.code;
+    return { ok: false, error: code || (err as Error).message || 'provider_error' };
+  }
+}
+
+/** Capacidades del modelo según el proveedor (p.ej. ['completion','tools']);
+ *  null cuando el proveedor no las expone o no está accesible. */
+export async function modelCapabilities(profile: ModelProfileV1): Promise<string[] | null> {
+  try {
+    const res = await fetch(`${getProviderBase(profile)}/api/tags`, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) {
+      return null;
+    }
+    const tags = (await res.json()) as { models?: Array<{ name?: string; capabilities?: string[] }> };
+    const entry = (tags.models ?? []).find((m) => m.name === profile.spec.model);
+    return entry?.capabilities ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export type ResolveProfileResult =
   | { ok: true; profile: ModelProfileV1 }
   | { ok: false; reason: 'not_registered' | 'unsupported_provider'; message: string };
@@ -84,7 +201,7 @@ export async function resolveModelRef(profileRef: string): Promise<ResolveProfil
 }
 
 /** URL base del proveedor para este despliegue, resuelta desde la variable de entorno referenciada. */
-function providerBase(profile: ModelProfileV1): string {
+export function getProviderBase(profile: ModelProfileV1): string {
   const envName = profile.spec.endpointEnv || 'OLLAMA_BASE_URL';
   const value = process.env[envName];
   if (!value) {
@@ -118,7 +235,7 @@ export interface ProfileHealthResult extends ProviderCallDescriptor {
 export async function checkProfileHealth(profile: ModelProfileV1): Promise<ProfileHealthResult> {
   const descriptor = { ...describeProfile(profile) };
   try {
-    const res = await fetch(`${providerBase(profile)}/api/tags`, { signal: AbortSignal.timeout(5000) });
+    const res = await fetch(`${getProviderBase(profile)}/api/tags`, { signal: AbortSignal.timeout(5000) });
     if (!res.ok) {
       return { ...descriptor, ok: false, detail: `el proveedor respondió ${res.status}` };
     }
@@ -168,7 +285,7 @@ export async function profileTestCompletion(
   try {
     const t0 = Date.now();
     const options = { num_predict: 8, temperature: 0 };
-    const chat = await fetch(`${providerBase(profile)}/api/chat`, {
+    const chat = await fetch(`${getProviderBase(profile)}/api/chat`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -190,7 +307,7 @@ export async function profileTestCompletion(
       };
     }
     // Fallback compat: versiones de ollama que rechazan 'think' (<0.9.x).
-    const legacy = await fetch(`${providerBase(profile)}/api/generate`, {
+    const legacy = await fetch(`${getProviderBase(profile)}/api/generate`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ model: profile.spec.model, prompt, stream: false, options }),
