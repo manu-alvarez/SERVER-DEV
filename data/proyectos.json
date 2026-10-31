@@ -1,0 +1,24 @@
+{
+  "$comment": "FUENTE ÚNICA del catálogo de proyectos del portfolio. Modo: vps-static | vps-docker | gh-pages | pendiente-decision.",
+  "version": "1.0.0",
+  "portfolio": "manuelalvarez.dev",
+  "actualizado": "2026-10-31",
+  "principales": [
+    { "nombre": "UIEP", "slug": "uiep", "dominio": "uiep.manuelalvarez.dev", "modo": "vps-docker", "repo": "manu-alvarez/SERVER-DEV (apps/uiep)", "version": "1.0.0", "estado": "activo-congelado", "notas": "plataforma de agentes; BFF /_uiep; volumen + backups diarios + copia iCloud" },
+    { "nombre": "Tu Energía Maya", "slug": "maya", "dominio": "maya.manuelalvarez.dev", "modo": "gh-pages", "repo": "manu-alvarez/TuEnergiaMaya", "estado": "activo", "pages": "https://manu-alvarez.github.io/TuEnergiaMaya/", "notas": "el dominio VPS hace 302 deliberado a Pages (verificado sin bucles); el estático www/app/maya queda como instancia disponible" },
+    { "nombre": "LogiSearch", "slug": "logisearch", "dominio": "logisearch.manuelalvarez.dev", "modo": "vps-static", "repo": "manu-alvarez/LogiSearch + monorepo apps/logisearch", "estado": "activo", "notas": "sin backend propio en el VPS; sin Pages" },
+    { "nombre": "Nikolina AI", "slug": "nikolina", "dominio": "nikolina.manuelalvarez.dev", "modo": "vps-docker", "repo": "monorepo apps/livekit-nikolina", "estado": "activo", "notas": "3 contenedores + PM2 livekit-server (host)" },
+    { "nombre": "FoZ SoundPro", "slug": "foz-soundpro", "dominio": "foz.manuelalvarez.dev", "modo": "gh-pages", "repo": "manu-alvarez/FoZ-SoundPro", "estado": "activo", "pages": "https://manu-alvarez.github.io/FoZ-SoundPro/", "notas": "PWA vanilla (web/); desplegado TAMBIÉN como estático VPS desde commit 38db6b6 (BUILD-INFO)" },
+    { "nombre": "Teringo MailOps AI / Neural CockPit", "slug": "teringo", "dominio": "teringo.manuelalvarez.dev", "modo": "gh-pages", "repo": "manu-alvarez/MSB (apps/teringo)", "estado": "activo", "pages": "https://manu-alvarez.github.io/MSB/apps/teringo/", "notas": "PWA vanilla con IA vía Ollama LOCAL del visitante; desplegado TAMBIÉN como estático VPS desde commit c9b70e4 (BUILD-INFO)" }
+  ],
+  "secundarios": [
+    { "nombre": "CombiPro", "slug": "combipro", "dominio": "combipro.manuelalvarez.dev", "modo": "vps-static", "repo": "manu-alvarez/CombiPro + monorepo apps/combipro", "estado": "activo" },
+    { "nombre": "Cuentos Mágicos", "slug": "cuentos-magicos", "dominio": "cuentos.manuelalvarez.dev", "modo": "vps-docker", "repo": "monorepo apps/cuentos-magicos", "estado": "activo", "notas": "backend + celery + postgres + redis compartido (jartosdto-redis) + storage" },
+    { "nombre": "GasStation", "slug": "gas-station", "dominio": "gasstation.manuelalvarez.dev", "modo": "vps-docker", "repo": "monorepo apps/gas-station", "estado": "activo", "notas": "backend granian + SQLite local (newton.db)" },
+    { "nombre": "Tarot RWS", "slug": "tarot-rws", "dominio": "tarot.manuelalvarez.dev", "modo": "gh-pages", "repo": "manu-alvarez/tarot-rws", "estado": "activo", "pages": "https://manu-alvarez.github.io/tarot-rws/", "notas": "estático VPS + Pages duplicadas (conservadas ambas)" }
+  ],
+  "retenidos-pendientes-decision": [
+    { "nombre": "CV Portfolio", "slug": "cv", "dominio": "cv.manuelalvarez.dev", "modo": "vps-static", "repo": "monorepo apps/cv-portfolio (deploy workflow propio)", "estado": "recurso profesional del portfolio — RECOMENDACIÓN: mantener" },
+    { "nombre": "JartosDTO", "slug": "jartosdto", "dominio": null, "modo": "retirado-del-vps", "repo": "monorepo apps/jartosdto", "estado": "stack retirado (31-oct); dumps pg/minio/redis en iCloud" }
+  ]
+}
