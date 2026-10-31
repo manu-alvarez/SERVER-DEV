@@ -112,7 +112,11 @@ export interface RunRecord {
     toolExecutions: ToolExecution[]
     iterations: number
     durationMs?: number
+    /** Fase 5: fragmentos de conocimiento inyectados (trazabilidad → fuente). */
     retrievals?: KnowledgeRetrievalRef[]
+    /** Fase 5.1: citas emitidas por el modelo, validadas contra los fragmentos
+     *  existentes (verified=false → el modelo citó una referencia inexistente). */
+    citations?: Array<{ ref: number; verified: boolean; sourceId: string | null; chunkIdx: number | null; score: number | null }>
   }
   errors: string[]
   startedAt: string
@@ -247,6 +251,21 @@ export interface KnowledgeQueryResult {
   dims: number
 }
 
+/* ── Memory (Fase 5.1) ───────────────────────────────────────────────────── */
+
+export interface MemoryRecord {
+  memoryId: string
+  agentSpecId: string
+  sessionId: string | null
+  kind: 'agent' | 'session'
+  content: string
+  origin: { executionId: string; input: string; reason: string }
+  createdAt: string
+  expiresAt: string
+  status: 'active' | 'deleted'
+  expired: boolean
+}
+
 /* ── Endpoints ─────────────────────────────────────────────────────────────── */
 
 export const api = {
@@ -285,6 +304,12 @@ export const api = {
     setBindings: (agentSpecId: string, sourceIds: string[]) =>
       post<{ bound: boolean }>(`/api/console/knowledge/bindings/${agentSpecId}`, { sourceIds }),
     query: (query: string, topK?: number) => post<KnowledgeQueryResult>('/api/console/knowledge/query', { query, topK }),
+  },
+
+  /* Memory (Fase 5.1 — consola) */
+  memory: {
+    list: () => get<MemoryRecord[]>('/api/console/memory'),
+    remove: (memoryId: string) => request<{ deleted: boolean }>('DELETE', `/api/console/memory/${memoryId}`),
   },
 
   /* Públicos (contratos de Fases 1-2, sin cambios) */

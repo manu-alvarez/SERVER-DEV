@@ -9,6 +9,7 @@ import {
   DialogTitle,
   IconButton,
   Stack,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
@@ -158,6 +159,26 @@ export default function RunDialog({ executionId, onClose }: { executionId: strin
                     {run.result.text}
                   </Typography>
                 </Box>
+              </Box>
+            )}
+
+            {run.result.citations && run.result.citations.length > 0 && (
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                  Citas emitidas (validación determinista)
+                </Typography>
+                <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.8 }}>
+                  {run.result.citations.map((c) => (
+                    <Tooltip key={c.ref} title={c.verified ? `cita verificada → ${c.sourceId} #${c.chunkIdx}` : 'el modelo citó una referencia que NO está entre los fragmentos recuperados'}>
+                      <Chip
+                        size="small"
+                        color={c.verified ? 'success' : 'error'}
+                        variant="status"
+                        label={`[${c.ref}] ${c.verified ? 'verificada' : 'SIN respaldo'}`}
+                      />
+                    </Tooltip>
+                  ))}
+                </Stack>
               </Box>
             )}
 
