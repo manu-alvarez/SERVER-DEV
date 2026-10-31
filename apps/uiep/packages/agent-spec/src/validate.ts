@@ -1,6 +1,7 @@
 import type { ZodError } from 'zod';
 import { AgentSpecV1Schema, type AgentSpecV1 } from './agent.schema';
 import { ModelProfileV1Schema, type ModelProfileV1 } from './model-profile.schema';
+import { ToolSpecV1Schema, type ToolSpecV1 } from './tool.schema';
 import { API_VERSION } from './common.schema';
 
 /** Versiones de esquema que este paquete sabe interpretar. Un documento con otra
@@ -12,11 +13,12 @@ export type SpecValidationResult =
   | { ok: true; spec: AgentSpecV1 }
   | { ok: false; errors: Record<string, string[]> };
 
-export type AnySpec = AgentSpecV1 | ModelProfileV1;
+export type AnySpec = AgentSpecV1 | ModelProfileV1 | ToolSpecV1;
 
 export type AnySpecValidationResult =
   | { ok: true; kind: 'Agent'; spec: AgentSpecV1 }
   | { ok: true; kind: 'ModelProfile'; spec: ModelProfileV1 }
+  | { ok: true; kind: 'Tool'; spec: ToolSpecV1 }
   | { ok: false; errors: Record<string, string[]> };
 
 function issuesToErrors(error: ZodError): Record<string, string[]> {
@@ -69,9 +71,15 @@ export function validateSpec(input: unknown): AnySpecValidationResult {
       ? { ok: true, kind: 'ModelProfile', spec: parsed.data }
       : { ok: false, errors: issuesToErrors(parsed.error) };
   }
+  if (kind === 'Tool') {
+    const parsed = ToolSpecV1Schema.safeParse(input);
+    return parsed.success
+      ? { ok: true, kind: 'Tool', spec: parsed.data }
+      : { ok: false, errors: issuesToErrors(parsed.error) };
+  }
   return {
     ok: false,
-    errors: { kind: [`kind desconocido: ${String(kind)} (esperados: Agent, ModelProfile)`] },
+    errors: { kind: [`kind desconocido: ${String(kind)} (esperados: Agent, ModelProfile, Tool)`] },
   };
 }
 
