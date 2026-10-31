@@ -29,6 +29,7 @@ import KnowledgeIcon from '@mui/icons-material/AutoStories'
 import HistoryIcon from '@mui/icons-material/ManageHistory'
 import WorkflowIcon from '@mui/icons-material/AccountTree'
 import IntegrationsIcon from '@mui/icons-material/Extension'
+import ObsIcon from '@mui/icons-material/Insights'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import LogoutIcon from '@mui/icons-material/Logout'
@@ -43,6 +44,7 @@ const NAV = [
   { to: '/memory', icon: <HistoryIcon sx={{ color: 'text.secondary' }} />, label: 'Memoria' },
   { to: '/workflows', icon: <WorkflowIcon sx={{ color: 'text.secondary' }} />, label: 'Workflows' },
   { to: '/integrations', icon: <IntegrationsIcon sx={{ color: 'text.secondary' }} />, label: 'Integraciones' },
+  { to: '/observability', icon: <ObsIcon sx={{ color: 'text.secondary' }} />, label: 'Observabilidad' },
   { to: '/models', icon: <MemoryIcon sx={{ color: 'text.secondary' }} />, label: 'Modelos' },
   { to: '/tools', icon: <BuildIcon sx={{ color: 'text.secondary' }} />, label: 'Herramientas' },
 ]
