@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ApiVersionSchema, MetadataSchema, SpecKindSchema, ToolRefSchema } from './common.schema';
+import { ApiVersionSchema, MetadataSchema, ToolRefSchema } from './common.schema';
 
 export const MemoryStrategySchema = z.enum([
   'none',
@@ -20,7 +20,9 @@ export const OrchestrationModeSchema = z.enum(['single-agent', 'supervised-team'
  *  ModelProfile (Model Gateway, Fase 2) — nunca un modelo concreto incrustado. */
 export const AgentSpecV1Schema = z.object({
   apiVersion: ApiVersionSchema,
-  kind: SpecKindSchema,
+  /** Literal pinado: un documento AgentSpec ES kind 'Agent' (SpecKindSchema
+   *  describe el universo de kinds, cada esquema exige el suyo). */
+  kind: z.literal('Agent'),
   metadata: MetadataSchema,
   spec: z
     .object({

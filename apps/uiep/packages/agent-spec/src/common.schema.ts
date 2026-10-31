@@ -5,10 +5,10 @@ import { z } from 'zod';
 export const API_VERSION = 'uiep.io/v1' as const;
 export const ApiVersionSchema = z.literal(API_VERSION);
 
-/** Tipos de entidad del sistema de especificaciones. Fase 1 entrega 'Agent';
- *  la enumeración creará de forma aditiva: Team, Workflow, Tool, ModelProfile,
- *  KnowledgeBase, Deployment, Evaluation (sin romper documentos existentes). */
-export const SpecKindSchema = z.enum(['Agent']);
+/** Tipos de entidad del sistema de especificaciones. Fase 1 entrega 'Agent' y
+ *  Fase 2 añade 'ModelProfile' (additivo: los documentos existentes no cambian).
+ *  La enumeración seguirá creciendo por adición: Team, Workflow, Tool, ... */
+export const SpecKindSchema = z.enum(['Agent', 'ModelProfile']);
 
 export const SemVerSchema = z
   .string()
