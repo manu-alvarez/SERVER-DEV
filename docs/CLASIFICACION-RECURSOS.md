@@ -67,6 +67,36 @@ activo: aclarar con el propietario), `cuentos-*` (SÍ seleccionado), `logitrack`
 propio + alias), `msbross-frontend` (el PORTFOLIO), `maya/tarot-maya` (Tarot Maya =
 proyecto NO seleccionado con Pages propia — conservar por la política de Pages).
 
+## 3b. POLÍTICA DEFINITIVA — análisis por servicio (las 7 preguntas, con evidencia de código)
+
+Aplicada la política del propietario (31-oct): el VPS solo alberga portfolio + 10
+proyectos + infraestructura estrictamente necesaria.
+
+| Servicio | ¿Quién lo usa? (verificado en código) | ¿Imprescindible para los 10? | Alternativa | Veredicto |
+|---|---|---|---|---|
+| Ollama (host) | UIEP (agentes+embeddings) · Teringo (cliente local del visitante) | SÍ (plano modelo) | — | **A** |
+| Postgres cuentos | cuentos-magicos (seleccionado) | SÍ | — | **A** |
+| Redis | SOLO jartosdto (no seleccionado) | NO | — | **C** |
+| MinIO | SOLO jartosdto (no seleccionado) | NO | almacenamiento local si algún día hace falta | **C** |
+| Postgres elitescout | SOLO elitescout (no seleccionado) | NO | — | **C** (dump verificado) |
+| Postgres jartosdto (+pgvector) | SOLO jartosdto | NO | — | **C** (dump verificado) |
+| msbross-backend (hub+vault, `assistant`) | su vault solo la consumen msbross-backend y **jartosdto** (grep x-injected: 2 consumidores, ninguno de los 10) | NO | — | **C** |
+| llm-admin-proxy (`llm`) | sin consumidores identificados en los 10 | NO | — | **C** |
+| portainer / uptime-kuma | operador (admin/monitorización) | útiles de operación | — | **A** |
+| PM2 livekit | nikolina (seleccionado) | SÍ | — | **A** |
+| postfix (localhost:25) | correo local del sistema | marginal (avisos cron) | — | **A-lite** (sin coste) |
+| Estáticos históricos (uiep-web, msbross, admin/dev-dashboard, app-generator, assistant, logitrack, iaprod-os, industrialpro, edelweiss, expositator-rte, taskflow, moko-tools, cv, tarot-maya, maya≠seleccionados) | no seleccionados (cv: aclarar si entra en el portfolio) | NO | sus repos GH los conservan | **C** (cv: **D**) |
+| Túneles cloudflared (teringo + 3 credenciales huérfanas + e77340ca) | NINGUNO activo (cloudflared no corre; msbross.me vive en Cloudflare ajeno) | NO | — | **C** (rotación del secreto expuesto: decisión aparte) |
+| ufw 8765 | sin proceso | NO | — | **C** |
+| /var/www/manuelalvarez (nginx legado) | nada (nginx inactivo) | NO | — | **C** |
+
+**Datos protegidos ANTES de retirar** (hecho el 31-oct, copia externa en
+`backups-local/retiradas-20261031/` en iCloud):
+`elitescout-pg.sql` (3,5K, restauración PROBADA en postgres:16 aislado) ·
+`jartosdto-pg.sql` (3,9K) · `cuentos-pg.sql` (133K — seleccionado, prudencia) ·
+`jartosdto-minio.tgz` (8K) · `jartosdto-redis.tgz` (794B) · `atenea-data.tgz` (45B).
+Los volúmenes docker originales NO se han tocado.
+
 ## 4. PROPUESTA DE RETIRADA (lista concreta — ESPERA APROBACIÓN)
 
 Fase de retirada propuesta (solo con tu aprobación, en este orden):
