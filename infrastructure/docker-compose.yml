@@ -485,6 +485,7 @@ services:
     environment:
       - PORT=4000
       - NODE_ENV=production
+      - OLLAMA_BASE_URL=${UIEP_OLLAMA_BASE_URL:-http://172.20.0.1:11434}
     volumes:
       - uiep-backend-data:/app/data
 
