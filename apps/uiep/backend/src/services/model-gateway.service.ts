@@ -147,8 +147,19 @@ export interface ProfileTestResult extends ProviderCallDescriptor {
 
 const DEFAULT_TEST_PROMPT = 'Responde exclusivamente con la palabra: OK';
 
+/** Elimina el reasoning en línea de los modelos de pensamiento (solo afecta al
+ *  texto extraído; el prompt y los límites no cambian. Sin LLM implicado). */
+function stripThinking(text: string): string {
+  return text
+    .replace(/<think>[\s\S]*?<\/think>/g, '')
+    .replace(/<think>[\s\S]*$/g, '')
+    .trim();
+}
+
 /** Completación real acotada (num_predict fijo) — evidencia end-to-end de que
- *  el perfil resuelve y el proveedor genera. Nunca streaming, nunca secretos. */
+ *  el perfil resuelve y el proveedor genera. Nunca streaming, nunca secretos.
+ *  Estrategia: /api/chat con think=false (models que razonan: qwen3.5, r1);
+ *  fallback a /api/generate sin 'think' para compatibilidad con ollama antiguo. */
 export async function profileTestCompletion(
   profile: ModelProfileV1,
   prompt: string = DEFAULT_TEST_PROMPT,
@@ -156,22 +167,45 @@ export async function profileTestCompletion(
   const descriptor = { ...describeProfile(profile) };
   try {
     const t0 = Date.now();
-    const res = await fetch(`${providerBase(profile)}/api/generate`, {
+    const options = { num_predict: 8, temperature: 0 };
+    const chat = await fetch(`${providerBase(profile)}/api/chat`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         model: profile.spec.model,
-        prompt,
+        messages: [{ role: 'user', content: prompt }],
         stream: false,
-        options: { num_predict: 8, temperature: 0 },
+        think: false,
+        options,
       }),
       signal: AbortSignal.timeout(30000),
     });
-    if (!res.ok) {
-      return { ...descriptor, ok: false, error: `provider_status_${res.status}` };
+    if (chat.ok) {
+      const body = (await chat.json()) as { message?: { content?: string } };
+      return {
+        ...descriptor,
+        ok: true,
+        text: stripThinking((body.message?.content ?? '').trim()),
+        latencyMs: Date.now() - t0,
+      };
     }
-    const body = (await res.json()) as { response?: string };
-    return { ...descriptor, ok: true, text: (body.response ?? '').trim(), latencyMs: Date.now() - t0 };
+    // Fallback compat: versiones de ollama que rechazan 'think' (<0.9.x).
+    const legacy = await fetch(`${providerBase(profile)}/api/generate`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ model: profile.spec.model, prompt, stream: false, options }),
+      signal: AbortSignal.timeout(30000),
+    });
+    if (!legacy.ok) {
+      return { ...descriptor, ok: false, error: `provider_status_${legacy.status}`, latencyMs: Date.now() - t0 };
+    }
+    const legacyBody = (await legacy.json()) as { response?: string };
+    return {
+      ...descriptor,
+      ok: true,
+      text: stripThinking((legacyBody.response ?? '').trim()),
+      latencyMs: Date.now() - t0,
+    };
   } catch (err) {
     const code = (err as { cause?: { code?: string } }).cause?.code;
     return { ...descriptor, ok: false, error: code || (err as Error).message || 'provider_error' };

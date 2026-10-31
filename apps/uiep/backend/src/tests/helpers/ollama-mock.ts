@@ -21,6 +21,16 @@ export function startOllamaMock(options?: { tags?: string[] }): Promise<{ server
       });
       return;
     }
+    if (req.method === 'POST' && req.url === '/api/chat') {
+      let body = '';
+      req.on('data', (c) => (body += c));
+      req.on('end', () => {
+        res.setHeader('content-type', 'application/json');
+        // El request con think:false debe terminar en contenido limpio ('OK').
+        res.end(JSON.stringify({ message: { role: 'assistant', content: 'OK' } }));
+      });
+      return;
+    }
     res.statusCode = 404;
     res.end('{}');
   });
