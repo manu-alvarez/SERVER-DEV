@@ -148,7 +148,7 @@ y mantenimiento reducida), no el espacio.
 
 | Verificación | Resultado |
 |---|---|
-| Contenedores | **11** (uiep-backend, msbross-proxy, traefik, cuentos×3, jartosdto-redis [compartido cuentos], gas-station, nikolina×2, portainer, uptime-kuma) — todos `unless-stopped`, proyecto compose unificado |
+| Contenedores | **12** (uiep-backend, msbross-proxy, traefik, cuentos×3, jartosdto-redis [compartido cuentos], gas-station, nikolina×2, portainer, uptime-kuma) — todos `unless-stopped`, proyecto compose unificado |
 | Los 10 dominios | manuelalvarez.dev 200 · uiep 200 · maya 302→Pages · logisearch 200 · nikolina 200 · **teringo 200** · **foz 200** · combipro 200 · cuentos 200 · gasstation 200 · tarot 200 |
 | UIEP 1.0.0 | imagen `4ea095d6f29a` intacta · volumen de datos intacto · health 200 · consola operativa |
 | GitHub Pages | 5 sites sin cambios (TuEnergiaMaya, tarot-rws, FoZ, Tarot-Maya, github.io) |
