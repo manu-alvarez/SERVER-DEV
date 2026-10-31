@@ -3,6 +3,7 @@ networks:
     external: true
 
 volumes:
+  uiep-backend-data:
   cuentos-pg-data:
     external: true
   elitescout-pg-data:
@@ -486,8 +487,5 @@ services:
       - NODE_ENV=production
     volumes:
       - uiep-backend-data:/app/data
-
-volumes:
-  uiep-backend-data:
 
 version: '3.8'
