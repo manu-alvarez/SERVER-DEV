@@ -32,5 +32,7 @@ FROM node:22-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=deploy-stage /deploy ./
+# Fase 9: plantillas (blueprints) que el backend sirve instalables
+COPY --from=build /app/backend/templates /app/templates
 EXPOSE 4000
 CMD ["node", "dist/server.js"]
