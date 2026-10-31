@@ -1,29 +1,38 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { HashRouter, Navigate, Route, Routes, useParams } from 'react-router-dom'
+import type { ReactNode } from 'react'
 import AppLayout from './components/Layout'
-import Canvas from './pages/Canvas'
-import Templates from './pages/Templates'
-import Generator from './pages/Generator'
-import MCP from './pages/MCP'
-import Adversarial from './pages/Adversarial'
-import Settings from './pages/Settings'
-import LogIn from './pages/Login'
+import Dashboard from './pages/Dashboard'
+import { AgentEditor, AgentList } from './pages/Agents'
+import Playground from './pages/Playground'
+import Models from './pages/Models'
+import Tools from './pages/Tools'
 
-export const router = createBrowserRouter([
-  {
-    path: '/login',
-    element: <LogIn />,
-  },
-  {
-    path: '/',
-    element: <AppLayout />,
-    children: [
-      { index: true, element: <Layout /> },
-      { path: 'canvas', element: <Canvas /> },
-      { path: 'templates', element: <Templates /> },
-      { path: 'generator', element: <Generator /> },
-      { path: 'mcp', element: <MCP /> },
-      { path: 'adversarial', element: <Adversarial /> },
-      { path: 'settings', element: <Settings /> },
-    ],
-  },
-])
+/**
+ * Routing con HashRouter: el estático se publica bajo dos superficies del
+ * proxy ('/' con dominio propio y '/app/uiep'), y el hash evita cualquier
+ * acoplamiento a la ruta física del servidor. Mismo origen que la API.
+ */
+export default function App(): ReactNode {
+  return (
+    <HashRouter>
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="/agents" element={<AgentList />} />
+          <Route path="/agents/new" element={<AgentEditor specId={null} />} />
+          <Route path="/agents/:id/edit" element={<AgentEditorRouter />} />
+          <Route path="/playground" element={<Playground />} />
+          <Route path="/playground/:sessionId" element={<Playground />} />
+          <Route path="/models" element={<Models />} />
+          <Route path="/tools" element={<Tools />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </HashRouter>
+  )
+}
+
+function AgentEditorRouter(): ReactNode {
+  const { id } = useParams<'id'>()
+  return <AgentEditor specId={id ?? null} />
+}

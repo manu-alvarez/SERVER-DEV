@@ -1,63 +1,282 @@
-import { Box, Paper, Typography, Grid, Chip, Button, CircularProgress } from '@mui/material'
-import { PlayCircle as PlayIcon, Layout as LayersIcon, Code as CodeIcon, Shield as ShieldIcon, Terminal as TerminalIcon, Extension as ExtensionIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { getHealth } from '../lib/api'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { useNavigate } from 'react-router-dom'
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  IconButton,
+  LinearProgress,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Tooltip,
+  Typography,
+} from '@mui/material'
+import Grid2 from '@mui/material/Grid2'
+import RefreshIcon from '@mui/icons-material/Refresh'
+import PlayIcon from '@mui/icons-material/PlayArrowOutlined'
+import ArrowIcon from '@mui/icons-material/ArrowForwardRounded'
+import { api, type Overview } from '../lib/api'
+import { fmtDuration, runStatusColor, runStatusLabel } from '../theme'
+import RunDialog from '../components/RunDialog'
 
-export default function Layout() {
-  const [health, setHealth] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+const POLL_MS = 15000
 
-  useEffect(() => {
-    getHealth().then((r) => { setHealth(r.data); setLoading(false) }).catch(() => setLoading(false))
+export default function Dashboard(): ReactNode {
+  const [ov, setOv] = useState<Overview | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [openRun, setOpenRun] = useState<string | null>(null)
+  const navigate = useNavigate()
+
+  const load = useCallback(() => {
+    setError(null)
+    api
+      .overview()
+      .then(setOv)
+      .catch((e) => setError(`No se pudo cargar el estado (${e.status ?? ''}). Reintenta o revisa el backend.`))
   }, [])
 
-  const stats = [
-    { label: 'Agentes Creados', value: '12', icon: <LayersIcon />, color: '#22d3ee' },
-    { label: 'Subagentes Activos', value: '34', icon: <CodeIcon />, color: '#a78bfa' },
-    { label: 'Plantillas', value: '8', icon: <TerminalIcon />, color: '#4ade80' },
-    { label: 'Servidores MCP', value: '3', icon: <ExternalLink />, color: '#fde047' },
-    { label: 'Tests Adversariales', value: '0', icon: <ShieldIcon />, color: '#f472b6' },
-  ]
+  useEffect(() => {
+    load()
+    const t = setInterval(load, POLL_MS)
+    return () => clearInterval(t)
+  }, [load])
+
+  if (error && !ov) {
+    return (
+      <Stack spacing={2}>
+        <Alert severity="error">{error}</Alert>
+        <Button onClick={load} startIcon={<RefreshIcon />} sx={{ alignSelf: 'flex-start' }}>
+          Reintentar
+        </Button>
+      </Stack>
+    )
+  }
+  if (!ov) {
+    return <LinearProgress sx={{ mt: 6, mx: 4, borderRadius: 2 }} />
+  }
+
+  const { counts, services } = ov
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-        <Box>
-          <Typography variant="h3" sx={{ fontWeight: 800, letterSpacing: '-1px' }}>Panel de Control</Typography>
-          <Typography sx={{ color: '#94a3b8' }}>Estado del sistema y generación de agentes</Typography>
-        </Box>
-        <Button variant="contained" startIcon={<PlayCircle />} size="large" sx={{ background: 'linear-gradient(135deg, #22d3ee 0%, #a78bfa 100%)', color: '#030712', fontWeight: 800, px: 4, py: 1.5, borderRadius: '10px', '&:hover': { opacity: 0.9 } }}>
-          Crear Nuevo Agente
-        </Button>
-      </Box>
+    <Stack spacing={2.6}>
+      <Stack direction="row" sx={{ alignItems: 'center', gap: 1.4 }}>
+        <Typography variant="h4" sx={{ width: 'auto' }}>
+          Panel general
+        </Typography>
+        <Box sx={{ flexGrow: 1 }} />
+        <Tooltip title={new Date(ov.generatedAt).toLocaleString('es-ES')}>
+          <Typography variant="caption" color="text.secondary">
+            actualizado {new Date(ov.generatedAt).toLocaleTimeString('es-ES')}
+          </Typography>
+        </Tooltip>
+        <IconButton onClick={load} title="Refrescar">
+          <RefreshIcon />
+        </IconButton>
+      </Stack>
 
-      <Grid container spacing={3}>
-        {stats.map((s) => (
-          <Grid key={s.label} xs={12} sm={6} md={3}>
-            <Paper sx={{ p: 3, borderRadius: '14px', background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Box sx={{ p: 2, borderRadius: '10px', background: `rgba(${s.color === '#22d3ee' ? '34,211,238' : s.color === '#a78bfa' ? '167,139,250' : s.color === '#4ade80' ? '74,222,128' : s.color === '#fde047' ? '253,224,71' : '244,114,182'}, 0.1)`, color: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {s.icon}
-              </Box>
-              <Box>
-                <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: '-0.5px' }}>{s.value}</Typography>
-                <Typography variant="caption" sx={{ color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{s.label}</Typography>
-              </Box>
-            </Paper>
-          </Grid>
-        ))}
-      </Grid>
+      {error && <Alert severity="warning">{error}</Alert>}
 
-      <Paper sx={{ mt: 4, p: 3, borderRadius: '14px', background: 'rgba(15, 23, 42, 0.5)', border: '1px solid rgba(255,255,255,0.04)' }}>
-        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Estado del Backend</Typography>
-        {loading ? <CircularProgress size={24} /> : (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: health?.status === 'ok' ? '#4ade80' : '#f43f5e' }} />
-            <Typography sx={{ fontWeight: 600, color: health?.status === 'ok' ? '#4ade80' : '#f43f5e' }}>
-              {health?.status === 'ok' ? 'Sistema operativo' : 'Sistema no disponible'}
-            </Typography>
-          </Box>
-        )}
-      </Paper>
-    </Box>
+      <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1 }}>
+        <Chip label={`agentes ${counts.agents}`} variant="outlined" />
+        <Chip label={`modelos ${counts.profiles}`} variant="outlined" />
+        <Chip label={`herramientas ${counts.tools}`} variant="outlined" />
+        <Chip label={`sesiones ${counts.sessions}`} variant="outlined" />
+        <Chip label={`ejecuciones ${counts.runs}`} variant="outlined" />
+      </Stack>
+
+      {/* 4 cuadrantes (referencia mockup) */}
+      <Grid2 container spacing={2.4}>
+        {/* 1 — Servicios */}
+        <Grid2 size={{ xs: 12, md: 6 }}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent sx={{ p: 2.4, '&:last-child': { pb: 2.4 } }}>
+              <Stack direction="row" sx={{ mb: 1.4, alignItems: 'center' }}>
+                <Typography variant="h6">Servicios</Typography>
+              </Stack>
+              <Stack spacing={1.2} fontSize={14}>
+                <ServiceRow label="UIEP backend" right={
+                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+                    <Chip size="small" color="success" variant="status" label="activo" />
+                    <Typography variant="caption" color="text.secondary">
+                      node {services.backend.node} · uptime {fmtDuration(services.backend.uptimeSec * 1000)}
+                    </Typography>
+                  </Stack>
+                } />
+                <ServiceRow label="Proveedores (gateway)" right={
+                  services.ollama.ok ? (
+                    <Stack direction="row" sx={{ alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                      <Chip size="small" color="success" variant="status" label="alcanzable" />
+                      <Chip size="small" variant="outlined" label={services.ollama.model ?? '—'} />
+                      {(services.ollama.capabilities ?? []).map((c) => (
+                        <Chip key={c} size="small" variant="outlined" sx={{ opacity: 0.75 }} label={c} />
+                      ))}
+                    </Stack>
+                  ) : (
+                    <Chip size="small" color="error" variant="status" label="no alcanzable" />
+                  )
+                } />
+                <ServiceRow label="Runtime (token)" right={
+                  <Chip
+                    size="small"
+                    color={services.backend.runtimeTokenConfigured ? 'success' : 'error'}
+                    variant="status"
+                    label={services.backend.runtimeTokenConfigured ? 'configurado' : 'AUSENTE'}
+                  />
+                } />
+                <ServiceRow label="Consola (BFF)" right={
+                  <Chip size="small" color={services.backend.consoleConfigured ? 'success' : 'warning'} variant="status" label={services.backend.consoleConfigured ? 'configurada' : 'sin contraseña'} />
+                } />
+              </Stack>
+            </CardContent>
+          </Card>
+        </Grid2>
+
+        {/* 2 — Ejecuciones (arriba a la derecha en el mockup) */}
+        <Grid2 size={{ xs: 12, md: 6 }}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+              <Stack direction="row" sx={{ p: 2.4, pb: 0.8, alignItems: 'center' }}>
+                <Typography variant="h6">Ejecuciones recientes</Typography>
+                <Box sx={{ flexGrow: 1 }} />
+                <Button size="small" endIcon={<ArrowIcon />} onClick={() => navigate('/playground')}>
+                  Playground
+                </Button>
+              </Stack>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ pl: 2.4 }}>Estado</TableCell>
+                    <TableCell>Agente</TableCell>
+                    <TableCell>Tools</TableCell>
+                    <TableCell>Duración</TableCell>
+                    <TableCell sx={{ pr: 2.4 }}>Fecha</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {ov.recentRuns.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={5} sx={{ pl: 2.4, color: 'text.secondary' }}>
+                        Aún no hay ejecuciones. Abre el Playground y lanza la primera sesión.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {ov.recentRuns.map((r) => (
+                    <TableRow key={r.executionId} hover onClick={() => setOpenRun(r.executionId)} sx={{ cursor: 'pointer' }}>
+                      <TableCell sx={{ pl: 2.4 }}>
+                        <Chip size="small" color={runStatusColor(r.status)} variant="status" label={runStatusLabel(r.status)} />
+                      </TableCell>
+                      <TableCell sx={{ pl: 2.4, fontSize: 13, color: 'text.secondary' }}>{r.agentSpecId}</TableCell>
+                      <TableCell>
+                        <Stack direction="row" spacing={0.6}>
+                          <Chip size="small" variant="outlined" label={`${r.toolCount && r.toolCount >= 0 ? r.toolCount : 0} calls`} />
+                          {r.toolFailures > 0 && <Chip size="small" color="error" variant="outlined" label={`${r.toolFailures} rechazos`} />}
+                        </Stack>
+                      </TableCell>
+                      <TableCell sx={{ fontSize: 13 }}>{fmtDuration(r.durationMs)}</TableCell>
+                      <TableCell sx={{ pr: 2.4, fontSize: 12.4 }} color="text.secondary">
+                        {new Date(r.startedAt).toLocaleTimeString('es-ES')}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </Grid2>
+
+        {/* 3 — Agentes */}
+        <Grid2 size={{ xs: 12, md: 6 }}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent sx={{ p: 2.4, '&:last-child': { pb: 2.4 } }}>
+              <Stack direction="row" sx={{ mb: 1.4, alignItems: 'center' }}>
+                <Typography variant="h6">Agentes registrados</Typography>
+                <Box sx={{ flexGrow: 1 }} />
+                <Button size="small" endIcon={<ArrowIcon />} onClick={() => navigate('/agents')}>
+                  Gestor
+                </Button>
+              </Stack>
+              {ov.agents.length === 0 ? (
+                <Typography color="text.secondary" fontSize={14}>
+                  Ningún AgentSpec registrado todavía.
+                </Typography>
+              ) : (
+                <Stack spacing={1.1}>
+                  {ov.agents.map((a) => (
+                    <Stack key={a.id} direction="row" sx={{ alignItems: 'center', gap: 1.2 }}>
+                      <PlayIcon fontSize="small" sx={{ color: 'primary.main' }} />
+                      <Box>
+                        <Typography fontSize={14}>
+                          {a.name} <code style={{ opacity: 0.7 }}>{a.id}</code>
+                        </Typography>
+                        {a.description && (
+                          <Typography fontSize={12} color="text.secondary" noWrap maxWidth={420}>
+                            {a.description}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Stack>
+                  ))}
+                </Stack>
+              )}
+            </CardContent>
+          </Card>
+        </Grid2>
+
+        {/* 4 — Modelos */}
+        <Grid2 size={{ xs: 12, md: 6 }}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent sx={{ p: 2.4, '&:last-child': { pb: 2.4 } }}>
+              <Stack direction="row" sx={{ mb: 1.4, alignItems: 'center' }}>
+                <Typography variant="h6">Modelos (perfiles)</Typography>
+                <Box sx={{ flexGrow: 1 }} />
+                <Button size="small" endIcon={<ArrowIcon />} onClick={() => navigate('/models')}>
+                  Model Manager
+                </Button>
+              </Stack>
+              {ov.profiles.length === 0 ? (
+                <Typography color="text.secondary" fontSize={14}>
+                  Sin ModelProfiles registrados.
+                </Typography>
+              ) : (
+                <Stack spacing={1.1}>
+                  {ov.profiles.map((p) => (
+                    <ServiceRow
+                      key={p.id}
+                      label={`${p.name} · ${p.id}`}
+                      right={<Chip size="small" variant="outlined" label={`v${p.version}`} />}
+                    />
+                  ))}
+                </Stack>
+              )}
+              {services.ollama.ok && (
+                <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1.4 }}>
+                  Proveedor activo: {services.ollama.model}
+                </Typography>
+              )}
+            </CardContent>
+          </Card>
+        </Grid2>
+      </Grid2>
+
+      <RunDialog executionId={openRun} onClose={() => setOpenRun(null)} />
+    </Stack>
+  )
+}
+
+export function ServiceRow({ label, right }: { label: string; right: ReactNode }): ReactNode {
+  return (
+    <Stack direction="row" sx={{ alignItems: 'center', gap: 1.4 }}>
+      <Typography fontSize={14} sx={{ flexShrink: 0, minWidth: 150, color: 'text.secondary' }}>
+        {label}
+      </Typography>
+      <Box sx={{ flexWrap: 'wrap', minWidth: 0 }}>{right}</Box>
+    </Stack>
   )
 }
