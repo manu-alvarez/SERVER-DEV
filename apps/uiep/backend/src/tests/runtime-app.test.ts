@@ -37,12 +37,12 @@ function agentSpec(id: string, opts: { tools?: Array<{ id: string; permissions?:
   };
 }
 
-const SERVER_TOKEN = 'test-token-0000000001';
+const RUNTIME_PASSPHRASE = 'test-token-0000000001';
 
 const server = createApp({ trustProxy: 'loopback' }).listen(0);
 const base = 'http://127.0.0.1:' + (server.address() as AddressInfo).port;
 
-const authHeaders = { 'content-type': 'application/json', authorization: 'Bearer ' + SERVER_TOKEN };
+const authHeaders = { 'content-type': 'application/json', authorization: 'Bearer ' + RUNTIME_PASSPHRASE };
 
 let mock: { server: Server; url: string };
 
@@ -61,7 +61,7 @@ const CLOCK_TOOL_SEED = {
 before(async () => {
   mock = await startRuntimeMock();
   process.env.OLLAMA_BASE_URL = mock.url;
-  process.env.UIEP_RUNTIME_TOKEN = SERVER_TOKEN;
+  process.env.UIEP_RUNTIME_TOKEN = RUNTIME_PASSPHRASE;
   await saveSpec(PROFILE);
   await saveSpec(CLOCK_TOOL_SEED);
   await saveSpec(agentSpec('e2e-agent', { tools: [{ id: 'clock', permissions: ['clock:read'] }] }));
@@ -99,7 +99,7 @@ test('runtime: sin token configurado → 503 runtime_disabled (seguridad por def
     const b: any = await r.json();
     assert.equal(b.error, 'runtime_disabled');
   } finally {
-    process.env.UIEP_RUNTIME_TOKEN = SERVER_TOKEN;
+    process.env.UIEP_RUNTIME_TOKEN = RUNTIME_PASSPHRASE;
   }
 });
 
@@ -141,7 +141,7 @@ async function runTurn(sessionId: string, input: string, maxInputChars?: string)
 
 test('runtime: sesión creada y recuperable (spec + perfil resueltos)', async () => {
   const sessionId = await createSession('e2e-agent');
-  const r = await fetch(base + '/api/runtime/sessions/' + sessionId, { headers: { authorization: 'Bearer ' + SERVER_TOKEN } });
+  const r = await fetch(base + '/api/runtime/sessions/' + sessionId, { headers: { authorization: 'Bearer ' + RUNTIME_PASSPHRASE } });
   assert.equal(r.status, 200);
   const b: any = await r.json();
   assert.equal(b.agentSpecId, 'e2e-agent');
@@ -149,7 +149,7 @@ test('runtime: sesión creada y recuperable (spec + perfil resueltos)', async ()
   assert.ok(b.createdAt);
   assert.equal(b.runs.length, 0);
 
-  const missing = await fetch(base + '/api/runtime/sessions/ses-noexiste-abc', { headers: { authorization: 'Bearer ' + SERVER_TOKEN } });
+  const missing = await fetch(base + '/api/runtime/sessions/ses-noexiste-abc', { headers: { authorization: 'Bearer ' + RUNTIME_PASSPHRASE } });
   assert.equal(missing.status, 404);
 });
 
@@ -169,14 +169,14 @@ test('runtime: ejecución con herramienta autorizada → resultado final y regis
   assert.ok(run.body.executionId && run.body.startedAt && run.body.finishedAt);
 
   // Registro de ejecución consultable
-  const runGet = await fetch(base + '/api/runtime/runs/' + run.body.executionId, { headers: { authorization: 'Bearer ' + SERVER_TOKEN } });
+  const runGet = await fetch(base + '/api/runtime/runs/' + run.body.executionId, { headers: { authorization: 'Bearer ' + RUNTIME_PASSPHRASE } });
   assert.equal(runGet.status, 200);
   const runBody: any = await runGet.json();
   assert.equal(runBody.agentSpecId, 'e2e-agent');
   assert.equal(runBody.input, '¿Qué hora es? Usa la herramienta.');
 
   // Historial de sesión con mensajes y ejecuciones
-  const sessionGet = await fetch(base + '/api/runtime/sessions/' + sessionId, { headers: { authorization: 'Bearer ' + SERVER_TOKEN } });
+  const sessionGet = await fetch(base + '/api/runtime/sessions/' + sessionId, { headers: { authorization: 'Bearer ' + RUNTIME_PASSPHRASE } });
   const sessionBody: any = await sessionGet.json();
   assert.ok(sessionBody.messages.some((m: any) => m.role === 'tool' && m.toolName === 'clock'));
   assert.ok(sessionBody.messages.some((m: any) => m.role === 'assistant' && m.content === 'MADE'));
@@ -185,7 +185,7 @@ test('runtime: ejecución con herramienta autorizada → resultado final y regis
 });
 
 test('runtime: petición GET sin sanear → 400 (path traversal)', async () => {
-  const r = await fetch(base + '/api/runtime/sessions/' + encodeURIComponent('../../etc/passwd'), { headers: { authorization: 'Bearer ' + SERVER_TOKEN } });
+  const r = await fetch(base + '/api/runtime/sessions/' + encodeURIComponent('../../etc/passwd'), { headers: { authorization: 'Bearer ' + RUNTIME_PASSPHRASE } });
   assert.equal(r.status, 400);
 });
 
