@@ -26,6 +26,8 @@ import { queryAll } from '../services/retrieval.service';
 import { listAll as listAllMemories, deleteMemory, isExpired } from '../services/memory-store.service';
 import { loadWorkflow, startWorkflowRun, cancelWorkflowRun, resumeWorkflowRun } from '../services/workflow-runtime.service';
 import { listWorkflowRuns, loadWorkflowRun } from '../services/workflow-store.service';
+import { listIntegrations, getIntegration, integrationHealth } from '../services/integration.service';
+import { mcpListTools } from '../services/mcp-client.service';
 import { createSession, startAgentRun } from '../services/agent-runtime.service';
 
 /**
@@ -864,4 +866,104 @@ export function registerConsoleRoute(app: Express): void {
   };
   app.post('/api/console/workflow-runs/:id/cancel', consoleCancel);
   app.post('/api/console/workflow-runs/:id/resume', consoleResume);
+
+  /* ── Integraciones (Fase 7): catálogo, health, descubrimiento MCP ───────── */
+
+  app.post('/api/console/integrations', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const result = validateSpec(req.body);
+    if (!result.ok) {
+      return void res.status(400).json({ error: result.errors });
+    }
+    if (result.kind !== 'Integration') {
+      return void res.status(400).json({ error: { kind: ['este endpoint registra solo IntegrationSpecs'] } });
+    }
+    saveSpec(result.spec)
+      .then(() => res.status(201).json({ stored: true, id: result.spec.metadata.id, version: result.spec.metadata.version }))
+      .catch((err) => {
+        console.error('[UIEP] console_integration_save_failed', err);
+        res.status(500).json({ error: 'integration_save_failed' });
+      });
+  });
+
+  app.get('/api/console/integrations', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    listIntegrations()
+      .then((list) =>
+        // El spec solo contiene la REFERENCIA del secreto (secretEnv) — jamás
+        // el valor; el resolutor vive en el proceso del servidor.
+        res.json(
+          list.map((i) => ({
+            id: i.metadata.id,
+            name: i.metadata.name,
+            version: i.metadata.version,
+            type: i.spec.type,
+            baseUrl: i.spec.baseUrl,
+            auth: { type: i.spec.auth.type, secretEnv: i.spec.auth.secretEnv ?? null },
+            healthPath: i.spec.healthPath,
+            timeoutMs: i.spec.timeoutMs,
+          })),
+        ),
+      )
+      .catch((err) => {
+        console.error('[UIEP] console_integration_list_failed', err);
+        res.status(500).json({ error: 'integration_list_failed' });
+      });
+  });
+
+  app.get('/api/console/integrations/:id/health', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!ID_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    getIntegration(id)
+      .then((spec) => {
+        if (!spec) {
+          return void res.status(404).json({ error: 'integration_not_found' });
+        }
+        integrationHealth(spec)
+          .then((h) => res.json({ id, ...h }))
+          .catch((err) => {
+            console.error('[UIEP] console_integration_health_failed', err);
+            res.status(500).json({ error: 'integration_health_failed' });
+          });
+      })
+      .catch((err) => {
+        console.error('[UIEP] console_integration_get_failed', err);
+        res.status(500).json({ error: 'integration_get_failed' });
+      });
+  });
+
+  app.get('/api/console/integrations/:id/mcp-tools', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!ID_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    getIntegration(id)
+      .then((spec) => {
+        if (!spec || spec.spec.type !== 'mcp-server') {
+          return void res.status(404).json({ error: 'integration_not_mcp' });
+        }
+        mcpListTools(spec)
+          .then((r) => (r.ok ? res.json({ id, tools: r.tools }) : res.status(502).json({ error: r.error })))
+          .catch((err) => {
+            console.error('[UIEP] console_integration_mcp_list_failed', err);
+            res.status(500).json({ error: 'mcp_list_failed' });
+          });
+      })
+      .catch((err) => {
+        console.error('[UIEP] console_integration_get_failed', err);
+        res.status(500).json({ error: 'integration_get_failed' });
+      });
+  });
 }

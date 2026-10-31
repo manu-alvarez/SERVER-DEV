@@ -37,7 +37,7 @@ export type ToolInputSchema = z.infer<typeof ToolInputSchemaSchema>;
  *  sobre el filesystem. 'memory-write' (Fase 5.1) escribe memoria PERSISTENTE
  *  solo a través de políticas deterministas del memory-store (dedup/TTL/
  *  cuota) y exige permiso 'memory:write' + spec.memory.enabled. */
-export const ToolAdapterSchema = z.enum(['clock', 'runtime-info', 'memory-write']);
+export const ToolAdapterSchema = z.enum(['clock', 'runtime-info', 'memory-write', 'http-call', 'mcp-call']);
 
 /**
  * ToolSpec v1 — herramienta declarativa: identificador (metadata.id),

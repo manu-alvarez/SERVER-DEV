@@ -3,6 +3,7 @@ import { AgentSpecV1Schema, type AgentSpecV1 } from './agent.schema';
 import { ModelProfileV1Schema, type ModelProfileV1 } from './model-profile.schema';
 import { ToolSpecV1Schema, type ToolSpecV1 } from './tool.schema';
 import { WorkflowSpecV1Schema, validateWorkflowStructure, type WorkflowSpecV1 } from './workflow.schema';
+import { IntegrationSpecV1Schema, type IntegrationSpecV1 } from './integration.schema';
 import { API_VERSION } from './common.schema';
 
 /** Versiones de esquema que este paquete sabe interpretar. Un documento con otra
@@ -14,13 +15,14 @@ export type SpecValidationResult =
   | { ok: true; spec: AgentSpecV1 }
   | { ok: false; errors: Record<string, string[]> };
 
-export type AnySpec = AgentSpecV1 | ModelProfileV1 | ToolSpecV1 | WorkflowSpecV1;
+export type AnySpec = AgentSpecV1 | ModelProfileV1 | ToolSpecV1 | WorkflowSpecV1 | IntegrationSpecV1;
 
 export type AnySpecValidationResult =
   | { ok: true; kind: 'Agent'; spec: AgentSpecV1 }
   | { ok: true; kind: 'ModelProfile'; spec: ModelProfileV1 }
   | { ok: true; kind: 'Tool'; spec: ToolSpecV1 }
   | { ok: true; kind: 'Workflow'; spec: WorkflowSpecV1 }
+  | { ok: true; kind: 'Integration'; spec: IntegrationSpecV1 }
   | { ok: false; errors: Record<string, string[]> };
 
 function issuesToErrors(error: ZodError): Record<string, string[]> {
@@ -90,9 +92,15 @@ export function validateSpec(input: unknown): AnySpecValidationResult {
     }
     return { ok: true, kind: 'Workflow', spec: parsed.data };
   }
+  if (kind === 'Integration') {
+    const parsed = IntegrationSpecV1Schema.safeParse(input);
+    return parsed.success
+      ? { ok: true, kind: 'Integration', spec: parsed.data }
+      : { ok: false, errors: issuesToErrors(parsed.error) };
+  }
   return {
     ok: false,
-    errors: { kind: [`kind desconocido: ${String(kind)} (esperados: Agent, ModelProfile, Tool, Workflow)`] },
+    errors: { kind: [`kind desconocido: ${String(kind)} (esperados: Agent, ModelProfile, Tool, Workflow, Integration)`] },
   };
 }
 

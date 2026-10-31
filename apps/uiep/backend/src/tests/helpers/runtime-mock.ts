@@ -17,6 +17,31 @@ export function startRuntimeMock(): Promise<{ server: Server; url: string }> {
       res.end(JSON.stringify({ models: [{ name: 'mock-model', capabilities: ['completion', 'tools'] }] }));
       return;
     }
+    // Fase 7 — endpoints de conector: eco del body, eco de la cabecera de
+    // auth (prueba de inyección por referencia) y fallo siempre (breaker).
+    if (req.method === 'POST' && req.url === '/echo') {
+      let raw = '';
+      req.on('data', (c) => (raw += c));
+      req.on('end', () => {
+        res.setHeader('content-type', 'application/json');
+        res.end(JSON.stringify({ echoed: JSON.parse(raw || '{}') }));
+      });
+      return;
+    }
+    if (req.method === 'POST' && req.url === '/secure-echo') {
+      let raw = '';
+      req.on('data', (c) => (raw += c));
+      req.on('end', () => {
+        res.setHeader('content-type', 'application/json');
+        res.end(JSON.stringify({ auth: req.headers.authorization ?? null, apiKey: req.headers['x-api-key'] ?? null }));
+      });
+      return;
+    }
+    if (req.url === '/fail-always') {
+      res.statusCode = 500;
+      res.end(JSON.stringify({ error: 'always_fails' }));
+      return;
+    }
     // Fase 5.2 — embeddings mock DETERMINISTAS (6 dims, ortogonales por tema):
     // rojo/azul/verde/naranja/violeta/gris → cada documento del corpus tiene
     // su propia dirección; temas desconocidos caen en un bucket aparte.

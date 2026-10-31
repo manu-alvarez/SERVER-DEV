@@ -8,7 +8,7 @@ export const ApiVersionSchema = z.literal(API_VERSION);
 /** Tipos de entidad del sistema de especificaciones. Fase 1 entrega 'Agent',
  *  Fase 2 'ModelProfile' y Fase 3 'Tool' (additivo: los documentos existentes
  *  no cambian). Sigue creciendo por adición: Team, Workflow, ... */
-export const SpecKindSchema = z.enum(['Agent', 'ModelProfile', 'Tool', 'Workflow']);
+export const SpecKindSchema = z.enum(['Agent', 'ModelProfile', 'Tool', 'Workflow', 'Integration']);
 
 export const SemVerSchema = z
   .string()

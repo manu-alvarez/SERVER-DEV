@@ -1,6 +1,6 @@
 import type { Express } from 'express';
 import { EntityIdSchema } from '@uiep/agent-spec';
-import { validateAgentSpec } from '@uiep/agent-spec';
+import { validateSpec } from '@uiep/agent-spec';
 import { getLatestSpec, listSpecs, saveSpec } from '../services/spec-registry.service';
 
 /**
@@ -12,7 +12,7 @@ import { getLatestSpec, listSpecs, saveSpec } from '../services/spec-registry.se
  */
 export function registerSpecsRoute(app: Express): void {
   app.post('/api/specs', (req, res) => {
-    const result = validateAgentSpec(req.body);
+    const result = validateSpec(req.body);
     if (!result.ok) {
       return res.status(400).json({ error: result.errors });
     }

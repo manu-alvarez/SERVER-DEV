@@ -7,5 +7,7 @@ export { ToolSpecV1Schema, ToolParamSchema, ToolInputSchemaSchema, ToolAdapterSc
 export type { ToolSpecV1, ToolParam, ToolInputSchema } from './tool.schema';
 export { WorkflowSpecV1Schema, WorkflowNodeSchema, WorkflowCheckOpSchema, validateWorkflowStructure } from './workflow.schema';
 export type { WorkflowSpecV1, WorkflowNode, WorkflowNodeAgent, WorkflowNodeCondition, WorkflowNodeParallel, WorkflowCheckOp, WorkflowStructureResult, WorkflowNodeInput, WorkflowSpecInput } from './workflow.schema';
+export { IntegrationSpecV1Schema, IntegrationTypeSchema, IntegrationAuthSchema } from './integration.schema';
+export type { IntegrationSpecV1, IntegrationType } from './integration.schema';
 export { validateAgentSpec, parseAgentSpec, validateSpec, parseSpec, SUPPORTED_SPEC_VERSIONS } from './validate';
 export type { SpecValidationResult, AnySpec, AnySpecValidationResult } from './validate';

@@ -72,7 +72,7 @@ export interface ToolContext {
   memoryEnabled: boolean
 }
 
-const ASYNC_ADAPTERS: Record<string, (input: Record<string, unknown>, ctx: ToolContext) => Promise<ToolExecutionResult>> = {
+const ASYNC_ADAPTERS: Record<string, (input: Record<string, unknown>, ctx: ToolContext, tool: ToolSpecV1) => Promise<ToolExecutionResult>> = {
   'memory-write': (parsed, ctx) =>
     (async () => {
       const { writeMemory } = await import('./memory-store.service');
@@ -96,6 +96,53 @@ const ASYNC_ADAPTERS: Record<string, (input: Record<string, unknown>, ctx: ToolC
           expiresAt: result.memory.expiresAt,
         },
       };
+    })(),
+  // Fase 7 — conector HTTP/API: URL/método/integración vienen de la CONFIG de
+  // la ToolSpec (operador); los argumentos del agente van al BODY (el dato
+  // del agente nunca construye el destino). Auth por referencia a env.
+  'http-call': (parsed, ctx, tool) =>
+    (async () => {
+      const { getIntegration, callIntegration } = await import('./integration.service');
+      const config = tool.spec.execution.config ?? {};
+      const integrationId = config.integrationId ?? '';
+      const spec = integrationId ? await getIntegration(integrationId) : null;
+      if (!spec) {
+        return { ok: false, error: 'integration_not_registered', detail: integrationId || 'falta integrationId en la config de la tool' };
+      }
+      const method = (config.method ?? 'GET').toUpperCase();
+      if (!['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+        return { ok: false, error: 'invalid_method', detail: method };
+      }
+      const body = method === 'GET' ? undefined : { input: ctx.input, ...parsed };
+      const r = await callIntegration(spec, { method, path: config.path, body });
+      if (!r.ok) {
+        return { ok: false, error: r.error ?? 'connector_failed', detail: `status=${r.status ?? '-'} ${r.durationMs}ms` };
+      }
+      return { ok: true, result: { status: r.status, body: (r.body ?? '').slice(0, 4000), durationMs: r.durationMs } };
+    })(),
+  // Fase 7 — cliente MCP: descubre/ejecuta herramientas del servidor MCP de
+  // la integración (protocolo de interoperabilidad — el núcleo sigue siendo
+  // el contrato interno de tools). integrationId + mcpTool: config del
+  // operador; los argumentos del agente van a MCP arguments.
+  'mcp-call': (parsed, ctx, tool) =>
+    (async () => {
+      const { getIntegration } = await import('./integration.service');
+      const { mcpCallTool } = await import('./mcp-client.service');
+      const config = tool.spec.execution.config ?? {};
+      const integrationId = config.integrationId ?? '';
+      const spec = integrationId ? await getIntegration(integrationId) : null;
+      if (!spec || spec.spec.type !== 'mcp-server') {
+        return { ok: false, error: 'integration_not_mcp', detail: integrationId || 'falta integrationId en la config' };
+      }
+      const toolName = config.mcpTool ?? '';
+      if (!toolName) {
+        return { ok: false, error: 'missing_mcp_tool', detail: 'falta mcpTool en la config de la tool' };
+      }
+      const r = await mcpCallTool(spec, toolName, Object.keys(parsed).length > 0 ? parsed : { input: ctx.input });
+      if (!r.ok) {
+        return { ok: false, error: r.error ?? 'mcp_call_failed', detail: r.content?.slice(0, 500) };
+      }
+      return { ok: true, result: { server: spec.metadata.id, tool: toolName, content: (r.content ?? '').slice(0, 4000) } };
     })(),
 };
 
@@ -126,7 +173,7 @@ export async function executeTool(tool: ToolSpecV1, input: unknown, ctx: ToolCon
   const asyncAdapter = ASYNC_ADAPTERS[tool.spec.execution.adapter];
   if (asyncAdapter) {
     try {
-      return await asyncAdapter(parsed.value, ctx);
+      return await asyncAdapter(parsed.value, ctx, tool);
     } catch (err) {
       return { ok: false, error: 'adapter_error', detail: (err as Error).message };
     }

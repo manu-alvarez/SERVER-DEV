@@ -11,6 +11,8 @@ import { registerModelGatewayRoute } from './routes/model-gateway';
 import { registerAgentRuntimeRoute } from './routes/agent-runtime';
 import { registerKnowledgeRoute } from './routes/knowledge';
 import { registerWorkflowRoutes } from './routes/workflows';
+import { registerMcpServer } from './routes/mcp-server';
+import { registerHooksRoute } from './routes/hooks';
 import { registerConsoleRoute } from './routes/console';
 
 /**
@@ -62,6 +64,8 @@ export function createApp(options: { trustProxy?: string | number | boolean } = 
   registerAgentRuntimeRoute(app);
   registerKnowledgeRoute(app);
   registerWorkflowRoutes(app);
+  registerMcpServer(app);
+  registerHooksRoute(app);
   registerConsoleRoute(app);
 
   return app;
