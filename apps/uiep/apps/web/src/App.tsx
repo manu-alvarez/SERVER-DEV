@@ -6,6 +6,7 @@ import { AgentEditor, AgentList } from './pages/Agents'
 import Playground from './pages/Playground'
 import Knowledge from './pages/Knowledge'
 import MemoryPage from './pages/Memory'
+import Workflows from './pages/Workflows'
 import Models from './pages/Models'
 import Tools from './pages/Tools'
 
@@ -27,6 +28,7 @@ export default function App(): ReactNode {
           <Route path="/playground/:sessionId" element={<Playground />} />
           <Route path="/knowledge" element={<Knowledge />} />
           <Route path="/memory" element={<MemoryPage />} />
+          <Route path="/workflows" element={<Workflows />} />
           <Route path="/models" element={<Models />} />
           <Route path="/tools" element={<Tools />} />
           <Route path="*" element={<Navigate to="/" replace />} />

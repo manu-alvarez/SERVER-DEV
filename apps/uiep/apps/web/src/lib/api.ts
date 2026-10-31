@@ -266,6 +266,57 @@ export interface MemoryRecord {
   expired: boolean
 }
 
+/* ── Workflows (Fase 6) ──────────────────────────────────────────────────── */
+
+export type WorkflowNodeStatus = 'pending' | 'running' | 'completed' | 'failed' | 'skipped' | 'cancelled'
+
+export interface WorkflowNodeStep {
+  nodeId: string
+  type: 'agent' | 'condition' | 'parallel'
+  status: WorkflowNodeStatus
+  output?: string
+  renderedInput?: string
+  error?: string
+  attempts: number
+  startedAt?: string
+  finishedAt?: string
+  durationMs?: number
+  agentSessionId?: string
+  agentExecutionId?: string
+  branchTaken?: string
+  branchOutputs?: Array<{ nodeId: string; ok: boolean; output?: string; error?: string }>
+}
+
+export type WorkflowRunStatus = 'running' | 'cancelling' | 'completed' | 'failed' | 'cancelled'
+
+export interface WorkflowRunRecord {
+  workflowRunId: string
+  workflowId: string
+  workflowVersion: string
+  input: string
+  status: WorkflowRunStatus
+  steps: Record<string, WorkflowNodeStep>
+  order: string[]
+  output?: string
+  errors: string[]
+  startedAt: string
+  finishedAt?: string
+}
+
+export interface WorkflowRunSummary {
+  workflowRunId: string
+  workflowId: string
+  workflowVersion: string
+  status: WorkflowRunStatus
+  input: string
+  output?: string
+  nodesDone: number
+  nodesTotal: number
+  errors: string[]
+  startedAt: string
+  finishedAt?: string
+}
+
 /* ── Endpoints ─────────────────────────────────────────────────────────────── */
 
 export const api = {
@@ -310,6 +361,18 @@ export const api = {
   memory: {
     list: () => get<MemoryRecord[]>('/api/console/memory'),
     remove: (memoryId: string) => request<{ deleted: boolean }>('DELETE', `/api/console/memory/${memoryId}`),
+  },
+
+  /* Workflows (Fase 6 — consola) */
+  workflows: {
+    list: () => get<SpecSummary[]>('/api/console/workflows'),
+    get: (id: string) => get<SpecDoc>(`/api/console/workflows/${id}`),
+    save: (doc: unknown) => post<{ stored: boolean; id: string; version: string }>('/api/console/workflows', doc),
+    run: (id: string, input: string) => post<{ workflowRunId: string }>(`/api/console/workflows/${id}/run`, { input }),
+    runs: () => get<WorkflowRunSummary[]>('/api/console/workflow-runs'),
+    runDetail: (runId: string) => get<WorkflowRunRecord>(`/api/console/workflow-runs/${runId}`),
+    cancel: (runId: string) => post<{ cancelling: boolean }>(`/api/console/workflow-runs/${runId}/cancel`),
+    resume: (runId: string) => post<{ resumed: boolean }>(`/api/console/workflow-runs/${runId}/resume`),
   },
 
   /* Públicos (contratos de Fases 1-2, sin cambios) */
