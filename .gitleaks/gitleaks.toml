@@ -25,6 +25,10 @@ paths = [
 regexes = [
   '''create_access_token''',
   '''startsAsVariableToken''',
+  # UIEP runtime token in tests: assignment from a test identifier (value is a
+  # throwaway string that never represents a real credential; the real token
+  # lives only in the VPS deployment .env, which is gitignored).
+  '''process\.env\.UIEP_RUNTIME_TOKEN''',
 ]
 
 [[rules]]
