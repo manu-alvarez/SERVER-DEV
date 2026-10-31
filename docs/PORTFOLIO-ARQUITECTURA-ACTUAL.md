@@ -149,6 +149,59 @@ dormido), mapa de `/var/www/manuelalvarez` (legado) — **sin tocar**.
 - Configuración dinámica de Traefik: routers por labels inventariados; no se revisó
   el acme.json (contiene datos sensibles).
 
+## 10b. MISIÓN 02 — hallazgos de trazabilidad profunda (solo lectura)
+
+### Teringo MailOps AI / Teringo CockPit — veredicto
+
+Fuentes inspeccionadas (todas de lectura): árbol completo del VPS (`find` por
+teringo/cockpit/mailops en /home, /var/www, /opt, /srv, /root), imágenes y
+contenedores docker, ramas y tags git del monorepo, historial completo de commits
+(grep case-insensitive), PM2, n8n (no existe en el servidor), buckets MinIO, repos de
+GitHub del usuario (45 repos, búsqueda global incluida).
+
+**Resultado**: la ÚNICA traza de Teringo en toda la infraestructura es
+`/home/ubuntu/.cloudflared/teringo.json` — una **credencial de túnel Cloudflare sin
+usar** (tunnel ID `c4530897-…`, creada 12-may, **el túnel no está configurado en
+ningún `config.yml` ni en ejecución**). No hay código, no hay contenedor, no hay
+estático, no hay historial git, no hay repositorio. **El proyecto Teringo no existe en
+este servidor**; o se desarrolló en otro sitio, o nunca llegó a existir más allá del
+túnel. El componente `ArchitectCockpit.tsx` del portfolio es el héroe 3D de la landing
+— no guarda relación con un producto MailOps.
+
+⚠️ **Seguridad**: durante la investigación se imprimió por error el `TunnelSecret` del
+túnel teringo.json en el registro de sesión de esta conversación. **Rotación
+recomendada**: eliminar/recrear el túnel desde el dashboard de Cloudflare (decisión del
+propietario; el túnel está inactivo).
+
+### Hallazgo colateral: msbross.me caído
+
+El `config.yml` de cloudflared activo enruta `msbross.me` y `*.msbross.me` →
+`localhost:8080` (msbross-proxy), pero **cloudflared no se ejecuta** (sin proceso, sin
+servicio systemd, sin unit file). El dominio `msbross.me` está actualmente **offline**
+(aunque su DNS de Cloudflare siga apuntando al túnel). Decisión pendiente: reactivar
+el túnel (si msbross.me sigue siendo relevante) o retirarlo de la arquitectura.
+
+### Git del monorepo: divergencia main/master
+
+- `main` = línea actual (Fases UIEP 0→9 + docs del ecosistema).
+- `master` = línea LEGADA (último commit `13a5744` "Fase 2 audit, security sweep,
+  legacy cleanup" — la era pre-UIEP con CI por rsync).
+- Existe rama remota de seguridad `backup/vps-divergencia-20261030` (copia de la
+  divergencia del 30-oct) y tag `backup-pre-limpieza`.
+- Ambas líneas conviven; la Documentación/runbook referencia SIEMPRE `main`. No se
+  toca nada (solo trazabilidad registrada).
+
+### Procedencia de los estáticos de los repos separados
+
+`www/app/maya` y `www/app/tarot-rws` (y las páginas de FoZ) NO tienen código fuente en
+el monorepo: son **artefactos compilados** copiados desde sus repositorios separados
+(`TuEnergiaMaya`, `tarot-rws`, `FoZ-SoundPro`). El flujo real es: build en el repo
+origen → copia manual/script a `www/app/<nombre>/` → commit en el monorepo → deploy
+VPS. `scripts/build/sync_www.sh` automatiza la copia de los builds de apps DEL
+monorepo (no de los repos externos). **Riesgo trazable**: sin registro de qué commit
+del repo origen generó cada artefacto (trazabilidad de versión débil en los
+duplicados).
+
 ## 11. Conclusiones y cuestiones que requieren decisión
 
 1. **¿Portfolio único?** Elegir la fuente de verdad (`manuelalvarez.dev` VPS
