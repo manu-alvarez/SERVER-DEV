@@ -31,7 +31,7 @@ los umbrales del RAG gate están congelados (no maquillar métricas ajustando um
 |---|---|---|
 | Recall@3 | 1.000 | 1.000 |
 | MRR | 1.000 | 1.000 |
-| Precision@3 | 1.000 | **0.333** ← línea base a mejorar |
+| Precision@3 | 1.000 | **1.000** (mejora del 31-oct: umbral 0.30→0.70 por barrido de evidencia con nomic real; línea base previa 0.333) |
 | Citas verificadas | 6/6 | por run (trazadas) |
 
 ## Productividad
@@ -51,6 +51,15 @@ los umbrales del RAG gate están congelados (no maquillar métricas ajustando um
 | Disco VPS | 48G/96G (50% — tras limpiar 51G de build cache) |
 | RAM | 4,7G/11G usados (7G disponibles) · swap 8G activo |
 | Límites en vuelo | agentes 0/8 · workflows 0/4 (429 backpressure) |
+
+## Cambios registrados sobre la base
+
+| Fecha | Cambio | Evidencia |
+|---|---|---|
+| 31-oct | KNOWLEDGE_RETRIEVAL_MIN_SCORE 0.30→0.70 | barrido 0.3-0.7 en VPS: Recall@3 estable en 1.000, Precision@3 0.333→1.000 (GATE PASSED en todos los puntos) |
+| 31-oct | swap 8G persistido en fstab (activo, 0 usados) | /proc/swaps + fstab |
+| 31-oct | build cache limpiado (51.3 GB, 0 activas) | df 98%→50% |
+| 31-oct | copia externa de backups al Mac vía iCloud | infrastructure/backup/pull-uiep-backup.sh |
 
 ## Vigilancia continua
 

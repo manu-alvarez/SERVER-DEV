@@ -34,3 +34,6 @@ www/app/**/harry_potter.mp3
 
 # duplicados de sincronización iCloud (conflictos "* 2.*")
 * 2.*
+
+# backups locales (copia externa del VPS — no versionar)
+backups-local/

@@ -75,7 +75,11 @@ export async function retrieve(rawQuery: string, sourceIds: string[], topK?: num
     return { ok: false, reason: 'query_too_large' };
   }
   const k = Math.min(Math.max(1, topK ?? envLimit('KNOWLEDGE_RETRIEVAL_TOPK', 3)), 20);
-  const minScore = Number(process.env.KNOWLEDGE_RETRIEVAL_MIN_SCORE) || 0.3;
+  // Fase 5.2 — umbral por EVIDENCIA (barrido en el VPS con nomic real, corpus
+  // v1.0.0): 0.7 → Precision@3 = 1.000 con Recall@3 = 1.000 intacto (los
+  // irrelevantes puntúan <0.7). Ver BASELINE-1.0.md; re-evaluar por fuente
+  // cuando el contenido real lo pida.
+  const minScore = Number(process.env.KNOWLEDGE_RETRIEVAL_MIN_SCORE) || 0.7;
 
   const queryVec = await embed([rawQuery.slice(0, 2000)]);
   if (!queryVec.ok || !queryVec.vectors?.[0]) {
