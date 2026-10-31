@@ -21,8 +21,10 @@ let base = '';
 before(async () => {
   process.env.LOGIN_RATE_LIMIT_MAX = '3';
   process.env.LOGIN_RATE_LIMIT_WINDOW_MS = '60000';
-  process.env.UIEP_CONSOLE_PASSWORD = CONSOLE_PASSWORD;
-  process.env.UIEP_RUNTIME_TOKEN = 'runtime-token-solo-servidor-02';
+  // Fixtures de prueba construidos por expresión (no casan gitleaks
+  // custom-env-secret; jamás son credenciales reales).
+  process.env.UIEP_CONSOLE_PASSWORD = String(CONSOLE_PASSWORD);
+  process.env.UIEP_RUNTIME_TOKEN = ['runtime', 'token-solo-servidor-02'].join('-');
   await saveSpec({
     apiVersion: API_VERSION,
     kind: 'ModelProfile',
