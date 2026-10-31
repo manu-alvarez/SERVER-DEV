@@ -32,26 +32,27 @@ Host nginx: **INACTIVO** (instalado pero sin uso — el README antiguo lo citaba
 PM2 (host): nikolina-livekit-server (LiveKit 7880/7881)
 ```
 
-## 3. Docker (25 contenedores, red `msbross_net`)
+## 3. Docker — estado DEFINITIVO (Misión 04): 11 contenedores, red `msbross_net`
 
 | Contenedor | Imagen | Proyecto |
 |---|---|---|
-| uiep-backend | msbrossai-uiep-backend:1.0.0 (243M) | **UIEP** (apps/uiep) |
+| uiep-backend | msbrossai-uiep-backend:latest (prod = `0286002…` = 44431f5; tag congelado 1.0.0 = `4ea095d6`) | **UIEP** (apps/uiep) |
 | msbross-proxy | node:22-alpine | infrastructure/msbross-proxy |
 | traefik | traefik:latest | perímetro |
-| portainer | portainer-ce:lts | administración (puertos internos, no expuestos) |
-| msbross-backend | msbross-msbross:granian | apps/msbross-backend (hub API) |
-| nikolina-agent · it-coach-agent · nikolina-api-hub | msbross-nikolina-backend (+granian) | apps/livekit-nikolina + it-english-coach |
-| it-english-backend | node:22-bookworm-slim | apps/it-english-coach |
-| jartosdto-backend + postgres(pgvector) + redis + minio | granian + pgvector:pg16 + redis:7 + minio | apps/jartosdto |
-| cuentos-magicos-backend + celery + postgres | granian ×2 + postgres:16 | apps/cuentos-magicos |
-| msbross-elitescout-db + elitescout-backend | postgres:16 + node:22-alpine | apps/elitescout |
-| iaprod-backend / traductor-backend / gas-station-backend / industrialpro-backend / atenea-backend / llm-admin-proxy | granian / bun | apps/* |
+| portainer | portainer-ce:lts | administración (sin puertos publicados) |
+| uptime-kuma | louislam/uptime-kuma:1 | monitorización (`monitor`) |
+| cuentos-magicos-backend + celery + msbross-cuentos-db | msbross-cuentos-magicos-backend:granian + postgres:16 | apps/cuentos-magicos |
+| gas-station-backend | msbross-gas-station-backend:granian | apps/gas-station |
+| nikolina-agent + nikolina-api-hub | msbross-nikolina-backend | apps/livekit-nikolina |
+| jartosdto-redis | redis:7-alpine | **compartido: cola de cuentos-magicos** (nombre legacy) |
 
-Imágenes: 9,5 GB (20; todas referenciadas). Digests completos: `docker images --digests`.
-Volúmenes: 12 (8 activos); datos de Postgres/MinIO/UIEP; **4 dangling NO tocados**:
-`fitness-data`, `perfume-data`, `perfume-pg-data`, `uptime-kuma` (decisión del propietario).
-BuildKit cache: 821M (tras limpieza de 51G — ver §5).
+Retirados el 31-oct (Misión 04, con backup externo previo y registro en
+CLASIFICACION-RECURSOS.md): iaprod, traductor, industrialpro, atenea, it-english+coach,
+elitescout+pg, jartosdto backend/pg/minio, msbross-backend(hub), llm-admin-proxy — y 16
+estáticos históricos de www/app (git-reversibles; repos GH y Pages intactos).
+Imágenes: 14, todas con contenedor. Volúmenes: 12 (8 activos + 4 dangling preservados:
+fitness-data, perfume-data, perfume-pg-data, uptime-kuma — decisión del propietario).
+BuildKit cache: 821M (la limpieza de 51,3 GB está en §5).
 
 ## 4. Almacenamiento (contabilidad completa de 48G usados)
 
