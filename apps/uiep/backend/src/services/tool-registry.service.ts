@@ -59,6 +59,46 @@ const ADAPTERS: Record<string, (input: Record<string, unknown>) => ToolExecution
   }),
 };
 
+/**
+ * Adaptadores con CONTEXTO y efectos controlados (Fase 5.1): la escritura en
+ * memoria persistente es una herramienta CERRADA con políticas deterministas
+ * (memory-store.writeMemory) — el modelo nunca escribe libremente.
+ */
+export interface ToolContext {
+  agentSpecId: string
+  sessionId: string
+  executionId: string
+  input: string
+  memoryEnabled: boolean
+}
+
+const ASYNC_ADAPTERS: Record<string, (input: Record<string, unknown>, ctx: ToolContext) => Promise<ToolExecutionResult>> = {
+  'memory-write': (parsed, ctx) =>
+    (async () => {
+      const { writeMemory } = await import('./memory-store.service');
+      const result = await writeMemory({
+        agentSpecId: ctx.agentSpecId,
+        sessionId: ctx.sessionId,
+        kind: parsed.kind === 'session' ? 'session' : 'agent',
+        content: String(parsed.content ?? ''),
+        origin: { executionId: ctx.executionId, input: ctx.input },
+        memoryEnabled: ctx.memoryEnabled,
+      });
+      if (!result.ok) {
+        return { ok: false, error: `memory_write_${result.reason}`, detail: result.message };
+      }
+      return {
+        ok: true,
+        result: {
+          memoryId: result.memory.memoryId,
+          kind: result.memory.kind,
+          deduplicated: result.deduplicated,
+          expiresAt: result.memory.expiresAt,
+        },
+      };
+    })(),
+};
+
 /** Validación de argumentos + ejecución por adaptador. Nunca lanza. */
 export function validateToolArguments(tool: ToolSpecV1, input: unknown): ToolExecutionResult {
   const parsed = validateToolInput(tool.spec.inputSchema, input);
@@ -74,6 +114,24 @@ export function validateToolArguments(tool: ToolSpecV1, input: unknown): ToolExe
   } catch (err) {
     return { ok: false, error: 'adapter_error', detail: (err as Error).message };
   }
+}
+
+/** Ejecución con contexto (Fase 5.1): async adapters para efectos
+ *  controlados (memoria); el resto usa la vía pura sincrónica. */
+export async function executeTool(tool: ToolSpecV1, input: unknown, ctx: ToolContext): Promise<ToolExecutionResult> {
+  const parsed = validateToolInput(tool.spec.inputSchema, input);
+  if (!parsed.ok) {
+    return { ok: false, error: 'invalid_input', detail: JSON.stringify(parsed.errors) };
+  }
+  const asyncAdapter = ASYNC_ADAPTERS[tool.spec.execution.adapter];
+  if (asyncAdapter) {
+    try {
+      return await asyncAdapter(parsed.value, ctx);
+    } catch (err) {
+      return { ok: false, error: 'adapter_error', detail: (err as Error).message };
+    }
+  }
+  return validateToolArguments(tool, input);
 }
 
 /* ── Seeds idempotentes de herramientas base ──────────────────────────────── */
@@ -116,10 +174,41 @@ export const RUNTIME_INFO_TOOL_SEED: ToolSpecV1 = {
   },
 };
 
+/** Fase 5.1 — memoria persistente como herramienta CERRADA: el modelo puede
+ *  PROPONER recuerdos; la escritura real pasa por políticas deterministas
+ *  (dedup por hash, TTL, cuota, embedding) y exige permiso 'memory:write' +
+ *  spec.memory.enabled. Nunca escritura libre. */
+export const MEMORY_WRITE_TOOL_SEED: ToolSpecV1 = {
+  apiVersion: API_VERSION,
+  kind: 'Tool',
+  metadata: {
+    id: 'memory-write',
+    name: 'Escritura de memoria',
+    version: '1.0.0',
+    description: 'Guarda un recuerdo (dato relevante a conservar) con políticas deterministas: deduplicación, TTL y cuota. Requiere que el agente tenga memoria habilitada.',
+    tags: ['memory', 'util'],
+    createdAt: '2026-10-31T00:00:00.000Z',
+  },
+  spec: {
+    description:
+      'Almacena un recuerdo para futuros turnos. kind "agent" = persistente para este agente (recuperación semántica); kind "session" = nota ligada a esta conversación. La escritura valida contenido (3-1000), deduplica por hash y aplica TTL/cuota.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        content: { type: 'string', description: 'El recuerdo, en una frase autocontenida (3-1000 caracteres)' },
+        kind: { type: 'string', description: '"agent" (persistente) o "session" (esta conversación)' },
+      },
+      required: ['content'],
+    },
+    permissions: ['memory:write'],
+    execution: { adapter: 'memory-write' },
+  },
+};
+
 /** Siembra idempotente al arranque: registra las herramientas base si no existen. */
 export async function seedDefaultToolSpecs(): Promise<'seeded' | 'failed'> {
   try {
-    for (const tool of [CLOCK_TOOL_SEED, RUNTIME_INFO_TOOL_SEED]) {
+    for (const tool of [CLOCK_TOOL_SEED, RUNTIME_INFO_TOOL_SEED, MEMORY_WRITE_TOOL_SEED]) {
       const existing = await getLatestSpec(tool.metadata.id);
       if (!existing) {
         await saveSpec(tool);

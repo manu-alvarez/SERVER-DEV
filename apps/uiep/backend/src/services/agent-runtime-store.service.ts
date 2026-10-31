@@ -65,6 +65,9 @@ export interface AgentRunRecord {
     /** Fase 5: fragmentos de conocimiento inyectados en el turno (trazabilidad
      *  respuesta→fuente). Solo con spec.memory { enabled, strategy: 'semantic' }. */
     retrievals?: Array<{ sourceId: string; title: string; ref: string; chunkIdx: number; score: number }>;
+    /** Fase 5.1: citas emitidas por el modelo, validadas contra los fragmentos
+     *  existentes (verified=false → el modelo citó una referencia inexistente). */
+    citations?: Array<{ ref: number; verified: boolean; sourceId: string | null; chunkIdx: number | null; score: number | null }>;
   };
   errors: string[];
   startedAt: string;

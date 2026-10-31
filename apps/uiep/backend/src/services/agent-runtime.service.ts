@@ -7,9 +7,10 @@ import {
   type RuntimeChatMessage,
   type RuntimeChatTool,
 } from './model-gateway.service';
-import { getToolSpec, validateToolArguments } from './tool-registry.service';
+import { getToolSpec, validateToolArguments, executeTool, type ToolContext } from './tool-registry.service';
 import { getLatestSpec, saveSpec } from './spec-registry.service';
 import { retrieveForAgent, type RetrievalHit } from './retrieval.service';
+import { retrieveMemories, type MemoryHit } from './memory-store.service';
 import {
   listSessionRuns,
   loadRun,
@@ -155,6 +156,8 @@ interface RunContext {
   maxIterations: number;
   maxContextChars: number;
   deadline: number;
+  // Fase 5.1 — contexto de ejecución para adaptadores con efectos (memoria)
+  toolContext: ToolContext;
 }
 
 type PreRun =
@@ -302,12 +305,38 @@ async function prepareRun(sessionId: string, rawInput: string): Promise<PreRun> 
     await saveRun(preview); // visible para el polling del Control Center
   }
 
+  // Fase 5.1 — memoria del agente y de la sesión (si memory.enabled): los
+  // recuerdos de agente se recuperan POR SIMILITUD con la entrada; los de
+  // sesión por recencia. Degradación honesta igual que knowledge.
+  let memoryAgent: MemoryHit[] = [];
+  let memorySession: MemoryHit[] = [];
+  if (spec.spec.memory?.enabled) {
+    try {
+      const m = await retrieveMemories(session.agentSpecId, session.sessionId, rawInput);
+      memoryAgent = m.agent;
+      memorySession = m.session;
+    } catch (err) {
+      preview.errors.push(`memory_retrieval_failed: ${(err as Error).message}`);
+    }
+  }
+
   const systemContentWithKnowledge =
-    retrievals.length > 0
-      ? `${systemContent}\n\n[Contexto de conocimiento recuperado — úsalo para responder y cita las referencias [n]]\n${retrievals
-          .map((h, i) => `[${i + 1}] (${h.title}${h.ref ? ' · ' + h.ref : ''}) ${h.text}`)
-          .join('\n---\n')}`
-      : systemContent;
+    [
+      systemContent,
+      retrievals.length > 0
+        ? `\n[Contexto de conocimiento recuperado — úsalo para responder y cita las referencias [n]]\n${retrievals
+            .map((h, i) => `[${i + 1}] (${h.title}${h.ref ? ' · ' + h.ref : ''}) ${h.text}`)
+            .join('\n---\n')}`
+        : '',
+      memoryAgent.length > 0
+        ? `\n[Memoria del agente — recuerdos persistentes de interacciones previas]\n${memoryAgent.map((m, i) => `[M${i + 1}] ${m.content}`).join('\n')}`
+        : '',
+      memorySession.length > 0
+        ? `\n[Notas de esta sesión]\n${memorySession.map((m, i) => `[S${i + 1}] ${m.content}`).join('\n')}`
+        : '',
+    ]
+      .filter(Boolean)
+      .join('\n');
 
   return {
     ok: true,
@@ -323,6 +352,13 @@ async function prepareRun(sessionId: string, rawInput: string): Promise<PreRun> 
       maxIterations,
       maxContextChars,
       deadline,
+      toolContext: {
+        agentSpecId: session.agentSpecId,
+        sessionId: session.sessionId,
+        executionId: preview.executionId,
+        input: rawInput,
+        memoryEnabled: spec.spec.memory?.enabled === true,
+      },
     },
   };
 }
@@ -399,7 +435,7 @@ async function executeRun(
           }
           continue;
         }
-        const executed = validateToolArguments(decision.tool, call.arguments);
+        const executed = await executeTool(decision.tool, call.arguments, ctx.toolContext);
         if (executed.ok) {
           preview.result.toolExecutions.push({ name: call.name, ok: true, result: executed.result });
           toolMessages.push({
@@ -453,6 +489,19 @@ async function executeRun(
   if (finalText !== undefined) {
     session.messages.push({ role: 'assistant', content: finalText, at: new Date().toISOString() });
     preview.result.text = finalText;
+    // Fase 5.1 — fiabilidad de citas: separamos fragmentos recuperados
+    // (result.retrievals), referencias DISPONIBLES para el modelo y citas
+    // EFECTIVAMENTE EMITIDAS. Validación determinista (sin modelo extra):
+    // cada cita [n] se contrasta con retrievals[n-1] → verified true/false.
+    const citedRefs = [...finalText.matchAll(/\[(\d{1,2})\]/g)].map((m) => Number(m[1]));
+    const retrievals = preview.result.retrievals ?? [];
+    const unique = [...new Set(citedRefs)];
+    if (citedRefs.length > 0 && retrievals.length > 0) {
+      preview.result.citations = unique.map((n) => {
+        const r = retrievals[n - 1];
+        return { ref: n, verified: Boolean(r), sourceId: r?.sourceId ?? null, chunkIdx: r?.chunkIdx ?? null, score: r?.score ?? null };
+      });
+    }
   }
   await saveSession(session);
   return { ok: true, record: await finalizeRunRecord(preview, status) };

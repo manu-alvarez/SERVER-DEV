@@ -1,6 +1,6 @@
 {
   "name": "@uiep/agent-spec",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "description": "UIEP AgentSpec v1 — versioned, framework-agnostic contract for intelligent entities. The spec describes WHAT the system is; adapters decide HOW it runs.",
   "main": "./dist/index.js",

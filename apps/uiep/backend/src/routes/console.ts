@@ -23,6 +23,7 @@ import {
 } from '../services/knowledge-store.service';
 import { createSource, ingestSource } from '../services/ingestion.service';
 import { queryAll } from '../services/retrieval.service';
+import { listAll as listAllMemories, deleteMemory, isExpired } from '../services/memory-store.service';
 import { createSession, startAgentRun } from '../services/agent-runtime.service';
 
 /**
@@ -202,6 +203,7 @@ type RunLike = {
     durationMs?: number;
     toolExecutions?: Array<{ ok?: boolean }>;
     retrievals?: Array<{ sourceId: string; title: string; ref: string; chunkIdx: number; score: number }>;
+    citations?: Array<{ ref: number; verified: boolean; sourceId: string | null; chunkIdx: number | null; score: number | null }>;
     text?: string;
   };
 };
@@ -220,6 +222,7 @@ function summarizeRun(run: RunLike) {
     toolCount: tools.length,
     toolFailures: tools.filter((t) => t.ok === false).length,
     retrievalCount: run.result.retrievals?.length ?? 0,
+    citations: run.result.citations?.map((c) => ({ ref: c.ref, verified: c.verified })),
     textPreview: (run.result.text ?? '').slice(0, 140),
   };
 }
@@ -638,6 +641,56 @@ export function registerConsoleRoute(app: Express): void {
       .catch((err) => {
         console.error('[UIEP] console_knowledge_bindings_set_failed', err);
         res.status(500).json({ error: 'knowledge_bindings_set_failed' });
+      });
+  });
+
+  /* ── Memory (Fase 5.1): gestión desde la consola ─────────────────────────── */
+
+  app.get('/api/console/memory', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    listAllMemories()
+      .then((list) =>
+        res.json(
+          list.map((m) => ({
+            memoryId: m.memoryId,
+            agentSpecId: m.agentSpecId,
+            sessionId: m.sessionId,
+            kind: m.kind,
+            content: m.content,
+            origin: m.origin,
+            createdAt: m.createdAt,
+            expiresAt: m.expiresAt,
+            status: m.status,
+            expired: isExpired(m),
+          })),
+        ),
+      )
+      .catch((err) => {
+        console.error('[UIEP] console_memory_list_failed', err);
+        res.status(500).json({ error: 'memory_list_failed' });
+      });
+  });
+
+  app.delete('/api/console/memory/:id', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!/^mem-[a-z0-9-]{3,80}$/.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de memoryId inválido'] } });
+    }
+    deleteMemory(id)
+      .then((deleted) => {
+        if (!deleted) {
+          return void res.status(404).json({ error: 'memory_not_found' });
+        }
+        res.json({ deleted: true });
+      })
+      .catch((err) => {
+        console.error('[UIEP] console_memory_delete_failed', err);
+        res.status(500).json({ error: 'memory_delete_failed' });
       });
   });
 }

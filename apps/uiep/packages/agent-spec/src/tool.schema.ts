@@ -34,8 +34,10 @@ export type ToolInputSchema = z.infer<typeof ToolInputSchemaSchema>;
 /** Adaptadores de ejecución permitidos. Enumeración cerrada: si el runtime
  *  recibe un adapter desconocido lo rechaza explícito (nunca ejecuta código
  *  arbitrario). El adapter 'clock' y 'runtime-info' son puros y sin efectos
- *  sobre el filesystem. */
-export const ToolAdapterSchema = z.enum(['clock', 'runtime-info']);
+ *  sobre el filesystem. 'memory-write' (Fase 5.1) escribe memoria PERSISTENTE
+ *  solo a través de políticas deterministas del memory-store (dedup/TTL/
+ *  cuota) y exige permiso 'memory:write' + spec.memory.enabled. */
+export const ToolAdapterSchema = z.enum(['clock', 'runtime-info', 'memory-write']);
 
 /**
  * ToolSpec v1 — herramienta declarativa: identificador (metadata.id),

@@ -1,4 +1,5 @@
 import { contentHash, embed } from './embedding.service';
+import { assertPublicUrl, guardedFetch } from './ssrf-guard.service';
 import {
   getSource,
   loadSourceContent,
@@ -93,30 +94,26 @@ function htmlToText(html: string): string {
     .replace(/&quot;/g, '"');
 }
 
-/** Extrae el contenido de una fuente URL (las textuales leen su fichero). */
+/** Extrae el contenido de una fuente URL con protección SSRF (Fase 5.1):
+ *  solo http/https público (DNS real validado), redirects re-validados por
+ *  salto, content-type esperado, límites de tamaño/tiempo. */
 async function extractContent(source: KnowledgeSource): Promise<{ ok: true; text: string } | { ok: false; error: string }> {
   if (source.type !== 'url') {
     return { ok: false, error: 'text_source_requires_content' };
   }
-  try {
-    const res = await fetch(source.ref, {
-      headers: { 'user-agent': 'UIEP-Knowledge/1.0 (+ingestion)' },
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-    });
-    if (!res.ok) {
-      return { ok: false, error: `fetch_status_${res.status}` };
-    }
-    const type = res.headers.get('content-type') ?? '';
-    const buf = await res.arrayBuffer();
-    if (buf.byteLength > MAX_SOURCE_BYTES) {
-      return { ok: false, error: `source_too_large_${MAX_SOURCE_BYTES}` };
-    }
-    const raw = Buffer.from(buf).toString('utf8');
-    const text = type.includes('html') ? htmlToText(raw) : raw;
-    return { ok: true, text };
-  } catch (err) {
-    return { ok: false, error: `fetch_error: ${(err as Error).message}` };
+  const pre = await assertPublicUrl(source.ref);
+  if (!pre.ok) {
+    return { ok: false, error: `ssrf_blocked_${pre.reason}` };
   }
+  const fetched = await guardedFetch(source.ref, {
+    timeoutMs: FETCH_TIMEOUT_MS,
+    maxBytes: MAX_SOURCE_BYTES,
+  });
+  if (!fetched.ok || fetched.text === undefined) {
+    return { ok: false, error: fetched.error ?? 'fetch_failed' };
+  }
+  const raw = fetched.text;
+  return { ok: true, text: fetched.contentType?.includes('html') ? htmlToText(raw) : raw };
 }
 
 /* ── Normalización + fragmentación ────────────────────────────────────────── */

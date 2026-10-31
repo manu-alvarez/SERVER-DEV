@@ -62,13 +62,20 @@ export function startRuntimeMock(): Promise<{ server: Server; url: string }> {
           res.end(JSON.stringify({ error: 'fail_provider' }));
           return;
         }
-        const callResponse = (name: string) =>
+        const callResponse = (name: string) => {
+          // memory-write con args VÁLIDOS: así el flujo auto-mock llega a la
+          // POLÍTICA de memoria (no se queda en invalid_input).
+          const args =
+            name === 'memory-write'
+              ? { content: 'recuerdo escrito por el flujo automático del mock', kind: 'agent' }
+              : {};
           res.end(
             JSON.stringify({
-              message: { role: 'assistant', content: '', tool_calls: [{ function: { name, arguments: {} } }] },
+              message: { role: 'assistant', content: '', tool_calls: [{ function: { name, arguments: args } }] },
               done: true,
             }),
           );
+        };
         // LOOP_CALL: el modelo hace la misma llamada en EVERY iteración (límites del runtime).
         if (match && match[1] === 'LOOP_CALL') {
           callResponse(match[2]);
@@ -86,11 +93,19 @@ export function startRuntimeMock(): Promise<{ server: Server; url: string }> {
         // Fase 5 — eco semántico: si el system inyectó contexto de conocimiento
         // (marcador), el modelo "responde" con el fragmento recuperado que
         // contiene 'RECOVER:' — prueba el viaje chunk→contexto→modelo.
+        // Fase 5.1 — igual para el bloque de MEMORIA del agente ([M1] …).
         const systemMsg = messages.find((m) => m.role === 'system')?.content ?? '';
         if (systemMsg.includes('[Contexto de conocimiento recuperado')) {
           const recover = /RECOVER:\s*([^\n\]]+)/.exec(systemMsg)?.[1]?.trim();
           if (recover) {
             res.end(JSON.stringify({ message: { role: 'assistant', content: `FACT: ${recover}` }, done: true }));
+            return;
+          }
+        }
+        if (systemMsg.includes('[Memoria del agente')) {
+          const memRecover = /\[M\d+\]\s*(?:RECOVER:\s*)?([^\n]+)/.exec(systemMsg)?.[1]?.trim();
+          if (memRecover) {
+            res.end(JSON.stringify({ message: { role: 'assistant', content: `FACT: ${memRecover}` }, done: true }));
             return;
           }
         }
