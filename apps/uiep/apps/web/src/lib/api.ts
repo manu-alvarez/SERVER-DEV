@@ -317,6 +317,19 @@ export interface WorkflowRunSummary {
   finishedAt?: string
 }
 
+/* ── Integraciones (Fase 7) ──────────────────────────────────────────────── */
+
+export interface IntegrationSummary {
+  id: string
+  name: string
+  version: string
+  type: 'http-api' | 'mcp-server'
+  baseUrl: string
+  auth: { type: string; secretEnv: string | null }
+  healthPath: string
+  timeoutMs: number
+}
+
 /* ── Endpoints ─────────────────────────────────────────────────────────────── */
 
 export const api = {
@@ -373,6 +386,14 @@ export const api = {
     runDetail: (runId: string) => get<WorkflowRunRecord>(`/api/console/workflow-runs/${runId}`),
     cancel: (runId: string) => post<{ cancelling: boolean }>(`/api/console/workflow-runs/${runId}/cancel`),
     resume: (runId: string) => post<{ resumed: boolean }>(`/api/console/workflow-runs/${runId}/resume`),
+  },
+
+  /* Integraciones (Fase 7 — consola) */
+  integrations: {
+    list: () => get<IntegrationSummary[]>('/api/console/integrations'),
+    health: (id: string) => get<{ id: string; ok: boolean; status?: number; detail: string; durationMs: number }>(`/api/console/integrations/${id}/health`),
+    mcpTools: (id: string) => get<{ id: string; tools: Array<{ name: string; description?: string }> }>(`/api/console/integrations/${id}/mcp-tools`),
+    save: (doc: unknown) => post<{ stored: boolean; id: string; version: string }>('/api/console/integrations', doc),
   },
 
   /* Públicos (contratos de Fases 1-2, sin cambios) */

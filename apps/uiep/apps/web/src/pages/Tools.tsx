@@ -85,6 +85,20 @@ export default function Tools(): ReactNode {
                   {tool.metadata.name} <code style={{ opacity: 0.7 }}>{tool.metadata.id}</code>
                 </Typography>
                 <Chip size="small" color="secondary" variant="outlined" label={`adapter: ${tool.spec.execution.adapter}`} />
+                <Chip
+                  size="small"
+                  variant="outlined"
+                  sx={{ opacity: 0.75 }}
+                  label={
+                    tool.spec.execution.adapter === 'http-call'
+                      ? 'origen: integración'
+                      : tool.spec.execution.adapter === 'mcp-call'
+                        ? 'origen: MCP'
+                        : tool.spec.execution.adapter === 'memory-write'
+                          ? 'origen: memoria'
+                          : 'origen: core'
+                  }
+                />
                 <Box sx={{ flexGrow: 1 }} />
                 {(tool.spec.permissions ?? []).map((p) => (
                   <Chip key={p} size="small" variant="outlined" label={`requiere ${p}`} />
