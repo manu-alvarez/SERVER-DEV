@@ -24,6 +24,9 @@ services:
       - OLLAMA_BASE_URL=${UIEP_OLLAMA_BASE_URL:-http://172.20.0.1:11434}
       - UIEP_RUNTIME_TOKEN=${UIEP_RUNTIME_TOKEN:-}
       - UIEP_CONSOLE_PASSWORD=${UIEP_CONSOLE_PASSWORD:-}
+      - UIEP_HOOKS=${UIEP_HOOKS:-}
+      - UIEP_HOOK_TOKEN_1=${UIEP_HOOK_TOKEN_1:-}
+      - UIEP_MCP_EXPOSED_TOOLS=${UIEP_MCP_EXPOSED_TOOLS:-}
     volumes:
       - uiep-backend-data:/app/data
     networks:
