@@ -1,6 +1,17 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import type { AgentSpecV1 } from '@uiep/agent-spec';
+
+/**
+ * Envelope mínimo de cualquier documento de especificación (AgentSpec,
+ * ModelProfile, ...). Fase 2 convierte el registro en polimórfico: la
+ * persistencia y las interfaces no cambian, solo el tipo del envelope.
+ */
+export type SpecEnvelope = {
+  apiVersion: string;
+  kind: string;
+  metadata: { id: string; name: string; version: string; description?: string; createdAt?: string };
+  spec?: unknown;
+};
 
 /**
  * spec-registry — persistencia inicial de especificaciones (Fase 1, P0).
@@ -28,7 +39,7 @@ function specFile(id: string, version: string): string {
 }
 
 /** Upsert idempotente: (id, version) identifica el documento. */
-export async function saveSpec(spec: AgentSpecV1): Promise<void> {
+export async function saveSpec(spec: SpecEnvelope): Promise<void> {
   await ensureDir();
   const file = specFile(spec.metadata.id, spec.metadata.version);
   const tmp = `${file}.tmp`;
@@ -46,17 +57,17 @@ export interface SpecSummary {
   createdAt?: string;
 }
 
-export async function listSpecs(): Promise<SpecSummary[]> {
+export async function listSpecs(opts?: { kind?: string }): Promise<SpecSummary[]> {
   await ensureDir();
   const files = (await fs.readdir(SPECS_DIR)).filter((f) => f.endsWith('.json'));
   const summaries: SpecSummary[] = [];
   for (const file of files) {
     try {
-      const doc = JSON.parse(await fs.readFile(path.join(SPECS_DIR, file), 'utf8')) as {
-        apiVersion: string;
-        kind: string;
-        metadata: { id: string; name: string; version: string; description?: string; createdAt?: string };
-      };
+      const doc = JSON.parse(await fs.readFile(path.join(SPECS_DIR, file), 'utf8')) as SpecEnvelope;
+      // Filtro additive por kind (Fase 2: ModelProfile); sin filtro se listan todos.
+      if (opts?.kind && doc.kind !== opts.kind) {
+        continue;
+      }
       summaries.push({
         id: doc.metadata.id,
         name: doc.metadata.name,
@@ -79,8 +90,8 @@ function compareSemVer(a: string, b: string): number {
   return ax - bx || ay - by || az - bz;
 }
 
-/** Devuelve la versión más reciente del spec con ese id, o null. */
-export async function getLatestSpec(id: string): Promise<AgentSpecV1 | null> {
+/** Devuelve la versión más reciente del documento con ese id (cualquier kind), o null. */
+export async function getLatestSpec(id: string): Promise<SpecEnvelope | null> {
   await ensureDir();
   // El id ya fue validado contra /^[a-z0-9][a-z0-9-]{2,63}$/ en la ruta:
   // nunca se usa sin sanear para construir rutas.
@@ -93,5 +104,5 @@ export async function getLatestSpec(id: string): Promise<AgentSpecV1 | null> {
     return null;
   }
   const latest = versions[versions.length - 1];
-  return JSON.parse(await fs.readFile(specFile(id, latest), 'utf8')) as AgentSpecV1;
+  return JSON.parse(await fs.readFile(specFile(id, latest), 'utf8')) as SpecEnvelope;
 }
