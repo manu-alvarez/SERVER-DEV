@@ -242,12 +242,14 @@ async function executeWorkflow(run: WorkflowRunRecord, spec: WorkflowSpecV1): Pr
         const taken = verdict ? node.then : node.else;
         const untaken = verdict ? node.else : node.then;
         step.branchTaken = taken;
-        // Visibilidad: la rama NO tomada queda skipped (su subárbol, si lo
-        // hubiera, se documenta como extensión futura del WorkflowSpec).
-        const untakenStep = run.steps[untaken];
-        if (untakenStep && (untakenStep.status === 'pending' || untakenStep.status === 'running')) {
-          untakenStep.status = 'skipped';
-          untakenStep.finishedAt = new Date().toISOString();
+        // Visibilidad: la rama NO tomada queda skipped — SOLO si es distinta de
+        // la tomada (plantillas con then==else no corrompen el flujo).
+        if (untaken !== taken) {
+          const untakenStep = run.steps[untaken];
+          if (untakenStep && (untakenStep.status === 'pending' || untakenStep.status === 'running')) {
+            untakenStep.status = 'skipped';
+            untakenStep.finishedAt = new Date().toISOString();
+          }
         }
         // El flujo continúa DESDE la rama tomada (salto, no secuencia).
         currentId = byId.has(taken) ? taken : undefined;
