@@ -13,6 +13,16 @@ import {
   loadRun,
   loadSession,
 } from '../services/agent-runtime-store.service';
+import {
+  listSources,
+  loadChunks,
+  getSource,
+  deleteSource,
+  getBindings,
+  setBindingsForAgent,
+} from '../services/knowledge-store.service';
+import { createSource, ingestSource } from '../services/ingestion.service';
+import { queryAll } from '../services/retrieval.service';
 import { createSession, startAgentRun } from '../services/agent-runtime.service';
 
 /**
@@ -187,7 +197,13 @@ type RunLike = {
   status: string;
   startedAt: string;
   finishedAt?: string;
-  result: { iterations?: number; durationMs?: number; toolExecutions?: Array<{ ok?: boolean }>; text?: string };
+  result: {
+    iterations?: number;
+    durationMs?: number;
+    toolExecutions?: Array<{ ok?: boolean }>;
+    retrievals?: Array<{ sourceId: string; title: string; ref: string; chunkIdx: number; score: number }>;
+    text?: string;
+  };
 };
 
 function summarizeRun(run: RunLike) {
@@ -203,6 +219,7 @@ function summarizeRun(run: RunLike) {
     iterations: run.result.iterations ?? 0,
     toolCount: tools.length,
     toolFailures: tools.filter((t) => t.ok === false).length,
+    retrievalCount: run.result.retrievals?.length ?? 0,
     textPreview: (run.result.text ?? '').slice(0, 140),
   };
 }
@@ -456,6 +473,171 @@ export function registerConsoleRoute(app: Express): void {
       .catch((err) => {
         console.error('[UIEP] console_run_failed', err);
         res.status(500).json({ error: 'run_failed' });
+      });
+  });
+
+  /* ── Knowledge (Fase 5): delegación directa, mismos patrones ─────────────── */
+
+  const KN_ID_RE2 = /^kn-[a-z0-9-]{3,80}$/;
+
+  app.get('/api/console/knowledge/sources', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    listSources()
+      .then((sources) => res.json(sources))
+      .catch((err) => {
+        console.error('[UIEP] console_knowledge_sources_failed', err);
+        res.status(500).json({ error: 'knowledge_sources_failed' });
+      });
+  });
+
+  app.post('/api/console/knowledge/sources', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const body = (req.body ?? {}) as { type?: unknown; ref?: unknown; title?: unknown; text?: unknown };
+    createSource({
+      type: body.type === 'url' ? 'url' : 'text',
+      ref: typeof body.ref === 'string' ? body.ref : undefined,
+      title: typeof body.title === 'string' ? body.title : undefined,
+      text: typeof body.text === 'string' ? body.text : undefined,
+    })
+      .then((result) => {
+        if (!result.ok) {
+          return void res
+            .status(result.reason === 'max_sources_reached' ? 429 : 400)
+            .json({ error: result.reason, message: result.message });
+        }
+        res.status(201).json(result.source);
+      })
+      .catch((err) => {
+        console.error('[UIEP] console_knowledge_create_failed', err);
+        res.status(500).json({ error: 'knowledge_source_failed' });
+      });
+  });
+
+  app.post('/api/console/knowledge/sources/:id/ingest', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!KN_ID_RE2.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de sourceId inválido'] } });
+    }
+    ingestSource(id)
+      .then((result) => {
+        if (!result.ok) {
+          return void res
+            .status(result.reason === 'source_not_found' ? 404 : result.reason === 'max_total_chunks' ? 429 : 422)
+            .json({ error: result.reason, message: result.message });
+        }
+        res.json({ source: result.source, skipped: result.skipped });
+      })
+      .catch((err) => {
+        console.error('[UIEP] console_knowledge_ingest_failed', err);
+        res.status(500).json({ error: 'knowledge_ingest_failed' });
+      });
+  });
+
+  app.delete('/api/console/knowledge/sources/:id', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!KN_ID_RE2.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de sourceId inválido'] } });
+    }
+    deleteSource(id)
+      .then((deleted) => {
+        if (!deleted) {
+          return void res.status(404).json({ error: 'source_not_found' });
+        }
+        res.json({ deleted: true });
+      })
+      .catch((err) => {
+        console.error('[UIEP] console_knowledge_delete_failed', err);
+        res.status(500).json({ error: 'knowledge_delete_failed' });
+      });
+  });
+
+  app.get('/api/console/knowledge/sources/:id', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!KN_ID_RE2.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de sourceId inválido'] } });
+    }
+    Promise.all([getSource(id), loadChunks(id)])
+      .then(([source, chunks]) => {
+        if (!source) {
+          return void res.status(404).json({ error: 'source_not_found' });
+        }
+        res.json({
+          ...source,
+          chunks: chunks.slice(0, 20).map((c) => ({ idx: c.idx, hash: c.hash, preview: c.text.slice(0, 200), dims: c.vector.length })),
+        });
+      })
+      .catch((err) => {
+        console.error('[UIEP] console_knowledge_source_get_failed', err);
+        res.status(500).json({ error: 'knowledge_source_get_failed' });
+      });
+  });
+
+  app.post('/api/console/knowledge/query', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const body = (req.body ?? {}) as { query?: unknown; topK?: unknown };
+    if (typeof body.query !== 'string' || body.query.trim().length === 0) {
+      return void res.status(400).json({ error: { query: ['falta la consulta'] } });
+    }
+    queryAll(body.query, typeof body.topK === 'number' ? body.topK : undefined)
+      .then((result) => {
+        if (!result.ok) {
+          return void res
+            .status(result.reason === 'query_too_large' ? 413 : result.reason === 'no_authorized_sources' ? 404 : 502)
+            .json({ error: result.reason, message: result.message });
+        }
+        res.json(result);
+      })
+      .catch((err) => {
+        console.error('[UIEP] console_knowledge_query_failed', err);
+        res.status(500).json({ error: 'knowledge_query_failed' });
+      });
+  });
+
+  app.get('/api/console/knowledge/bindings', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    getBindings()
+      .then((b) => res.json(b))
+      .catch((err) => {
+        console.error('[UIEP] console_knowledge_bindings_failed', err);
+        res.status(500).json({ error: 'knowledge_bindings_failed' });
+      });
+  });
+
+  app.put('/api/console/knowledge/bindings/:agentSpecId', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const agentSpecId = String(req.params.agentSpecId);
+    if (!ID_RE.test(agentSpecId)) {
+      return void res.status(400).json({ error: { agentSpecId: ['formato de agentSpecId inválido'] } });
+    }
+    const body = (req.body ?? {}) as { sourceIds?: unknown };
+    const sourceIds = Array.isArray(body.sourceIds) ? body.sourceIds.filter((s): s is string => typeof s === 'string') : null;
+    if (sourceIds === null) {
+      return void res.status(400).json({ error: { sourceIds: ['falta el array de sourceIds'] } });
+    }
+    setBindingsForAgent(agentSpecId, sourceIds)
+      .then(() => res.json({ bound: true, agentSpecId, sourceIds }))
+      .catch((err) => {
+        console.error('[UIEP] console_knowledge_bindings_set_failed', err);
+        res.status(500).json({ error: 'knowledge_bindings_set_failed' });
       });
   });
 }

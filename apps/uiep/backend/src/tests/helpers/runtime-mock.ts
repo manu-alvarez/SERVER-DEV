@@ -16,6 +16,31 @@ export function startRuntimeMock(): Promise<{ server: Server; url: string }> {
       res.end(JSON.stringify({ models: [{ name: 'mock-model', capabilities: ['completion', 'tools'] }] }));
       return;
     }
+    // Fase 5 — embeddings mock DETERMINISTAS (4 dims): 'rojo'→[1,0,0,0],
+    // 'azul'→[0,1,0,0], 'verde'→[0,0,1,0], resto→[0,0,0,1]. Batch o unitario.
+    if (req.method === 'POST' && req.url === '/api/embed') {
+      let raw = '';
+      req.on('data', (c) => (raw += c));
+      req.on('end', () => {
+        res.setHeader('content-type', 'application/json');
+        let body: { input?: string | string[] } = {};
+        try {
+          body = JSON.parse(raw);
+        } catch {
+          body = {};
+        }
+        const inputs = Array.isArray(body.input) ? body.input : [body.input ?? ''];
+        const vectorFor = (text: string): number[] => {
+          const t = text.toLowerCase();
+          if (t.includes('rojo')) return [1, 0, 0, 0];
+          if (t.includes('azul')) return [0, 1, 0, 0];
+          if (t.includes('verde')) return [0, 0, 1, 0];
+          return [0, 0, 0, 1];
+        };
+        res.end(JSON.stringify({ model: 'mock-embed', embeddings: inputs.map(vectorFor) }));
+      });
+      return;
+    }
     if (req.method === 'POST' && req.url === '/api/chat') {
       let raw = '';
       req.on('data', (c) => (raw += c));
@@ -57,6 +82,17 @@ export function startRuntimeMock(): Promise<{ server: Server; url: string }> {
         if (last && last.role === 'tool') {
           res.end(JSON.stringify({ message: { role: 'assistant', content: 'MADE' }, done: true }));
           return;
+        }
+        // Fase 5 — eco semántico: si el system inyectó contexto de conocimiento
+        // (marcador), el modelo "responde" con el fragmento recuperado que
+        // contiene 'RECOVER:' — prueba el viaje chunk→contexto→modelo.
+        const systemMsg = messages.find((m) => m.role === 'system')?.content ?? '';
+        if (systemMsg.includes('[Contexto de conocimiento recuperado')) {
+          const recover = /RECOVER:\s*([^\n\]]+)/.exec(systemMsg)?.[1]?.trim();
+          if (recover) {
+            res.end(JSON.stringify({ message: { role: 'assistant', content: `FACT: ${recover}` }, done: true }));
+            return;
+          }
         }
         if (body.tools && body.tools.length > 0) {
           callResponse(body.tools[0].function?.name ?? 'clock');

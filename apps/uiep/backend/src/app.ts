@@ -9,6 +9,7 @@ import { registerMcpRoute } from './routes/mcp';
 import { registerSpecsRoute } from './routes/specs';
 import { registerModelGatewayRoute } from './routes/model-gateway';
 import { registerAgentRuntimeRoute } from './routes/agent-runtime';
+import { registerKnowledgeRoute } from './routes/knowledge';
 import { registerConsoleRoute } from './routes/console';
 
 /**
@@ -58,6 +59,7 @@ export function createApp(options: { trustProxy?: string | number | boolean } = 
   registerSpecsRoute(app);
   registerModelGatewayRoute(app);
   registerAgentRuntimeRoute(app);
+  registerKnowledgeRoute(app);
   registerConsoleRoute(app);
 
   return app;

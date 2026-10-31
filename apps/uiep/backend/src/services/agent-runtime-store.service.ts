@@ -62,6 +62,9 @@ export interface AgentRunRecord {
     toolExecutions: Array<{ name: string; ok: boolean; error?: string; result?: unknown }>;
     iterations: number;
     durationMs?: number;
+    /** Fase 5: fragmentos de conocimiento inyectados en el turno (trazabilidad
+     *  respuesta→fuente). Solo con spec.memory { enabled, strategy: 'semantic' }. */
+    retrievals?: Array<{ sourceId: string; title: string; ref: string; chunkIdx: number; score: number }>;
   };
   errors: string[];
   startedAt: string;

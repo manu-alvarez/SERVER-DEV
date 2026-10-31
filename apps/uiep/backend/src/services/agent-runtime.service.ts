@@ -9,6 +9,7 @@ import {
 } from './model-gateway.service';
 import { getToolSpec, validateToolArguments } from './tool-registry.service';
 import { getLatestSpec, saveSpec } from './spec-registry.service';
+import { retrieveForAgent, type RetrievalHit } from './retrieval.service';
 import {
   listSessionRuns,
   loadRun,
@@ -271,6 +272,43 @@ async function prepareRun(sessionId: string, rawInput: string): Promise<PreRun> 
     spec.spec.instructions.system,
   ].join('\n');
 
+  // Fase 5 — memoria semántica: si el spec la activa (memory.enabled +
+  // strategy 'semantic') y el agente tiene fuentes autorizadas (bindings),
+  // se recupera contexto del KNOWLEDGE BASE para ESTE turno y se inyecta en
+  // el system prompt con referencias [n] trazables (result.retrievals).
+  // DEGRADACIÓN HONESTA: un fallo del subsistema NO bloquea el turno — se
+  // anota en errors y el agente responde sin conocimiento inyectado.
+  let retrievals: RetrievalHit[] = [];
+  if (spec.spec.memory?.enabled && spec.spec.memory.strategy === 'semantic') {
+    try {
+      const r = await retrieveForAgent(session.agentSpecId, rawInput);
+      if (r.ok) {
+        retrievals = r.hits;
+      } else if (r.reason === 'embedding_failed') {
+        preview.errors.push(`knowledge_retrieval_failed: ${r.message ?? 'fallo del servicio de embeddings'}`);
+      } // no_authorized_sources: configuración (sin bindings) — silencioso.
+    } catch (err) {
+      preview.errors.push(`knowledge_retrieval_failed: ${(err as Error).message}`);
+    }
+  }
+  if (retrievals.length > 0) {
+    preview.result.retrievals = retrievals.map((h) => ({
+      sourceId: h.sourceId,
+      title: h.title,
+      ref: h.ref,
+      chunkIdx: h.chunkIdx,
+      score: h.score,
+    }));
+    await saveRun(preview); // visible para el polling del Control Center
+  }
+
+  const systemContentWithKnowledge =
+    retrievals.length > 0
+      ? `${systemContent}\n\n[Contexto de conocimiento recuperado — úsalo para responder y cita las referencias [n]]\n${retrievals
+          .map((h, i) => `[${i + 1}] (${h.title}${h.ref ? ' · ' + h.ref : ''}) ${h.text}`)
+          .join('\n---\n')}`
+      : systemContent;
+
   return {
     ok: true,
     record: preview,
@@ -278,7 +316,7 @@ async function prepareRun(sessionId: string, rawInput: string): Promise<PreRun> 
     ctx: {
       spec,
       profile: profile.profile,
-      systemContent,
+      systemContent: systemContentWithKnowledge,
       wantsTools,
       toolsSupported,
       toolDefs,
