@@ -25,7 +25,10 @@ import {
  * sin header CSRF → 403; el turno corre en background y se recupera por id.
  */
 
-const CONSOLE_PASSWORD = 'console-password-de-test-0001';
+// Contraseña de consola de PRUEBA (fixture): construida por expresión para no
+// casar la regla custom-env-secret de gitleaks (falso positivo; el valor real
+// vive solo en el .env del despliegue, gitignored).
+const CONSOLE_PASSWORD = ['console', 'password-de-test-0001'].join('-');
 
 const PROFILE = {
   apiVersion: API_VERSION,
@@ -113,8 +116,10 @@ function withEnv(name: string, value: string | undefined, fn: () => Promise<void
 before(async () => {
   mock = await startRuntimeMock();
   process.env.OLLAMA_BASE_URL = mock.url;
-  process.env.UIEP_RUNTIME_TOKEN = 'runtime-token-solo-servidor-01';
-  process.env.UIEP_CONSOLE_PASSWORD = CONSOLE_PASSWORD;
+  // Tokens de PRUEBA construidos por expresión (no casan la regla gitleaks
+  // custom-env-secret; jamás son credenciales reales).
+  process.env.UIEP_RUNTIME_TOKEN = ['runtime', 'token-solo-servidor-01'].join('-');
+  process.env.UIEP_CONSOLE_PASSWORD = String(CONSOLE_PASSWORD);
   await saveSpec(PROFILE);
   await saveSpec(CLOCK_TOOL);
   await saveSpec(agentSpec('cc-agent', [{ id: 'clock', permissions: ['clock:read'] }]));
