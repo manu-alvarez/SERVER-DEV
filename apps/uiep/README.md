@@ -63,6 +63,8 @@ Requisitos: node 22 + pnpm 9.15.0 (corepack) + docker + Ollama accesible
 2. El backend NO requiere rollback (la imagen no cambió en 1.1). Si algún día hiciera falta: `docker tag msbrossai-uiep-backend:<ancla> msbrossai-uiep-backend:latest && docker compose -f infrastructure/docker-compose.yml up -d uiep-backend` — nunca `docker image prune -a` (elimina las anclas).
 3. Los datos viven en el volumen `uiep-backend-data` — intactos en cualquier rollback de código.
 
+**Semántica de versionado (inequívoca)**: `BUILD-INFO.json → sourceCommit` identifica SIEMPRE el commit que **produjo el bundle servido** (en 1.1.0: `e773d08` — el commit de docs `b4f12a1` no regenera el bundle); el **tag de release** (`uiep-1.1.0` = `b4f12a1`) identifica el **estado final de `main` publicado**, incluida la documentación. Cuando el artefacto y la publicación coinciden en el mismo commit, ambos apuntan igual. (Definido en la Misión 10; campo `releaseTag` previsto para el Registry de M11+.)
+
 | Elemento | Valor |
 |---|---|
 | Commit congelado | `e1d2d39` (+docs `cf566a0`..) → **git tag `uiep-1.0.0`** |
