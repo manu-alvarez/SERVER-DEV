@@ -49,7 +49,19 @@ Requisitos: node 22 + pnpm 9.15.0 (corepack) + docker + Ollama accesible
 | Desplegar | push a main → en VPS: `git fetch && git reset --hard origin/main` → install → build → compose build+up → **verificar binario servido** (`docker exec … grep`) |
 | Rollback | anclas de imagen (`rollback-*`) o rebuild desde el commit de la fase (matriz abajo) |
 
-## Matriz de trazabilidad / rollback (v1.0)
+## Matriz de trazabilidad / rollback (v1.0 → v1.1)
+
+| Versión | Estado | Commit | Frontend (www/app/uiep) | Backend (imagen) |
+|---|---|---|---|---|
+| **1.1.0** | **publicada** (`uiep-1.1.0`) | `e773d08` (merge `33287f1` de `uiep-1.1-ux` + fix observabilidad) | bundle `index-CEji4u03.js` + `BUILD-INFO.json` | **sin cambios** = `msbrossai-uiep-backend:latest` `sha256:028600208387…` (idéntico al de 1.0.1 — `git diff 44431f5..main -- apps/uiep/backend` vacío) |
+| 1.0.1 | **histórica congelada** (`uiep-1.0.1` = `44431f5`) | RAG 0.70 | bundle `index-DbWra3SD.js` (sustituido) | misma línea de imagen (`0286002…`) |
+| 1.0.0 | **histórica congelada** (`uiep-1.0.0` = `e1d2d39`) | cierre 1.0 | — | **`msbrossai-uiep-backend:1.0.0`** = `4ea095d6f29a` |
+| Ancla previa | — | — | — | `rollback-fase3` = `3b601c4c898e` (desde commit `8dce03b`) |
+
+**Rollback 1.1 → 1.0.1** (probado solo a nivel de frontend; el backend no se toca):
+1. El frontend 1.1 es solo estático: `git revert` del merge `33287f1` (o `git checkout uiep-1.0.1 -- www/app/uiep && git commit`) + push → `git reset --hard origin/main` en el VPS. Sin rebuild, sin reinicio.
+2. El backend NO requiere rollback (la imagen no cambió en 1.1). Si algún día hiciera falta: `docker tag msbrossai-uiep-backend:<ancla> msbrossai-uiep-backend:latest && docker compose -f infrastructure/docker-compose.yml up -d uiep-backend` — nunca `docker image prune -a` (elimina las anclas).
+3. Los datos viven en el volumen `uiep-backend-data` — intactos en cualquier rollback de código.
 
 | Elemento | Valor |
 |---|---|
