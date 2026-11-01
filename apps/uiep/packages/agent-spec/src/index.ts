@@ -11,3 +11,7 @@ export { IntegrationSpecV1Schema, IntegrationTypeSchema, IntegrationAuthSchema }
 export type { IntegrationSpecV1, IntegrationType } from './integration.schema';
 export { validateAgentSpec, parseAgentSpec, validateSpec, parseSpec, SUPPORTED_SPEC_VERSIONS } from './validate';
 export type { SpecValidationResult, AnySpec, AnySpecValidationResult } from './validate';
+export { UES_API_VERSION, UesApiVersionSchema, ArtifactTypeSchema, ArtifactDependencySchema, ProvenanceSchema, RegisteredSpecRefSchema, UESArtifactSchema, LifecycleStateSchema, UESProjectV1Schema, validateUESProject } from './ues.schema';
+export type { ArtifactType, Provenance, UESArtifact, LifecycleState, UESProjectV1, UESValidationResult } from './ues.schema';
+export { BlueprintV1Schema, EmbeddedSpecSchema, UESParameterSchema, BlueprintKnowledgeSchema, BlueprintArtifactSchema, validateBlueprint } from './blueprint.schema';
+export type { BlueprintV1, EmbeddedSpec, UESParameter, BlueprintKnowledge, BlueprintArtifact, BlueprintValidationResult } from './blueprint.schema';export { satisfiesRange } from './version-range';
