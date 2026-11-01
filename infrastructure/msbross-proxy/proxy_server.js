@@ -353,11 +353,13 @@ function smtpDeliver(fromAddr, toAddr, message, cb) {
       // Solo avanzar con la línea FINAL del bloque (espacio tras el código).
       if (!stepDef.expect.test(lastLine)) return;
       buffer = '';
+      // Escribir el send del PASO CASADO (el EHLO del paso 0 incluía el bug:
+      // se saltaba y el MX respondía "Send hello first").
+      sock.write(stepDef.send);
       step += 1;
       if (step >= steps.length) {
         return done(null, 'aceptado_por_MX');
       }
-      sock.write(steps[step].send);
     });
   });
 }
