@@ -65,6 +65,14 @@ import {
   writeExportFile,
   listExportFiles,
 } from '../services/engineering-export.service';
+import {
+  executeArtifact,
+  getExecution,
+  listExecutions,
+  cancelExecution,
+} from '../services/execution-orchestrator.service';
+import { runQualityChecks, runProjectQuality } from '../services/quality-engine.service';
+import { sandboxHealth, sandboxConfigured, sandboxInfo, SANDBOX_IMAGE } from '../services/sandbox-client.service';
 
 /**
  * Control Center BFF (Fase 4) — capa de interfaz con autenticación propia.
@@ -126,6 +134,15 @@ const genLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'too_many_generations', message: 'límite de generaciones por minuto alcanzado; reintenta más tarde' },
+});
+
+/** Límites de EJECUCIÓN (M14): el sandbox es un recurso acotado — 12/min. */
+const execLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: envLimit('EXEC_RATE_LIMIT_MAX', 12),
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'too_many_executions', message: 'límite de ejecuciones por minuto alcanzado; reintenta más tarde' },
 });
 
 /** Regex de ids de registro de generación (engine y composiciones comparten formato). */
@@ -1537,6 +1554,141 @@ export function registerConsoleRoute(app: Express): void {
       .catch((err) => {
         console.error('[UIEP] engineering_exports_list_failed', err);
         res.status(500).json({ error: 'engineering_exports_failed' });
+      });
+  });
+
+  /* ── Execution Sandbox & Quality Engine (Misión 14) ────────────────────────
+   * Ejecución aislada de artefactos (contenedor uiep-sandbox en red interna
+   * sin salida), registro de ejecuciones con trazabilidad completa y motor
+   * de calidad (schema+refs+security+behavior). Fail-closed: sin sandbox
+   * configurado NADA se ejecuta en este proceso. */
+
+  app.get('/api/console/engineering/sandbox', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    sandboxHealth()
+      .then((healthy) =>
+        res.json({
+          configured: sandboxConfigured(),
+          healthy,
+          mode: sandboxInfo().mode,
+          image: SANDBOX_IMAGE,
+          note: 'la ejecución SOLO ocurre en el contenedor sandbox (read-only, cap_drop ALL, red interna sin salida); nunca en este proceso',
+        }),
+      )
+      .catch((err) => {
+        console.error('[UIEP] engineering_sandbox_health_failed', err);
+        res.status(500).json({ error: 'engineering_sandbox_failed' });
+      });
+  });
+
+  const EXEC_KIND_RE = /^(agentic-app|api-platform|evaluation|harness)$/;
+
+  app.post('/api/console/engineering/:kind/:id/runs', execLimiter, (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const kind = String(req.params.kind ?? '');
+    const id = String(req.params.id ?? '');
+    if (!EXEC_KIND_RE.test(kind)) {
+      return void res.status(400).json({ error: { kind: [`tipo no ejecutable: '${kind}' (ejecutables: agentic-app, api-platform, evaluation, harness)`] } });
+    }
+    if (!ID_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    const body = (req.body ?? {}) as { version?: unknown; invocation?: unknown };
+    const version = typeof body.version === 'string' ? body.version : undefined;
+    executeArtifact(kind, id, version, body.invocation ?? {}, 'console')
+      .then((r) => {
+        if (!r.ok) {
+          return void res.status(r.status).json({ error: r.code, detail: r.detail ?? null, errors: r.errors ?? null });
+        }
+        res.status(201).json(r.record);
+      })
+      .catch((err) => {
+        console.error('[UIEP] engineering_execution_failed', err);
+        res.status(500).json({ error: 'engineering_execution_failed' });
+      });
+  });
+
+  app.get('/api/console/engineering/executions', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const limitRaw = Number(req.query.limit);
+    const limit = Number.isFinite(limitRaw) ? Math.min(Math.max(Math.trunc(limitRaw), 1), 200) : 50;
+    listExecutions(limit)
+      .then((records) => res.json({ count: records.length, executions: records.map((r) => ({ runId: r.runId, kind: r.kind, artifact: r.artifact, status: r.status, durationMs: r.durationMs ?? null, startedAt: r.startedAt })) }))
+      .catch((err) => {
+        console.error('[UIEP] engineering_executions_list_failed', err);
+        res.status(500).json({ error: 'engineering_executions_failed' });
+      });
+  });
+
+  app.get('/api/console/engineering/executions/:runId', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const runId = String(req.params.runId ?? '');
+    getExecution(runId)
+      .then((r) => (r ? res.json(r) : res.status(404).json({ error: 'run_not_found' })))
+      .catch((err) => {
+        console.error('[UIEP] engineering_execution_get_failed', err);
+        res.status(500).json({ error: 'engineering_execution_failed' });
+      });
+  });
+
+  app.post('/api/console/engineering/executions/:runId/cancel', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const runId = String(req.params.runId ?? '');
+    cancelExecution(runId)
+      .then((r) => (r.ok ? res.json({ ok: true, runId }) : res.status(404).json({ error: r.reason, status: r.status ?? null })))
+      .catch((err) => {
+        console.error('[UIEP] engineering_execution_cancel_failed', err);
+        res.status(500).json({ error: 'engineering_execution_cancel_failed' });
+      });
+  });
+
+  app.post('/api/console/engineering/quality/:kind/:id', execLimiter, (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const kind = String(req.params.kind ?? '');
+    const id = String(req.params.id ?? '');
+    if (!ID_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    const body = (req.body ?? {}) as { version?: unknown; behavior?: { agentSpecId?: unknown; timeoutMs?: unknown } };
+    const version = typeof body.version === 'string' ? body.version : undefined;
+    const behaviorTarget =
+      body.behavior && typeof body.behavior.agentSpecId === 'string' && ID_RE.test(body.behavior.agentSpecId)
+        ? { agentSpecId: body.behavior.agentSpecId, timeoutMs: typeof body.behavior.timeoutMs === 'number' ? body.behavior.timeoutMs : 30_000 }
+        : undefined;
+    runQualityChecks(kind, id, version, behaviorTarget)
+      .then((r) => ('ok' in r && r.ok === false ? res.status(r.status).json({ error: r.code }) : res.json(r)))
+      .catch((err) => {
+        console.error('[UIEP] engineering_quality_failed', err);
+        res.status(500).json({ error: 'engineering_quality_failed' });
+      });
+  });
+
+  app.post('/api/console/engineering/projects/:id/quality', execLimiter, (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id ?? '');
+    if (!ID_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    const body = (req.body ?? {}) as { behavior?: unknown };
+    runProjectQuality(id, body.behavior === true)
+      .then((r) => (r.ok ? res.json(r) : res.status(r.status).json({ error: r.code })))
+      .catch((err) => {
+        console.error('[UIEP] engineering_project_quality_failed', err);
+        res.status(500).json({ error: 'engineering_quality_failed' });
       });
   });
 
