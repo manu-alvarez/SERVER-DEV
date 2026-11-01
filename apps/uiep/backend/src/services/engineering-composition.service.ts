@@ -296,7 +296,9 @@ export async function generateComposition(projectInput: unknown, opts: { onConfl
     inputSummary: { project: project.metadata.id, artifacts: project.artifacts.map((a) => ({ ref: a.ref, type: a.type, mode: a.specRef ? 'specRef' : 'generate' })) },
     warnings: [],
     children: [],
+    provenance: { generator: { id: 'uiep-composition-engine', version: GENERATOR_ENGINE_VERSION }, generatedAt: '' },
   };
+  group.provenance!.generatedAt = group.startedAt;
   const warnings: string[] = [];
   for (const ref of topo.ok ? topo.order : []) {
     const a = project.artifacts.find((x) => x.ref === ref)!;
