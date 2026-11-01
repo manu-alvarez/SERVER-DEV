@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { Alert, Box, Card, CardContent, Chip, Grid2, IconButton, LinearProgress, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import { fmtDuration } from '../theme'
+import { API_BASE } from '../lib/api'
 
 /**
  * Observabilidad (Fase 8): vista transversal de la plataforma — métricas por
@@ -23,7 +24,7 @@ export default function Observability(): ReactNode {
 
   const load = useCallback(() => {
     setError(null)
-    fetch('/api/console/observability', { credentials: 'same-origin' })
+    fetch(`${API_BASE}/api/console/observability`, { credentials: 'same-origin' })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
       .then((d: unknown) => setObs(d as ObsPayload))
       .catch(() => setError('No se pudo cargar la observabilidad.'))
