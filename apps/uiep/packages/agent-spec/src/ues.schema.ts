@@ -84,7 +84,26 @@ export type Provenance = z.infer<typeof ProvenanceSchema>;
 /** Referencia a un spec REGISTRADO en el registry (data/specs, envelope id@version). */
 export const RegisteredSpecRefSchema = z.object({
   id: EntityIdSchema,
-  kind: z.enum(['Agent', 'ModelProfile', 'Tool', 'Workflow', 'Integration']),
+  /** kinds de specs de RUNTIME (data/specs) + kinds de ARTEFACTO DE
+   *  INGENIERÍA (M12: data/engineering/artifacts) — aditivo y compatible:
+   *  los documentos v1 existentes siguen siendo válidos. */
+  kind: z.enum([
+    'Agent',
+    'ModelProfile',
+    'Tool',
+    'Workflow',
+    'Integration',
+    'PromptSystem',
+    'SkillPack',
+    'McpServerManifest',
+    'ToolCollection',
+    'RagSystem',
+    'KnowledgeBase',
+    'MultiAgentSystem',
+    'EvaluationDataset',
+    'Harness',
+    'Framework',
+  ]),
   version: SemVerSchema.optional(),
 });
 

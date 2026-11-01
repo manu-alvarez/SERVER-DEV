@@ -41,8 +41,30 @@ import {
   resolveProjectGraph,
   getLifecycle,
   transitionLifecycle,
+  listArtifacts,
+  listArtifactVersions,
+  getArtifactLifecycle,
+  transitionArtifactLifecycle,
+  isEngineeringArtifactKind,
 } from '../services/engineering-registry.service';
 import { LifecycleStateSchema } from '@uiep/agent-spec';
+import {
+  GENERATOR_ENGINE_VERSION,
+  listGenerators,
+  describeGenerator,
+  validateGeneration,
+  runGeneration,
+  listGenerationRecords,
+  getGenerationRecord,
+} from '../services/engineering-generator.service';
+import { generateComposition } from '../services/engineering-composition.service';
+import {
+  buildArtifactExport,
+  buildGenerationExport,
+  buildProjectExport,
+  writeExportFile,
+  listExportFiles,
+} from '../services/engineering-export.service';
 
 /**
  * Control Center BFF (Fase 4) — capa de interfaz con autenticación propia.
@@ -95,6 +117,39 @@ const loginLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: 'too_many_attempts', message: 'demasiados intentos de login; reintenta cuando expire la ventana' },
 });
+
+/** Límites de GENERACIÓN (M12): las generaciones escriben almacenes — tope
+ *  por IP/30/min (ajustable por env; fail-closed como el login). */
+const genLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: envLimit('GEN_RATE_LIMIT_MAX', 30),
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'too_many_generations', message: 'límite de generaciones por minuto alcanzado; reintenta más tarde' },
+});
+
+/** Regex de ids de registro de generación (engine y composiciones comparten formato). */
+const GEN_RECORD_RE = /^gen-[a-z0-9-]{6,60}$/;
+
+/** Tipos de generador válidos por forma (slug corto; evita inyectar raras rutas). */
+const GENERATOR_TYPE_RE = /^[a-z][a-z0-9-]{1,39}$/;
+
+function typeSafeType(type: string): boolean {
+  return GENERATOR_TYPE_RE.test(type);
+}
+
+/* Helpers de lectura de versiones de artefacto (los docs sonunknown-shaped). */
+function artifactVersionOf(doc: Record<string, unknown>): string {
+  return String((doc as { metadata?: { version?: string } }).metadata?.version ?? '');
+}
+
+function artifactCreatedAtOf(doc: Record<string, unknown>): string | null {
+  return (doc as { metadata?: { createdAt?: string } }).metadata?.createdAt ?? null;
+}
+
+function findArtifactVersion(docs: Array<Record<string, unknown>>, version: string): Record<string, unknown> | null {
+  return docs.find((d) => artifactVersionOf(d) === version) ?? null;
+}
 
 function readCookie(req: Request, name: string): string | null {
   const header = req.headers.cookie;
@@ -1214,6 +1269,274 @@ export function registerConsoleRoute(app: Express): void {
       .catch((err) => {
         console.error('[UIEP] engineering_lifecycle_failed', err);
         res.status(500).json({ error: 'engineering_lifecycle_failed' });
+      });
+  });
+
+
+
+  /* ── Engineering Generators (Misión 12): Generator Engine + composición ────
+   * Motor central de generación (12 tipos), registros de generación con
+   * procedencia por hash, composición de proyectos UES con orden topológico
+   * y exportación estructurada 'uiep-export-v1' (bundle JSON reinstalable).
+   * Mutaciones de generación con rate limit (genLimiter). */
+
+  app.get('/api/console/engineering/generators', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    res.json({ engineVersion: GENERATOR_ENGINE_VERSION, generators: listGenerators() });
+  });
+
+  app.get('/api/console/engineering/generators/:type', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const type = String(req.params.type);
+    const gen = describeGenerator(type);
+    if (!typeSafeType(type)) {
+      return void res.status(400).json({ error: { type: ['formato de tipo inválido'] } });
+    }
+    if (!gen) {
+      return void res.status(404).json({ error: 'generator_not_found' });
+    }
+    res.json(gen);
+  });
+
+  app.post('/api/console/engineering/generators/:type/validate', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const type = String(req.params.type);
+    if (!typeSafeType(type)) {
+      return void res.status(400).json({ error: { type: ['formato de tipo inválido'] } });
+    }
+    validateGeneration(type, req.body)
+      .then((r) => res.json(r))
+      .catch((err) => {
+        console.error('[UIEP] engineering_validate_failed', err);
+        res.status(500).json({ error: 'engineering_validate_failed' });
+      });
+  });
+
+  app.post('/api/console/engineering/generate', genLimiter, (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const body = (req.body ?? {}) as { type?: unknown; input?: unknown };
+    if (typeof body.type !== 'string' || !typeSafeType(body.type)) {
+      return void res.status(400).json({ error: { type: ['falta type válido'] } });
+    }
+    runGeneration(body.type, body.input ?? {})
+      .then((r) => (r.ok ? res.status(201).json(r) : res.status(r.status).json({ error: r.code ?? 'generation_failed', details: r.errors })))
+      .catch((err) => {
+        console.error('[UIEP] engineering_generate_failed', err);
+        res.status(500).json({ error: 'engineering_generate_failed' });
+      });
+  });
+
+  app.get('/api/console/engineering/generations', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const limitRaw = Number(req.query.limit);
+    const limit = Number.isFinite(limitRaw) ? Math.min(Math.max(Math.trunc(limitRaw), 1), 200) : 50;
+    listGenerationRecords(limit)
+      .then((records) => res.json({ count: records.length, records }))
+      .catch((err) => {
+        console.error('[UIEP] engineering_generations_list_failed', err);
+        res.status(500).json({ error: 'engineering_generations_failed' });
+      });
+  });
+
+  app.get('/api/console/engineering/generations/:id', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!GEN_RECORD_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id de generación inválido'] } });
+    }
+    getGenerationRecord(id)
+      .then((r) => (r ? res.json(r) : res.status(404).json({ error: 'generation_not_found' })))
+      .catch((err) => {
+        console.error('[UIEP] engineering_generation_get_failed', err);
+        res.status(500).json({ error: 'engineering_generation_failed' });
+      });
+  });
+
+  app.post('/api/console/engineering/compositions', genLimiter, (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const body = (req.body ?? {}) as { onConflict?: unknown };
+    const onConflict = body.onConflict === 'bump' ? { onConflict: 'bump' as const } : {};
+    generateComposition(req.body, onConflict)
+      .then((r) =>
+        r.ok
+          ? res.status(201).json(r)
+          : res.status(r.status).json({ error: r.phase, details: r.errors, generationId: r.generationId ?? null, artifacts: r.artifacts ?? null }),
+      )
+      .catch((err) => {
+        console.error('[UIEP] engineering_compose_failed', err);
+        res.status(500).json({ error: 'engineering_compose_failed' });
+      });
+  });
+
+  app.get('/api/console/engineering/artifacts', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    listArtifacts()
+      .then((arts) => res.json({ count: arts.length, artifacts: arts }))
+      .catch((err) => {
+        console.error('[UIEP] engineering_artifacts_list_failed', err);
+        res.status(500).json({ error: 'engineering_artifacts_failed' });
+      });
+  });
+
+  app.get('/api/console/engineering/artifacts/:kind/:id', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const kind = String(req.params.kind);
+    const id = String(req.params.id);
+    if (!isEngineeringArtifactKind(kind)) {
+      return void res.status(400).json({ error: { kind: [`kind de artefacto desconocido: '${kind}'`] } });
+    }
+    if (!ID_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    Promise.all([listArtifactVersions(kind, id), getArtifactLifecycle(kind, id)])
+      .then(([versions, lifecycle]) => {
+        const requested = typeof req.query.version === 'string' ? req.query.version : undefined;
+        const chosen = requested ? findArtifactVersion(versions, requested) : versions[0] ?? null;
+        if (!chosen) {
+          return void res.status(404).json({ error: 'artifact_not_found' });
+        }
+        res.json({
+          kind,
+          id,
+          version: artifactVersionOf(chosen),
+          lifecycle: lifecycle?.state ?? 'draft',
+          history: lifecycle?.history ?? [],
+          versions: versions.map((v) => ({ version: artifactVersionOf(v), createdAt: artifactCreatedAtOf(v) })),
+          document: chosen,
+        });
+      })
+      .catch((err) => {
+        console.error('[UIEP] engineering_artifact_get_failed', err);
+        res.status(500).json({ error: 'engineering_artifact_failed' });
+      });
+  });
+
+  app.post('/api/console/engineering/artifacts/:kind/:id/lifecycle', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const kind = String(req.params.kind);
+    const id = String(req.params.id);
+    const body = (req.body ?? {}) as { to?: unknown; note?: unknown };
+    if (!isEngineeringArtifactKind(kind)) {
+      return void res.status(400).json({ error: { kind: [`kind de artefacto desconocido: '${kind}'`] } });
+    }
+    if (!ID_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    const to = LifecycleStateSchema.safeParse(body.to);
+    if (!to.success) {
+      return void res.status(400).json({ error: { to: ['estado de ciclo de vida inválido'] } });
+    }
+    transitionArtifactLifecycle(kind, id, to.data, { actor: 'console', note: typeof body.note === 'string' ? body.note.slice(0, 500) : undefined })
+      .then((r) => (r.ok ? res.json({ ok: true, state: r.entry.state, history: r.entry.history }) : res.status(r.status).json({ error: r.reason })))
+      .catch((err) => {
+        console.error('[UIEP] engineering_artifact_lifecycle_failed', err);
+        res.status(500).json({ error: 'engineering_artifact_lifecycle_failed' });
+      });
+  });
+
+  /* ── Exportación estructurada (M12 §5): bundle 'uiep-export-v1' ─────────── */
+
+  app.post('/api/console/engineering/artifacts/:kind/:id/export', genLimiter, (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const kind = String(req.params.kind);
+    const id = String(req.params.id);
+    if (!isEngineeringArtifactKind(kind)) {
+      return void res.status(400).json({ error: { kind: [`kind de artefacto desconocido: '${kind}'`] } });
+    }
+    if (!ID_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    const version = typeof req.query.version === 'string' ? req.query.version : undefined;
+    buildArtifactExport(kind, id, version)
+      .then(async (r) => {
+        if (!r.ok) {
+          return void res.status(404).json({ error: r.reason });
+        }
+        await writeExportFile(r);
+        res.json({ exported: true, format: r.format, filename: r.filename, documents: r.documents, sizeBytes: r.sizeBytes, sha256: r.sha256 });
+      })
+      .catch((err) => {
+        console.error('[UIEP] engineering_artifact_export_failed', err);
+        res.status(500).json({ error: 'engineering_export_failed' });
+      });
+  });
+
+  app.post('/api/console/engineering/projects/:id/export', genLimiter, (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!ID_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    const version = typeof req.query.version === 'string' ? req.query.version : undefined;
+    buildProjectExport(id, version)
+      .then(async (r) => {
+        if (!r.ok) {
+          return void res.status(404).json({ error: r.reason });
+        }
+        await writeExportFile(r);
+        res.json({ exported: true, format: r.format, filename: r.filename, documents: r.documents, sizeBytes: r.sizeBytes, sha256: r.sha256 });
+      })
+      .catch((err) => {
+        console.error('[UIEP] engineering_project_export_failed', err);
+        res.status(500).json({ error: 'engineering_export_failed' });
+      });
+  });
+
+  app.post('/api/console/engineering/generations/:id/export', genLimiter, (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!GEN_RECORD_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id de generación inválido'] } });
+    }
+    buildGenerationExport(id)
+      .then(async (r) => {
+        if (!r.ok) {
+          return void res.status(404).json({ error: r.reason });
+        }
+        await writeExportFile(r);
+        res.json({ exported: true, format: r.format, filename: r.filename, documents: r.documents, sizeBytes: r.sizeBytes, sha256: r.sha256 });
+      })
+      .catch((err) => {
+        console.error('[UIEP] engineering_generation_export_failed', err);
+        res.status(500).json({ error: 'engineering_export_failed' });
+      });
+  });
+
+  app.get('/api/console/engineering/exports', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    listExportFiles()
+      .then((files) => res.json({ count: files.length, files }))
+      .catch((err) => {
+        console.error('[UIEP] engineering_exports_list_failed', err);
+        res.status(500).json({ error: 'engineering_exports_failed' });
       });
   });
 
