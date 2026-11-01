@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { before, after, test } from 'node:test';
 import { waitForSandbox, stopAll } from './helpers/sandbox-env';
+import './helpers/sandbox-port-4185';
 import { seedDefaultModelProfile } from '../services/model-gateway.service';
 import { seedDefaultToolSpecs } from '../services/tool-registry.service';
 import { startRuntimeMock } from './helpers/runtime-mock';
