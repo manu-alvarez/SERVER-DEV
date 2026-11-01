@@ -1,6 +1,11 @@
 networks:
   msbross_net:
     external: true
+  # M14 — red INTERNA del sandbox de ejecución: sin salida a internet
+  # (internal: true → los contenedores que la usan NO tienen egress).
+  uiep-internal:
+    name: uiep-internal
+    internal: true
 
 volumes:
   uiep-backend-data:
@@ -211,6 +216,9 @@ services:
       dockerfile: backend/Dockerfile
     image: msbrossai-uiep-backend
     container_name: uiep-backend
+    networks:
+      - msbross_net
+      - uiep-internal
     environment:
       - PORT=4000
       - NODE_ENV=production
@@ -220,7 +228,50 @@ services:
       - UIEP_HOOKS=${UIEP_HOOKS:-}
       - UIEP_HOOK_TOKEN_1=${UIEP_HOOK_TOKEN_1:-}
       - UIEP_MCP_EXPOSED_TOOLS=${UIEP_MCP_EXPOSED_TOOLS:-}
+      # M14 — Execution Sandbox: punto de ejecución aislada (fail-closed si
+      # no se configura: NADA se ejecuta en este proceso).
+      - SANDBOX_URL=${UIEP_SANDBOX_URL:-http://uiep-sandbox:4100}
+      - SANDBOX_EXEC_TOKEN=${SANDBOX_EXEC_TOKEN:-}
+      - UIEP_RUNNER_TOKEN=${UIEP_RUNNER_TOKEN:-}
     volumes:
       - uiep-backend-data:/app/data
+
+  # ──────────────────────────────────────────────
+  # UIEP SANDBOX (Misión 14) — Execution Sandbox & runtimes de artefactos
+  #
+  # Intérprete de artefactos declarativos SIN dependencias npm. Aislamiento:
+  # · rootfs read-only + tmpfs noexec (sin disco persistente)
+  # · cap_drop ALL + no-new-privileges (sin escalada)
+  # · pids/mem/ulimits duros + timeout por job con aborto real
+  # · red uiep-internal (internal: true → SIN salida a internet); solo puede
+  #   hablar con uiep-backend (runner con token dedicado)
+  # · SIN acceso al socket de Docker ni volúmenes del host
+  # ──────────────────────────────────────────────
+  uiep-sandbox:
+    build:
+      context: ../apps/uiep
+      dockerfile: sandbox/Dockerfile
+    image: msbrossai-uiep-sandbox
+    container_name: uiep-sandbox
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,noexec,nosuid
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    mem_limit: 256m
+    ulimits:
+      nproc: 64
+      nofile: 128
+    networks:
+      - uiep-internal
+    environment:
+      - PORT=4100
+      - SANDBOX_EXEC_TOKEN=${SANDBOX_EXEC_TOKEN:-}
+      - UIEP_BACKEND_URL=http://uiep-backend:4000
+      - UIEP_RUNNER_TOKEN=${UIEP_RUNNER_TOKEN:-}
 
 version: '3.8'

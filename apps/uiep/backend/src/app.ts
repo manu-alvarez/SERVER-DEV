@@ -15,6 +15,7 @@ import { registerMcpServer } from './routes/mcp-server';
 import { registerHooksRoute } from './routes/hooks';
 import { registerObservabilityRoute } from './routes/observability';
 import { registerConsoleRoute } from './routes/console';
+import { registerRunnerRoute } from './routes/runner';
 
 /**
  * createApp — construye la aplicación Express sin abrir socket (independiente
@@ -69,6 +70,7 @@ export function createApp(options: { trustProxy?: string | number | boolean } = 
   registerHooksRoute(app);
   registerObservabilityRoute(app);
   registerConsoleRoute(app);
+  registerRunnerRoute(app);
 
   return app;
 }
