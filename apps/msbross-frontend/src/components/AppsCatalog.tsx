@@ -123,8 +123,7 @@ export default function AppsCatalog() {
               </span>
             </h1>
             <p className="mt-3 text-slate-400 text-base sm:text-lg leading-relaxed">
-              Catálogo completo y centralizado: {ALL_PROJECTS.length} proyectos reales con su estado verificado —
-              lo que está en producción, lo que está en desarrollo y lo que es experimento. Sin inflar el perfil.
+              Catálogo completo y centralizado de {ALL_PROJECTS.length} proyectos con su estado verificado.
             </p>
           </motion.div>
 
