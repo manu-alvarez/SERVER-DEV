@@ -313,7 +313,9 @@ function sanitizeHeader(value) {
 }
 
 /** Diálogo SMTP DIRECTO al MX del dominio destino (node puro: net+dns).
- *  El VPS ya entrega a hotmail con 250 (PTR de contabo verificado). */
+ *  El VPS ya entrega a hotmail con 250 (PTR de contabo verificado).
+ *  Parsing: las líneas de CONTINUACIÓN llevan '250-' (guion); la FINAL
+ *  '250 ' (espacio) — sin esto el EHLO multilínea desincroniza el diálogo. */
 function smtpDeliver(fromAddr, toAddr, message, cb) {
   const domain = toAddr.split('@')[1];
   smtpDns.resolveMx(domain, (err, mxList) => {
@@ -323,36 +325,40 @@ function smtpDeliver(fromAddr, toAddr, message, cb) {
     const mx = mxList.sort((a, b) => a.priority - b.priority)[0].exchange;
     const sock = smtpNet.createConnection(25, mx, () => {});
     const steps = [
-      { expect: /^220/, send: `EHLO vmi3330796.contaboserver.net\r\n` },
-      { expect: /^250/, send: `MAIL FROM:<${fromAddr}>\r\n` },
-      { expect: /^250/, send: `RCPT TO:<${toAddr}>\r\n` },
-      { expect: /^250/, send: `DATA\r\n` },
-      { expect: /^354/, send: message + (/\r\n$/.test(message) ? '' : '\r\n') + '.\r\n' },
-      { expect: /^250/, send: `QUIT\r\n` },
+      { expect: /^220[ -]/, send: `EHLO vmi3330796.contaboserver.net\r\n` },
+      { expect: /^250 /, send: `MAIL FROM:<${fromAddr}>\r\n` },
+      { expect: /^250 /, send: `RCPT TO:<${toAddr}>\r\n` },
+      { expect: /^250 /, send: `DATA\r\n` },
+      { expect: /^354[ -]/, send: message + (/\r\n$/.test(message) ? '' : '\r\n') + '.\r\n' },
+      { expect: /^250 /, send: `QUIT\r\n` },
     ];
     let step = 0;
     let buffer = '';
-    sock.setTimeout(30000, () => { sock.destroy(); cb(new Error('smtp_timeout')); });
+    let finished = false;
+    const done = (err, info) => {
+      if (finished) return;
+      finished = true;
+      try { sock.destroy(); } catch (_) {}
+      cb(err, info);
+    };
+    sock.setTimeout(30000, () => done(new Error('smtp_timeout')));
+    sock.on('error', (e) => done(e));
+    sock.on('close', () => done(new Error('smtp_cerrado_por_el_MX')));
     sock.on('data', (d) => {
       buffer += d.toString();
       const stepDef = steps[step];
-      if (!stepDef) {
-        return;
-      }
-      const lastLine = buffer.split(/\r?\n/).filter(Boolean).pop() || '';
-      if (!stepDef.expect.test(lastLine)) {
-        return; // respuesta multilinea (EHLO): esperar la última línea
-      }
+      if (!stepDef) return;
+      const lines = buffer.split(/\r?\n/).filter(Boolean);
+      const lastLine = lines[lines.length - 1] || '';
+      // Solo avanzar con la línea FINAL del bloque (espacio tras el código).
+      if (!stepDef.expect.test(lastLine)) return;
       buffer = '';
       step += 1;
       if (step >= steps.length) {
-        sock.end();
-        return cb(null, 'aceptado_por_MX');
+        return done(null, 'aceptado_por_MX');
       }
       sock.write(steps[step].send);
     });
-    sock.on('error', (e) => cb(e));
-    sock.on('close', () => { if (step < steps.length) cb(new Error(`smtp_cerrado_temprano_paso_${step}`)); });
   });
 }
 
