@@ -1,0 +1,12 @@
+{
+  "type": "framework",
+  "input": {
+    "name": "Framework Soporte M13",
+    "components": [{ "type": "agent", "ref": { "id": "m13-agente-api", "kind": "Agent" } }],
+    "modules": [
+      { "id": "nucleo", "description": "módulo nuclear con el agente", "components": [{ "type": "agent", "ref": { "id": "m13-agente-api", "kind": "Agent" } }] },
+      { "id": "prompts", "components": [{ "type": "prompt-system", "ref": { "id": "m13-prompts-framework", "kind": "PromptSystem" } }], "dependencies": ["nucleo"] }
+    ],
+    "extensionPoints": [{ "name": "plugins", "description": "herramientas y agentes adicionales" }]
+  }
+}

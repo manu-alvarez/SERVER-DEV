@@ -45,7 +45,7 @@ before(async () => {
   await saveSpec(PROFILE);
 });
 
-test('catálogo: 19 tipos; agent/workflow/knowledge-base generables; saas/framework solo esquema', () => {
+test('catálogo: 19 tipos; 16 generables (M12+M13); saas/application/api-platform/agentic-app desde M13', () => {
   assert.equal(getCatalog().length, 19);
   assert.deepEqual(ARTIFACT_CATALOG.length, 19);
   const agent = getCatalog().find((e) => e.type === 'agent')!;
@@ -53,8 +53,16 @@ test('catálogo: 19 tipos; agent/workflow/knowledge-base generables; saas/framew
   assert.equal(agent.capabilities.execution, true);
   assert.equal(agent.capabilities.validation, true);
   const saas = getCatalog().find((e) => e.type === 'saas')!;
-  assert.equal(saas.capabilities.generator, false, 'saas NO se declara generable (no hay generador)');
-  assert.equal(saas.capabilities.execution, false);
+  assert.equal(saas.capabilities.generator, true, 'M13: saas GENERABLE (módulos verificados + tenancy preparada)');
+  assert.equal(saas.capabilities.execution, false, 'la multi-tenancy REAL requiere ejecución aislada (M14+)');
+  const app = getCatalog().find((e) => e.type === 'application')!;
+  assert.equal(app.capabilities.generator, true, 'M13: application GENERABLE (módulos con componentRefs reales)');
+  const api = getCatalog().find((e) => e.type === 'api-platform')!;
+  assert.equal(api.capabilities.generator, true, 'M13: api-platform GENERABLE (contratos + docs determinista)');
+  assert.equal(api.capabilities.execution, false, 'los endpoints SE sirven en M14');
+  const agApp = getCatalog().find((e) => e.type === 'agentic-app')!;
+  assert.equal(agApp.capabilities.generator, true, 'M13: agentic-app GENERABLE (solo componentes ejecutables)');
+  assert.equal(agApp.capabilities.execution, false, 'la app como paquete → M14; sus componentes YA corren');
   const mcp = getCatalog().find((e) => e.type === 'mcp-server')!;
   assert.equal(mcp.capabilities.generator, true, 'M12: mcp-server es GENERABLE (manifiesto exportable, no despliegue)');
   assert.equal(mcp.capabilities.execution, false, 'mcp-server NO se despliega/expone (sandbox → M14)');

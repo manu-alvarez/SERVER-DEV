@@ -1,0 +1,17 @@
+{
+  "type": "agentic-app",
+  "input": {
+    "name": "App Agéntica Soporte M13",
+    "agents": [
+      { "agent": "m13-agente-api", "role": "atención" },
+      { "agent": { "generate": { "name": "M13 Agente Escalado", "role": "escalado", "objective": "derivar casos complejos", "system": "Segundo agente de la app de soporte M13.", "memory": { "enabled": false, "strategy": "none" } } }, "role": "escalado" }
+    ],
+    "workflows": ["m13-flujo-app"],
+    "tools": ["clock"],
+    "surfaces": [
+      { "type": "console", "note": "consola UIEP" },
+      { "type": "workflow-engine" }
+    ],
+    "guardrails": { "maxIterations": 4, "approvalRequired": [] }
+  }
+}
