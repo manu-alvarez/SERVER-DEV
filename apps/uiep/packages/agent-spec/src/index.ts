@@ -15,3 +15,5 @@ export { UES_API_VERSION, UesApiVersionSchema, ArtifactTypeSchema, ArtifactDepen
 export type { ArtifactType, Provenance, UESArtifact, LifecycleState, UESProjectV1, UESValidationResult } from './ues.schema';
 export { BlueprintV1Schema, EmbeddedSpecSchema, UESParameterSchema, BlueprintKnowledgeSchema, BlueprintArtifactSchema, validateBlueprint } from './blueprint.schema';
 export type { BlueprintV1, EmbeddedSpec, UESParameter, BlueprintKnowledge, BlueprintArtifact, BlueprintValidationResult } from './blueprint.schema';export { satisfiesRange } from './version-range';
+export { EngineeringArtifactSchema, PromptVariableSchema, PromptTemplateSchema, PromptCompositionStepSchema, SkillIOSchema, validateEngineeringArtifact } from './engineering-artifacts.schema';
+export type { PromptSystemV1, SkillPackV1, McpServerManifestV1, ToolCollectionV1, RagSystemV1, KnowledgeBaseV1, MultiAgentSystemV1, EvaluationDatasetV1, HarnessV1, FrameworkV1, EngineeringArtifact, EngineeringArtifactValidationResult } from './engineering-artifacts.schema';

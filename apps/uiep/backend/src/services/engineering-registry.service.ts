@@ -45,18 +45,18 @@ export interface CatalogEntry {
 }
 
 export const ARTIFACT_CATALOG: CatalogEntry[] = [
-  { type: 'agent', capabilities: { schema: true, generator: true, execution: true, validation: true }, via: { generator: 'design-engine (/api/generate)', execution: 'agent-runtime', validation: 'zod + estructura' } },
-  { type: 'workflow', capabilities: { schema: true, generator: true, execution: true, validation: true }, via: { generator: 'blueprint-installer', execution: 'workflow-engine', validation: 'zod + DAG' } },
-  { type: 'knowledge-base', capabilities: { schema: true, generator: true, execution: true, validation: true }, via: { generator: 'blueprint-installer', execution: 'ingesta + retrieval', validation: 'gate RAG' } },
-  { type: 'tool-collection', capabilities: { schema: true, generator: false, execution: true, validation: true }, via: { execution: 'tool-registry (deny-by-default)', validation: 'zod' }, notes: 'no hay generador de colecciones: las tools se registran individualmente' },
-  { type: 'evaluation', capabilities: { schema: true, generator: false, execution: false, validation: true }, via: { validation: 'gate RAG (Recall/Precision/MRR)' }, notes: 'evaluación de agentes/datasets pendiente como capacidad runtime' },
-  { type: 'rag-system', capabilities: { schema: true, generator: false, execution: false, validation: true }, via: { validation: 'gate RAG' }, notes: 'el pipeline knowledge completo ya es evaluable' },
-  { type: 'multi-agent-system', capabilities: { schema: true, generator: false, execution: false, validation: false }, notes: 'coordinación hoy vía workflow; sin spec propia dedicada' },
-  { type: 'mcp-server', capabilities: { schema: true, generator: false, execution: false, validation: false }, notes: 'la plataforma EXPONE sus tools vía MCP, pero no genera servidores MCP nuevos' },
-  { type: 'prompt-system', capabilities: { schema: true, generator: false, execution: false, validation: false }, notes: 'instrucciones inline en AgentSpec; sin plantillas/versiones de prompt' },
-  { type: 'skill-pack', capabilities: { schema: true, generator: false, execution: false, validation: false } },
-  { type: 'framework', capabilities: { schema: true, generator: false, execution: false, validation: false } },
-  { type: 'harness', capabilities: { schema: true, generator: false, execution: false, validation: false } },
+  { type: 'agent', capabilities: { schema: true, generator: true, execution: true, validation: true }, via: { generator: 'engineering-generator (/generate) + design-engine (/api/generate)', execution: 'agent-runtime', validation: 'zod + estructura' } },
+  { type: 'workflow', capabilities: { schema: true, generator: true, execution: true, validation: true }, via: { generator: 'engineering-generator (/generate) + blueprint-installer', execution: 'workflow-engine', validation: 'zod + DAG' } },
+  { type: 'knowledge-base', capabilities: { schema: true, generator: true, execution: true, validation: true }, via: { generator: 'engineering-generator (/generate) + blueprint-installer', execution: 'ingesta + retrieval', validation: 'gate RAG' } },
+  { type: 'tool-collection', capabilities: { schema: true, generator: true, execution: true, validation: true }, via: { generator: 'engineering-generator (solo tools registradas)', execution: 'tool-registry (deny-by-default)', validation: 'zod' } },
+  { type: 'evaluation', capabilities: { schema: true, generator: true, execution: false, validation: true }, via: { generator: 'engineering-generator (dataset corpus v1)', validation: 'gate RAG (Recall/Precision/MRR)' }, notes: 'la EJECUCIÓN de la evaluación queda en el runner eval:rag (cableado completo → M14)' },
+  { type: 'rag-system', capabilities: { schema: true, generator: true, execution: false, validation: true }, via: { generator: 'engineering-generator (bindings + umbral declarado)', validation: 'gate RAG' }, notes: 'el runtime posee el umbral EFECTIVO (env 0.70); el artefacto declara la configuración' },
+  { type: 'multi-agent-system', capabilities: { schema: true, generator: true, execution: true, validation: true }, via: { generator: 'engineering-generator (workflow de coordinación real)', execution: 'workflow-engine', validation: 'zod + DAG' } },
+  { type: 'mcp-server', capabilities: { schema: true, generator: true, execution: false, validation: true }, via: { generator: 'engineering-generator (manifiesto)' }, notes: 'genera manifiesto/export — NO despliega ni expone servidores' },
+  { type: 'prompt-system', capabilities: { schema: true, generator: true, execution: false, validation: true }, via: { generator: 'engineering-generator' }, notes: 'prompts versionados con variables tipadas; composición sin ejecución' },
+  { type: 'skill-pack', capabilities: { schema: true, generator: true, execution: false, validation: true }, via: { generator: 'engineering-generator' } },
+  { type: 'framework', capabilities: { schema: true, generator: true, execution: false, validation: true }, via: { generator: 'engineering-generator (composición de componentes existentes)' } },
+  { type: 'harness', capabilities: { schema: true, generator: true, execution: false, validation: true }, via: { generator: 'engineering-generator' }, notes: 'la ejecución del harness requiere el sandbox de M14' },
   { type: 'application', capabilities: { schema: true, generator: false, execution: false, validation: false } },
   { type: 'agentic-app', capabilities: { schema: true, generator: false, execution: false, validation: false } },
   { type: 'api-platform', capabilities: { schema: true, generator: false, execution: false, validation: false } },
@@ -327,15 +327,18 @@ export async function resolveProjectGraph(doc: UESProjectV1): Promise<ProjectGra
     if (!a.specRef) {
       continue;
     }
-    const latest = await getLatestSpec(a.specRef.id);
+    // M12: los kinds de artefacto de INGENIERÍA viven en data/engineering/artifacts;
+    // los de runtime continúan en data/specs. Compatible con proyectos M11.
+    const latest = isEngineeringArtifactKind(a.specRef.kind) ? await getLatestArtifact(a.specRef.kind, a.specRef.id) : await getLatestSpec(a.specRef.id);
+    const latestMeta = latest as { kind?: string; metadata?: { version?: string } } | null;
     specRefs.push({
       artifact: a.ref,
       ref: a.specRef.id,
       expectedKind: a.specRef.kind,
       found: Boolean(latest),
-      kindMatch: latest ? latest.kind === a.specRef.kind : undefined,
-      versionMatch: latest && a.specRef.version ? latest.metadata.version === a.specRef.version : null,
-      registeredVersion: latest?.metadata.version,
+      kindMatch: latestMeta ? latestMeta.kind === a.specRef.kind : undefined,
+      versionMatch: latestMeta && a.specRef.version ? latestMeta.metadata?.version === a.specRef.version : null,
+      registeredVersion: latestMeta?.metadata?.version,
     });
   }
 
@@ -421,4 +424,205 @@ export async function transitionLifecycle(
   });
   lifecycleMutex = run.catch(() => undefined);
   return run;
+}
+
+/* ── Almacén de ARTEFACTOS DE INGENIERÍA (M12) ───────────────────────────── */
+
+/** Kinds de ARTEFACTO registrable en data/engineering/artifacts/ (NO specs de
+ *  runtime — esos 5 viven en data/specs y no cambian). Espejo del enum de
+ *  RegisteredSpecRef en @uiep/agent-spec. */
+export const ENGINEERING_ARTIFACT_KINDS = [
+  'PromptSystem',
+  'SkillPack',
+  'McpServerManifest',
+  'ToolCollection',
+  'RagSystem',
+  'KnowledgeBase',
+  'MultiAgentSystem',
+  'EvaluationDataset',
+  'Harness',
+  'Framework',
+] as const;
+
+export type EngineeringArtifactKindName = (typeof ENGINEERING_ARTIFACT_KINDS)[number];
+
+export function isEngineeringArtifactKind(kind: string): kind is EngineeringArtifactKindName {
+  return (ENGINEERING_ARTIFACT_KINDS as readonly string[]).includes(kind);
+}
+
+const ARTIFACTS_DIR = path.join(DATA_DIR, 'engineering', 'artifacts');
+
+let artifactsDirReady = false;
+
+async function ensureArtifactsDir(): Promise<void> {
+  if (!artifactsDirReady) {
+    await fs.mkdir(ARTIFACTS_DIR, { recursive: true });
+    artifactsDirReady = true;
+  }
+}
+
+/** Guardado atómico por kind: artifacts/{kind}/{id}@{version}.json. KIND e id
+ *  vienen de un whitelist/regex — sin path traversal. */
+export async function saveArtifact(doc: { kind: string; metadata: { id: string; version: string; createdAt?: string } } & Record<string, unknown>): Promise<void> {
+  if (!isEngineeringArtifactKind(doc.kind)) {
+    throw new Error(`kind de artefacto no permitido: ${doc.kind}`);
+  }
+  if (!/^[a-z0-9][a-z0-9-]{2,63}$/.test(doc.metadata.id)) {
+    throw new Error(`id de artefacto no válido: ${doc.metadata.id}`);
+  }
+  await ensureArtifactsDir();
+  const dir = path.join(ARTIFACTS_DIR, doc.kind);
+  await fs.mkdir(dir, { recursive: true });
+  const file = path.join(dir, `${doc.metadata.id}@${doc.metadata.version}.json`);
+  const tmp = `${file}.tmp`;
+  await fs.writeFile(tmp, JSON.stringify(doc, null, 2), 'utf8');
+  await fs.rename(tmp, file);
+}
+
+export interface ArtifactSummary {
+  kind: string;
+  id: string;
+  name: string;
+  version: string;
+  lifecycle: LifecycleState;
+  createdAt?: string;
+}
+
+export async function listArtifacts(): Promise<ArtifactSummary[]> {
+  await ensureArtifactsDir();
+  const out: ArtifactSummary[] = [];
+  try {
+    for (const kindDir of await fs.readdir(ARTIFACTS_DIR)) {
+      const dir = path.join(ARTIFACTS_DIR, kindDir);
+      const st = await fs.stat(dir);
+      if (!st.isDirectory() || !isEngineeringArtifactKind(kindDir)) {
+        continue;
+      }
+      for (const f of (await fs.readdir(dir)).filter((f) => f.endsWith('.json'))) {
+        try {
+          const doc = JSON.parse(await fs.readFile(path.join(dir, f), 'utf8')) as { metadata?: { id?: string; name?: string; version?: string; createdAt?: string } };
+          if (!doc.metadata?.id) {
+            continue;
+          }
+          const lc = await getArtifactLifecycle(kindDir, doc.metadata.id);
+          out.push({
+            kind: kindDir,
+            id: doc.metadata.id,
+            name: doc.metadata.name ?? doc.metadata.id,
+            version: doc.metadata.version ?? '0.0.0',
+            lifecycle: lc?.state ?? 'draft',
+            createdAt: doc.metadata.createdAt,
+          });
+        } catch {
+          /* corrupto: ignorar */
+        }
+      }
+    }
+  } catch {
+    return [];
+  }
+  return out.sort((a, b) => `${a.kind}/${a.id}`.localeCompare(`${b.kind}/${b.id}`));
+}
+
+async function artifactFiles(kind: string, id: string): Promise<string[]> {
+  if (!isEngineeringArtifactKind(kind)) {
+    return [];
+  }
+  try {
+    return (await fs.readdir(path.join(ARTIFACTS_DIR, kind))).filter((f) => f.startsWith(`${id}@`) && f.endsWith('.json'));
+  } catch {
+    return [];
+  }
+}
+
+export async function listArtifactVersions(kind: string, id: string): Promise<Array<Record<string, unknown>>> {
+  const files = await artifactFiles(kind, id);
+  const docs: Array<Record<string, unknown>> = [];
+  for (const f of files) {
+    try {
+      docs.push(JSON.parse(await fs.readFile(path.join(ARTIFACTS_DIR, kind, f), 'utf8')) as Record<string, unknown>);
+    } catch {
+      /* corrupto: ignorar */
+    }
+  }
+  const semver = (a: unknown, b: unknown): number => {
+    const [ax, ay, az] = String(a ?? '0').split('.').map(Number);
+    const [bx, by, bz] = String(b ?? '0').split('.').map(Number);
+    return bx - ax || by - ay || bz - az;
+  };
+  return docs.sort((a, b) => semver((a as { metadata?: { version?: string } }).metadata?.version, (b as { metadata?: { version?: string } }).metadata?.version));
+}
+
+export async function getLatestArtifact(kind: string, id: string): Promise<Record<string, unknown> | null> {
+  const versions = await listArtifactVersions(kind, id);
+  return versions[0] ?? null;
+}
+
+export async function getArtifactVersion(kind: string, id: string, version: string): Promise<Record<string, unknown> | null> {
+  if (!/^\d+\.\d+\.\d+$/.test(version)) {
+    return null;
+  }
+  try {
+    return JSON.parse(await fs.readFile(path.join(ARTIFACTS_DIR, kind, `${id}@${version}.json`), 'utf8')) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+/** Ciclo de vida de ARTEFACTOS (namespaced: `artifact:kind:id`) — mismas
+ *  transiciones permitidas que los proyectos; keyed en el MISMO fichero. */
+export async function getArtifactLifecycle(kind: string, id: string): Promise<LifecycleEntry | null> {
+  return getLifecycle(`artifact:${kind}:${id}`);
+}
+
+export async function transitionArtifactLifecycle(
+  kind: string,
+  id: string,
+  to: LifecycleState,
+  opts: { actor?: string; note?: string } = {},
+): Promise<{ ok: true; entry: LifecycleEntry } | { ok: false; status: 400 | 404; reason: string }> {
+  if (!isEngineeringArtifactKind(kind)) {
+    return { ok: false, status: 404, reason: 'artifact_kind_not_found' };
+  }
+  const doc = await getArtifactVersion(kind, id, (await latestArtifactVersionOf(kind, id)) ?? '');
+  if (!doc) {
+    return { ok: false, status: 404, reason: 'artifact_not_found' };
+  }
+  // Reutiliza el motor de transición de proyectos con clave namespaced.
+  const projectIdKey = `artifact:${kind}:${id}`;
+  const run = lifecycleMutex.then(async () => {
+    const current = await getLifecycle(projectIdKey);
+    const from: LifecycleState = current?.state ?? 'draft';
+    const allowed = LIFECYCLE_TRANSITIONS[from] ?? [];
+    if (!allowed.includes(to)) {
+      return { ok: false as const, status: 400 as const, reason: `transición no permitida: ${from} → ${to} (permitidas: ${allowed.join(', ') || 'ninguna'})` };
+    }
+    const entry: LifecycleEntry = {
+      state: to,
+      history: [...(current?.history ?? []), { from, to, at: new Date().toISOString(), actor: opts.actor ?? 'console', note: opts.note }],
+    };
+    await fs.mkdir(path.dirname(LIFECYCLE_FILE), { recursive: true });
+    const tmp = `${LIFECYCLE_FILE}.tmp`;
+    const all = JSON.parse(await fs.readFile(LIFECYCLE_FILE, 'utf8').catch(() => '{}')) as Record<string, LifecycleEntry>;
+    all[projectIdKey] = entry;
+    await fs.writeFile(tmp, JSON.stringify(all, null, 2), 'utf8');
+    await fs.rename(tmp, LIFECYCLE_FILE);
+    audit({
+      actor: { kind: 'console' },
+      action: 'engineering.lifecycle',
+      correlation: { targetId: id },
+      detail: { scope: 'artifact', kind, from, to, note: opts.note ?? null },
+    });
+    return { ok: true as const, entry };
+  });
+  lifecycleMutex = run.catch(() => undefined);
+  return run;
+}
+
+async function latestArtifactVersionOf(kind: string, id: string): Promise<string | null> {
+  const docs = await listArtifactVersions(kind, id);
+  if (docs.length === 0) {
+    return null;
+  }
+  return String((docs[0] as { metadata?: { version?: string } }).metadata?.version ?? '');
 }
