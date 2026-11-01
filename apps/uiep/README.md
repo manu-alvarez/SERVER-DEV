@@ -45,27 +45,28 @@ Requisitos: node 22 + pnpm 9.15.0 (corepack) + docker + Ollama accesible
 | Backup | Automático diario 04:17 (`infrastructure/backup/uiep-backup.sh`, retención 14 d) |
 | Restaurar | Procedimiento en `PHASE42-HARDENING.md` (contenedor aislado, verificado) |
 | Evaluación RAG | `corepack pnpm --filter uiep-backend eval:rag` (gate) · `eval:rag:real` (proveedor real) |
-| Tests | `corepack pnpm --filter uiep-backend test` (137/137 — incluye el GATE de calidad) |
+| Tests | `corepack pnpm --filter uiep-backend test` (211/211 — incluye el GATE de calidad y los 29 de la Misión 12) |
 | Desplegar | push a main → en VPS: `git fetch && git reset --hard origin/main` → install → build → compose build+up → **verificar binario servido** (`docker exec … grep`) |
 | Rollback | anclas de imagen (`rollback-*`) o rebuild desde el commit de la fase (matriz abajo) |
 
-## Matriz de trazabilidad / rollback (v1.0 → v1.2)
+## Matriz de trazabilidad / rollback (v1.0 → v1.3)
 
 | Versión | Estado | Commit | Frontend (www/app/uiep) | Backend (imagen) |
 |---|---|---|---|---|
-| **1.2.0** | **publicada** (`uiep-1.2.0`) | `f70497b` (Misión 11: UES + Registry + Blueprint v1) | bundle `index-CEji4u03.js` (sin cambios en 1.2) | **`msbrossai-uiep-backend:latest`** = `sha256:49228b89eadaf343…` |
+| **1.3.0** | **publicada** (`uiep-1.3.0`) | `420bea4` (Misión 12: Generator Engine + composición + export) | bundle `index-CEji4u03.js` (sin cambios en 1.3) | **`msbrossai-uiep-backend:latest`** = `sha256:a24d6a448492add7…` |
+| 1.2.0 | histórica (`uiep-1.2.0`) | `f70497b` (Misión 11: UES + Registry + Blueprint v1) | bundle `index-CEji4u03.js` (sin cambios en 1.2) | **ancla `1.2.0`** = `49228b89eada` |
 | 1.1.0 | histórica (`uiep-1.1.0` = `b4f12a1`) | merge `33287f1` + fix `e773d08` | bundle `index-CEji4u03.js` + `BUILD-INFO.json` | imagen de 1.0.1 (`0286002…`) — **perdida por GC del host**; ancla reconstruida (ver abajo) |
 | 1.0.1 | **histórica congelada** (`uiep-1.0.1` = `44431f5`) | RAG 0.70 | bundle `index-DbWra3SD.js` (sustituido) | **ancla reconstruida `1.0.1`** = `128cfd74a443` (fuente-equivalente a la perdida `0286002…`) |
 | 1.0.0 | **histórica congelada** (`uiep-1.0.0` = `e1d2d39`) | cierre 1.0 | — | **`msbrossai-uiep-backend:1.0.0`** = `4ea095d6f29a` (original, intacta) |
 | Ancla previa | — | — | — | `rollback-fase3` = `3b601c4c898e` (desde commit `8dce03b`) |
 
-**Rollback 1.2.0 → 1.1.0/1.0.1**:
-1. La 1.2.0 cambió SOLO el backend (el frontend/bundle es el mismo de 1.1.0): `docker tag msbrossai-uiep-backend:1.0.1 msbrossai-uiep-backend:latest && docker compose -f infrastructure/docker-compose.yml up -d uiep-backend` (segundos, datos intactos en el volumen).
+**Rollback 1.3.0 → 1.2.0**:
+1. La 1.3.0 cambió SOLO el backend (el frontend/bundle es el mismo de 1.1.0): `docker tag msbrossai-uiep-backend:1.2.0 msbrossai-uiep-backend:latest && docker compose -p infrastructure -f infrastructure/docker-compose.yml up -d --force-recreate uiep-backend` (segundos, datos intactos en el volumen).
 2. Si hiciera falta reconstruir desde commit: `git worktree add /tmp/ancla <commit>` → `docker build -t msbrossai-uiep-backend:<tag> -f apps/uiep/backend/Dockerfile apps/uiep` → tag+up — NUNCA `compose build` sobre un checkout viejo (retag de `:latest`, incidente Fase 8/9) y NUNCA `docker image prune -a`.
 3. Los datos viven en el volumen `uiep-backend-data` — intactos en cualquier rollback de código.
-4. **Lección 1.2.0**: la imagen `0286002…` (1.0.1) desapareció del VPS sin prune manual (GC de BuildKit/cron del host sospechoso) — por eso existen ahora 4 anclas etiquetadas y el paso 2 está probado.
+4. **Lección 1.2.0**: la imagen `0286002…` (1.0.1) desapareció del VPS sin prune manual (GC de BuildKit/cron del host sospechoso) — por eso existen ahora 5 anclas etiquetadas (1.0.0, 1.0.1, 1.2.0, 1.3.0 y rollback-fase3) y el paso 2 está probado. **Nota 1.3.0**: el contenedor `uiep-backend` pertenece al proyecto compose `infrastructure` (label) — recrear con `-p infrastructure` o `--force-recreate` da conflicto de nombre si se omite.
 
-**Semántica de versionado (inequívoca)**: `BUILD-INFO.json → sourceCommit` identifica SIEMPRE el commit que **produjo el bundle servido** (en 1.1.0: `e773d08` — el commit de docs `b4f12a1` no regenera el bundle); el **tag de release** (`uiep-1.1.0` = `b4f12a1`) identifica el **estado final de `main` publicado**, incluida la documentación. Cuando el artefacto y la publicación coinciden en el mismo commit, ambos apuntan igual. (Definido en la Misión 10; campo `releaseTag` previsto para el Registry de M11+.)
+**Semántica de versionado (inequívoca)**: `BUILD-INFO.json → sourceCommit` identifica SIEMPRE el commit que **produjo el artefacto servido** (el bundle si cambió el frontend — en 1.1.0: `e773d08` — o la imagen backend si solo cambió el backend — en 1.2.0 `f70497b` y en 1.3.0 `420bea4`); el **tag de release** (`uiep-1.1.0` = `b4f12a1`, `uiep-1.3.0` = el commit de docs) identifica el **estado final de `main` publicado**, incluida la documentación. Cuando el artefacto y la publicación coinciden en el mismo commit, ambos apuntan igual. (Definido en la Misión 10; campo `releaseTag` previsto para el Registry de M11+.)
 
 | Elemento | Valor |
 |---|---|

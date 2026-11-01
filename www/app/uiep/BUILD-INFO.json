@@ -1,12 +1,12 @@
 {
   "project": "uiep-control-center",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "source": "https://github.com/manu-alvarez/SERVER-DEV (apps/uiep)",
-  "sourceCommit": "f70497b",
-  "releaseTag": "uiep-1.2.0",
-  "changedIn12": "backend (UES + Registry + Blueprint v1); frontend sin cambios (bundle index-CEji4u03.js desde e773d08/1.1.0)",
-  "backendImage": "msbrossai-uiep-backend:latest sha256:49228b89eadaf3431b01687f463e0bbaf9d492b846521224dc372ec3ad62c5ea",
-  "builtAt": "2026-11-01T13:35:00Z",
+  "sourceCommit": "420bea4",
+  "releaseTag": "uiep-1.3.0",
+  "changedIn12": "backend (Generator Engine + composición + export uiep-export-v1); frontend sin cambios (bundle index-CEji4u03.js desde e773d08/1.1.0)",
+  "backendImage": "msbrossai-uiep-backend:latest sha256:a24d6a448492add7415599f7a672999f718e902b6ef15618e79a8a0919e7b1bb",
+  "builtAt": "2026-11-01T14:05:00Z",
   "deployedTo": "www/app/uiep + contenedor uiep-backend (VPS manuelalvarez.dev)",
-  "notes": "Misión 11 — Universal Engineering Core: UES (uiep.io/ues/v1) con catálogo de 19 tipos, registry con dependencias/procedencia/ciclo de vida, Blueprint v1 (2 blueprints migrados), 9 rutas de consola nuevas, 182 tests. Compatibilidad total con specs v1 y datos existentes."
+  "notes": "Misión 12 — Universal Artifact Generators: engineering-generator (12 generadores deterministas: agent/workflow de runtime ejecutables en data/specs + 8 kinds de documento en data/engineering/artifacts, upserts fail-closed id@version con bump opcional, registros de generación con hashes), engineering-composition (proyectos UES por composición: specRef reutiliza, generate delega, tokens $ref, orden topológico, rollback lógico), engineering-export (bundle uiep-export-v1 reinstalable con README), 14 rutas BFF nuevas con genLimiter, catálogo honesto (execution=false para evaluation/harness/mcp-server hasta el sandbox de M14), 211 tests. Compatibilidad total con specs v1 y datos existentes (28 specs previos + 5 generados, proyecto-referencia-m11 intacto)."
 }
