@@ -13,10 +13,14 @@
 set -euo pipefail
 
 BASE="${UIEP_BASE:-https://uiep.manuelalvarez.dev/_uiep/api}"
-COOKIE="$(mktemp)"
 
-if [[ "${1:-}" != "skip-login" ]]; then
+if [[ "${1:-}" == "skip-login" ]]; then
+  # Reutiliza una sesión ya iniciada (fichero de cookie Netscape apuntado por UIEP_COOKIE).
+  : "${UIEP_COOKIE:?skip-login requiere UIEP_COOKIE=/ruta/al/fichero/de/cookie}"
+  COOKIE="$UIEP_COOKIE"
+else
   : "${UIEP_CONSOLE_PASSWORD:?exporta UIEP_CONSOLE_PASSWORD para el login}"
+  COOKIE="$(mktemp)"
   curl -s -X POST "$BASE/console/auth/login" -H 'content-type: application/json' \
     -d "{\"password\":\"$UIEP_CONSOLE_PASSWORD\"}" -c "$COOKIE" -o /dev/null
   echo "· login OK"
