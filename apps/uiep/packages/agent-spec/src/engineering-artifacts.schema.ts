@@ -543,6 +543,30 @@ export const SaasV1Schema = z
 
 export type SaasV1 = z.infer<typeof SaasV1Schema>;
 
+/* ── Source Project (Misión FINAL): código fuente determinista generado ───── */
+
+export const SourceProjectV1Schema = z.object({
+  apiVersion: EngineeringApiVersionSchema,
+  kind: z.literal('SourceProject'),
+  metadata: MetadataSchema,
+  spec: z.object({
+    /** Proyecto DERIVADO de un contrato ApiPlatform registrado. */
+    from: z.object({ kind: z.literal('ApiPlatform'), id: EntityIdSchema, version: SemVerSchema }),
+    /** Matriz de tecnologías HONESTA: solo el runtime implementado y probado. */
+    runtime: z.literal('node-express'),
+    /** Mapa ruta → contenido (determinista; sin secretos). */
+    files: z.record(z.string().max(200), z.string().max(60_000)),
+    build: z.object({
+      steps: z.array(z.string().max(120)).max(8),
+      note: z.string().max(300).optional(),
+    }),
+    /** Hash del conjunto de ficheros (reproducibilidad verificable). */
+    contentHash: z.string().min(16).max(64),
+  }),
+});
+
+export type SourceProjectV1 = z.infer<typeof SourceProjectV1Schema>;
+
 /* ── Framework (composición verificada de componentes ya registrados) ────── */
 
 export const FrameworkV1Schema = z.object({
@@ -618,6 +642,7 @@ export const EngineeringArtifactSchema = z.union([
   ApplicationV1Schema,
   AgenticAppV1Schema,
   SaasV1Schema,
+  SourceProjectV1Schema,
 ]);
 export type EngineeringArtifact = z.infer<typeof EngineeringArtifactSchema>;
 
@@ -640,6 +665,7 @@ const KIND_SCHEMAS: Record<string, z.ZodTypeAny> = {
   Application: ApplicationV1Schema,
   AgenticApp: AgenticAppV1Schema,
   Saas: SaasV1Schema,
+  SourceProject: SourceProjectV1Schema,
 };
 
 export function validateEngineeringArtifact(input: unknown): EngineeringArtifactValidationResult {

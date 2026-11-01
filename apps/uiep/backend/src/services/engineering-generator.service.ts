@@ -934,6 +934,16 @@ const SaasInputSchema = z.object({
   onConflict: OnConflictSchema,
 });
 
+/** M17 — Source Project: código fuente DETERMINISTA desde un ApiPlatform. */
+const SourceProjectInputSchema = z.object({
+  id: EntityIdSchema.optional(),
+  name: z.string().min(1).max(110).optional(),
+  apiId: EntityIdSchema,
+  apiVersion: SemVerSchema.optional(),
+  version: SemVerSchema.default('1.0.0'),
+  onConflict: OnConflictSchema,
+});
+
 /* ── Implementación de los generadores ───────────────────────────────────── */
 
 async function resolveComponentRef(kind: string, id: string): Promise<{ found: boolean; registeredVersion?: string; store: 'specs' | 'engineering' }> {
@@ -952,6 +962,7 @@ async function resolveComponentRef(kind: string, id: string): Promise<{ found: b
     'Application',
     'AgenticApp',
     'Saas',
+    'SourceProject',
   ]);
   if (engineeringKinds.has(kind)) {
     const doc = await getLatestArtifact(kind, id);
@@ -2137,7 +2148,7 @@ const GENERATORS: Record<string, GeneratorModule> = {
       } as GeneratorGenerateResult & { childGenerationIds?: string[] };
     },
   },
-  saas: {
+  'saas': {
     type: 'saas',
     label: 'SaaS compuesto: módulos verificados + roles/tenancy preparados',
     docKind: 'Saas',
@@ -2192,6 +2203,118 @@ const GENERATORS: Record<string, GeneratorModule> = {
         reused: up.reused,
         warnings: ['tenancy multiusuario PREPARADA (roles + isolation declarados); el aislamiento REAL por tenant requiere ejecución aislada (M14) y persistencia por-tenant (fases posteriores)'],
         docHash: fingerprintOf(up.finalDoc),
+      };
+    },
+  },
+  'source-project': {
+    type: 'source-project',
+    label: 'Código fuente determinista (proyecto Node/Express desde un ApiPlatform)',
+    docKind: 'SourceProject',
+    outStore: 'engineering',
+    inputShape: '{ apiId, apiVersion?, version?, onConflict? } — genera package.json + server.js + README con dependencias PINNEADAS',
+    async validate(input) {
+      const parsed = parseErr(SourceProjectInputSchema, input);
+      if (!parsed.ok) {
+        return parsed;
+      }
+      const apiDoc = parsed.data.apiVersion ? await getArtifactVersion('ApiPlatform', parsed.data.apiId, parsed.data.apiVersion) : await getLatestArtifact('ApiPlatform', parsed.data.apiId);
+      if (!apiDoc) {
+        return { ok: false, status: 400, errors: { apiId: [`contrato ApiPlatform inexistente: '${parsed.data.apiId}'`] } };
+      }
+      return { ok: true, checks: [{ name: 'schema', passed: true }, { name: 'api-exists', passed: true }] };
+    },
+    async generate(input) {
+      const parsed = parseErr(SourceProjectInputSchema, input);
+      if (!parsed.ok) {
+        return parsed;
+      }
+      const apiDoc = parsed.data.apiVersion ? await getArtifactVersion('ApiPlatform', parsed.data.apiId, parsed.data.apiVersion) : await getLatestArtifact('ApiPlatform', parsed.data.apiId);
+      if (!apiDoc) {
+        return { ok: false, status: 400, errors: { apiId: [`contrato ApiPlatform inexistente: '${parsed.data.apiId}'`] } };
+      }
+      const apiMeta = (apiDoc as { metadata?: { id?: string; version?: string; name?: string } }).metadata ?? {};
+      const endpoints = ((apiDoc as { spec?: { endpoints?: Array<Record<string, unknown>> } }).spec?.endpoints ?? []) as Array<{ id: string; method: string; path: string; summary?: string; request?: Array<{ name: string; type: string; required?: boolean }>; response?: Array<{ name: string; type: string }> }>;
+
+      // server.js — generado DETERMINISTAMENTE desde el contrato (sin eval,
+      // sin código de terceros: solo express + validación inline de campos).
+      const routeFns = endpoints
+        .map((e) => {
+          const reqChecks = (e.request ?? [])
+            .map((f) => {
+              const reqCheck = f.required !== false ? `\n  if (req.body['${f.name}'] === undefined) return res.status(422).json({ error: 'campo requerido: ${f.name}' });` : '';
+              const typeCheck = f.type === 'string' ? `\n  if (req.body['${f.name}'] !== undefined && typeof req.body['${f.name}'] !== 'string') return res.status(422).json({ error: '${f.name} debe ser string' });` : f.type === 'number' ? `\n  if (req.body['${f.name}'] !== undefined && typeof req.body['${f.name}'] !== 'number') return res.status(422).json({ error: '${f.name} debe ser number' });` : '';
+              return reqCheck + typeCheck;
+            })
+            .join('');
+          return `app.${e.method.toLowerCase()}('${e.path}', (req, res) => {${reqChecks}\n  res.json({ endpoint: '${e.id}', summary: '${(e.summary ?? '').replace(/'/g, "\\'")}', servedBy: 'generated-source-project', validated: req.body ?? {} });\n});`;
+        })
+        .join('\n\n');
+      const serverJs = `/**
+ * Generado por UIEP (source-project generator, Misión FINAL) — NO editar a mano.
+ * Origen: ApiPlatform ${apiMeta.id}@${apiMeta.version}
+ * El CÓDIGO GENERADO NO SE EJECUTA en la plataforma UIEP: este proyecto se
+ * exporta para su uso EXTERNO (build/execution fuera del host, bajo tu control).
+ */
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+app.get('/health', (req, res) => res.json({ ok: true, origin: '${apiMeta.id}@${apiMeta.version}' }));
+
+${routeFns}
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log('[generated] escuchando en ' + PORT));
+`;
+      const packageJson = JSON.stringify(
+        {
+          name: `uiep-generated-${apiMeta.id}`,
+          version: parsed.data.version,
+          private: true,
+          description: `Proyecto generado por UIEP desde el contrato ${apiMeta.id}@${apiMeta.version}`,
+          scripts: { start: 'node server.js' },
+          dependencies: { express: '4.19.2' }, // PINNED — builds reproducibles
+        },
+        null,
+        2,
+      );
+      const readme = [
+        `# ${parsed.data.name ?? `uiep-generated-${apiMeta.id}`}`,
+        '',
+        `Proyecto Node/Express GENERADO por UIEP desde el contrato ApiPlatform **${apiMeta.id}@${apiMeta.version}** (${endpoints.length} endpoints).`,
+        '',
+        '## Build (reproducible — dependencias pinneadas)',
+        '1. `npm install` (fuera del host UIEP — la plataforma NO instala dependencias).',
+        '2. `npm start` (escucha en PORT, default 3000).',
+        '',
+        '## Seguridad',
+        '- Código generado DETERMINISTA (mismo contrato → mismo hash de contenido).',
+        '- NO desplegar sin auditar: UIEP no ejecuta código generado (sandbox solo interpreta documentos).',
+      ].join('\n');
+
+      const files: Record<string, string> = { 'server.js': serverJs, 'package.json': packageJson, 'README.md': readme };
+      const contentHash = sha256Hex(stableStringify(files)).slice(0, 32);
+      const id = parsed.data.id ?? `src-${slugify(String(apiMeta.id))}`;
+      if (!EntityIdSchema.safeParse(id).success) {
+        return { ok: false, status: 400, errors: { id: [`id derivado no válido: '${id}'`] } };
+      }
+      const doc = withMeta(API_VERSION, 'SourceProject', id, parsed.data.name ?? `uiep-generated-${apiMeta.id}`, parsed.data.version, 'Código fuente determinista generado desde un contrato ApiPlatform (para uso EXTERNO — UIEP no ejecuta código generado).', {
+        from: { kind: 'ApiPlatform', id: String(apiMeta.id), version: String(apiMeta.version) },
+        runtime: 'node-express',
+        files,
+        build: { steps: ['npm install', 'npm start'], note: 'ejecución SIEMPRE fuera del host UIEP; dependencias pinneadas (express 4.19.2)' },
+        contentHash,
+      });
+      const up = await upsertEngineeringArtifact(doc, parsed.data.onConflict);
+      if (!up.ok) {
+        return up;
+      }
+      return {
+        ok: true,
+        outcome: { store: 'engineering', artifactKind: 'SourceProject', id: up.id, version: up.version },
+        reused: up.reused,
+        warnings: ['el código generado se EXPORTA y se ejecuta FUERA del host UIEP (la plataforma no ejecuta código generado — decisión de seguridad permanente)'],
+        docHash: contentHash,
       };
     },
   },

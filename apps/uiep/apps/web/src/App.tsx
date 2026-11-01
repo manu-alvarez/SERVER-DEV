@@ -20,6 +20,8 @@ import Registry from './pages/engineering/Registry'
 import Executions from './pages/engineering/Executions'
 import Quality from './pages/engineering/Quality'
 import Exports from './pages/engineering/Exports'
+import Admin from './pages/engineering/Admin'
+import Deployments from './pages/engineering/Deployments'
 
 /**
  * Routing con HashRouter: el estático se publica bajo dos superficies del
@@ -53,6 +55,8 @@ export default function App(): ReactNode {
           <Route path="/engineering/ejecuciones" element={<Executions />} />
           <Route path="/engineering/calidad" element={<Quality />} />
           <Route path="/engineering/export" element={<Exports />} />
+          <Route path="/engineering/despliegues" element={<Deployments />} />
+          <Route path="/engineering/admin" element={<Admin />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

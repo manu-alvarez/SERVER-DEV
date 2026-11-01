@@ -63,7 +63,9 @@ export async function listSpecVersions(id: string): Promise<SpecEnvelope[]> {
       /* corrupto: ignorar */
     }
   }
-  docs.sort((a, b) => (b.metadata.version ?? '').localeCompare(a.metadata.version ?? ''));
+  // M16 — comparación SEMVER real (localeCompare daba '1.10.0' < '1.9.0');
+  // el orden de versiones define qué spec resuelve el runtime.
+  docs.sort((a, b) => compareSemVer(b.metadata.version ?? '0.0.0', a.metadata.version ?? '0.0.0'));
   return docs;
 }
 
@@ -104,7 +106,8 @@ export async function listSpecs(opts?: { kind?: string }): Promise<SpecSummary[]
   return summaries.sort((a, b) => (a.createdAt || a.id).localeCompare(b.createdAt || b.id));
 }
 
-function compareSemVer(a: string, b: string): number {
+/** Comparación semver pura (exportada: la usan el orden de versiones y los tests). */
+export function compareSemVer(a: string, b: string): number {
   const [ax, ay, az] = a.split('.').map(Number);
   const [bx, by, bz] = b.split('.').map(Number);
   return ax - bx || ay - by || az - bz;

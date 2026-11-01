@@ -54,6 +54,10 @@ const PRESETS: Record<string, unknown> = {
     components: [{ type: 'agent', ref: { id: 'REEMPLAZAR_POR_ID_DE_AGENTE', kind: 'Agent' } }],
     modules: [],
   },
+  'source-project': {
+    apiId: 'REEMPLAZAR_POR_ID_DE_API',
+    version: '1.0.0',
+  },
 }
 
 export default function Generator(): ReactNode {

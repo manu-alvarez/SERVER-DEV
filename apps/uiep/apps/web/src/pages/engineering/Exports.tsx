@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
-import { Alert, Button, LinearProgress, MenuItem, Stack, TextField, Typography } from '@mui/material'
+import { Alert, Button, Checkbox, FormControlLabel, LinearProgress, MenuItem, Stack, TextField, Typography } from '@mui/material'
 import DownloadIcon from '@mui/icons-material/DownloadRounded'
 import RefreshIcon from '@mui/icons-material/RefreshRounded'
 import { api, type ArtifactSummary, type ExportResult, type ProjectSummary } from '../../lib/api'
 import { downloadJson, truncate } from '../../lib/engineering'
+import { API_BASE } from '../../lib/api'
 import { KV, Panel, SectionHeader } from './shared'
 
 /**
@@ -21,6 +22,7 @@ export default function Exports(): ReactNode {
   const [target, setTarget] = useState<Target>({ mode: 'project', ref: '' })
   const [busy, setBusy] = useState(false)
   const [result, setResult] = useState<ExportResult | null>(null)
+  const [asZip, setAsZip] = useState(true)
   const [files, setFiles] = useState<Array<{ filename: string; sizeBytes: number; createdAt: string }>>([])
   const [error, setError] = useState<string | null>(null)
 
@@ -51,10 +53,10 @@ export default function Exports(): ReactNode {
     try {
       const r =
         target.mode === 'project'
-          ? await api.eng.exportProject(target.ref)
+          ? await api.eng.exportProject(target.ref, asZip)
           : target.mode === 'artifact'
-            ? await api.eng.exportArtifact(...(target.ref.split('/') as [string, string]))
-            : await api.eng.exportGeneration(target.ref)
+            ? await api.eng.exportArtifact(...(target.ref.split('/') as [string, string]), asZip)
+            : await api.eng.exportGeneration(target.ref, asZip)
       setResult(r)
       load()
     } catch (e) {
@@ -114,7 +116,8 @@ export default function Exports(): ReactNode {
             slotProps={{ input: { sx: { fontFamily: 'ui-monospace, Menlo, monospace' } } }}
           />
         )}
-        <Button variant="contained" startIcon={<DownloadIcon />} disabled={busy || !target.ref || (target.mode === 'generation' && !target.ref.startsWith('gen-'))} onClick={doExport}>
+          <FormControlLabel control={<Checkbox checked={asZip} onChange={(e) => setAsZip(e.target.checked)} />} label={<Typography variant="caption">ZIP</Typography>} />
+          <Button variant="contained" startIcon={<DownloadIcon />} disabled={busy || !target.ref || (target.mode === 'generation' && !target.ref.startsWith('gen-'))} onClick={doExport}>
           {busy ? 'Exportando…' : 'Exportar'}
         </Button>
       </Stack>
@@ -134,14 +137,24 @@ export default function Exports(): ReactNode {
             startIcon={<DownloadIcon />}
             onClick={async () => {
               try {
-                const bundle = await api.eng.exportFile(result.filename)
-                downloadJson(bundle, result.filename)
+                if (result.zip) {
+                  const res = await fetch(`${API_BASE}/api/console/engineering/exports/${encodeURIComponent(result.zip)}`, { credentials: 'same-origin' })
+                  if (!res.ok) throw new Error(String(res.status))
+                  const blob = await res.blob()
+                  const a = document.createElement('a')
+                  a.href = URL.createObjectURL(blob)
+                  a.download = result.zip
+                  a.click()
+                  URL.revokeObjectURL(a.href)
+                } else {
+                  downloadJson(await api.eng.exportFile(result.filename), result.filename)
+                }
               } catch {
                 setError('No se pudo descargar el bundle (¿se eliminó del servidor?).')
               }
             }}
           >
-            Descargar bundle completo
+            Descargar bundle completo {result.zip ? '(zip)' : '(json)'}
           </Button>
         </Stack>
       )}

@@ -132,13 +132,14 @@ test('engineering: mutación sin header CSRF → 403', async () => {
 
 /* ── Catálogo y proyectos ────────────────────────────────────────────────── */
 
-test('catálogo HTTP: 19 tipos con capacidades honestas', async () => {
+test('catálogo HTTP: 19 tipos con capacidades honestas (16 generables desde M13)', async () => {
   const r = await consoleFetch('/api/console/engineering/catalog');
   assert.equal(r.status, 200);
   const catalog = (await r.json()) as any[];
   assert.equal(catalog.length, 19);
   const saas = catalog.find((e) => e.type === 'saas');
-  assert.equal(saas.capabilities.generator, false);
+  assert.equal(saas.capabilities.generator, true, 'M13: saas GENERABLE');
+  assert.equal(saas.capabilities.execution, false, 'la multi-tenancy REAL → M14+');
 });
 
 test('proyectos: registro válido → 201; inválido → 400 con errores estructurados', async () => {

@@ -11,6 +11,7 @@ import {
   isEngineeringArtifactKind,
 } from './engineering-registry.service';
 import { getGenerationRecord, sha256Hex } from './engineering-generator.service';
+import { buildZip } from './zip.service';
 
 /**
  * engineering-export (Misión 12 §5) — exportación ESTRUCTURADA.
@@ -214,6 +215,18 @@ function finalize(bundle: ExportBundle, filenameRaw: string): ExportResult {
   };
 }
 
+/** Genera el ZIP del bundle (STORED sin compresión, sin dependencias): los
+ *  documentos + README + manifest con hashes. Determinista. */
+export function bundleToZip(result: ExportResult): Buffer {
+  const entries = Object.entries(result.bundle.documents).map(([p, doc]) => ({ path: p, content: JSON.stringify(doc, null, 2) }));
+  entries.push({ path: 'README.md', content: result.bundle.readme });
+  entries.push({
+    path: 'manifest.json',
+    content: JSON.stringify({ format: result.format, subject: result.bundle.export.subject, sha256: result.sha256, files: entries.map((e) => e.path) }, null, 2),
+  });
+  return buildZip(entries);
+}
+
 /** Escribe el bundle a data/engineering/exports/ (atómico; el contenido del
  *  fichero es el MISMO que se devuelve, con hashes sobre el JSON canónico). */
 export async function writeExportFile(result: ExportResult): Promise<void> {
@@ -225,7 +238,15 @@ export async function writeExportFile(result: ExportResult): Promise<void> {
 }
 
 /** Lee un bundle exportado (por nombre saneado) para su descarga vía BFF. */
-export async function readExportFile(filename: string): Promise<{ ok: true; bundle: unknown } | { ok: false; status: 404; reason: string }> {
+export async function readExportFile(filename: string): Promise<{ ok: true; bundle: unknown; zip?: Buffer } | { ok: false; status: 404; reason: string }> {
+  if (/^[a-z0-9@._-]{3,140}\.zip$/.test(filename)) {
+    try {
+      const buf = await fs.readFile(path.join(EXPORTS_DIR, filename));
+      return { ok: true, bundle: { zipBytes: buf.length }, zip: buf };
+    } catch {
+      return { ok: false, status: 404, reason: 'export_no_encontrado' };
+    }
+  }
   if (!/^[a-z0-9@._-]{3,140}$/.test(filename) || !filename.endsWith('.export.json')) {
     return { ok: false, status: 404, reason: 'filename_invalido' };
   }
@@ -237,11 +258,19 @@ export async function readExportFile(filename: string): Promise<{ ok: true; bund
   }
 }
 
+/** Escribe el ZIP del bundle (uiep-export-v1 comprimido STORED). */
+export async function writeZipFile(result: ExportResult): Promise<string> {
+  const zipName = result.filename.replace(/\.export\.json$/, '.zip');
+  await fs.mkdir(EXPORTS_DIR, { recursive: true });
+  await fs.writeFile(path.join(EXPORTS_DIR, zipName), bundleToZip(result));
+  return zipName;
+}
+
 /** Lista los ficheros de export generados (nombre, tamaños, hash). */
 export async function listExportFiles(): Promise<Array<{ filename: string; sizeBytes: number; createdAt: string }>> {
   let files: string[] = [];
   try {
-    files = (await fs.readdir(EXPORTS_DIR)).filter((f) => f.endsWith('.export.json'));
+    files = (await fs.readdir(EXPORTS_DIR)).filter((f) => f.endsWith('.export.json') || f.endsWith('.zip'));
   } catch {
     return [];
   }

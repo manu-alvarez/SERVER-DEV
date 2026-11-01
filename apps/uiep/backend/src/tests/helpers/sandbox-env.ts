@@ -17,7 +17,7 @@ import { createApp } from '../../app';
 const backend = createApp({ trustProxy: 'loopback' }).listen(0);
 const backendBase = `http://127.0.0.1:${(backend.address() as { port: number }).port}`;
 
-const SANDBOX_PORT = '4177';
+const SANDBOX_PORT = process.env.SANDBOX_TEST_PORT || '4177';
 const child: ChildProcess = spawn(process.execPath, [path.resolve(__dirname, '../../../../sandbox/server.mjs')], {
   env: {
     ...process.env,

@@ -499,9 +499,31 @@ export interface ExportResult {
   exported: boolean
   format: string
   filename: string
+  zip?: string
   documents: string[]
   sizeBytes: number
   sha256: string
+}
+
+export interface IamUserPub {
+  id: string
+  username: string
+  tenantId: string
+  role: 'admin' | 'operator' | 'viewer'
+  createdAt: string
+}
+
+export interface DeploymentRecord {
+  deploymentId: string
+  tenantId: string
+  artifact: { kind: string; id: string; version: string }
+  environment: string
+  status: 'deployed' | 'stopped'
+  config: { timeoutMs: number }
+  health: { lastOk: boolean | null; lastAt: string | null; detail: string }
+  versions: Array<{ version: string; deployedAt: string; actor: string }>
+  deployedAt: string
+  updatedAt: string
 }
 
 export interface SandboxStatus {
@@ -642,10 +664,24 @@ export const api = {
         `/api/console/engineering/projects/${id}/quality`,
         { behavior },
       ),
-    exportProject: (id: string) => post<ExportResult>(`/api/console/engineering/projects/${id}/export`),
-    exportArtifact: (kind: string, id: string) => post<ExportResult>(`/api/console/engineering/artifacts/${kind}/${id}/export`),
-    exportGeneration: (id: string) => post<ExportResult>(`/api/console/engineering/generations/${id}/export`),
+    exportProject: (id: string, zip = false) => post<ExportResult>(`/api/console/engineering/projects/${id}/export${zip ? '?format=zip' : ''}`),
+    exportArtifact: (kind: string, id: string, zip = false) => post<ExportResult>(`/api/console/engineering/artifacts/${kind}/${id}/export${zip ? '?format=zip' : ''}`),
+    exportGeneration: (id: string, zip = false) => post<ExportResult>(`/api/console/engineering/generations/${id}/export${zip ? '?format=zip' : ''}`),
     exports: () => get<{ count: number; files: Array<{ filename: string; sizeBytes: number; createdAt: string }> }>('/api/console/engineering/exports'),
     exportFile: (filename: string) => get<unknown>(`/api/console/engineering/exports/${encodeURIComponent(filename)}`),
+    iam: {
+      me: () => get<{ principal: { username: string; tenantId: string; role: string; via: string }; permissions: string[] }>('/api/console/iam/me'),
+      users: () => get<{ count: number; users: IamUserPub[] }>('/api/console/iam/users'),
+      create: (u: { username: string; password: string; tenantId: string; role: string }) => post<IamUserPub>('/api/console/iam/users', u),
+      remove: (username: string) => request<{ deleted: boolean }>('DELETE', `/api/console/iam/users/${username}`),
+    },
+    deployments: {
+      list: () => get<{ count: number; deployments: DeploymentRecord[] }>('/api/console/engineering/deployments'),
+      deploy: (d: { deploymentId?: string; kind: string; id: string; version?: string }) => post<DeploymentRecord>('/api/console/engineering/deployments', d),
+      stop: (id: string) => post<{ ok: boolean }>(`/api/console/engineering/deployments/${id}/stop`),
+      rollback: (id: string) => post<{ ok: boolean; deployment: DeploymentRecord }>(`/api/console/engineering/deployments/${id}/rollback`),
+      health: (id: string) => get<{ ok: boolean; detail: string }>(`/api/console/engineering/deployments/${id}/health`),
+      invoke: (id: string, invocation: Record<string, unknown>) => post<ExecutionRecord>(`/api/console/engineering/deployments/${id}/invoke`, invocation),
+    },
   },
 }

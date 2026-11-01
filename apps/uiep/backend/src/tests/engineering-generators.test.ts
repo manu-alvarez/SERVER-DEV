@@ -64,7 +64,7 @@ after(() => {
 
 test('catálogo de generadores: 16 tipos con capacidades honestas del registro', () => {
   const gens = listGenerators();
-  assert.equal(gens.length, 16, '12 de M12 + 4 de M13 (api-platform/application/agentic-app/saas)');
+  assert.equal(gens.length, 17, '12 de M12 + 4 de M13 + source-project (M17)');
   const types = gens.map((g) => g.type);
   for (const t of ['agent', 'workflow', 'multi-agent-system', 'prompt-system', 'tool-collection', 'knowledge-base', 'rag-system', 'mcp-server', 'skill-pack', 'evaluation', 'harness', 'framework', 'api-platform', 'application', 'agentic-app', 'saas']) {
     assert.ok(types.includes(t), `falta el generador ${t}`);
