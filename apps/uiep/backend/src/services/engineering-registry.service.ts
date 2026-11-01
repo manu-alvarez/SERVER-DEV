@@ -446,6 +446,7 @@ export const ENGINEERING_ARTIFACT_KINDS = [
   'Application',
   'AgenticApp',
   'Saas',
+  'SourceProject',
 ] as const;
 
 export type EngineeringArtifactKindName = (typeof ENGINEERING_ARTIFACT_KINDS)[number];

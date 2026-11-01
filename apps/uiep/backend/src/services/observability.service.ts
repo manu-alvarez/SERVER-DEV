@@ -26,7 +26,9 @@ export type AuditActor =
   | { kind: 'agent'; id: string }
   | { kind: 'mcp' }
   | { kind: 'hook'; id: string }
-  | { kind: 'system' };
+  | { kind: 'system' }
+  /** Misión FINAL — acciones de usuarios IAM (con identidad de usuario). */
+  | { kind: 'user'; id?: string };
 
 export interface AuditEvent {
   /** El ts lo añade el writer (los llamadores no lo pasan). */

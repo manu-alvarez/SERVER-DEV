@@ -107,6 +107,7 @@ export const RegisteredSpecRefSchema = z.object({
     'Application',
     'AgenticApp',
     'Saas',
+    'SourceProject',
   ]),
   version: SemVerSchema.optional(),
 });

@@ -65,7 +65,7 @@ test('catálogo de generadores vía HTTP y detalle por tipo', async () => {
   const r = await consoleFetch('/api/console/engineering/generators');
   assert.equal(r.status, 200);
   const body = (await r.json()) as { engineVersion: string; generators: Array<{ type: string; inputShape: string }> };
-  assert.equal(body.generators.length, 16, '12 de M12 + 4 de M13');
+  assert.equal(body.generators.length, 17, '12 de M12 + 4 de M13 + source-project (M17)');
   assert.equal(body.engineVersion, '1.1.0');
   const detail = (await (await consoleFetch('/api/console/engineering/generators/multi-agent-system')).json()) as { type: string; capabilities: { generator: boolean } };
   assert.equal(detail.type, 'multi-agent-system');

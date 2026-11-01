@@ -39,6 +39,8 @@ import RegistryIcon from '@mui/icons-material/StorageRounded'
 import ExecIcon from '@mui/icons-material/PlayCircleOutlineRounded'
 import QualityIcon from '@mui/icons-material/VerifiedRounded'
 import ExportIcon from '@mui/icons-material/IosShareRounded'
+import DeployIcon from '@mui/icons-material/RocketLaunchRounded'
+import AdminIcon from '@mui/icons-material/AdminPanelSettingsRounded'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import LogoutIcon from '@mui/icons-material/Logout'
@@ -61,6 +63,8 @@ const NAV_AVANZADO = [
   { to: '/engineering/ejecuciones', icon: <ExecIcon sx={{ color: 'text.secondary' }} />, label: 'Ingeniería · Ejecuciones' },
   { to: '/engineering/calidad', icon: <QualityIcon sx={{ color: 'text.secondary' }} />, label: 'Ingeniería · Calidad' },
   { to: '/engineering/export', icon: <ExportIcon sx={{ color: 'text.secondary' }} />, label: 'Ingeniería · Export' },
+  { to: '/engineering/despliegues', icon: <DeployIcon sx={{ color: 'text.secondary' }} />, label: 'Ingeniería · Despliegues' },
+  { to: '/engineering/admin', icon: <AdminIcon sx={{ color: 'text.secondary' }} />, label: 'Ingeniería · IAM' },
   { to: '/models', icon: <MemoryIcon sx={{ color: 'text.secondary' }} />, label: 'Modelos' },
   { to: '/tools', icon: <BuildIcon sx={{ color: 'text.secondary' }} />, label: 'Herramientas' },
   { to: '/integrations', icon: <IntegrationsIcon sx={{ color: 'text.secondary' }} />, label: 'Integraciones' },

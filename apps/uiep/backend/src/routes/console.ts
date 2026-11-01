@@ -25,6 +25,27 @@ import { createSource, ingestSource } from '../services/ingestion.service';
 import { queryAll } from '../services/retrieval.service';
 import { listAll as listAllMemories, deleteMemory, isExpired } from '../services/memory-store.service';
 import { audit, recordMetric, snapshotMetrics, auditTail, logStructured } from '../services/observability.service';
+import {
+  createUser,
+  listUsers,
+  deleteUser,
+  verifyUser,
+  signUserToken,
+  verifyUserToken,
+  USER_COOKIE_NAME,
+  permissionsOf,
+  type UserPrincipal,
+  type IamPermission,
+} from '../services/iam.service';
+import {
+  deploy,
+  stopDeployment,
+  rollbackDeployment,
+  healthCheck as deploymentHealthCheck,
+  listDeployments,
+  getDeployment,
+  invokeDeployment,
+} from '../services/deployment-engine.service';
 import { globalSlots } from '../services/reliability.service';
 import { loadWorkflow, startWorkflowRun, cancelWorkflowRun, resumeWorkflowRun } from '../services/workflow-runtime.service';
 import { listWorkflowRuns, loadWorkflowRun } from '../services/workflow-store.service';
@@ -149,6 +170,50 @@ const execLimiter = rateLimit({
 
 /** Regex de ids de registro de generación (engine y composiciones comparten formato). */
 const GEN_RECORD_RE = /^gen-[a-z0-9-]{6,60}$/;
+
+/* ── Autorización M17: sesión de consola (admin) O sesión de USUARIO ─────── */
+
+function userAuth(req: Request): UserPrincipal | null {
+  const cookie = readCookie(req, USER_COOKIE_NAME);
+  if (!cookie) {
+    return null;
+  }
+  return verifyUserToken(cookie);
+}
+
+/** Principal efectivo de la petición: admin de consola o usuario IAM. */
+function authz(req: Request): { state: ConsoleState; principal: UserPrincipal | null } {
+  const consoleState = consoleAuth(req);
+  if (consoleState === 'ok') {
+    return { state: 'ok', principal: { id: 'platform-admin', username: 'platform-admin', tenantId: 'platform', role: 'admin', via: 'console-admin' } };
+  }
+  const user = userAuth(req);
+  if (user) {
+    if (req.method !== 'GET' && req.headers[CSRF_HEADER] !== '1') {
+      return { state: 'csrf', principal: user };
+    }
+    return { state: 'ok', principal: user };
+  }
+  return { state: consoleState, principal: null };
+}
+
+/** Guard con PERMISO granular (M17): 403 si el principal no lo tiene. */
+function authzGuard(res: Response, auth: { state: ConsoleState; principal: UserPrincipal | null }, permission: IamPermission): UserPrincipal | null {
+  if (auth.state !== 'ok') {
+    guard(res, auth.state);
+    return null;
+  }
+  if (!auth.principal || !permissionsOf(auth.principal).includes(permission)) {
+    res.status(403).json({ error: 'sin_permiso', permission });
+    return null;
+  }
+  return auth.principal;
+}
+
+/** Guard de las rutas engineering (permiso granular + principal). */
+function engGuard(res: Response, req: Request, permission: IamPermission): UserPrincipal | null {
+  return authzGuard(res, authz(req), permission);
+}
 
 /** Tipos de generador válidos por forma (slug corto; evita inyectar raras rutas). */
 const GENERATOR_TYPE_RE = /^[a-z][a-z0-9-]{1,39}$/;
@@ -1127,16 +1192,18 @@ export function registerConsoleRoute(app: Express): void {
    * NO contamina los listados de specs existentes. */
 
   app.get('/api/console/engineering/catalog', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     res.json(getCatalog());
   });
 
   app.get('/api/console/engineering/graph', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     // Integridad global: grafo resuelto de todos los proyectos registrados.
     listProjects()
       .then(async (projects) => {
@@ -1156,9 +1223,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.get('/api/console/engineering/projects', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     listProjects()
       .then((p) => res.json(p))
       .catch((err) => {
@@ -1168,9 +1236,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.post('/api/console/engineering/projects', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:write');
+  if (!_p) {
+    return;
+  }
     registerProject(req.body)
       .then((r) =>
         r.ok
@@ -1190,9 +1259,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.get('/api/console/engineering/projects/:id', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     const id = String(req.params.id);
     if (!ID_RE.test(id)) {
       return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
@@ -1206,9 +1276,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.get('/api/console/engineering/projects/:id/versions', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     const id = String(req.params.id);
     if (!ID_RE.test(id)) {
       return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
@@ -1224,9 +1295,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.get('/api/console/engineering/projects/:id/graph', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     const id = String(req.params.id);
     if (!ID_RE.test(id)) {
       return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
@@ -1245,9 +1317,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.get('/api/console/engineering/projects/:id/provenance', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     const id = String(req.params.id);
     if (!ID_RE.test(id)) {
       return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
@@ -1271,9 +1344,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.post('/api/console/engineering/projects/:id/lifecycle', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:write');
+  if (!_p) {
+    return;
+  }
     const id = String(req.params.id);
     const body = (req.body ?? {}) as { to?: unknown; note?: unknown };
     const to = LifecycleStateSchema.safeParse(body.to);
@@ -1300,16 +1374,18 @@ export function registerConsoleRoute(app: Express): void {
    * Mutaciones de generación con rate limit (genLimiter). */
 
   app.get('/api/console/engineering/generators', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     res.json({ engineVersion: GENERATOR_ENGINE_VERSION, generators: listGenerators() });
   });
 
   app.get('/api/console/engineering/generators/:type', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     const type = String(req.params.type);
     const gen = describeGenerator(type);
     if (!typeSafeType(type)) {
@@ -1322,9 +1398,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.post('/api/console/engineering/generators/:type/validate', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:write');
+  if (!_p) {
+    return;
+  }
     const type = String(req.params.type);
     if (!typeSafeType(type)) {
       return void res.status(400).json({ error: { type: ['formato de tipo inválido'] } });
@@ -1338,9 +1415,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.post('/api/console/engineering/generate', genLimiter, (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:write');
+  if (!_p) {
+    return;
+  }
     const body = (req.body ?? {}) as { type?: unknown; input?: unknown };
     if (typeof body.type !== 'string' || !typeSafeType(body.type)) {
       return void res.status(400).json({ error: { type: ['falta type válido'] } });
@@ -1354,9 +1432,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.get('/api/console/engineering/generations', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     const limitRaw = Number(req.query.limit);
     const limit = Number.isFinite(limitRaw) ? Math.min(Math.max(Math.trunc(limitRaw), 1), 200) : 50;
     listGenerationRecords(limit)
@@ -1368,9 +1447,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.get('/api/console/engineering/generations/:id', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     const id = String(req.params.id);
     if (!GEN_RECORD_RE.test(id)) {
       return void res.status(400).json({ error: { id: ['formato de id de generación inválido'] } });
@@ -1384,9 +1464,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.post('/api/console/engineering/compositions', genLimiter, (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:write');
+  if (!_p) {
+    return;
+  }
     const body = (req.body ?? {}) as { onConflict?: unknown };
     const onConflict = body.onConflict === 'bump' ? { onConflict: 'bump' as const } : {};
     generateComposition(req.body, onConflict)
@@ -1402,9 +1483,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.get('/api/console/engineering/artifacts', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     listArtifacts()
       .then((arts) => res.json({ count: arts.length, artifacts: arts }))
       .catch((err) => {
@@ -1414,9 +1496,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.get('/api/console/engineering/artifacts/:kind/:id', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     const kind = String(req.params.kind);
     const id = String(req.params.id);
     if (!isEngineeringArtifactKind(kind)) {
@@ -1449,9 +1532,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.post('/api/console/engineering/artifacts/:kind/:id/lifecycle', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:write');
+  if (!_p) {
+    return;
+  }
     const kind = String(req.params.kind);
     const id = String(req.params.id);
     const body = (req.body ?? {}) as { to?: unknown; note?: unknown };
@@ -1476,9 +1560,10 @@ export function registerConsoleRoute(app: Express): void {
   /* ── Exportación estructurada (M12 §5): bundle 'uiep-export-v1' ─────────── */
 
   app.post('/api/console/engineering/artifacts/:kind/:id/export', genLimiter, (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:write');
+  if (!_p) {
+    return;
+  }
     const kind = String(req.params.kind);
     const id = String(req.params.id);
     if (!isEngineeringArtifactKind(kind)) {
@@ -1503,9 +1588,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.post('/api/console/engineering/projects/:id/export', genLimiter, (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:write');
+  if (!_p) {
+    return;
+  }
     const id = String(req.params.id);
     if (!ID_RE.test(id)) {
       return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
@@ -1526,9 +1612,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.post('/api/console/engineering/generations/:id/export', genLimiter, (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:write');
+  if (!_p) {
+    return;
+  }
     const id = String(req.params.id);
     if (!GEN_RECORD_RE.test(id)) {
       return void res.status(400).json({ error: { id: ['formato de id de generación inválido'] } });
@@ -1548,9 +1635,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.get('/api/console/engineering/exports', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     listExportFiles()
       .then((files) => res.json({ count: files.length, files }))
       .catch((err) => {
@@ -1560,9 +1648,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.get('/api/console/engineering/exports/:filename', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     readExportFile(String(req.params.filename ?? ''))
       .then((r) => (r.ok ? res.json(r.bundle) : res.status(r.status).json({ error: r.reason })))
       .catch((err) => {
@@ -1580,9 +1669,10 @@ export function registerConsoleRoute(app: Express): void {
   let lastReconcileAt = 0;
 
   app.get('/api/console/engineering/sandbox', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     sandboxHealth()
       .then((healthy) =>
         res.json({
@@ -1602,9 +1692,10 @@ export function registerConsoleRoute(app: Express): void {
   const EXEC_KIND_RE = /^(agentic-app|api-platform|evaluation|harness)$/;
 
   app.post('/api/console/engineering/:kind/:id/runs', execLimiter, (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'executions:run');
+  if (!_p) {
+    return;
+  }
     const kind = String(req.params.kind ?? '');
     const id = String(req.params.id ?? '');
     if (!EXEC_KIND_RE.test(kind)) {
@@ -1629,9 +1720,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.get('/api/console/engineering/executions', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     const limitRaw = Number(req.query.limit);
     const limit = Number.isFinite(limitRaw) ? Math.min(Math.max(Math.trunc(limitRaw), 1), 200) : 50;
     // Reconciliación perezosa (máx. 1 vez/min): los runs zombis se cierran
@@ -1650,9 +1742,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.post('/api/console/engineering/executions/reconcile', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:write');
+  if (!_p) {
+    return;
+  }
     reconcileExecutions()
       .then((r) => res.json({ ok: true, reconciled: r.reconciled, sandboxReachable: r.sandboxReachable }))
       .catch((err) => {
@@ -1662,9 +1755,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.get('/api/console/engineering/executions/:runId', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:read');
+  if (!_p) {
+    return;
+  }
     const runId = String(req.params.runId ?? '');
     getExecution(runId)
       .then((r) => (r ? res.json(r) : res.status(404).json({ error: 'run_not_found' })))
@@ -1675,9 +1769,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.post('/api/console/engineering/executions/:runId/cancel', (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'executions:cancel');
+  if (!_p) {
+    return;
+  }
     const runId = String(req.params.runId ?? '');
     cancelExecution(runId)
       .then((r) => (r.ok ? res.json({ ok: true, runId }) : res.status(404).json({ error: r.reason, status: r.status ?? null })))
@@ -1688,9 +1783,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.post('/api/console/engineering/quality/:kind/:id', execLimiter, (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:write');
+  if (!_p) {
+    return;
+  }
     const kind = String(req.params.kind ?? '');
     const id = String(req.params.id ?? '');
     if (!ID_RE.test(id)) {
@@ -1711,9 +1807,10 @@ export function registerConsoleRoute(app: Express): void {
   });
 
   app.post('/api/console/engineering/projects/:id/quality', execLimiter, (req, res) => {
-    if (!guard(res, consoleAuth(req))) {
-      return;
-    }
+  const _p = engGuard(res, req, 'engineering:write');
+  if (!_p) {
+    return;
+  }
     const id = String(req.params.id ?? '');
     if (!ID_RE.test(id)) {
       return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
@@ -1725,6 +1822,144 @@ export function registerConsoleRoute(app: Express): void {
         console.error('[UIEP] engineering_project_quality_failed', err);
         res.status(500).json({ error: 'engineering_quality_failed' });
       });
+  });
+
+  /* ── IAM (Misión FINAL): usuarios/tenants/roles + sesión de usuario ─────── */
+
+  app.post('/api/console/auth/login-user', (req, res) => {
+    const body = (req.body ?? {}) as { username?: unknown; password?: unknown };
+    if (typeof body.username !== 'string' || typeof body.password !== 'string') {
+      return void res.status(400).json({ error: 'faltan credenciales' });
+    }
+    const v = verifyUser(body.username, body.password);
+    if (!v.ok) {
+      return void res.status(401).json({ error: 'credenciales_inválidas' });
+    }
+    const token = signUserToken(v.user);
+    res.setHeader('set-cookie', `${USER_COOKIE_NAME}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${8 * 3600}`);
+    audit({ actor: { kind: 'user', id: v.user.username }, action: 'iam.login', correlation: { targetId: v.user.username }, detail: { tenant: v.user.tenantId, role: v.user.role } });
+    res.json({ authenticated: true, username: v.user.username, tenantId: v.user.tenantId, role: v.user.role });
+  });
+
+  app.get('/api/console/iam/me', (req, res) => {
+    const user = userAuth(req);
+    if (user) {
+      return void res.json({ principal: user, permissions: permissionsOf(user) });
+    }
+    if (consoleAuth(req) === 'ok') {
+      const adminPrincipal: UserPrincipal = { id: 'platform-admin', username: 'platform-admin', tenantId: 'platform', role: 'admin', via: 'console-admin' };
+      return void res.json({ principal: adminPrincipal, permissions: permissionsOf(adminPrincipal) });
+    }
+    res.status(401).json({ error: 'sin_sesión' });
+  });
+
+  app.get('/api/console/iam/users', (req, res) => {
+    const admin = authzGuard(res, authz(req), 'iam:manage');
+    if (!admin) {
+      return;
+    }
+    listUsers()
+      .then((users) => res.json({ count: users.length, users }))
+      .catch(() => res.status(500).json({ error: 'iam_users_failed' }));
+  });
+
+  app.post('/api/console/iam/users', (req, res) => {
+    const admin = authzGuard(res, authz(req), 'iam:manage');
+    if (!admin) {
+      return;
+    }
+    const body = (req.body ?? {}) as { username?: unknown; password?: unknown; tenantId?: unknown; role?: unknown };
+    if (typeof body.username !== 'string' || typeof body.password !== 'string' || typeof body.tenantId !== 'string' || typeof body.role !== 'string') {
+      return void res.status(400).json({ error: 'faltan campos (username/password/tenantId/role)' });
+    }
+    createUser({ username: body.username, password: body.password, tenantId: body.tenantId, role: body.role as never }, `console:${admin.username}`)
+      .then((r) => (r.ok ? res.status(201).json(r.user) : res.status(r.status).json({ error: r.reason })))
+      .catch(() => res.status(500).json({ error: 'iam_create_failed' }));
+  });
+
+  app.delete('/api/console/iam/users/:username', (req, res) => {
+    const admin = authzGuard(res, authz(req), 'iam:manage');
+    if (!admin) {
+      return;
+    }
+    deleteUser(String(req.params.username ?? ''), `console:${admin.username}`)
+      .then((r) => (r.ok ? res.json({ deleted: true }) : res.status(404).json({ error: r.reason })))
+      .catch(() => res.status(500).json({ error: 'iam_delete_failed' }));
+  });
+
+  /* ── Deployment Engine (Misión FINAL): despliegues controlados al sandbox ─ */
+
+  app.get('/api/console/engineering/deployments', (req, res) => {
+    const _pd = engGuard(res, req, 'engineering:read');
+    if (!_pd) {
+      return;
+    }
+    listDeployments(_pd)
+      .then((deps) => res.json({ count: deps.length, deployments: deps }))
+      .catch(() => res.status(500).json({ error: 'deployments_failed' }));
+  });
+
+  app.post('/api/console/engineering/deployments', execLimiter, (req, res) => {
+    const principal = authzGuard(res, authz(req), 'deployments:manage');
+    if (!principal) {
+      return;
+    }
+    const body = (req.body ?? {}) as { deploymentId?: unknown; kind?: unknown; id?: unknown; version?: unknown; timeoutMs?: unknown };
+    if (typeof body.kind !== 'string' || typeof body.id !== 'string') {
+      return void res.status(400).json({ error: 'faltan kind/id' });
+    }
+    deploy(
+      {
+        deploymentId: typeof body.deploymentId === 'string' ? body.deploymentId : undefined,
+        kind: body.kind as 'AgenticApp' | 'ApiPlatform',
+        id: body.id,
+        version: typeof body.version === 'string' ? body.version : undefined,
+        timeoutMs: typeof body.timeoutMs === 'number' ? body.timeoutMs : undefined,
+      },
+      principal,
+    )
+      .then((r) => (r.ok ? res.status(201).json(r.deployment) : res.status(r.status).json({ error: r.reason })))
+      .catch(() => res.status(500).json({ error: 'deployment_failed' }));
+  });
+
+  app.post('/api/console/engineering/deployments/:id/stop', (req, res) => {
+    const principal = authzGuard(res, authz(req), 'deployments:manage');
+    if (!principal) {
+      return;
+    }
+    stopDeployment(String(req.params.id ?? ''), principal)
+      .then((r) => (r.ok ? res.json({ ok: true, status: r.status }) : res.status(404).json({ error: r.reason })))
+      .catch(() => res.status(500).json({ error: 'deployment_stop_failed' }));
+  });
+
+  app.post('/api/console/engineering/deployments/:id/rollback', execLimiter, (req, res) => {
+    const principal = authzGuard(res, authz(req), 'deployments:manage');
+    if (!principal) {
+      return;
+    }
+    rollbackDeployment(String(req.params.id ?? ''), principal)
+      .then((r) => (r.ok ? res.json({ ok: true, deployment: r.deployment }) : res.status(r.status).json({ error: r.reason })))
+      .catch(() => res.status(500).json({ error: 'deployment_rollback_failed' }));
+  });
+
+  app.get('/api/console/engineering/deployments/:id/health', (req, res) => {
+    const _ph = engGuard(res, req, 'engineering:read');
+    if (!_ph) {
+      return;
+    }
+    deploymentHealthCheck(String(req.params.id ?? ''))
+      .then((h) => res.json(h))
+      .catch(() => res.status(500).json({ error: 'deployment_health_failed' }));
+  });
+
+  app.post('/api/console/engineering/deployments/:id/invoke', execLimiter, (req, res) => {
+    const principal = authzGuard(res, authz(req), 'executions:run');
+    if (!principal) {
+      return;
+    }
+    invokeDeployment(String(req.params.id ?? ''), (req.body ?? {}) as Record<string, unknown>)
+      .then((r) => (r.ok ? res.status(201).json(r.run) : res.status(r.status).json({ error: r.reason })))
+      .catch(() => res.status(500).json({ error: 'deployment_invoke_failed' }));
   });
 
 
