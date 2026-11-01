@@ -62,6 +62,7 @@ import {
   buildArtifactExport,
   buildGenerationExport,
   buildProjectExport,
+  readExportFile,
   writeExportFile,
   listExportFiles,
 } from '../services/engineering-export.service';
@@ -70,6 +71,7 @@ import {
   getExecution,
   listExecutions,
   cancelExecution,
+  reconcileExecutions,
 } from '../services/execution-orchestrator.service';
 import { runQualityChecks, runProjectQuality } from '../services/quality-engine.service';
 import { sandboxHealth, sandboxConfigured, sandboxInfo, SANDBOX_IMAGE } from '../services/sandbox-client.service';
@@ -1557,11 +1559,25 @@ export function registerConsoleRoute(app: Express): void {
       });
   });
 
+  app.get('/api/console/engineering/exports/:filename', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    readExportFile(String(req.params.filename ?? ''))
+      .then((r) => (r.ok ? res.json(r.bundle) : res.status(r.status).json({ error: r.reason })))
+      .catch((err) => {
+        console.error('[UIEP] engineering_export_read_failed', err);
+        res.status(500).json({ error: 'engineering_export_read_failed' });
+      });
+  });
+
   /* ── Execution Sandbox & Quality Engine (Misión 14) ────────────────────────
    * Ejecución aislada de artefactos (contenedor uiep-sandbox en red interna
    * sin salida), registro de ejecuciones con trazabilidad completa y motor
    * de calidad (schema+refs+security+behavior). Fail-closed: sin sandbox
    * configurado NADA se ejecuta en este proceso. */
+
+  let lastReconcileAt = 0;
 
   app.get('/api/console/engineering/sandbox', (req, res) => {
     if (!guard(res, consoleAuth(req))) {
@@ -1618,11 +1634,30 @@ export function registerConsoleRoute(app: Express): void {
     }
     const limitRaw = Number(req.query.limit);
     const limit = Number.isFinite(limitRaw) ? Math.min(Math.max(Math.trunc(limitRaw), 1), 200) : 50;
+    // Reconciliación perezosa (máx. 1 vez/min): los runs zombis se cierran
+    // antes de listar — la UI siempre muestra estado real.
+    const now = Date.now();
+    if (now - lastReconcileAt > 60_000) {
+      lastReconcileAt = now;
+      void reconcileExecutions().catch(() => undefined);
+    }
     listExecutions(limit)
-      .then((records) => res.json({ count: records.length, executions: records.map((r) => ({ runId: r.runId, kind: r.kind, artifact: r.artifact, status: r.status, durationMs: r.durationMs ?? null, startedAt: r.startedAt })) }))
+      .then((records) => res.json({ count: records.length, executions: records.map((r) => ({ runId: r.runId, kind: r.kind, artifact: r.artifact, status: r.status, durationMs: r.durationMs ?? null, startedAt: r.startedAt, error: r.error ?? null })) }))
       .catch((err) => {
         console.error('[UIEP] engineering_executions_list_failed', err);
         res.status(500).json({ error: 'engineering_executions_failed' });
+      });
+  });
+
+  app.post('/api/console/engineering/executions/reconcile', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    reconcileExecutions()
+      .then((r) => res.json({ ok: true, reconciled: r.reconciled, sandboxReachable: r.sandboxReachable }))
+      .catch((err) => {
+        console.error('[UIEP] engineering_executions_reconcile_failed', err);
+        res.status(500).json({ error: 'engineering_reconcile_failed' });
       });
   });
 

@@ -106,3 +106,23 @@ export async function sandboxHealth(): Promise<boolean> {
     return false;
   }
 }
+
+/** Jobs EN CURSO en el sandbox (para reconciliación de runs zombis). */
+export async function sandboxRunningJobs(): Promise<string[] | null> {
+  if (!sandboxConfigured()) {
+    return null;
+  }
+  try {
+    const res = await fetch(`${SANDBOX_URL}/v1/jobs`, {
+      headers: { authorization: `Bearer ${SANDBOX_TOKEN}` },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (res.status !== 200) {
+      return null;
+    }
+    const json = (await res.json()) as { running?: string[] };
+    return Array.isArray(json.running) ? json.running : null;
+  } catch {
+    return null;
+  }
+}

@@ -165,4 +165,10 @@ export async function cancelExecution(runId: string): Promise<{ ok: boolean; sta
   return res;
 }
 
+/** Reconciliación manual (desde la consola) o automática (intervalo del server). */
+export async function reconcileExecutions(): Promise<{ reconciled: string[]; sandboxReachable: boolean }> {
+  const { reconcileZombieExecutions } = await import('./execution-registry.service');
+  return reconcileZombieExecutions();
+}
+
 export { getExecution, listExecutions };

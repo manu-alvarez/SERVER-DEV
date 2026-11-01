@@ -151,3 +151,42 @@ export function tryAcquireExecutionSlot(max = 2): boolean {
 export function releaseExecutionSlot(): void {
   inFlight = Math.max(0, inFlight - 1);
 }
+
+/**
+ * Reconciliación de RUNS ZOMBIS (Misión 15): un run `running` cuyo job ya NO
+ * existe en el sandbox (el contenedor se reinició, el cliente murió a mitad,
+ * el proceso perdió la respuesta) se marca `failed` con error
+ * `orphan_reconciled` — sin inventar resultados. Solo se consulta el sandbox
+ * una vez por ciclo; si no responde, no se toca nada (fail-closed).
+ */
+export async function reconcileZombieExecutions(): Promise<{ reconciled: string[]; sandboxReachable: boolean }> {
+  const running = (await listExecutions(200)).filter((r) => r.status === 'running');
+  if (running.length === 0) {
+    return { reconciled: [], sandboxReachable: true };
+  }
+  const { sandboxRunningJobs } = await import('./sandbox-client.service');
+  const liveJobs = await sandboxRunningJobs();
+  if (liveJobs === null) {
+    return { reconciled: [], sandboxReachable: false }; // sandbox no disponible: NO se toca nada
+  }
+  const reconciled: string[] = [];
+  for (const rec of running) {
+    if (!liveJobs.includes(rec.runId)) {
+      const done = await updateExecution(rec.runId, {
+        status: 'failed',
+        finishedAt: new Date().toISOString(),
+        error: 'orphan_reconciled: el job ya no existe en el sandbox (reinicio del contenedor o respuesta perdida)',
+      });
+      audit({
+        actor: { kind: 'system' },
+        action: 'engineering.execution.reconcile',
+        correlation: { targetId: rec.runId },
+        detail: { kind: rec.kind, artifact: `${rec.artifact.kind}/${rec.artifact.id}` },
+      });
+      if (done) {
+        reconciled.push(rec.runId);
+      }
+    }
+  }
+  return { reconciled, sandboxReachable: true };
+}
