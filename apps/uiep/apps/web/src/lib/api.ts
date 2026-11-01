@@ -342,6 +342,176 @@ export interface IntegrationSummary {
 
 /* ── Endpoints ─────────────────────────────────────────────────────────────── */
 
+/* ── Engineering Control Center (M12–M15) ────────────────────────────────── */
+
+export interface CapabilityMatrix {
+  schema: boolean
+  generator: boolean
+  execution: boolean
+  validation: boolean
+}
+
+export interface CatalogEntry {
+  type: string
+  capabilities: CapabilityMatrix
+  via?: { generator?: string; execution?: string; validation?: string }
+  notes?: string
+}
+
+export interface GeneratorInfo {
+  type: string
+  label: string
+  docKind: string
+  outStore: 'specs' | 'engineering'
+  inputShape: string
+  capabilities: CapabilityMatrix | null
+}
+
+export type EngineeringOutcome = {
+  store: 'specs' | 'engineering'
+  specKind?: string
+  artifactKind?: string
+  id: string
+  version: string
+}
+
+export interface GenerationRecord {
+  id: string
+  type: string
+  status: 'succeeded' | 'failed'
+  startedAt: string
+  durationMs: number
+  inputHash: string
+  outputHash?: string
+  outcome?: EngineeringOutcome | null
+  extraOutcomes?: EngineeringOutcome[]
+  warnings?: string[]
+  children?: string[]
+  error?: { status?: number; code?: string; keys?: string[]; message?: string }
+  provenance?: { generator: { id: string; version: string }; generatedAt: string }
+}
+
+export interface GenerateOkResponse {
+  ok: true
+  generationId: string
+  type: string
+  outcome: EngineeringOutcome
+  extraOutcomes?: EngineeringOutcome[]
+  reused: boolean
+  warnings: string[]
+  provenance: { generator: { id: string; version: string }; generatedAt: string; inputHash: string; outputHash: string }
+  durationMs: number
+  children?: string[]
+}
+
+export interface ArtifactSummary {
+  kind: string
+  id: string
+  name: string
+  version: string
+  lifecycle: string
+  createdAt?: string
+}
+
+export interface ArtifactDetail {
+  kind: string
+  id: string
+  version: string
+  lifecycle: string
+  history: Array<{ from: string; to: string; at: string; actor: string; note?: string }>
+  versions: Array<{ version: string; createdAt: string | null }>
+  document: Record<string, unknown>
+}
+
+export interface ProjectSummary {
+  id: string
+  name?: string
+  version?: string
+  lifecycle?: string
+  artifacts?: number
+}
+
+export interface ProjectGraphRef {
+  artifact: { ref: string; type: string }
+  ref: string
+  expectedKind: string
+  found: boolean
+  kindMatch?: boolean
+  versionMatch?: boolean | null
+  registeredVersion?: string
+}
+
+export interface ProjectGraph {
+  artifacts: Array<{ ref: string; type: string; dependencies: Array<{ ref: string }> }>
+  specRefs: ProjectGraphRef[]
+}
+
+export interface CompositionArtifactResult {
+  ref: string
+  type: string
+  action: 'reused-existing' | 'reused-generated' | 'created'
+  specRef: { id: string; kind: string; version: string }
+  generationId?: string
+}
+
+export interface ExecutionRecord {
+  runId: string
+  kind: 'agentic-app' | 'api-request' | 'dataset' | 'harness' | 'quality'
+  artifact: { kind: string; id: string; version: string }
+  invocationSummary: Record<string, unknown>
+  status: 'queued' | 'running' | 'succeeded' | 'failed' | 'timeout' | 'cancelled'
+  sandbox: { image: string; mode: string }
+  limits: { timeoutMs: number }
+  startedAt: string
+  finishedAt?: string
+  durationMs?: number
+  result?: Record<string, unknown>
+  logs?: string[]
+  error?: string
+  cancelled?: boolean
+}
+
+export interface ExecutionListItem {
+  runId: string
+  kind: string
+  artifact: { kind: string; id: string; version: string }
+  status: ExecutionRecord['status']
+  durationMs: number | null
+  startedAt: string
+  error?: string | null
+}
+
+export interface QualityCheck {
+  dimension: 'schema' | 'references' | 'security' | 'behavior'
+  passed: boolean
+  detail: Record<string, unknown>
+}
+
+export interface QualityReport {
+  artifact: { kind: string; id: string; version: string }
+  verdict: 'pass' | 'fail'
+  checks: QualityCheck[]
+  behaviorRunId?: string
+  evaluatedAt: string
+}
+
+export interface ExportResult {
+  exported: boolean
+  format: string
+  filename: string
+  documents: string[]
+  sizeBytes: number
+  sha256: string
+}
+
+export interface SandboxStatus {
+  configured: boolean
+  healthy: boolean
+  mode: string
+  image: string
+  note: string
+}
+
 export const api = {
   /* Consola (BFF autenticado) */
   auth: {
@@ -429,4 +599,53 @@ export const api = {
       ),
   },
   health: () => get<{ ok?: boolean; status?: string }>('/api/health'),
+
+  /* Engineering Control Center (M12–M15 — consola) */
+  eng: {
+    catalog: () => get<CatalogEntry[]>('/api/console/engineering/catalog'),
+    generators: () => get<{ engineVersion: string; generators: GeneratorInfo[] }>('/api/console/engineering/generators'),
+    validate: (type: string, input: unknown) =>
+      post<{ ok: boolean; type: string; checks?: Array<{ name: string; passed: boolean }>; status?: number; errors?: Record<string, string[]> }>(
+        `/api/console/engineering/generators/${type}/validate`,
+        input,
+      ),
+    generate: (type: string, input: unknown) => post<GenerateOkResponse>('/api/console/engineering/generate', { type, input }),
+    generations: (limit = 30) => get<{ count: number; records: GenerationRecord[] }>(`/api/console/engineering/generations?limit=${limit}`),
+    generation: (id: string) => get<GenerationRecord>(`/api/console/engineering/generations/${id}`),
+    artifacts: () => get<{ count: number; artifacts: ArtifactSummary[] }>('/api/console/engineering/artifacts'),
+    artifact: (kind: string, id: string) => get<ArtifactDetail>(`/api/console/engineering/artifacts/${kind}/${id}`),
+    artifactLifecycle: (kind: string, id: string, to: string, note?: string) =>
+      post<{ ok: boolean; state: string }>(`/api/console/engineering/artifacts/${kind}/${id}/lifecycle`, { to, note }),
+    projects: () => get<ProjectSummary[] | { projects: ProjectSummary[] }>('/api/console/engineering/projects'),
+    project: (id: string) => get<Record<string, unknown>>(`/api/console/engineering/projects/${id}`),
+    projectGraph: (id: string) => get<ProjectGraph>(`/api/console/engineering/projects/${id}/graph`),
+    projectProvenance: (id: string) => get<Record<string, unknown>>(`/api/console/engineering/projects/${id}/provenance`),
+    projectLifecycle: (id: string, to: string, note?: string) =>
+      post<{ ok: boolean; state: string }>(`/api/console/engineering/projects/${id}/lifecycle`, { to, note }),
+    compose: (project: unknown) =>
+      post<{ ok: true; projectId: string; version: string; artifacts: CompositionArtifactResult[]; warnings: string[]; generationId: string; durationMs: number }>(
+        '/api/console/engineering/compositions',
+        project,
+      ),
+    sandbox: () => get<SandboxStatus>('/api/console/engineering/sandbox'),
+    run: (kind: string, id: string, invocation: Record<string, unknown>) =>
+      post<ExecutionRecord>(`/api/console/engineering/${kind}/${id}/runs`, { invocation }),
+    executions: (limit = 30) =>
+      get<{ count: number; executions: ExecutionListItem[] }>(`/api/console/engineering/executions?limit=${limit}`),
+    execution: (runId: string) => get<ExecutionRecord>(`/api/console/engineering/executions/${runId}`),
+    cancelExecution: (runId: string) => post<{ ok: boolean; runId: string }>(`/api/console/engineering/executions/${runId}/cancel`),
+    reconcile: () => post<{ ok: boolean; reconciled: string[]; sandboxReachable: boolean }>('/api/console/engineering/executions/reconcile'),
+    quality: (kind: string, id: string, behavior?: { agentSpecId: string; timeoutMs?: number }) =>
+      post<QualityReport>(`/api/console/engineering/quality/${kind}/${id}`, behavior ? { behavior } : {}),
+    projectQuality: (id: string, behavior: boolean) =>
+      post<{ ok: true; project: string; reports: Array<QualityReport | { artifact: string; error: string }> }>(
+        `/api/console/engineering/projects/${id}/quality`,
+        { behavior },
+      ),
+    exportProject: (id: string) => post<ExportResult>(`/api/console/engineering/projects/${id}/export`),
+    exportArtifact: (kind: string, id: string) => post<ExportResult>(`/api/console/engineering/artifacts/${kind}/${id}/export`),
+    exportGeneration: (id: string) => post<ExportResult>(`/api/console/engineering/generations/${id}/export`),
+    exports: () => get<{ count: number; files: Array<{ filename: string; sizeBytes: number; createdAt: string }> }>('/api/console/engineering/exports'),
+    exportFile: (filename: string) => get<unknown>(`/api/console/engineering/exports/${encodeURIComponent(filename)}`),
+  },
 }

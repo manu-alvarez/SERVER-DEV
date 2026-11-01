@@ -13,6 +13,13 @@ import Observability from './pages/Observability'
 import Project from './pages/Project'
 import Models from './pages/Models'
 import Tools from './pages/Tools'
+import Catalog from './pages/engineering/Catalog'
+import Generator from './pages/engineering/Generator'
+import Composer from './pages/engineering/Composer'
+import Registry from './pages/engineering/Registry'
+import Executions from './pages/engineering/Executions'
+import Quality from './pages/engineering/Quality'
+import Exports from './pages/engineering/Exports'
 
 /**
  * Routing con HashRouter: el estático se publica bajo dos superficies del
@@ -39,6 +46,13 @@ export default function App(): ReactNode {
           <Route path="/project" element={<Project />} />
           <Route path="/models" element={<Models />} />
           <Route path="/tools" element={<Tools />} />
+          <Route path="/engineering" element={<Catalog />} />
+          <Route path="/engineering/generar" element={<Generator />} />
+          <Route path="/engineering/compositor" element={<Composer />} />
+          <Route path="/engineering/registry" element={<Registry />} />
+          <Route path="/engineering/ejecuciones" element={<Executions />} />
+          <Route path="/engineering/calidad" element={<Quality />} />
+          <Route path="/engineering/export" element={<Exports />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

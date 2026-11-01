@@ -32,6 +32,13 @@ import ExpandIcon from '@mui/icons-material/ExpandMoreRounded'
 import IntegrationsIcon from '@mui/icons-material/Extension'
 import ObsIcon from '@mui/icons-material/Insights'
 import ProjectIcon from '@mui/icons-material/FolderCopy'
+import EngineeringIcon from '@mui/icons-material/Engineering'
+import GeneratorIcon from '@mui/icons-material/AutoAwesome'
+import ComposerIcon from '@mui/icons-material/AccountTreeRounded'
+import RegistryIcon from '@mui/icons-material/StorageRounded'
+import ExecIcon from '@mui/icons-material/PlayCircleOutlineRounded'
+import QualityIcon from '@mui/icons-material/VerifiedRounded'
+import ExportIcon from '@mui/icons-material/IosShareRounded'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import LogoutIcon from '@mui/icons-material/Logout'
@@ -47,6 +54,13 @@ const NAV_TRABAJO = [
 ]
 
 const NAV_AVANZADO = [
+  { to: '/engineering', icon: <EngineeringIcon sx={{ color: 'text.secondary' }} />, label: 'Ingeniería · Catálogo' },
+  { to: '/engineering/generar', icon: <GeneratorIcon sx={{ color: 'text.secondary' }} />, label: 'Ingeniería · Generar' },
+  { to: '/engineering/compositor', icon: <ComposerIcon sx={{ color: 'text.secondary' }} />, label: 'Ingeniería · Compositor' },
+  { to: '/engineering/registry', icon: <RegistryIcon sx={{ color: 'text.secondary' }} />, label: 'Ingeniería · Registry' },
+  { to: '/engineering/ejecuciones', icon: <ExecIcon sx={{ color: 'text.secondary' }} />, label: 'Ingeniería · Ejecuciones' },
+  { to: '/engineering/calidad', icon: <QualityIcon sx={{ color: 'text.secondary' }} />, label: 'Ingeniería · Calidad' },
+  { to: '/engineering/export', icon: <ExportIcon sx={{ color: 'text.secondary' }} />, label: 'Ingeniería · Export' },
   { to: '/models', icon: <MemoryIcon sx={{ color: 'text.secondary' }} />, label: 'Modelos' },
   { to: '/tools', icon: <BuildIcon sx={{ color: 'text.secondary' }} />, label: 'Herramientas' },
   { to: '/integrations', icon: <IntegrationsIcon sx={{ color: 'text.secondary' }} />, label: 'Integraciones' },
