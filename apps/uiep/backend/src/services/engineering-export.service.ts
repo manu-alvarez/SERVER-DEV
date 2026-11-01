@@ -216,9 +216,19 @@ function finalize(bundle: ExportBundle, filenameRaw: string): ExportResult {
 }
 
 /** Genera el ZIP del bundle (STORED sin compresión, sin dependencias): los
- *  documentos + README + manifest con hashes. Determinista. */
+ *  documentos + README + manifest con hashes. Determinista. Los SourceProject
+ *  se EXPANDEN: sus files van como ficheros planos (proyecto listo para build). */
 export function bundleToZip(result: ExportResult): Buffer {
-  const entries = Object.entries(result.bundle.documents).map(([p, doc]) => ({ path: p, content: JSON.stringify(doc, null, 2) }));
+  const entries: Array<{ path: string; content: string }> = [];
+  for (const [p, doc] of Object.entries(result.bundle.documents)) {
+    entries.push({ path: p, content: JSON.stringify(doc, null, 2) });
+    const spec = (doc as { spec?: { files?: Record<string, string>; runtime?: string } }).spec;
+    if (spec?.files && spec.runtime === 'node-express') {
+      for (const [fp, content] of Object.entries(spec.files)) {
+        entries.push({ path: `codigo/${fp}`, content });
+      }
+    }
+  }
   entries.push({ path: 'README.md', content: result.bundle.readme });
   entries.push({
     path: 'manifest.json',
