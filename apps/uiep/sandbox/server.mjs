@@ -407,6 +407,10 @@ const server = createServer(async (req, res) => {
     if (req.method === 'GET' && url === '/v1/health') {
       return send(res, 200, { ok: true, sandbox: 'uiep-execution', running: jobs.size, limits: { maxConcurrent: LIMITS.maxConcurrent, maxJobMs: LIMITS.maxJobMs } });
     }
+    if (req.method === 'GET' && url === '/v1/jobs') {
+      // Lista de jobs EN CURSO (para reconciliación de runs zombis del backend).
+      return send(res, 200, { running: [...jobs.keys()], count: jobs.size });
+    }
     if (!authOk(req)) {
       return send(res, TOKEN ? 401 : 503, { error: TOKEN ? 'unauthorized' : 'sandbox_disabled' });
     }
