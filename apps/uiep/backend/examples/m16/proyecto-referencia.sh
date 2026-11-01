@@ -27,11 +27,22 @@ else
 fi
 B="$BASE/console"
 
-# j(): parsear JSON sin dependencias.
-j() { python3 -c "import json,sys; j=json.load(sys.stdin); $1"; }
+# j(): parsear JSON sin dependencias; si la respuesta no tiene el campo
+# esperado, muestra la respuesta cruda (rate limits, errores del BFF...).
+j() {
+  local payload
+  payload=$(cat)
+  if ! python3 -c "import json,sys; j=json.loads(sys.argv[1]); $1" "$payload" 2>/dev/null; then
+    echo "   [respuesta inesperada del BFF]" "$payload" | head -c 300
+    echo
+    exit 1
+  fi
+}
 
-gen() { # gen <type> <json>
-  curl -s -b "$COOKIE" -X POST "$B/engineering/generate" -H 'content-type: application/json' -H 'x-uiep-console: 1' -d "$2" \
+gen() { # gen <type> <json-de-entrada> — envuelve en el envelope del BFF
+  local envelope
+  envelope=$(python3 -c 'import json,sys; print(json.dumps({"type": sys.argv[1], "input": json.loads(sys.argv[2])}))' "$1" "$2")
+  curl -s -b "$COOKIE" -X POST "$B/engineering/generate" -H 'content-type: application/json' -H 'x-uiep-console: 1' -d "$envelope" \
     | j "print('$1 →', j['outcome'].get('specKind') or j['outcome'].get('artifactKind'), j['outcome']['id']+'@'+j['outcome']['version'], '(reutilizado)' if j['reused'] else '(creado)')"
 }
 
