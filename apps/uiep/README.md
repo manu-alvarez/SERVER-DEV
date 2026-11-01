@@ -45,27 +45,28 @@ Requisitos: node 22 + pnpm 9.15.0 (corepack) + docker + Ollama accesible
 | Backup | Automático diario 04:17 (`infrastructure/backup/uiep-backup.sh`, retención 14 d) |
 | Restaurar | Procedimiento en `PHASE42-HARDENING.md` (contenedor aislado, verificado) |
 | Evaluación RAG | `corepack pnpm --filter uiep-backend eval:rag` (gate) · `eval:rag:real` (proveedor real) |
-| Tests | `corepack pnpm --filter uiep-backend test` (219/219 — incluye el GATE de calidad, 29 de M12 y 8 de M13) |
+| Tests | `corepack pnpm --filter uiep-backend test` (228/228 — GATE + M12 29 + M13 8 + M14 9) |
 | Desplegar | push a main → en VPS: `git fetch && git reset --hard origin/main` → install → build → compose build+up → **verificar binario servido** (`docker exec … grep`) |
 | Rollback | anclas de imagen (`rollback-*`) o rebuild desde el commit de la fase (matriz abajo) |
 
-## Matriz de trazabilidad / rollback (v1.0 → v1.4)
+## Matriz de trazabilidad / rollback (v1.0 → v1.5)
 
 | Versión | Estado | Commit | Frontend (www/app/uiep) | Backend (imagen) |
 |---|---|---|---|---|
-| **1.4.0** | **publicada** (`uiep-1.4.0`) | `cfb9028` (Misión 13: api-platform/application/agentic-app/saas + framework módulos; engine 1.1.0) | bundle `index-CEji4u03.js` (sin cambios en 1.3/1.4) | **`msbrossai-uiep-backend:latest`** = `sha256:e6dbc822c3108c5a…` |
-| 1.3.0 | histórica (`uiep-1.3.0`) | `420bea4` (Misión 12: Generator Engine + composición + export) | bundle `index-CEji4u03.js` (sin cambios en 1.3) | **ancla `1.3.0`** = `a24d6a448492…` |
+| **1.5.0** | **publicada** (`uiep-1.5.0`) | `6b6dc34` (M14: Execution Sandbox & Quality Engine) | bundle `index-CEji4u03.js` (sin cambios en 1.3–1.5) | **`msbrossai-uiep-backend:latest`** = `sha256:1f3fe0a266d7…` + **nuevo contenedor `uiep-sandbox`** (`msbrossai-uiep-sandbox` = `sha256:48764495cad2…`) |
+| 1.4.0 | histórica (`uiep-1.4.0`) | `cfb9028` (Misión 13: api-platform/application/agentic-app/saas + framework módulos; engine 1.1.0) | bundle `index-CEji4u03.js` (sin cambios en 1.3/1.4) | **ancla `1.4.0`** = `e6dbc822c310` |
+| 1.3.0 | histórica (`uiep-1.3.0`) | `420bea4` (Misión 12: Generator Engine + composición + export) | bundle `index-CEji4u03.js` (sin cambios en 1.3) | **ancla `1.3.0`** = `a24d6a448492` |
 | 1.2.0 | histórica (`uiep-1.2.0`) | `f70497b` (Misión 11: UES + Registry + Blueprint v1) | bundle `index-CEji4u03.js` (sin cambios en 1.2) | **ancla `1.2.0`** = `49228b89eada` |
 | 1.1.0 | histórica (`uiep-1.1.0` = `b4f12a1`) | merge `33287f1` + fix `e773d08` | bundle `index-CEji4u03.js` + `BUILD-INFO.json` | imagen de 1.0.1 (`0286002…`) — **perdida por GC del host**; ancla reconstruida (ver abajo) |
 | 1.0.1 | **histórica congelada** (`uiep-1.0.1` = `44431f5`) | RAG 0.70 | bundle `index-DbWra3SD.js` (sustituido) | **ancla reconstruida `1.0.1`** = `128cfd74a443` (fuente-equivalente a la perdida `0286002…`) |
 | 1.0.0 | **histórica congelada** (`uiep-1.0.0` = `e1d2d39`) | cierre 1.0 | — | **`msbrossai-uiep-backend:1.0.0`** = `4ea095d6f29a` (original, intacta) |
 | Ancla previa | — | — | — | `rollback-fase3` = `3b601c4c898e` (desde commit `8dce03b`) |
 
-**Rollback 1.4.0 → 1.3.0**:
-1. La 1.4.0 cambió SOLO el backend (el frontend/bundle es el mismo de 1.1.0): `docker tag msbrossai-uiep-backend:1.3.0 msbrossai-uiep-backend:latest && docker compose -p infrastructure -f infrastructure/docker-compose.yml up -d --force-recreate uiep-backend` (segundos, datos intactos en el volumen).
+**Rollback 1.5.0 → 1.4.0**:
+1. La 1.5.0 cambió el backend y AÑADIÓ el contenedor sandbox: `docker tag msbrossai-uiep-backend:1.4.0 msbrossai-uiep-backend:latest && docker compose -p infrastructure -f infrastructure/docker-compose.yml up -d --force-recreate uiep-backend` y `docker compose -p infrastructure -f infrastructure/docker-compose.yml stop uiep-sandbox` (el backend queda fail-closed: sin SANDBOX_URL activo, las ejecuciones responden 503 y NADA se ejecuta en el proceso principal).
 2. Si hiciera falta reconstruir desde commit: `git worktree add /tmp/ancla <commit>` → `docker build -t msbrossai-uiep-backend:<tag> -f apps/uiep/backend/Dockerfile apps/uiep` → tag+up — NUNCA `compose build` sobre un checkout viejo (retag de `:latest`, incidente Fase 8/9) y NUNCA `docker image prune -a`.
 3. Los datos viven en el volumen `uiep-backend-data` — intactos en cualquier rollback de código.
-4. **Lección 1.2.0**: la imagen `0286002…` (1.0.1) desapareció del VPS sin prune manual (GC de BuildKit/cron del host sospechoso) — por eso existen ahora 6 anclas etiquetadas (1.0.0, 1.0.1, 1.2.0, 1.3.0, 1.4.0 y rollback-fase3) y el paso 2 está probado. **Nota 1.3.0**: el contenedor `uiep-backend` pertenece al proyecto compose `infrastructure` (label) — recrear con `-p infrastructure` o `--force-recreate` da conflicto de nombre si se omite.
+4. **Lección 1.2.0**: la imagen `0286002…` (1.0.1) desapareció del VPS sin prune manual (GC de BuildKit/cron del host sospechoso) — por eso existen ahora 7 anclas etiquetadas (1.0.0, 1.0.1, 1.2.0, 1.3.0, 1.4.0, 1.5.0 y rollback-fase3) y el paso 2 está probado. **Nota 1.3.0**: el contenedor `uiep-backend` pertenece al proyecto compose `infrastructure` (label) — recrear con `-p infrastructure` o `--force-recreate` da conflicto de nombre si se omite. **Nota 1.5.0**: `docker compose -f infrastructure/docker-compose.yml` busca el `.env` en `infrastructure/` (dirname del primer -f), NO en el CWD — usar `--env-file .env` (o `--project-directory .`) para interpolar los tokens del sandbox.
 
 **Semántica de versionado (inequívoca)**: `BUILD-INFO.json → sourceCommit` identifica SIEMPRE el commit que **produjo el artefacto servido** (el bundle si cambió el frontend — en 1.1.0: `e773d08` — o la imagen backend si solo cambió el backend — en 1.2.0 `f70497b` y en 1.3.0 `420bea4`); el **tag de release** (`uiep-1.1.0` = `b4f12a1`, `uiep-1.3.0` = el commit de docs) identifica el **estado final de `main` publicado**, incluida la documentación. Cuando el artefacto y la publicación coinciden en el mismo commit, ambos apuntan igual. (Definido en la Misión 10; campo `releaseTag` previsto para el Registry de M11+.)
 

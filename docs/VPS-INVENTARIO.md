@@ -36,7 +36,8 @@ PM2 (host): nikolina-livekit-server (LiveKit 7880/7881)
 
 | Contenedor | Imagen | Proyecto |
 |---|---|---|
-| uiep-backend | msbrossai-uiep-backend:latest (prod 1.4.0 = `e6dbc82…` = cfb9028; anclas: 1.3.0 = `a24d6a4…` = 420bea4, 1.2.0 = `49228b8…` = f70497b, 1.0.1 = `128cfd7…` reconstruida, 1.0.0 = `4ea095d6`) | **UIEP** (apps/uiep) — *1.4.0: Application & System Generators (16 generadores: api-platform/application/agentic-app/saas + framework módulos)* |
+| uiep-backend | msbrossai-uiep-backend:latest (prod 1.5.0 = `1f3fe0a…` = 6b6dc34; anclas: 1.4.0 = `e6dbc82…` = cfb9028, 1.3.0 = `a24d6a4…`, 1.2.0 = `49228b8…`, 1.0.1 = `128cfd7…` reconstruida, 1.0.0 = `4ea095d6`) | **UIEP** (apps/uiep) — *1.5.0: Execution Sandbox & Quality Engine* |
+| uiep-sandbox | msbrossai-uiep-sandbox:latest (`48764495…`), aislado: read-only + cap_drop ALL + red interna sin salida + pids/mem duros | **UIEP M14** — intérprete de artefactos; callbacks SOLO a uiep-backend:4000 vía runner con token |
 | msbross-proxy | node:22-alpine | infrastructure/msbross-proxy |
 | traefik | traefik:latest | perímetro |
 | portainer | portainer-ce:lts | administración (sin puertos publicados) |
