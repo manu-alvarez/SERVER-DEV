@@ -294,6 +294,104 @@ app.get('/api/visits-badge', (req, res) => {
 
 // ── Contact Message Endpoint ──
 const messagesFile = path.join(__dirname, '../../data', 'messages.json');
+
+/**
+ * Notificación por EMAIL del formulario "Hablemos" (cierre manuelalvarez.dev):
+ * cada mensaje recibido se envía vía sendmail local (postfix ya activo en el
+ * VPS — entrega directa verificada a hotmail con 250). Sin dependencias npm.
+ *
+ * Seguridad: los valores del formulario van al CUERPO; en las cabeceras solo
+ * van valores SANITIZADOS (sin \r\n → anti inyección de cabeceras) y el
+ * remitente del formulario viaja en Reply-To (nunca en From).
+ */
+const CONTACT_NOTIFY_TO = (process.env.CONTACT_NOTIFY_TO || 'manuelalvarezdianez@hotmail.com').split(',').map(s => s.trim()).filter(Boolean);
+const smtpNet = require('net');
+const smtpDns = require('dns');
+
+function sanitizeHeader(value) {
+  return String(value).replace(/[\r\n]+/g, ' ').replace(/[<>]/g, '').trim();
+}
+
+/** Diálogo SMTP DIRECTO al MX del dominio destino (node puro: net+dns).
+ *  El VPS ya entrega a hotmail con 250 (PTR de contabo verificado). */
+function smtpDeliver(fromAddr, toAddr, message, cb) {
+  const domain = toAddr.split('@')[1];
+  smtpDns.resolveMx(domain, (err, mxList) => {
+    if (err || !mxList || mxList.length === 0) {
+      return cb(new Error(`sin_MX_para_${domain}`));
+    }
+    const mx = mxList.sort((a, b) => a.priority - b.priority)[0].exchange;
+    const sock = smtpNet.createConnection(25, mx, () => {});
+    const steps = [
+      { expect: /^220/, send: `EHLO vmi3330796.contaboserver.net\r\n` },
+      { expect: /^250/, send: `MAIL FROM:<${fromAddr}>\r\n` },
+      { expect: /^250/, send: `RCPT TO:<${toAddr}>\r\n` },
+      { expect: /^250/, send: `DATA\r\n` },
+      { expect: /^354/, send: message + (/\r\n$/.test(message) ? '' : '\r\n') + '.\r\n' },
+      { expect: /^250/, send: `QUIT\r\n` },
+    ];
+    let step = 0;
+    let buffer = '';
+    sock.setTimeout(30000, () => { sock.destroy(); cb(new Error('smtp_timeout')); });
+    sock.on('data', (d) => {
+      buffer += d.toString();
+      const stepDef = steps[step];
+      if (!stepDef) {
+        return;
+      }
+      const lastLine = buffer.split(/\r?\n/).filter(Boolean).pop() || '';
+      if (!stepDef.expect.test(lastLine)) {
+        return; // respuesta multilinea (EHLO): esperar la última línea
+      }
+      buffer = '';
+      step += 1;
+      if (step >= steps.length) {
+        sock.end();
+        return cb(null, 'aceptado_por_MX');
+      }
+      sock.write(steps[step].send);
+    });
+    sock.on('error', (e) => cb(e));
+    sock.on('close', () => { if (step < steps.length) cb(new Error(`smtp_cerrado_temprano_paso_${step}`)); });
+  });
+}
+
+function notifyContactByEmail(msgEntry) {
+  const headers = [
+    `From: Web manuelalvarez.dev <contacto@manuelalvarez.dev>`,
+    `To: ${CONTACT_NOTIFY_TO.join(', ')}`,
+    `Reply-To: ${sanitizeHeader(msgEntry.email)}`,
+    `Subject: [web] ${sanitizeHeader(msgEntry.subject).slice(0, 120)}`,
+    `X-UIEP-Contact-Id: ${sanitizeHeader(msgEntry.id)}`,
+    'MIME-Version: 1.0',
+    'Content-Type: text/plain; charset=UTF-8',
+  ].join('\r\n');
+  const body = [
+    'Nuevo mensaje recibido en manuelalvarez.dev (formulario "Hablemos")',
+    '──────────────────────────────────────────',
+    `Fecha: ${msgEntry.date}`,
+    `Nombre: ${msgEntry.name}`,
+    `Email: ${msgEntry.email}`,
+    `Asunto: ${msgEntry.subject}`,
+    `IP: ${msgEntry.ip}`,
+    '',
+    msgEntry.message,
+    '',
+    '──────────────────────────────────────────',
+    'También queda guardado en data/messages.json (VPS).',
+  ].join('\r\n');
+  const full = headers + '\r\n\r\n' + body;
+  for (const to of CONTACT_NOTIFY_TO) {
+    smtpDeliver('contacto@manuelalvarez.dev', to, full, (err, info) => {
+      if (err) {
+        console.error(`[Contact Error] notificación a ${to} fallida: ${err.message}`);
+      } else {
+        console.log(`[Contact] Email de notificación entregado al MX de ${to} (mensaje ${msgEntry.id}): ${info}`);
+      }
+    });
+  }
+}
+
 app.post('/api/contact', express.json(), (req, res) => {
   const { name, email, subject, message } = req.body || {};
   if (!name || !email || !message) {
@@ -320,6 +418,7 @@ app.post('/api/contact', express.json(), (req, res) => {
     existing.unshift(msgEntry);
     fs.writeFileSync(messagesFile, JSON.stringify(existing.slice(0, 500), null, 2));
     console.log(`[Contact] Mensaje recibido de ${msgEntry.name} <${msgEntry.email}>`);
+    notifyContactByEmail(msgEntry);
     return res.json({ success: true, message: '¡Mensaje recibido correctamente! Manuel se pondrá en contacto pronto.' });
   } catch (err) {
     console.error('[Contact Error]', err);
