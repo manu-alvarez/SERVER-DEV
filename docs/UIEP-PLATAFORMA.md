@@ -1,8 +1,14 @@
 # UIEP — Plataforma Universal de Ingeniería de IA
 
+> **⚠️ PRODUCTION FREEZE — uiep-1.8.0 (2026-11-01)**
+> El proyecto queda **CERRADO Y CONGELADO**: estable, respaldado y en producción.
+> Commit del release: `d3baf08` · tag `uiep-1.8.0` · backend `sha256:6814a6266f70…`
+> Cualquier modificación futura requiere una decisión expresa y un nuevo alcance.
+> (Este documento describe la plataforma tal cual está desplegada.)
+
 > **Guía de inicio y arquitectura** — todo lo necesario para entender y usar
 > UIEP sin depender del historial de desarrollo. Versión de este documento:
-> `uiep-1.7.0`.
+> `uiep-1.8.0` (release congelado).
 
 ## Qué es UIEP
 
@@ -124,7 +130,22 @@ Contratos de API completos: `docs/UIEP-M12-CONTRATOS.md`,
 
 ## Suite de pruebas
 
-- Backend: `corepack pnpm --filter uiep-backend test` → 235 tests (235/235).
+- Backend: `corepack pnpm --filter uiep-backend test` → 240 tests (240/240).
 - Frontend: `corepack pnpm --filter "@uiep/web" test` → 13 tests vitest.
 - E2E plataforma: `dist/tests/e2e-platform.test.js` (ciclo completo).
 - Proyecto de referencia reproducible: `apps/uiep/backend/examples/m16/proyecto-referencia.sh`.
+
+## Estado definitivo del release (PRODUCTION FREEZE)
+
+| Elemento | Valor |
+|---|---|
+| Versión final | **1.8.0** |
+| Tag / commit | `uiep-1.8.0` → `d3baf08` (local y GitHub verificados) |
+| Backend | `msbrossai-uiep-backend:1.8.0` = `sha256:6814a6266f70…` |
+| Sandbox | `msbrossai-uiep-sandbox:1.8.0` = `sha256:d2f9cd47c6cf…` |
+| Frontend | bundle `index-CjCgK9vr.js` (BUILD-INFO sourceCommit `22c5d2d`) |
+| Backup final | `uiep-data-2026-11-01-1811.tgz` — 124,647 bytes — sha256 `363e9652d0af26db…` — VPS `/home/ubuntu/backups/uiep/` + iCloud `backups-local/uiep/` (mismo hash verificado en ambas) |
+| Restauración | extraer tgz + `docker run --rm -v <datos>:/app/data:ro -p 127.0.0.1:4999:4000` (probada en M16/M17) |
+| Rollback | retag de ancla (1.0.0→1.7.0 conservadas) + `up -d --force-recreate` con `-p infrastructure` y `--env-file .env` |
+| Verificación de cierre | 240 backend + 13 frontend verdes · 11 APIs 200 · auth 401 sin sesión · aislamiento sandbox inspeccionado · contenedores ajenos intactos |
+

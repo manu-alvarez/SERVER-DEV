@@ -1,5 +1,9 @@
 # UIEP — Decisiones y lecciones (M11 → M17 / uiep-1.8.0)
 
+> **PRODUCTION FREEZE 2026-11-01**: este registro queda CONGELADO con el
+> release `uiep-1.8.0` (commit `d3baf08`). Refleja el estado definitivo
+> desplegado y verificado.
+
 Registro versionado de las decisiones técnicas y lecciones operativas
 acumuladas. Conservado EN EL REPOSITORIO (no en memoria externa) según la
 directiva de la misión final.
