@@ -1,0 +1,5 @@
+{
+  "kind": "api-platform",
+  "id": "m13-api-tickets",
+  "invocation": { "endpointId": "listar-tickets", "method": "GET", "body": {} }
+}
