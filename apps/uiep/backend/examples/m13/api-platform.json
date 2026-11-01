@@ -1,6 +1,7 @@
 {
   "type": "api-platform",
   "input": {
+    "id": "m13-api-tickets",
     "name": "API Soporte M13",
     "description": "Contratos REST del módulo de soporte (ejemplo de la Misión 13).",
     "auth": "console-session",

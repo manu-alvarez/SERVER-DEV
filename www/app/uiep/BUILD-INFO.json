@@ -1,12 +1,12 @@
 {
   "project": "uiep-control-center",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "source": "https://github.com/manu-alvarez/SERVER-DEV (apps/uiep)",
-  "sourceCommit": "420bea4",
-  "releaseTag": "uiep-1.3.0",
-  "changedIn12": "backend (Generator Engine + composición + export uiep-export-v1); frontend sin cambios (bundle index-CEji4u03.js desde e773d08/1.1.0)",
-  "backendImage": "msbrossai-uiep-backend:latest sha256:a24d6a448492add7415599f7a672999f718e902b6ef15618e79a8a0919e7b1bb",
-  "builtAt": "2026-11-01T14:05:00Z",
+  "sourceCommit": "cfb9028",
+  "releaseTag": "uiep-1.4.0",
+  "changedIn13": "backend (Application & System Generators: api-platform/application/agentic-app/saas + framework con módulos, engine 1.1.0 con 16 generadores); frontend sin cambios (bundle index-CEji4u03.js desde e773d08/1.1.0)",
+  "backendImage": "msbrossai-uiep-backend:latest sha256:e6dbc822c3108c5a6fa5db612ad4efca817488c328fd70ba1af6365fb6978868",
+  "builtAt": "2026-11-01T15:05:00Z",
   "deployedTo": "www/app/uiep + contenedor uiep-backend (VPS manuelalvarez.dev)",
-  "notes": "Misión 12 — Universal Artifact Generators: engineering-generator (12 generadores deterministas: agent/workflow de runtime ejecutables en data/specs + 8 kinds de documento en data/engineering/artifacts, upserts fail-closed id@version con bump opcional, registros de generación con hashes), engineering-composition (proyectos UES por composición: specRef reutiliza, generate delega, tokens $ref, orden topológico, rollback lógico), engineering-export (bundle uiep-export-v1 reinstalable con README), 14 rutas BFF nuevas con genLimiter, catálogo honesto (execution=false para evaluation/harness/mcp-server hasta el sandbox de M14), 211 tests. Compatibilidad total con specs v1 y datos existentes (28 specs previos + 5 generados, proyecto-referencia-m11 intacto)."
+  "notes": "Misión 13 — Application & System Generators: mismo motor universal de M12 ampliado a 16 generadores. api-platform (contratos tipados + validación declarativa + openapiLike determinista + agentBinding a agentes reales), application (módulos con componentRefs verificados, entryModule, envVarNames sin valores, grafo acíclico), agentic-app (SOLO componentes ejecutables: agentes propios o subgenerados, workflows, tools, knowledge reales), saas (módulos + roles + tenancy multi-tenant-ready declarativa) y framework con módulos. Composición end-to-end (api→application→agentic-app→saas con tokens $ref), export uiep-export-v1 de proyectos completos, ejemplos funcionales en backend/examples/m13, 219 tests. Honestidad: execution=false (sandbox M14); los componentes agénticos listados SÍ corren hoy."
 }
