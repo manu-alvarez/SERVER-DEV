@@ -62,19 +62,21 @@ after(() => {
   MOCK?.server.close();
 });
 
-test('catálogo de generadores: 12 tipos con capacidades honestas del registro', () => {
+test('catálogo de generadores: 16 tipos con capacidades honestas del registro', () => {
   const gens = listGenerators();
-  assert.equal(gens.length, 12);
+  assert.equal(gens.length, 16, '12 de M12 + 4 de M13 (api-platform/application/agentic-app/saas)');
   const types = gens.map((g) => g.type);
-  for (const t of ['agent', 'workflow', 'multi-agent-system', 'prompt-system', 'tool-collection', 'knowledge-base', 'rag-system', 'mcp-server', 'skill-pack', 'evaluation', 'harness', 'framework']) {
+  for (const t of ['agent', 'workflow', 'multi-agent-system', 'prompt-system', 'tool-collection', 'knowledge-base', 'rag-system', 'mcp-server', 'skill-pack', 'evaluation', 'harness', 'framework', 'api-platform', 'application', 'agentic-app', 'saas']) {
     assert.ok(types.includes(t), `falta el generador ${t}`);
   }
+  const saas = gens.find((g) => g.type === 'saas')!;
+  assert.equal(saas.capabilities?.execution, false, 'honestidad: tenancy declarativa (real → M14+)');
   const evaluation = gens.find((g) => g.type === 'evaluation')!;
   assert.equal(evaluation.capabilities?.execution, false, 'humildad: la ejecución de datasets → M14');
   const harness = gens.find((g) => g.type === 'harness')!;
   assert.equal(harness.capabilities?.execution, false);
   assert.equal(describeGenerator('no-existe'), null);
-  assert.equal(GENERATOR_ENGINE_VERSION, '1.0.0');
+  assert.equal(GENERATOR_ENGINE_VERSION, '1.1.0');
 });
 
 test('validación dry-run NO escribe (agent con referencias rotas y válidas)', async () => {

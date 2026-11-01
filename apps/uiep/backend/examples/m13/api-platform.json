@@ -1,0 +1,31 @@
+{
+  "type": "api-platform",
+  "input": {
+    "name": "API Soporte M13",
+    "description": "Contratos REST del módulo de soporte (ejemplo de la Misión 13).",
+    "auth": "console-session",
+    "endpoints": [
+      {
+        "id": "listar-tickets",
+        "method": "GET",
+        "path": "/api/tickets",
+        "summary": "lista tickets abiertos",
+        "response": [
+          { "name": "items", "type": "array" },
+          { "name": "total", "type": "number", "constraints": [{ "kind": "min", "value": 0 }] }
+        ],
+        "errors": [{ "status": 401, "code": "unauthorized", "when": "sin sesión" }],
+        "agentBinding": "m13-agente-api"
+      },
+      {
+        "id": "crear-ticket",
+        "method": "POST",
+        "path": "/api/tickets",
+        "summary": "crea un ticket",
+        "request": [{ "name": "titulo", "type": "string", "constraints": [{ "kind": "maxLength", "value": 120 }] }],
+        "errors": [{ "status": 422, "code": "invalid_input", "when": "título vacío" }],
+        "rateLimit": { "max": 30, "windowMs": 60000 }
+      }
+    ]
+  }
+}

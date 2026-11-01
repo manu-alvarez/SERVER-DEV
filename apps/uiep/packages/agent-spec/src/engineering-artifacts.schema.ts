@@ -346,6 +346,203 @@ export type MultiAgentSystemV1 = z.infer<typeof MultiAgentSystemV1Schema>;
 export type EvaluationDatasetV1 = z.infer<typeof EvaluationDatasetV1Schema>;
 export type HarnessV1 = z.infer<typeof HarnessV1Schema>;
 
+/* ── Api Platform (Misión 13): contratos REST tipados con validación declarativa ─ */
+
+export const ApiFieldSchema = z.object({
+  name: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_]{0,63}$/),
+  type: z.enum(['string', 'number', 'boolean', 'object', 'array']),
+  required: z.boolean().default(true),
+  /** Restricciones declarativas (se VALIDAN en el doc; sin código). */
+  constraints: z
+    .array(z.object({ kind: z.enum(['min', 'max', 'pattern', 'enum', 'maxLength']), value: z.union([z.string().max(200), z.number()]) }))
+    .max(8)
+    .default([]),
+  description: z.string().max(200).optional(),
+});
+
+export const ApiPlatformV1Schema = z
+  .object({
+    apiVersion: EngineeringApiVersionSchema,
+    kind: z.literal('ApiPlatform'),
+    metadata: MetadataSchema,
+    spec: z.object({
+      title: z.string().min(1).max(120),
+      description: z.string().max(500).optional(),
+      auth: z
+        .object({
+          type: z.enum(['console-session', 'bearer', 'none']).default('console-session'),
+          csrfHeader: z.string().max(60).optional(),
+        })
+        .default({ type: 'console-session' }),
+      endpoints: z
+        .array(
+          z.object({
+            id: EntityIdSchema,
+            method: z.enum(['GET', 'POST', 'PUT', 'PATCH', 'DELETE']),
+            path: z.string().min(1).max(200),
+            summary: z.string().min(1).max(200),
+            request: z.array(ApiFieldSchema).max(16).default([]),
+            response: z.array(ApiFieldSchema).max(16).default([]),
+            errors: z.array(z.object({ status: z.number().int().min(400).max(599), code: z.string().min(1).max(60), when: z.string().max(160) })).max(6).default([]),
+            rateLimit: z.object({ max: z.number().int().min(1).max(10_000), windowMs: z.number().int().min(1000).max(3_600_000) }).optional(),
+            /** El endpoint puede estar SERVIDO por un agente (runtime existente). */
+            agentBinding: EntityIdSchema.optional(),
+          }),
+        )
+        .min(1)
+        .max(32),
+    }),
+  })
+  .superRefine((doc, ctx) => {
+    const seen = new Set<string>();
+    const methodPath = new Set<string>();
+    doc.spec.endpoints.forEach((e, i) => {
+      if (!e.path.startsWith('/')) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['spec', 'endpoints', i, 'path'], message: `${e.id}: la ruta debe empezar por '/'` });
+      }
+      if (seen.has(e.id)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['spec', 'endpoints', i, 'id'], message: `id de endpoint duplicado: ${e.id}` });
+      }
+      seen.add(e.id);
+      const mp = `${e.method} ${e.path}`;
+      if (methodPath.has(mp)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['spec', 'endpoints', i, 'path'], message: `método+ruta duplicados: ${mp}` });
+      }
+      methodPath.add(mp);
+    });
+  });
+
+export type ApiPlatformV1 = z.infer<typeof ApiPlatformV1Schema>;
+
+/* ── Application (Misión 13): estructura de aplicación compuesta por módulos ─── */
+
+export const ApplicationModuleSchema = z.object({
+  ref: z.string().min(1).max(64),
+  kind: z.enum(['api-platform', 'frontend', 'backend', 'config', 'library', 'agent-runtime']),
+  description: z.string().max(200).optional(),
+  /** Referencia a un artefacto REAL ya registrado (verificado por el generador). */
+  componentRef: z.object({ kind: z.string().min(1).max(40), id: EntityIdSchema, version: SemVerSchema.optional() }).optional(),
+  dependencies: z.array(z.string().min(1).max(64)).max(16).default([]),
+});
+
+export const ApplicationV1Schema = z
+  .object({
+    apiVersion: EngineeringApiVersionSchema,
+    kind: z.literal('Application'),
+    metadata: MetadataSchema,
+    spec: z.object({
+      entryModule: z.string().min(1).max(64),
+      modules: z.array(ApplicationModuleSchema).min(1).max(24),
+      /** Solo NOMBRES de variables — los valores NUNCA van en el documento. */
+      config: z.object({ envVarNames: z.array(z.string().regex(/^[A-Z][A-Z0-9_]{1,63}$/)).max(24).default([]), runtime: z.enum(['uiep-backend', 'static-www']).default('uiep-backend') }),
+    }),
+  })
+  .superRefine((doc, ctx) => {
+    const refs = new Set(doc.spec.modules.map((m) => m.ref));
+    if (refs.size !== doc.spec.modules.length) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['spec', 'modules'], message: 'refs de módulo duplicadas' });
+    }
+    if (!refs.has(doc.spec.entryModule)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['spec', 'entryModule'], message: `entryModule '${doc.spec.entryModule}' no declara ningún módulo` });
+    }
+    doc.spec.modules.forEach((m, i) => {
+      for (const dep of m.dependencies) {
+        if (!refs.has(dep)) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['spec', 'modules', i, 'dependencies'], message: `'${m.ref}' depende de '${dep}' inexistente` });
+        }
+        if (dep === m.ref) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['spec', 'modules', i, 'dependencies'], message: `'${m.ref}' depende de sí mismo` });
+        }
+      }
+    });
+  });
+
+export type ApplicationV1 = z.infer<typeof ApplicationV1Schema>;
+
+/* ── Agentic App (Misión 13): app compuesta SOLO de componentes EJECUTABLES ──── */
+
+export const AgenticAppV1Schema = z.object({
+  apiVersion: EngineeringApiVersionSchema,
+  kind: z.literal('AgenticApp'),
+  metadata: MetadataSchema,
+  spec: z.object({
+    description: z.string().max(500).optional(),
+    /** AgentSpec REGISTRADOS (id@version verificado por el generador). */
+    agents: z
+      .array(z.object({ agentSpecId: EntityIdSchema, role: z.string().min(1).max(80) }))
+      .min(1)
+      .max(12),
+    workflows: z.array(EntityIdSchema).max(8).default([]),
+    tools: z.array(EntityIdSchema).max(16).default([]),
+    knowledge: z.array(z.object({ sourceId: EntityIdSchema, purpose: z.string().max(160).optional() })).max(8).default([]),
+    surfaces: z
+      .array(z.object({ type: z.enum(['console', 'http', 'mcp', 'workflow-engine']), note: z.string().max(160).optional() }))
+      .min(1)
+      .max(6),
+    guardrails: z
+      .object({
+        maxIterations: z.number().int().min(1).max(16).optional(),
+        approvalRequired: z.array(z.string().max(60)).max(8).default([]),
+        notes: z.string().max(300).optional(),
+      })
+      .default({}),
+  }),
+});
+
+export type AgenticAppV1 = z.infer<typeof AgenticAppV1Schema>;
+
+/* ── SaaS (Misión 13): proyecto compuesto con tenancy preparada ──────────────── */
+
+export const SaasModuleSchema = z.object({
+  ref: z.string().min(1).max(64),
+  kind: z.enum(['api-platform', 'application', 'auth', 'billing-config', 'config', 'library', 'agent-runtime']),
+  description: z.string().max(200).optional(),
+  componentRef: z.object({ kind: z.string().min(1).max(40), id: EntityIdSchema, version: SemVerSchema.optional() }).optional(),
+  dependencies: z.array(z.string().min(1).max(64)).max(16).default([]),
+});
+
+export const SaasV1Schema = z
+  .object({
+    apiVersion: EngineeringApiVersionSchema,
+    kind: z.literal('Saas'),
+    metadata: MetadataSchema,
+    spec: z.object({
+      description: z.string().max(500).optional(),
+      entryModule: z.string().min(1).max(64),
+      modules: z.array(SaasModuleSchema).min(1).max(24),
+      tenancy: z
+        .object({
+          model: z.enum(['single-tenant-prep', 'multi-tenant-ready']).default('multi-tenant-ready'),
+          isolation: z.enum(['logical']).default('logical'),
+          identity: z.enum(['console-session', 'external']).default('console-session'),
+          roles: z
+            .array(z.object({ name: z.string().min(1).max(40), permissions: z.array(z.string().min(1).max(80)).max(16).default([]) }))
+            .min(1)
+            .max(8),
+        })
+        .default({ model: 'multi-tenant-ready', isolation: 'logical', identity: 'console-session', roles: [{ name: 'admin', permissions: [] }] }),
+      config: z.object({ envVarNames: z.array(z.string().regex(/^[A-Z][A-Z0-9_]{1,63}$/)).max(24).default([]) }),
+    }),
+  })
+  .superRefine((doc, ctx) => {
+    const refs = new Set(doc.spec.modules.map((m) => m.ref));
+    if (refs.size !== doc.spec.modules.length) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['spec', 'modules'], message: 'refs de módulo duplicadas' });
+    }
+    if (!refs.has(doc.spec.entryModule)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['spec', 'entryModule'], message: `entryModule '${doc.spec.entryModule}' no declara ningún módulo` });
+    }
+    doc.spec.modules.forEach((m, i) => {
+      for (const dep of m.dependencies) {
+        if (!refs.has(dep)) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['spec', 'modules', i, 'dependencies'], message: `'${m.ref}' depende de '${dep}' inexistente` });
+        }
+      }
+    });
+  });
+
+export type SaasV1 = z.infer<typeof SaasV1Schema>;
+
 /* ── Framework (composición verificada de componentes ya registrados) ────── */
 
 export const FrameworkV1Schema = z.object({
@@ -373,6 +570,30 @@ export const FrameworkV1Schema = z.object({
       .min(1)
       .max(16),
     extensionPoints: z.array(z.object({ name: z.string().min(1).max(60), description: z.string().min(1).max(200) })).max(8).default([]),
+    /** M13 — módulos reutilizables: agrupan componentes con dependencias
+     *  internas (el generador verifica cada ref contra los almacenes reales
+     *  y valida que el grafo de módulos sea acíclico). */
+    modules: z
+      .array(
+        z.object({
+          id: EntityIdSchema,
+          description: z.string().max(200).optional(),
+          components: z
+            .array(
+              z.object({
+                type: z.string().min(1).max(40),
+                ref: z.object({ id: EntityIdSchema, kind: z.string().min(1).max(40), version: SemVerSchema.optional() }),
+                registeredVersion: SemVerSchema.optional(),
+                use: z.string().max(120).optional(),
+              }),
+            )
+            .min(1)
+            .max(16),
+          dependencies: z.array(EntityIdSchema).max(8).default([]),
+        }),
+      )
+      .max(12)
+      .default([]),
   }),
 });
 
@@ -393,6 +614,10 @@ export const EngineeringArtifactSchema = z.union([
   EvaluationDatasetV1Schema,
   HarnessV1Schema,
   FrameworkV1Schema,
+  ApiPlatformV1Schema,
+  ApplicationV1Schema,
+  AgenticAppV1Schema,
+  SaasV1Schema,
 ]);
 export type EngineeringArtifact = z.infer<typeof EngineeringArtifactSchema>;
 
@@ -411,6 +636,10 @@ const KIND_SCHEMAS: Record<string, z.ZodTypeAny> = {
   EvaluationDataset: EvaluationDatasetV1Schema,
   Harness: HarnessV1Schema,
   Framework: FrameworkV1Schema,
+  ApiPlatform: ApiPlatformV1Schema,
+  Application: ApplicationV1Schema,
+  AgenticApp: AgenticAppV1Schema,
+  Saas: SaasV1Schema,
 };
 
 export function validateEngineeringArtifact(input: unknown): EngineeringArtifactValidationResult {

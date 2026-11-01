@@ -1,0 +1,14 @@
+{
+  "type": "application",
+  "input": {
+    "name": "App Soporte M13",
+    "entryModule": "api",
+    "modules": [
+      { "ref": "api", "kind": "api-platform", "componentRef": { "kind": "ApiPlatform", "id": "m13-api-tickets" } },
+      { "ref": "frontend", "kind": "frontend", "description": "SPA de la consola UIEP (existente)" },
+      { "ref": "config", "kind": "config", "dependencies": ["api"] }
+    ],
+    "envVarNames": ["UIEP_CONSOLE_PASSWORD", "UIEP_RUNTIME_TOKEN"],
+    "runtime": "uiep-backend"
+  }
+}

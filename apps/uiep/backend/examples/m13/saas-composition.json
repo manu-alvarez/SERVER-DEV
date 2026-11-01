@@ -1,0 +1,50 @@
+{
+  "apiVersion": "uiep.io/ues/v1",
+  "kind": "Project",
+  "metadata": { "id": "saas-soporte-m13", "name": "SaaS Soporte M13", "version": "1.0.0" },
+  "description": "SaaS compuesto de ejemplo (Misión 13): genera API + Application + AgenticApp + Saas referenciándose con tokens $ref.",
+  "artifacts": [
+    {
+      "ref": "api",
+      "type": "api-platform",
+      "generate": {
+        "name": "API SaaS M13",
+        "endpoints": [{ "id": "whoami", "method": "GET", "path": "/api/me", "summary": "sesión actual" }]
+      }
+    },
+    {
+      "ref": "app",
+      "type": "application",
+      "dependencies": [{ "ref": "api" }],
+      "generate": {
+        "name": "App SaaS M13",
+        "entryModule": "api",
+        "modules": [{ "ref": "api", "kind": "api-platform", "componentRef": { "kind": "ApiPlatform", "id": "$ref:api" } }]
+      }
+    },
+    {
+      "ref": "agentic",
+      "type": "agentic-app",
+      "dependencies": [{ "ref": "api" }],
+      "generate": {
+        "name": "AgenticApp SaaS M13",
+        "agents": [{ "agent": "m13-agente-api", "role": "núcleo" }],
+        "surfaces": [{ "type": "http", "note": "contratos de la API compuesta" }]
+      }
+    },
+    {
+      "ref": "saas",
+      "type": "saas",
+      "dependencies": [{ "ref": "app" }, { "ref": "agentic" }],
+      "generate": {
+        "name": "SaaS Compuesto M13",
+        "entryModule": "app",
+        "modules": [{ "ref": "app", "kind": "application", "componentRef": { "kind": "Application", "id": "$ref:app" } }],
+        "roles": [
+          { "name": "admin", "permissions": ["*"] },
+          { "name": "agente", "permissions": ["tickets.write"] }
+        ]
+      }
+    }
+  ]
+}
