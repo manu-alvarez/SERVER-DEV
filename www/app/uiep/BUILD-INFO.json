@@ -2,7 +2,7 @@
   "project": "uiep-control-center",
   "version": "1.8.0",
   "source": "https://github.com/manu-alvarez/SERVER-DEV (apps/uiep)",
-  "sourceCommit": "971ed51",
+  "sourceCommit": "22c5d2d",
   "releaseTag": "uiep-1.8.0",
   "changedIn17": "FRONTEND: módulos IAM + Despliegues + ZIP en Export (bundle index-Cf-aDrhR.js); BACKEND: IAM multi-tenant v1 + Deployment Engine + source-project + ZIP sin dependencias",
   "backendImage": "msbrossai-uiep-backend:latest (se actualizará en el despliegue 1.8.0)",
