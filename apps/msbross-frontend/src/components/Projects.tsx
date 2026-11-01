@@ -1,11 +1,16 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FEATURED_PROJECTS, OTHER_PROJECTS, CATEGORIES } from '../data/projects';
+import { ArrowRight } from 'lucide-react';
+import { FEATURED_PROJECTS, CATEGORIES } from '../data/projects';
 import type { Project } from '../data/projects';
 import ProjectCard from './ProjectCard';
 import ProjectModal from './ProjectModal';
 import Glow from './Glow';
 
+/**
+ * Portada (cierre manuelalvarez.dev) — SOLO proyectos destacados + acceso
+ * claro al catálogo completo en /apps (fuente única: data/projects.ts).
+ */
 export default function Projects() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -14,11 +19,6 @@ export default function Projects() {
     activeCategory === 'all'
       ? FEATURED_PROJECTS
       : FEATURED_PROJECTS.filter((p) => p.category === activeCategory);
-
-  const filteredOther =
-    activeCategory === 'all'
-      ? OTHER_PROJECTS
-      : OTHER_PROJECTS.filter((p) => p.category === activeCategory);
 
   return (
     <section id="proyectos" className="relative py-24 lg:py-32 bg-[#060B18] overflow-hidden">
@@ -96,36 +96,16 @@ export default function Projects() {
           ))}
         </div>
 
-        {/* Otros Proyectos Destacados (CombiPro, Cuentos Mágicos, GasStation, Tarot RWS, Suite Beca Laud) */}
-        {filteredOther.length > 0 && (
-          <div className="mt-20 pt-14 border-t border-slate-800/80">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="max-w-2xl mb-8"
-            >
-              <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                Otros proyectos destacados
-              </h3>
-              <p className="text-slate-400 mt-2 text-sm sm:text-base">
-                Herramientas complementarias, aplicaciones temáticas y suites completas desarrolladas para producción.
-              </p>
-            </motion.div>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-              {filteredOther.map((project, i) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  index={i}
-                  compact
-                  onSelect={setSelectedProject}
-                />
-              ))}
-            </div>
-          </div>
-        )}
+        {/* CTA al catálogo completo (la portada NO repite el listado) */}
+        <div className="mt-14 text-center">
+          <a
+            href="/apps"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold bg-[#0E1E3D]/70 text-slate-300 border border-slate-700 hover:border-cyan-500 hover:text-white transition-all"
+          >
+            Ver el catálogo completo de proyectos y aplicaciones
+            <ArrowRight size={16} />
+          </a>
+        </div>
       </div>
 
       {/* Interactive Project Detail Modal */}
