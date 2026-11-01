@@ -85,6 +85,7 @@ import {
   buildProjectExport,
   readExportFile,
   writeExportFile,
+  writeZipFile,
   listExportFiles,
 } from '../services/engineering-export.service';
 import {
@@ -1579,7 +1580,8 @@ export function registerConsoleRoute(app: Express): void {
           return void res.status(404).json({ error: r.reason });
         }
         await writeExportFile(r);
-        res.json({ exported: true, format: r.format, filename: r.filename, documents: r.documents, sizeBytes: r.sizeBytes, sha256: r.sha256 });
+        const zip = req.query.format === 'zip' ? await writeZipFile(r) : undefined;
+        res.json({ exported: true, format: r.format, filename: r.filename, zip, documents: r.documents, sizeBytes: r.sizeBytes, sha256: r.sha256 });
       })
       .catch((err) => {
         console.error('[UIEP] engineering_artifact_export_failed', err);
@@ -1603,7 +1605,8 @@ export function registerConsoleRoute(app: Express): void {
           return void res.status(404).json({ error: r.reason });
         }
         await writeExportFile(r);
-        res.json({ exported: true, format: r.format, filename: r.filename, documents: r.documents, sizeBytes: r.sizeBytes, sha256: r.sha256 });
+        const zip = req.query.format === 'zip' ? await writeZipFile(r) : undefined;
+        res.json({ exported: true, format: r.format, filename: r.filename, zip, documents: r.documents, sizeBytes: r.sizeBytes, sha256: r.sha256 });
       })
       .catch((err) => {
         console.error('[UIEP] engineering_project_export_failed', err);
@@ -1626,7 +1629,8 @@ export function registerConsoleRoute(app: Express): void {
           return void res.status(404).json({ error: r.reason });
         }
         await writeExportFile(r);
-        res.json({ exported: true, format: r.format, filename: r.filename, documents: r.documents, sizeBytes: r.sizeBytes, sha256: r.sha256 });
+        const zip = req.query.format === 'zip' ? await writeZipFile(r) : undefined;
+        res.json({ exported: true, format: r.format, filename: r.filename, zip, documents: r.documents, sizeBytes: r.sizeBytes, sha256: r.sha256 });
       })
       .catch((err) => {
         console.error('[UIEP] engineering_generation_export_failed', err);
@@ -1653,7 +1657,16 @@ export function registerConsoleRoute(app: Express): void {
     return;
   }
     readExportFile(String(req.params.filename ?? ''))
-      .then((r) => (r.ok ? res.json(r.bundle) : res.status(r.status).json({ error: r.reason })))
+      .then((r) => {
+        if (!r.ok) {
+          return void res.status(r.status).json({ error: r.reason });
+        }
+        if (r.zip) {
+          res.setHeader('content-type', 'application/zip');
+          return void res.send(r.zip);
+        }
+        res.json(r.bundle);
+      })
       .catch((err) => {
         console.error('[UIEP] engineering_export_read_failed', err);
         res.status(500).json({ error: 'engineering_export_read_failed' });
