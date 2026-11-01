@@ -21,6 +21,7 @@ import {
   saveArtifact,
   getLatestArtifact,
   getArtifactVersion,
+  topologicalOrder,
   transitionArtifactLifecycle,
 } from './engineering-registry.service';
 
@@ -46,8 +47,10 @@ import {
  *   (evita persistir documentos potencialmente sensibles del usuario).
  */
 
-/** Versión de la LÓGICA de generación — cambia con cada cambio de lógica. */
-export const GENERATOR_ENGINE_VERSION = '1.0.0';
+/** Versión de la LÓGICA de generación — cambia con cada cambio de lógica.
+ *  1.1.0 (Misión 13): +4 generadores de aplicación/sistema (api-platform,
+ *  application, agentic-app, saas) y framework con módulos. Aditivo. */
+export const GENERATOR_ENGINE_VERSION = '1.1.0';
 
 const DATA_DIR = process.env.DATA_DIR || path.join(process.cwd(), 'data');
 const GENERATIONS_DIR = path.join(DATA_DIR, 'engineering', 'generations');
@@ -614,13 +617,22 @@ async function validateHarnessReferences(parsed: z.infer<typeof HarnessInputSche
   return null;
 }
 
-/** Referencias comunes de framework. */
+/** Referencias comunes de framework (componentes + módulos M13). */
 async function validateFrameworkComponents(parsed: z.infer<typeof FrameworkInputSchema>): Promise<GeneratorError | null> {
   for (const comp of parsed.components) {
     const resolved = await resolveComponentRef(comp.ref.kind, comp.ref.id);
     if (!resolved.found) {
       return { ok: false, status: 400, errors: { components: [`componente inexistente: ${comp.type} → ${comp.ref.kind} '${comp.ref.id}'`] } };
     }
+  }
+  // M13: módulos — refs verificadas + dependencias existentes + acíclico.
+  const errs: Record<string, string[]> = {};
+  await validateModuleGraph(
+    parsed.modules.map((m) => ({ id: m.id, components: m.components, dependencies: m.dependencies })),
+    errs,
+  );
+  if (Object.keys(errs).length > 0) {
+    return { ok: false, status: 400, errors: errs };
   }
   return null;
 }
@@ -784,6 +796,140 @@ const FrameworkInputSchema = z.object({
     .min(1)
     .max(16),
   extensionPoints: z.array(z.object({ name: z.string().min(1).max(60), description: z.string().max(200) })).max(8).default([]),
+  modules: z
+    .array(
+      z.object({
+        id: z.string().min(1).max(64),
+        description: z.string().max(200).optional(),
+        components: z
+          .array(z.object({ type: z.string().min(1).max(40), ref: z.object({ id: EntityIdSchema, kind: z.string().min(1).max(40), version: SemVerSchema.optional() }), use: z.string().max(120).optional() }))
+          .min(1)
+          .max(16),
+        dependencies: z.array(z.string().min(1).max(64)).max(8).default([]),
+      }),
+    )
+    .max(12)
+    .default([]),
+  version: SemVerSchema.default('1.0.0'),
+  onConflict: OnConflictSchema,
+});
+
+/* ── Misión 13 — Application & System generators ─────────────────────────── */
+
+const ApiFieldInputSchema = z.object({
+  name: z.string().regex(/^[a-zA-Z][a-zA-Z0-9_]{0,63}$/),
+  type: z.enum(['string', 'number', 'boolean', 'object', 'array']),
+  required: z.boolean().optional(),
+  constraints: z
+    .array(z.object({ kind: z.enum(['min', 'max', 'pattern', 'enum', 'maxLength']), value: z.union([z.string().max(200), z.number()]) }))
+    .max(8)
+    .default([]),
+  description: z.string().max(200).optional(),
+});
+
+const ApiPlatformInputSchema = z.object({
+  id: EntityIdSchema.optional(),
+  name: z.string().min(1).max(110),
+  description: z.string().max(500).optional(),
+  auth: z.enum(['console-session', 'bearer', 'none']).default('console-session'),
+  endpoints: z
+    .array(
+      z.object({
+        id: EntityIdSchema,
+        method: z.enum(['GET', 'POST', 'PUT', 'PATCH', 'DELETE']),
+        path: z.string().min(1).max(200),
+        summary: z.string().min(1).max(200),
+        request: z.array(ApiFieldInputSchema).max(16).default([]),
+        response: z.array(ApiFieldInputSchema).max(16).default([]),
+        errors: z.array(z.object({ status: z.number().int().min(400).max(599), code: z.string().min(1).max(60), when: z.string().max(160) })).max(6).default([]),
+        rateLimit: z.object({ max: z.number().int().min(1).max(10_000), windowMs: z.number().int().min(1000).max(3_600_000) }).optional(),
+        agentBinding: EntityIdSchema.optional(),
+      }),
+    )
+    .min(1)
+    .max(32),
+  version: SemVerSchema.default('1.0.0'),
+  onConflict: OnConflictSchema,
+});
+
+const ApplicationInputSchema = z.object({
+  id: EntityIdSchema.optional(),
+  name: z.string().min(1).max(110),
+  description: z.string().max(500).optional(),
+  entryModule: z.string().min(1).max(64),
+  modules: z
+    .array(
+      z.object({
+        ref: z.string().min(1).max(64),
+        kind: z.enum(['api-platform', 'frontend', 'backend', 'config', 'library', 'agent-runtime']),
+        description: z.string().max(200).optional(),
+        componentRef: z.object({ kind: z.string().min(1).max(40), id: EntityIdSchema, version: SemVerSchema.optional() }).optional(),
+        dependencies: z.array(z.string().min(1).max(64)).max(16).default([]),
+      }),
+    )
+    .min(1)
+    .max(24),
+  envVarNames: z.array(z.string().regex(/^[A-Z][A-Z0-9_]{1,63}$/)).max(24).default([]),
+  runtime: z.enum(['uiep-backend', 'static-www']).default('uiep-backend'),
+  version: SemVerSchema.default('1.0.0'),
+  onConflict: OnConflictSchema,
+});
+
+const AgenticAppInputSchema = z.object({
+  id: EntityIdSchema.optional(),
+  name: z.string().min(1).max(110),
+  description: z.string().max(500).optional(),
+  agents: z
+    .array(
+      z.object({
+        agent: z.union([EntityIdSchema, z.object({ generate: z.record(z.string(), z.unknown()) })]),
+        role: z.string().min(1).max(80),
+      }),
+    )
+    .min(1)
+    .max(12),
+  workflows: z.array(EntityIdSchema).max(8).default([]),
+  tools: z.array(EntityIdSchema).max(16).default([]),
+  knowledge: z.array(z.object({ sourceId: EntityIdSchema, purpose: z.string().max(160).optional() })).max(8).default([]),
+  surfaces: z
+    .array(z.object({ type: z.enum(['console', 'http', 'mcp', 'workflow-engine']), note: z.string().max(160).optional() }))
+    .min(1)
+    .max(6),
+  guardrails: z
+    .object({
+      maxIterations: z.number().int().min(1).max(16).optional(),
+      approvalRequired: z.array(z.string().max(60)).max(8).default([]),
+      notes: z.string().max(300).optional(),
+    })
+    .default({}),
+  version: SemVerSchema.default('1.0.0'),
+  onConflict: OnConflictSchema,
+});
+
+const SaasInputSchema = z.object({
+  id: EntityIdSchema.optional(),
+  name: z.string().min(1).max(110),
+  description: z.string().max(500).optional(),
+  entryModule: z.string().min(1).max(64),
+  modules: z
+    .array(
+      z.object({
+        ref: z.string().min(1).max(64),
+        kind: z.enum(['api-platform', 'application', 'auth', 'billing-config', 'config', 'library', 'agent-runtime']),
+        description: z.string().max(200).optional(),
+        componentRef: z.object({ kind: z.string().min(1).max(40), id: EntityIdSchema, version: SemVerSchema.optional() }).optional(),
+        dependencies: z.array(z.string().min(1).max(64)).max(16).default([]),
+      }),
+    )
+    .min(1)
+    .max(24),
+  roles: z
+    .array(z.object({ name: z.string().min(1).max(40), permissions: z.array(z.string().min(1).max(80)).max(16).default([]) }))
+    .min(1)
+    .max(8)
+    .default([{ name: 'admin', permissions: [] }]),
+  tenancy: z.enum(['single-tenant-prep', 'multi-tenant-ready']).default('multi-tenant-ready'),
+  envVarNames: z.array(z.string().regex(/^[A-Z][A-Z0-9_]{1,63}$/)).max(24).default([]),
   version: SemVerSchema.default('1.0.0'),
   onConflict: OnConflictSchema,
 });
@@ -802,6 +948,10 @@ async function resolveComponentRef(kind: string, id: string): Promise<{ found: b
     'EvaluationDataset',
     'Harness',
     'Framework',
+    'ApiPlatform',
+    'Application',
+    'AgenticApp',
+    'Saas',
   ]);
   if (engineeringKinds.has(kind)) {
     const doc = await getLatestArtifact(kind, id);
@@ -815,6 +965,66 @@ async function resolveComponentRef(kind: string, id: string): Promise<{ found: b
 
 function withMeta(apiVersion: string, kind: string, id: string, name: string, version: string, description: string, spec: unknown): Record<string, unknown> {
   return { apiVersion, kind, metadata: { id, name, version, description }, spec };
+}
+
+/* ── M13: validación compartida de módulos (application/saas/framework) ──── */
+
+interface ModuleLike {
+  ref?: string;
+  id?: string;
+  componentRef?: { kind: string; id: string; version?: string };
+  components?: Array<{ type: string; ref: { kind: string; id: string; version?: string } }>;
+  dependencies: string[];
+}
+
+/** Verifica TODAS las componentRefs contra los almacenes reales, la existencia
+ *  de dependencias y la ACICLICIDAD del grafo de módulos. Fail-closed. */
+async function validateModuleGraph(
+  modules: ModuleLike[],
+  errs: Record<string, string[]>,
+): Promise<void> {
+  let n = 0;
+  for (const m of modules) {
+    const key = m.ref ?? m.id ?? `modulo-${n++}`;
+    for (const comp of m.components ?? [{ type: 'component', ref: m.componentRef ?? { kind: '', id: '' } }]) {
+      if (!comp.ref?.kind) {
+        continue; // módulo sin componentRef (p. ej. config) — permitido
+      }
+      const resolved = await resolveComponentRef(comp.ref.kind, comp.ref.id);
+      if (!resolved.found) {
+        (errs.modules ??= []).push(`'${key}': componente inexistente → ${comp.ref.kind} '${comp.ref.id}'`);
+      }
+    }
+    for (const dep of m.dependencies) {
+      if (!modules.some((x) => (x.ref ?? x.id) === dep)) {
+        (errs.modules ??= []).push(`'${key}': dependencia inexistente '${dep}'`);
+      }
+    }
+  }
+  const edges = modules.map((m) => ({ ref: m.ref ?? m.id ?? '', dependencies: m.dependencies.map((ref) => ({ ref, required: true })) }));
+  const topo = topologicalOrder(edges);
+  if (!topo.ok) {
+    (errs.modules ??= []).push(`grafo de módulos con ciclo: ${topo.cycle.join(' → ')}`);
+  }
+}
+
+/** Resuelve las versiones registradas de las componentRefs para el doc final. */
+async function resolveModuleVersions(modules: ModuleLike[]): Promise<Array<Record<string, unknown>>> {
+  const out: Array<Record<string, unknown>> = [];
+  for (const m of modules) {
+    const comp = m.components?.[0];
+    const cr = m.componentRef ?? (comp ? { kind: comp.ref.kind, id: comp.ref.id } : undefined);
+    let registeredVersion: string | undefined;
+    if (cr) {
+      const resolved = await resolveComponentRef(cr.kind, cr.id);
+      registeredVersion = resolved.registeredVersion;
+    }
+    out.push({
+      ...m,
+      ...(m.componentRef ? { componentRef: { ...m.componentRef, ...(registeredVersion ? { registeredVersion } : {}) } } : {}),
+    });
+  }
+  return out;
 }
 
 function buildPromptSystemDoc(input: z.infer<typeof PromptSysInputSchema>): { ok: true; doc: Record<string, unknown> } | GeneratorError {
@@ -1628,6 +1838,24 @@ const GENERATORS: Record<string, GeneratorModule> = {
         ...(parsed.data.conventions === undefined ? {} : { conventions: parsed.data.conventions }),
         components,
         extensionPoints: parsed.data.extensionPoints,
+        // M13: módulos con versiones registradas resueltas.
+        modules: await (async () => {
+          const resolved: Array<Record<string, unknown>> = [];
+          for (const m of parsed.data.modules) {
+            const comps: Array<Record<string, unknown>> = [];
+            for (const c of m.components) {
+              const r = await resolveComponentRef(c.ref.kind, c.ref.id);
+              comps.push({
+                type: c.type,
+                ref: { id: c.ref.id, kind: c.ref.kind, ...(c.ref.version === undefined ? {} : { version: c.ref.version }) },
+                registeredVersion: r.registeredVersion,
+                ...(c.use === undefined ? {} : { use: c.use }),
+              });
+            }
+            resolved.push({ id: m.id, ...(m.description === undefined ? {} : { description: m.description }), components: comps, dependencies: m.dependencies });
+          }
+          return resolved;
+        })(),
       });
       const up = await upsertEngineeringArtifact(doc, parsed.data.onConflict);
       if (!up.ok) {
@@ -1638,6 +1866,331 @@ const GENERATORS: Record<string, GeneratorModule> = {
         outcome: { store: 'engineering', artifactKind: 'Framework', id: up.id, version: up.version },
         reused: up.reused,
         warnings: [],
+        docHash: fingerprintOf(up.finalDoc),
+      };
+    },
+  },
+  /* ── Misión 13 — Application & System generators ─────────────────────────── */
+
+  'api-platform': {
+    type: 'api-platform',
+    label: 'Plataforma API: contratos tipados + validación declarativa + documentación determinista',
+    docKind: 'ApiPlatform',
+    outStore: 'engineering',
+    inputShape: "{ name, auth?, endpoints: [{ id, method, path, summary, request?, response?, errors?, rateLimit?, agentBinding? }] }",
+    async validate(input) {
+      const parsed = parseErr(ApiPlatformInputSchema, input);
+      if (!parsed.ok) {
+        return parsed;
+      }
+      const errs: Record<string, string[]> = {};
+      const seenIds = new Set<string>();
+      const methodPath = new Set<string>();
+      for (const e of parsed.data.endpoints) {
+        if (seenIds.has(e.id)) {
+          (errs.endpoints ??= []).push(`id de endpoint duplicado: '${e.id}'`);
+        }
+        seenIds.add(e.id);
+        const mp = `${e.method} ${e.path}`;
+        if (methodPath.has(mp)) {
+          (errs.endpoints ??= []).push(`método+ruta duplicados: '${mp}'`);
+        }
+        methodPath.add(mp);
+        if (!e.path.startsWith('/')) {
+          (errs.endpoints ??= []).push(`'${e.id}': la ruta debe empezar por '/'`);
+        }
+        if (e.agentBinding) {
+          const envelope = await getLatestSpec(e.agentBinding);
+          if (!envelope || (envelope as { kind?: string }).kind !== 'Agent') {
+            (errs.endpoints ??= []).push(`'${e.id}': agente vinculado inexistente: '${e.agentBinding}'`);
+          }
+        }
+      }
+      if (Object.keys(errs).length > 0) {
+        return { ok: false, status: 400, errors: errs };
+      }
+      return { ok: true, checks: [{ name: 'schema', passed: true }, { name: 'endpoints', passed: true }, { name: 'agent-bindings', passed: true }] };
+    },
+    async generate(input) {
+      const parsed = parseErr(ApiPlatformInputSchema, input);
+      if (!parsed.ok) {
+        return parsed;
+      }
+      // Validación de referencias reutilizando la lógica de validate (misma rutina).
+      const errs: Record<string, string[]> = {};      for (const e of parsed.data.endpoints) {
+        if (e.agentBinding) {
+          const envelope = await getLatestSpec(e.agentBinding);
+          if (!envelope || (envelope as { kind?: string }).kind !== 'Agent') {
+            (errs.endpoints ??= []).push(`'${e.id}': agente vinculado inexistente: '${e.agentBinding}'`);
+          }
+        }
+      }
+      if (Object.keys(errs).length > 0) {
+        return { ok: false, status: 400, errors: errs };
+      }
+      const id = parsed.data.id ?? slugify(parsed.data.name);
+      if (!EntityIdSchema.safeParse(id).success) {
+        return { ok: false, status: 400, errors: { id: [`id derivado no válido: '${id}'`] } };
+      }
+      // Documentación determinista estilo OpenAPI (contenido REAL derivado de
+      // los contratos — no un placeholder): paths, métodos, schemas y errores.
+      const paths: Record<string, Record<string, unknown>> = {};
+      for (const e of parsed.data.endpoints) {
+        paths[e.path] ??= {};
+        paths[e.path][e.method.toLowerCase()] = {
+          operationId: e.id,
+          summary: e.summary,
+          ...(e.request.length > 0 ? { requestBody: { fields: e.request } } : {}),
+          responses: {
+            '200': { description: 'éxito', ...(e.response.length > 0 ? { fields: e.response } : {}) },
+            ...Object.fromEntries(e.errors.map((err) => [String(err.status), { code: err.code, when: err.when }])),
+          },
+          ...(e.rateLimit ? { 'x-rate-limit': e.rateLimit } : {}),
+          ...(e.agentBinding ? { 'x-agent-binding': e.agentBinding } : {}),
+        };
+      }
+      const doc = withMeta(API_VERSION, 'ApiPlatform', id, parsed.data.name, parsed.data.version, 'Plataforma API generada: contratos validados + documentación determinista (los endpoints SE sirven en M14; los agentes vinculados ya corren hoy).', {
+        title: parsed.data.name,
+        ...(parsed.data.description === undefined ? {} : { description: parsed.data.description }),
+        auth: { type: parsed.data.auth, ...(parsed.data.auth === 'console-session' ? { csrfHeader: 'x-uiep-console' } : {}) },
+        endpoints: parsed.data.endpoints.map((e) => ({
+          ...e,
+          request: e.request.map((f) => ({ ...f, required: f.required ?? true })),
+          response: e.response.map((f) => ({ ...f, required: f.required ?? true })),
+        })),
+        openapiLike: { version: '3.1.0-uiep-declarative', info: { title: parsed.data.name, version: parsed.data.version }, paths },
+      });
+      const up = await upsertEngineeringArtifact(doc, parsed.data.onConflict);
+      if (!up.ok) {
+        return up;
+      }
+      return {
+        ok: true,
+        outcome: { store: 'engineering', artifactKind: 'ApiPlatform', id: up.id, version: up.version },
+        reused: up.reused,
+        warnings: ['el SERVIDOR de estos endpoints requiere el sandbox M14 — hoy el contrato se valida, documenta y vincula a agentes ejecutables'],
+        docHash: fingerprintOf(up.finalDoc),
+      };
+    },
+  },
+  application: {
+    type: 'application',
+    label: 'Aplicación compuesta: módulos verificados + entrypoint + config SIN valores',
+    docKind: 'Application',
+    outStore: 'engineering',
+    inputShape: "{ name, entryModule, modules: [{ ref, kind, componentRef?, dependencies? }], envVarNames?, runtime? }",
+    async validate(input) {
+      const parsed = parseErr(ApplicationInputSchema, input);
+      if (!parsed.ok) {
+        return parsed;
+      }
+      if (!parsed.data.modules.some((m) => m.ref === parsed.data.entryModule)) {
+        return { ok: false, status: 400, errors: { entryModule: [`'${parsed.data.entryModule}' no declara ningún módulo`] } };
+      }
+      const errs: Record<string, string[]> = {};
+      await validateModuleGraph(parsed.data.modules, errs);
+      if (Object.keys(errs).length > 0) {
+        return { ok: false, status: 400, errors: errs };
+      }
+      return { ok: true, checks: [{ name: 'schema', passed: true }, { name: 'modules', passed: true }, { name: 'component-refs', passed: true }] };
+    },
+    async generate(input) {
+      const parsed = parseErr(ApplicationInputSchema, input);
+      if (!parsed.ok) {
+        return parsed;
+      }
+      if (!parsed.data.modules.some((m) => m.ref === parsed.data.entryModule)) {
+        return { ok: false, status: 400, errors: { entryModule: [`'${parsed.data.entryModule}' no declara ningún módulo`] } };
+      }
+      const errs: Record<string, string[]> = {};
+      await validateModuleGraph(parsed.data.modules, errs);
+      if (Object.keys(errs).length > 0) {
+        return { ok: false, status: 400, errors: errs };
+      }
+      const id = parsed.data.id ?? slugify(parsed.data.name);
+      if (!EntityIdSchema.safeParse(id).success) {
+        return { ok: false, status: 400, errors: { id: [`id derivado no válido: '${id}'`] } };
+      }
+      const doc = withMeta(API_VERSION, 'Application', id, parsed.data.name, parsed.data.version, 'Aplicación generada: módulos con componentRefs REALES verificados, entrypoint declarado y configuración SIN valores sensibles.', {
+        entryModule: parsed.data.entryModule,
+        modules: await resolveModuleVersions(parsed.data.modules),
+        config: { envVarNames: parsed.data.envVarNames, runtime: parsed.data.runtime },
+        ...(parsed.data.description === undefined ? {} : { description: parsed.data.description }),
+      });
+      const up = await upsertEngineeringArtifact(doc, parsed.data.onConflict);
+      if (!up.ok) {
+        return up;
+      }
+      return {
+        ok: true,
+        outcome: { store: 'engineering', artifactKind: 'Application', id: up.id, version: up.version },
+        reused: up.reused,
+        warnings: ['la estructura se valida y documenta; la EJECUCIÓN del paquete completo requiere el sandbox M14 (los componentes individuales sí corren en sus runtimes)'],
+        docHash: fingerprintOf(up.finalDoc),
+      };
+    },
+  },
+  'agentic-app': {
+    type: 'agentic-app',
+    label: 'App agéntica: SOLO componentes ejecutables (agentes/workflows/tools/knowledge reales)',
+    docKind: 'AgenticApp',
+    outStore: 'engineering',
+    inputShape: '{ name, agents: [{ agent: id | { generate }, role }], workflows?, tools?, knowledge?, surfaces, guardrails? }',
+    async validate(input) {
+      const parsed = parseErr(AgenticAppInputSchema, input);
+      if (!parsed.ok) {
+        return parsed;
+      }
+      for (const a of parsed.data.agents) {
+        if (typeof a.agent === 'string') {
+          const envelope = await getLatestSpec(a.agent);
+          if (!envelope || (envelope as { kind?: string }).kind !== 'Agent') {
+            return { ok: false, status: 400, errors: { agents: [`agente inexistente: '${a.agent}' (o declara { generate } para crearlo en la misma generación)`] } };
+          }
+        }
+      }
+      for (const wfId of parsed.data.workflows) {
+        const envelope = await getLatestSpec(wfId);
+        if (!envelope || (envelope as { kind?: string }).kind !== 'Workflow') {
+          return { ok: false, status: 400, errors: { workflows: [`workflow inexistente: '${wfId}'`] } };
+        }
+      }
+      for (const toolId of parsed.data.tools) {
+        if (!(await getToolSpec(toolId))) {
+          return { ok: false, status: 400, errors: { tools: [`herramienta no registrada: '${toolId}'`] } };
+        }
+      }
+      for (const k of parsed.data.knowledge) {
+        const source = await getSource(k.sourceId);
+        if (!source) {
+          return { ok: false, status: 400, errors: { knowledge: [`fuente de conocimiento inexistente: '${k.sourceId}'`] } };
+        }
+      }
+      return { ok: true, checks: [{ name: 'schema', passed: true }, { name: 'executable-components', passed: true }] };
+    },
+    async generate(input) {
+      const parsed = parseErr(AgenticAppInputSchema, input);
+      if (!parsed.ok) {
+        return parsed;
+      }
+      const warnings: string[] = [];
+      const childIds: string[] = [];
+      const agents: Array<{ agentSpecId: string; role: string }> = [];
+      for (const a of parsed.data.agents) {
+        if (typeof a.agent === 'string') {
+          const envelope = await getLatestSpec(a.agent);
+          if (!envelope || (envelope as { kind?: string }).kind !== 'Agent') {
+            return { ok: false, status: 400, errors: { agents: [`agente inexistente: '${a.agent}'`] } };
+          }
+          agents.push({ agentSpecId: a.agent, role: a.role });
+        } else {
+          const child = await runGeneration('agent', a.agent.generate, { queue: false });
+          if (!child.ok) {
+            return { ok: false, status: child.status === 400 ? 400 : 409, errors: { agents: [`subgeneración de agente falló: ${JSON.stringify(child.errors).slice(0, 200)}`] } };
+          }
+          childIds.push(child.generationId);
+          agents.push({ agentSpecId: (child.outcome as { id: string }).id, role: a.role });
+        }
+      }
+      for (const wfId of parsed.data.workflows) {
+        const envelope = await getLatestSpec(wfId);
+        if (!envelope || (envelope as { kind?: string }).kind !== 'Workflow') {
+          return { ok: false, status: 400, errors: { workflows: [`workflow inexistente: '${wfId}'`] } };
+        }
+      }
+      for (const toolId of parsed.data.tools) {
+        if (!(await getToolSpec(toolId))) {
+          return { ok: false, status: 400, errors: { tools: [`herramienta no registrada: '${toolId}'`] } };
+        }
+      }
+      for (const k of parsed.data.knowledge) {
+        const source = await getSource(k.sourceId);
+        if (!source) {
+          return { ok: false, status: 400, errors: { knowledge: [`fuente de conocimiento inexistente: '${k.sourceId}'`] } };
+        }
+      }
+      const id = parsed.data.id ?? slugify(parsed.data.name);
+      if (!EntityIdSchema.safeParse(id).success) {
+        return { ok: false, status: 400, errors: { id: [`id derivado no válido: '${id}'`] } };
+      }
+      const doc = withMeta(API_VERSION, 'AgenticApp', id, parsed.data.name, parsed.data.version, 'Aplicación agéntica generada sobre componentes REALES (agentes/workflows registrados y ejecutables, tools deny-by-default, knowledge con gate RAG).', {
+        ...(parsed.data.description === undefined ? {} : { description: parsed.data.description }),
+        agents,
+        workflows: parsed.data.workflows,
+        tools: parsed.data.tools,
+        knowledge: parsed.data.knowledge,
+        surfaces: parsed.data.surfaces,
+        guardrails: parsed.data.guardrails,
+      });
+      const up = await upsertEngineeringArtifact(doc, parsed.data.onConflict);
+      if (!up.ok) {
+        return up;
+      }
+      warnings.push('todos los agentes/workflows listados SON ejecutables hoy (workflow-engine/agent-runtime); la app como paquete único se sirve en M14');
+      return {
+        ok: true,
+        outcome: { store: 'engineering', artifactKind: 'AgenticApp', id: up.id, version: up.version },
+        reused: up.reused,
+        warnings,
+        docHash: fingerprintOf(up.finalDoc),
+        ...(childIds.length > 0 ? { childGenerationIds: childIds } : {}),
+      } as GeneratorGenerateResult & { childGenerationIds?: string[] };
+    },
+  },
+  saas: {
+    type: 'saas',
+    label: 'SaaS compuesto: módulos verificados + roles/tenancy preparados',
+    docKind: 'Saas',
+    outStore: 'engineering',
+    inputShape: "{ name, entryModule, modules: [{ ref, kind, componentRef?, dependencies? }], roles?, tenancy?, envVarNames? }",
+    async validate(input) {
+      const parsed = parseErr(SaasInputSchema, input);
+      if (!parsed.ok) {
+        return parsed;
+      }
+      if (!parsed.data.modules.some((m) => m.ref === parsed.data.entryModule)) {
+        return { ok: false, status: 400, errors: { entryModule: [`'${parsed.data.entryModule}' no declara ningún módulo`] } };
+      }
+      const errs: Record<string, string[]> = {};
+      await validateModuleGraph(parsed.data.modules, errs);
+      if (Object.keys(errs).length > 0) {
+        return { ok: false, status: 400, errors: errs };
+      }
+      return { ok: true, checks: [{ name: 'schema', passed: true }, { name: 'modules', passed: true }, { name: 'component-refs', passed: true }] };
+    },
+    async generate(input) {
+      const parsed = parseErr(SaasInputSchema, input);
+      if (!parsed.ok) {
+        return parsed;
+      }
+      if (!parsed.data.modules.some((m) => m.ref === parsed.data.entryModule)) {
+        return { ok: false, status: 400, errors: { entryModule: [`'${parsed.data.entryModule}' no declara ningún módulo`] } };
+      }
+      const errs: Record<string, string[]> = {};
+      await validateModuleGraph(parsed.data.modules, errs);
+      if (Object.keys(errs).length > 0) {
+        return { ok: false, status: 400, errors: errs };
+      }
+      const id = parsed.data.id ?? slugify(parsed.data.name);
+      if (!EntityIdSchema.safeParse(id).success) {
+        return { ok: false, status: 400, errors: { id: [`id derivado no válido: '${id}'`] } };
+      }
+      const doc = withMeta(API_VERSION, 'Saas', id, parsed.data.name, parsed.data.version, 'SaaS generado: módulos verificados con separation of concerns, roles declarados y tenancy preparada (multi-tenancy REAL → fases posteriores).', {
+        ...(parsed.data.description === undefined ? {} : { description: parsed.data.description }),
+        entryModule: parsed.data.entryModule,
+        modules: await resolveModuleVersions(parsed.data.modules),
+        tenancy: { model: parsed.data.tenancy, isolation: 'logical', identity: 'console-session', roles: parsed.data.roles },
+        config: { envVarNames: parsed.data.envVarNames },
+      });
+      const up = await upsertEngineeringArtifact(doc, parsed.data.onConflict);
+      if (!up.ok) {
+        return up;
+      }
+      return {
+        ok: true,
+        outcome: { store: 'engineering', artifactKind: 'Saas', id: up.id, version: up.version },
+        reused: up.reused,
+        warnings: ['tenancy multiusuario PREPARADA (roles + isolation declarados); el aislamiento REAL por tenant requiere ejecución aislada (M14) y persistencia por-tenant (fases posteriores)'],
         docHash: fingerprintOf(up.finalDoc),
       };
     },

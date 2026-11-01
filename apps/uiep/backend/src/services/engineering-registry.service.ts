@@ -55,12 +55,12 @@ export const ARTIFACT_CATALOG: CatalogEntry[] = [
   { type: 'mcp-server', capabilities: { schema: true, generator: true, execution: false, validation: true }, via: { generator: 'engineering-generator (manifiesto)' }, notes: 'genera manifiesto/export — NO despliega ni expone servidores' },
   { type: 'prompt-system', capabilities: { schema: true, generator: true, execution: false, validation: true }, via: { generator: 'engineering-generator' }, notes: 'prompts versionados con variables tipadas; composición sin ejecución' },
   { type: 'skill-pack', capabilities: { schema: true, generator: true, execution: false, validation: true }, via: { generator: 'engineering-generator' } },
-  { type: 'framework', capabilities: { schema: true, generator: true, execution: false, validation: true }, via: { generator: 'engineering-generator (composición de componentes existentes)' } },
+  { type: 'framework', capabilities: { schema: true, generator: true, execution: false, validation: true }, via: { generator: 'engineering-generator (composición de componentes existentes)' }, notes: 'M13: módulos reutilizables con dependencias verificadas' },
   { type: 'harness', capabilities: { schema: true, generator: true, execution: false, validation: true }, via: { generator: 'engineering-generator' }, notes: 'la ejecución del harness requiere el sandbox de M14' },
-  { type: 'application', capabilities: { schema: true, generator: false, execution: false, validation: false } },
-  { type: 'agentic-app', capabilities: { schema: true, generator: false, execution: false, validation: false } },
-  { type: 'api-platform', capabilities: { schema: true, generator: false, execution: false, validation: false } },
-  { type: 'saas', capabilities: { schema: true, generator: false, execution: false, validation: false } },
+  { type: 'application', capabilities: { schema: true, generator: true, execution: false, validation: true }, via: { generator: 'engineering-generator (módulos verificados + config sin valores + entrypoint)', execution: 'los COMPONENTES registrados sí se ejecutan con sus runtimes' }, notes: 'M13: genera la estructura de la aplicación (módulos con componentRefs REALES, entryModule, envVarNames sin valores); la ejecución aislada del paquete completo → M14' },
+  { type: 'agentic-app', capabilities: { schema: true, generator: true, execution: false, validation: true }, via: { generator: 'engineering-generator (SÓLO componentes reales: agentes propios o subgenerados, workflows, tools, knowledge — todos ejecutables HOY por los runtimes existentes)' }, notes: 'la app como paquete único se ejecuta en M14 (sandbox); sus agentes/workflows ya corren vía workflow-engine/agent-runtime' },
+  { type: 'api-platform', capabilities: { schema: true, generator: true, execution: false, validation: true }, via: { generator: 'engineering-generator (contratos tipados + validaciones declarativas + documentación determinista estilo OpenAPI + bindings a agentes verificados)', execution: 'los agentes vinculados sí se ejecutan vía agent-runtime' }, notes: 'M13: el contrato se valida y documenta; el SERVIDOR de los endpoints → M14' },
+  { type: 'saas', capabilities: { schema: true, generator: true, execution: false, validation: true }, via: { generator: 'engineering-generator (módulos con componentRefs verificados + roles/tenancy preparados + envVarNames sin valores)' }, notes: 'M13: estructura multiusuario PREPARADA (roles, isolation logical, identity); la multi-tenancy REAL es fase posterior' },
   { type: 'enterprise-architecture', capabilities: { schema: true, generator: false, execution: false, validation: false } },
   { type: 'infrastructure-stack', capabilities: { schema: true, generator: false, execution: false, validation: false } },
   { type: 'deployment-architecture', capabilities: { schema: true, generator: false, execution: false, validation: false } },
@@ -442,6 +442,10 @@ export const ENGINEERING_ARTIFACT_KINDS = [
   'EvaluationDataset',
   'Harness',
   'Framework',
+  'ApiPlatform',
+  'Application',
+  'AgenticApp',
+  'Saas',
 ] as const;
 
 export type EngineeringArtifactKindName = (typeof ENGINEERING_ARTIFACT_KINDS)[number];

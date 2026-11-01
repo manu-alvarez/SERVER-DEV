@@ -103,6 +103,10 @@ export const RegisteredSpecRefSchema = z.object({
     'EvaluationDataset',
     'Harness',
     'Framework',
+    'ApiPlatform',
+    'Application',
+    'AgenticApp',
+    'Saas',
   ]),
   version: SemVerSchema.optional(),
 });
