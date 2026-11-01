@@ -57,26 +57,6 @@ export const FEATURED_PROJECTS: Project[] = [
     architecture: 'Arquitectura monorepo Turborepo con paquetes desacoplados (@uiep/design-engine, @uiep/framework-adapter, @uiep/ui) servida en subdominio propio.'
   },
   {
-    id: 'iaprod-os',
-    name: 'IA Prod OS',
-    subtitle: 'Productividad & Automatización B2B',
-    description: 'Suite empresarial de automatización documental, conectada con APIs y modelos de lenguaje de ultra-baja latencia para procesamiento inteligente de flujos de trabajo.',
-    category: 'ai-enterprise',
-    iconBg: 'linear-gradient(135deg, #8B5CF6, #EC4899)',
-    iconSvg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10"/><path d="M7 12h10"/><path d="M7 17h10"/></svg>`,
-    tech: ['React', 'FastAPI', 'Groq', 'Google GenAI', 'Python'],
-    url: 'https://iaprod.manuelalvarez.dev',
-    status: 'live',
-    featured: true,
-    features: [
-      'Procesamiento y análisis de documentos PDF y contratos por lotes',
-      'Conexión multimodelo con rotación inteligente de API Keys (Groq / Gemini / Ollama)',
-      'Generación estructurada de informes con descarga instantánea',
-      'Panel analítico de métricas y rendimiento de tareas'
-    ],
-    architecture: 'Backend en Python FastAPI (puerto 8006) + Frontend React Vite servido bajo subdominio iaprod.manuelalvarez.dev.'
-  },
-  {
     id: 'tu-energia-maya',
     name: 'Tu Energía Maya',
     subtitle: 'Sincronario Maya & Tarot Tzolk\'in',
