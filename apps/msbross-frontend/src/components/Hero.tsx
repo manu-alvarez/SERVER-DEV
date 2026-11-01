@@ -122,6 +122,28 @@ export default function Hero() {
                 <div className="text-xs text-slate-400 mt-1 font-medium">Aprendiendo siempre</div>
               </div>
             </motion.div>
+
+            {/* CTAs: catálogo completo + CV (Misión de cierre) */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.45 }}
+              className="flex flex-wrap items-center gap-3 pt-2"
+            >
+              <a
+                href="/apps"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] transition-all"
+              >
+                Explorar aplicaciones
+              </a>
+              <a
+                href="/CV-Manuel_Alvarez_Dianez.pdf"
+                download
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-300 border border-slate-700 hover:border-slate-500 hover:text-white transition-all"
+              >
+                Descargar CV
+              </a>
+            </motion.div>
           </div>
 
           {/* Right Column: 3D Cyber-Architect Cockpit */}

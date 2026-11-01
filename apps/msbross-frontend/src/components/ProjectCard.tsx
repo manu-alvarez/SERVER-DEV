@@ -138,7 +138,7 @@ export default function ProjectCard({
                     : 'bg-cyan-400'
                 }`}
               />
-              {project.status === 'live' ? 'Producción' : 'Desarrollo'}
+              {project.status === 'live' ? 'Producción' : project.status === 'experimental' ? 'Experimento' : 'Desarrollo'}
             </span>
 
             <span className="text-[11px] font-semibold text-cyan-400 flex items-center gap-1 group-hover:underline">

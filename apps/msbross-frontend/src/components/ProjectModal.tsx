@@ -80,7 +80,7 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
                       }`}
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      {project.status === 'live' ? 'En producción' : 'En desarrollo'}
+                      {project.status === 'live' ? 'En producción' : project.status === 'experimental' ? 'Experimento' : 'En desarrollo'}
                     </span>
                   </div>
 

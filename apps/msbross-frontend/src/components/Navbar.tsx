@@ -11,6 +11,23 @@ const NAV_LINKS = [
   { id: 'contacto', label: 'Contacto' },
 ];
 
+/** Enlace fijo al catálogo completo (navega, no hace scroll-spy). */
+function AppsLink({ compact }: { compact?: boolean }) {
+  return (
+    <a
+      href="/apps"
+      className={
+        compact
+          ? 'block px-4 py-2 rounded-lg text-sm font-medium text-cyan-400 hover:text-cyan-300 hover:bg-white/5'
+          : 'text-sm font-medium text-cyan-400 hover:text-cyan-300 transition-colors'
+      }
+    >
+      Aplicaciones
+    </a>
+  );
+}
+export { AppsLink };
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -67,6 +84,7 @@ export default function Navbar() {
                 {link.label}
               </button>
             ))}
+            <AppsLink />
           </div>
 
           {/* Right Actions */}
@@ -122,6 +140,7 @@ export default function Navbar() {
             className="lg:hidden overflow-hidden glass-nav border-t border-white/5"
           >
             <div className="px-4 py-4 space-y-1">
+              <AppsLink compact />
               {NAV_LINKS.map((link) => (
                 <button
                   key={link.id}
