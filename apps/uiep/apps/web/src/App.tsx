@@ -2,6 +2,7 @@ import { HashRouter, Navigate, Route, Routes, useParams } from 'react-router-dom
 import type { ReactNode } from 'react'
 import AppLayout from './components/Layout'
 import Dashboard from './pages/Dashboard'
+import Home from './pages/Home'
 import { AgentEditor, AgentList } from './pages/Agents'
 import Playground from './pages/Playground'
 import Knowledge from './pages/Knowledge'
@@ -23,7 +24,8 @@ export default function App(): ReactNode {
     <HashRouter>
       <Routes>
         <Route element={<AppLayout />}>
-          <Route index element={<Dashboard />} />
+          <Route index element={<Home />} />
+          <Route path="/sistema" element={<Dashboard />} />
           <Route path="/agents" element={<AgentList />} />
           <Route path="/agents/new" element={<AgentEditor specId={null} />} />
           <Route path="/agents/:id/edit" element={<AgentEditorRouter />} />
