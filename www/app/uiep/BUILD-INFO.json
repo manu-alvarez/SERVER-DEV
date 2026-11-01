@@ -1,13 +1,13 @@
 {
   "project": "uiep-control-center",
-  "version": "1.6.0",
+  "version": "1.8.0",
   "source": "https://github.com/manu-alvarez/SERVER-DEV (apps/uiep)",
-  "sourceCommit": "0a03ed2",
-  "releaseTag": "uiep-1.6.0",
-  "changedIn15": "FRONTEND: Universal Engineering Control Center (7 módulos: catálogo/generador/compositor/registry/ejecuciones/calidad/export) + reconciliación de runs zombis (backend+sandbox); bundle NUEVO (index-c5qUOozL.js)",
-  "backendImage": "msbrossai-uiep-backend:latest sha256:1f3fe0a266d79b76e52d2d25913ddc9352ccb7498cdb142a7e2aeecfb48ab8b8",
-  "sandboxImage": "msbrossai-uiep-sandbox:latest sha256:48764495cad26cfd5a96b556a6aae32ba7e571375dbfe7a58570a177a6df3e02",
-  "builtAt": "2026-11-01T16:55:00Z",
+  "sourceCommit": "971ed51",
+  "releaseTag": "uiep-1.8.0",
+  "changedIn17": "FRONTEND: módulos IAM + Despliegues + ZIP en Export (bundle index-Cf-aDrhR.js); BACKEND: IAM multi-tenant v1 + Deployment Engine + source-project + ZIP sin dependencias",
+  "backendImage": "msbrossai-uiep-backend:latest (se actualizará en el despliegue 1.8.0)",
+  "sandboxImage": "msbrossai-uiep-sandbox:latest (sin cambios funcionales desde 1.6.0)",
+  "builtAt": "2026-11-01T17:45:00Z",
   "deployedTo": "www/app/uiep + contenedores uiep-backend y uiep-sandbox (VPS manuelalvarez.dev)",
-  "notes": "Misión 15 — Control Center: catálogo honesto (capacidades reales tachadas si no existen), generador con presets reales y dry-run, compositor con grafo xyflow del proyecto y orden topológico, registry con procedencia/lifecycle, ejecuciones con cancelación/reconciliación (sweep 5min + perezoso 1/min + manual), quality 4 dimensiones, export uiep-export-v1 descargable completo. 229 tests backend + 13 vitest frontend. Sin datos ficticios."
+  "notes": "Misión FINAL — Plataforma completa: ciclo diseñar→generar→componer→validar→construir(source-project)→ejecutar→evaluar→desplegar→monitorizar→recuperar; IAM multi-tenant con aislamiento verificado; Decisiones y lecciones M11-M17 en docs/UIEP-DECISIONES.md."
 }

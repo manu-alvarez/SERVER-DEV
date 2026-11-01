@@ -45,15 +45,16 @@ Requisitos: node 22 + pnpm 9.15.0 (corepack) + docker + Ollama accesible
 | Backup | Automático diario 04:17 (`infrastructure/backup/uiep-backup.sh`, retención 14 d) |
 | Restaurar | Procedimiento en `PHASE42-HARDENING.md` (contenedor aislado, verificado) |
 | Evaluación RAG | `corepack pnpm --filter uiep-backend eval:rag` (gate) · `eval:rag:real` (proveedor real) |
-| Tests | `corepack pnpm --filter uiep-backend test` (228/228 — GATE + M12 29 + M13 8 + M14 9) |
+| Tests | backend 240/240 · frontend 13/13 (vitest) · E2E de plataforma incluido |
 | Desplegar | push a main → en VPS: `git fetch && git reset --hard origin/main` → install → build → compose build+up → **verificar binario servido** (`docker exec … grep`) |
 | Rollback | anclas de imagen (`rollback-*`) o rebuild desde el commit de la fase (matriz abajo) |
 
-## Matriz de trazabilidad / rollback (v1.0 → v1.5)
+## Matriz de trazabilidad / rollback (v1.0 → v1.8)
 
 | Versión | Estado | Commit | Frontend (www/app/uiep) | Backend (imagen) |
 |---|---|---|---|---|
-| **1.5.0** | **publicada** (`uiep-1.5.0`) | `6b6dc34` (M14: Execution Sandbox & Quality Engine) | bundle `index-CEji4u03.js` (sin cambios en 1.3–1.5) | **`msbrossai-uiep-backend:latest`** = `sha256:1f3fe0a266d7…` + **nuevo contenedor `uiep-sandbox`** (`msbrossai-uiep-sandbox` = `sha256:48764495cad2…`) |
+| **1.8.0** | **publicada** (`uiep-1.8.0`) | `971ed51` (M17 cierre: IAM multi-tenant + Deployment Engine + source-project + ZIP) | **bundle `index-Cf-aDrhR.js`** (nuevo: módulos IAM/Despliegues/ZIP) | **`msbrossai-uiep-backend:latest`** = imagen 1.8.0 (ancla etiquetada en el despliegue) |
+| 1.5.0 | histórica (`uiep-1.5.0`) | `6b6dc34` (M14: Execution Sandbox & Quality Engine) | bundle `index-CEji4u03.js` | **ancla `1.5.0`** = `sha256:1f3fe0a266d7…` + sandbox `48764495cad2…` |
 | 1.4.0 | histórica (`uiep-1.4.0`) | `cfb9028` (Misión 13: api-platform/application/agentic-app/saas + framework módulos; engine 1.1.0) | bundle `index-CEji4u03.js` (sin cambios en 1.3/1.4) | **ancla `1.4.0`** = `e6dbc822c310` |
 | 1.3.0 | histórica (`uiep-1.3.0`) | `420bea4` (Misión 12: Generator Engine + composición + export) | bundle `index-CEji4u03.js` (sin cambios en 1.3) | **ancla `1.3.0`** = `a24d6a448492` |
 | 1.2.0 | histórica (`uiep-1.2.0`) | `f70497b` (Misión 11: UES + Registry + Blueprint v1) | bundle `index-CEji4u03.js` (sin cambios en 1.2) | **ancla `1.2.0`** = `49228b89eada` |
