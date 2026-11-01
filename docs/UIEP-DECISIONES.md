@@ -39,6 +39,8 @@ directiva de la misión final.
 | L8 | Qwen3.5:4b tiene "thinking": respuestas lentas con content vacío si `num_predict` es bajo — documentado para las demos |
 | L9 | La exportación del bundle de specs se reinstala vía `saveSpec` (canal real de instalación), no vía generadores de entrada |
 | L10 | Los intentos de sesión sin contraseña NO deben filtrar si el usuario existe (mismo error para username/password) |
+| L11 | Notificación del formulario "Hablemos" por SMTP DIRECTO en node puro (net+dns.resolveMx): el contenedor proxy no tiene sendmail (EPIPE) y postfix no hace relay desde la red docker; la máquina de estados SMTP debe escribir el send del PASO CASADO (el EHLO se saltaba → "503 Send hello first"); el parser exige '250 ' con espacio para el FIN de bloque multilínea. Entrega verificada: 250 aceptado por el MX de hotmail |
+| L12 | El formulario guarda SIEMPRE en data/messages.json (VPS) ANTES de notificar — si el email falla, el mensaje no se pierde (el fallo solo queda en el log) |
 
 ## Matriz de tecnologías soportadas (HONESTA)
 
