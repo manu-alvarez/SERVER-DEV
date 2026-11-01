@@ -1,13 +1,13 @@
 {
   "project": "uiep-control-center",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "source": "https://github.com/manu-alvarez/SERVER-DEV (apps/uiep)",
-  "sourceCommit": "6b6dc34",
-  "releaseTag": "uiep-1.5.0",
-  "changedIn14": "backend + NUEVO contenedor uiep-sandbox (Execution Sandbox, API Runtime, Agentic App Runtime, Dataset/Harness Runtime, Quality Engine, Execution Registry); frontend sin cambios (bundle index-CEji4u03.js desde e773d08/1.1.0)",
+  "sourceCommit": "0a03ed2",
+  "releaseTag": "uiep-1.6.0",
+  "changedIn15": "FRONTEND: Universal Engineering Control Center (7 módulos: catálogo/generador/compositor/registry/ejecuciones/calidad/export) + reconciliación de runs zombis (backend+sandbox); bundle NUEVO (index-c5qUOozL.js)",
   "backendImage": "msbrossai-uiep-backend:latest sha256:1f3fe0a266d79b76e52d2d25913ddc9352ccb7498cdb142a7e2aeecfb48ab8b8",
   "sandboxImage": "msbrossai-uiep-sandbox:latest sha256:48764495cad26cfd5a96b556a6aae32ba7e571375dbfe7a58570a177a6df3e02",
-  "builtAt": "2026-11-01T16:25:00Z",
+  "builtAt": "2026-11-01T16:55:00Z",
   "deployedTo": "www/app/uiep + contenedores uiep-backend y uiep-sandbox (VPS manuelalvarez.dev)",
-  "notes": "Misión 14 — Execution Sandbox & Quality Engine: sandbox REAL en contenedor aislado (rootfs read-only, tmpfs noexec 64MB, cap_drop ALL, no-new-privileges, pids 64, mem 256MB, red docker internal:true SIN salida a internet, sin volúmenes ni socket Docker), intérprete de artefactos declarativos SIN dependencias npm con límites por job (512KB/300s/50 pasos/2 concurrentes) y cancelación real; API Runtime (contratos api-platform con validación 404/405/422/429 + agentBinding a agentes reales), Agentic App Runtime, Dataset/Harness Runtime (scoring determinista, exigencia total por defecto), Quality Engine 4 dimensiones (schema/refs/security/behavior) y Execution Registry con invocaciones redactadas. Runner token-protected timing-safe fail-closed. 228 tests. Los turnos agénticos corren en los runtimes existentes del backend (qwen3.5:4b ~80-120s/turno con thinking bajo contención de CPU del host)."
+  "notes": "Misión 15 — Control Center: catálogo honesto (capacidades reales tachadas si no existen), generador con presets reales y dry-run, compositor con grafo xyflow del proyecto y orden topológico, registry con procedencia/lifecycle, ejecuciones con cancelación/reconciliación (sweep 5min + perezoso 1/min + manual), quality 4 dimensiones, export uiep-export-v1 descargable completo. 229 tests backend + 13 vitest frontend. Sin datos ficticios."
 }
