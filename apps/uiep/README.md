@@ -49,19 +49,21 @@ Requisitos: node 22 + pnpm 9.15.0 (corepack) + docker + Ollama accesible
 | Desplegar | push a main → en VPS: `git fetch && git reset --hard origin/main` → install → build → compose build+up → **verificar binario servido** (`docker exec … grep`) |
 | Rollback | anclas de imagen (`rollback-*`) o rebuild desde el commit de la fase (matriz abajo) |
 
-## Matriz de trazabilidad / rollback (v1.0 → v1.1)
+## Matriz de trazabilidad / rollback (v1.0 → v1.2)
 
 | Versión | Estado | Commit | Frontend (www/app/uiep) | Backend (imagen) |
 |---|---|---|---|---|
-| **1.1.0** | **publicada** (`uiep-1.1.0`) | `e773d08` (merge `33287f1` de `uiep-1.1-ux` + fix observabilidad) | bundle `index-CEji4u03.js` + `BUILD-INFO.json` | **sin cambios** = `msbrossai-uiep-backend:latest` `sha256:028600208387…` (idéntico al de 1.0.1 — `git diff 44431f5..main -- apps/uiep/backend` vacío) |
-| 1.0.1 | **histórica congelada** (`uiep-1.0.1` = `44431f5`) | RAG 0.70 | bundle `index-DbWra3SD.js` (sustituido) | misma línea de imagen (`0286002…`) |
-| 1.0.0 | **histórica congelada** (`uiep-1.0.0` = `e1d2d39`) | cierre 1.0 | — | **`msbrossai-uiep-backend:1.0.0`** = `4ea095d6f29a` |
+| **1.2.0** | **publicada** (`uiep-1.2.0`) | `f70497b` (Misión 11: UES + Registry + Blueprint v1) | bundle `index-CEji4u03.js` (sin cambios en 1.2) | **`msbrossai-uiep-backend:latest`** = `sha256:49228b89eadaf343…` |
+| 1.1.0 | histórica (`uiep-1.1.0` = `b4f12a1`) | merge `33287f1` + fix `e773d08` | bundle `index-CEji4u03.js` + `BUILD-INFO.json` | imagen de 1.0.1 (`0286002…`) — **perdida por GC del host**; ancla reconstruida (ver abajo) |
+| 1.0.1 | **histórica congelada** (`uiep-1.0.1` = `44431f5`) | RAG 0.70 | bundle `index-DbWra3SD.js` (sustituido) | **ancla reconstruida `1.0.1`** = `128cfd74a443` (fuente-equivalente a la perdida `0286002…`) |
+| 1.0.0 | **histórica congelada** (`uiep-1.0.0` = `e1d2d39`) | cierre 1.0 | — | **`msbrossai-uiep-backend:1.0.0`** = `4ea095d6f29a` (original, intacta) |
 | Ancla previa | — | — | — | `rollback-fase3` = `3b601c4c898e` (desde commit `8dce03b`) |
 
-**Rollback 1.1 → 1.0.1** (probado solo a nivel de frontend; el backend no se toca):
-1. El frontend 1.1 es solo estático: `git revert` del merge `33287f1` (o `git checkout uiep-1.0.1 -- www/app/uiep && git commit`) + push → `git reset --hard origin/main` en el VPS. Sin rebuild, sin reinicio.
-2. El backend NO requiere rollback (la imagen no cambió en 1.1). Si algún día hiciera falta: `docker tag msbrossai-uiep-backend:<ancla> msbrossai-uiep-backend:latest && docker compose -f infrastructure/docker-compose.yml up -d uiep-backend` — nunca `docker image prune -a` (elimina las anclas).
+**Rollback 1.2.0 → 1.1.0/1.0.1**:
+1. La 1.2.0 cambió SOLO el backend (el frontend/bundle es el mismo de 1.1.0): `docker tag msbrossai-uiep-backend:1.0.1 msbrossai-uiep-backend:latest && docker compose -f infrastructure/docker-compose.yml up -d uiep-backend` (segundos, datos intactos en el volumen).
+2. Si hiciera falta reconstruir desde commit: `git worktree add /tmp/ancla <commit>` → `docker build -t msbrossai-uiep-backend:<tag> -f apps/uiep/backend/Dockerfile apps/uiep` → tag+up — NUNCA `compose build` sobre un checkout viejo (retag de `:latest`, incidente Fase 8/9) y NUNCA `docker image prune -a`.
 3. Los datos viven en el volumen `uiep-backend-data` — intactos en cualquier rollback de código.
+4. **Lección 1.2.0**: la imagen `0286002…` (1.0.1) desapareció del VPS sin prune manual (GC de BuildKit/cron del host sospechoso) — por eso existen ahora 4 anclas etiquetadas y el paso 2 está probado.
 
 **Semántica de versionado (inequívoca)**: `BUILD-INFO.json → sourceCommit` identifica SIEMPRE el commit que **produjo el bundle servido** (en 1.1.0: `e773d08` — el commit de docs `b4f12a1` no regenera el bundle); el **tag de release** (`uiep-1.1.0` = `b4f12a1`) identifica el **estado final de `main` publicado**, incluida la documentación. Cuando el artefacto y la publicación coinciden en el mismo commit, ambos apuntan igual. (Definido en la Misión 10; campo `releaseTag` previsto para el Registry de M11+.)
 

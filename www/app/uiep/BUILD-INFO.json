@@ -1,11 +1,12 @@
 {
   "project": "uiep-control-center",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "source": "https://github.com/manu-alvarez/SERVER-DEV (apps/uiep)",
-  "sourceCommit": "e773d08",
-  "frontendOnly": true,
-  "backendImage": "msbrossai-uiep-backend:latest sha256:028600208387… (sin cambios desde 1.0.1 = 44431f5)",
-  "builtAt": "2026-11-01T12:35:00Z",
-  "deployedTo": "www/app/uiep (VPS manuelalvarez.dev)",
-  "notes": "UX 1.1: navegación dos espacios (Trabajo/Avanzado), home de tareas con hero aurora/retícula, identidad neón. Fix: observabilidad con API_BASE. Backend/APIs/AgentSpec/Runtime intactos."
+  "sourceCommit": "f70497b",
+  "releaseTag": "uiep-1.2.0",
+  "changedIn12": "backend (UES + Registry + Blueprint v1); frontend sin cambios (bundle index-CEji4u03.js desde e773d08/1.1.0)",
+  "backendImage": "msbrossai-uiep-backend:latest sha256:49228b89eadaf3431b01687f463e0bbaf9d492b846521224dc372ec3ad62c5ea",
+  "builtAt": "2026-11-01T13:35:00Z",
+  "deployedTo": "www/app/uiep + contenedor uiep-backend (VPS manuelalvarez.dev)",
+  "notes": "Misión 11 — Universal Engineering Core: UES (uiep.io/ues/v1) con catálogo de 19 tipos, registry con dependencias/procedencia/ciclo de vida, Blueprint v1 (2 blueprints migrados), 9 rutas de consola nuevas, 182 tests. Compatibilidad total con specs v1 y datos existentes."
 }

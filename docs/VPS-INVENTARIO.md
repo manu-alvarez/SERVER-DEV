@@ -36,7 +36,7 @@ PM2 (host): nikolina-livekit-server (LiveKit 7880/7881)
 
 | Contenedor | Imagen | Proyecto |
 |---|---|---|
-| uiep-backend | msbrossai-uiep-backend:latest (prod = `0286002…` = 44431f5; **sin rebuild en 1.1** — backend idéntico; tag congelado 1.0.0 = `4ea095d6`) | **UIEP** (apps/uiep) — *1.1 publicada: solo frontend estático* |
+| uiep-backend | msbrossai-uiep-backend:latest (prod 1.2.0 = `49228b8…` = f70497b; anclas: 1.0.1 = `128cfd7…` reconstruida, 1.0.0 = `4ea095d6`) | **UIEP** (apps/uiep) — *1.2.0: Engineering Core (UES+Registry+Blueprints)* |
 | msbross-proxy | node:22-alpine | infrastructure/msbross-proxy |
 | traefik | traefik:latest | perímetro |
 | portainer | portainer-ce:lts | administración (sin puertos publicados) |
