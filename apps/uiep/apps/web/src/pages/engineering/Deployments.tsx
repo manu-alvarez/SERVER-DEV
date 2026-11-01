@@ -107,14 +107,6 @@ export default function Deployments(): ReactNode {
           sx={{ minWidth: 280 }}
           slotProps={{ input: { sx: { fontFamily: 'ui-monospace, Menlo, monospace', fontSize: 12 } } }}
         />
-        <TextField
-          size="small"
-          label="invocación (JSON)"
-          value={invocationText}
-          onChange={(e) => setInvocationText(e.target.value)}
-          sx={{ minWidth: 280 }}
-          slotProps={{ input: { sx: { fontFamily: 'ui-monospace, Menlo, monospace', fontSize: 12 } } }}
-        />
         <Button variant="contained" startIcon={<RocketIcon />} disabled={busy || !id} onClick={() => act(() => api.eng.deployments.deploy({ kind, id, version: version || undefined }), `Desplegado ${kind}/${id}${version ? `@${version}` : ' (latest)'}.`)}>
           Desplegar
         </Button>
