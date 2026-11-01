@@ -42,7 +42,7 @@ const InvocationSchema = z.object({
   path: z.string().max(200).optional(),
   body: z.record(z.string(), z.unknown()).optional(),
   query: z.record(z.string(), z.unknown()).optional(),
-  timeoutMs: z.number().int().min(2000).max(120_000).optional(),
+  timeoutMs: z.number().int().min(2000).max(300_000).optional(),
 });
 
 export type ExecutionRequest =

@@ -1,3 +1,6 @@
 {
-  "behavior": { "agentSpecId": "m13-agente-api", "timeoutMs": 60000 }
+  "behavior": {
+    "agentSpecId": "m13-agente-api",
+    "timeoutMs": 300000
+  }
 }

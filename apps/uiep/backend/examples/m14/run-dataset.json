@@ -1,5 +1,8 @@
 {
   "kind": "evaluation",
   "id": "m14-dataset-demo",
-  "invocation": { "agentSpecId": "m13-agente-api", "timeoutMs": 60000 }
+  "invocation": {
+    "agentSpecId": "m13-agente-api",
+    "timeoutMs": 300000
+  }
 }

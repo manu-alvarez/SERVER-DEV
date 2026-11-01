@@ -1,5 +1,8 @@
 {
   "kind": "agentic-app",
   "id": "app-agentica-soporte-m13",
-  "invocation": { "input": "Necesito ayuda con la devolución del pedido 4213.", "timeoutMs": 60000 }
+  "invocation": {
+    "input": "Necesito ayuda con la devolución del pedido 4213.",
+    "timeoutMs": 300000
+  }
 }

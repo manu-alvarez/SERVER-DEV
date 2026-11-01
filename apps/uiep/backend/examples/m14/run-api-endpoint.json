@@ -1,5 +1,10 @@
 {
   "kind": "api-platform",
   "id": "m13-api-tickets",
-  "invocation": { "endpointId": "listar-tickets", "method": "GET", "body": {} }
+  "invocation": {
+    "endpointId": "listar-tickets",
+    "method": "GET",
+    "body": {},
+    "timeoutMs": 120000
+  }
 }

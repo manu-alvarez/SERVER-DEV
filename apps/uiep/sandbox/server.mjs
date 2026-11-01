@@ -30,7 +30,7 @@ const RUNNER_TOKEN = process.env.UIEP_RUNNER_TOKEN || '';
 /** Límites duros del sandbox (no negociables por job). */
 const LIMITS = {
   maxBodyBytes: 512 * 1024, // 512 KB por envelope
-  maxJobMs: 120_000,
+  maxJobMs: 300_000, // 5 min — turnos de LLM reales (thinking ~80s/turno)
   defaultJobMs: 30_000,
   maxSteps: 50,
   maxConcurrent: 2,
