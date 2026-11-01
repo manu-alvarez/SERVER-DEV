@@ -56,7 +56,8 @@ test('catálogo: 19 tipos; agent/workflow/knowledge-base generables; saas/framew
   assert.equal(saas.capabilities.generator, false, 'saas NO se declara generable (no hay generador)');
   assert.equal(saas.capabilities.execution, false);
   const mcp = getCatalog().find((e) => e.type === 'mcp-server')!;
-  assert.equal(mcp.capabilities.generator, false, 'mcp-server NO generable todavía');
+  assert.equal(mcp.capabilities.generator, true, 'M12: mcp-server es GENERABLE (manifiesto exportable, no despliegue)');
+  assert.equal(mcp.capabilities.execution, false, 'mcp-server NO se despliega/expone (sandbox → M14)');
   const kb = getCatalog().find((e) => e.type === 'knowledge-base')!;
   assert.equal(kb.capabilities.generator, true);
   assert.equal(kb.capabilities.validation, true, 'el gate RAG valida knowledge/RAG');
