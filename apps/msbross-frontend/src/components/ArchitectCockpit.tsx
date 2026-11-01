@@ -106,29 +106,28 @@ export default function ArchitectCockpit() {
           <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
             {/* Column A: Real Portrait Sanctuary */}
             <div className="sm:col-span-5 relative group">
-              <div className="relative rounded-2xl overflow-hidden border border-slate-700/80 bg-gradient-to-b from-slate-900 via-slate-950 to-black shadow-lg shadow-black/50 aspect-[4/5] flex items-center justify-center">
+              <div className="relative rounded-2xl overflow-hidden border border-slate-700/80 bg-gradient-to-b from-slate-900 via-slate-950 to-black shadow-lg shadow-black/50 flex flex-col">
                 {/* Real Photo without hard circular background */}
                 <img
                   src="./hero-portrait.png"
                   alt="Manuel Álvarez — Técnico en Sistemas y Desarrollador"
-                  className="w-full h-full object-contain filter contrast-105 group-hover:scale-[1.02] transition-transform duration-500 select-none pointer-events-none"
+                  className="w-full object-contain max-h-[280px] pt-3 filter contrast-105 group-hover:scale-[1.02] transition-transform duration-500 select-none pointer-events-none"
                 />
 
-                {/* Subtle bottom shadow vignette for name overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent pointer-events-none" />
-
-                {/* Floating Recruiter-Focused Badge on the photo */}
-                <div className="absolute bottom-2.5 left-2.5 right-2.5 p-2 rounded-xl bg-slate-900/90 backdrop-blur-md border border-slate-700/70 text-left">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-white">
-                    <span>Manuel Álvarez</span>
-                    <CheckCircle2 size={13} className="text-cyan-400 shrink-0" />
-                  </div>
-                  <div className="text-[11px] text-slate-300 font-medium mt-0.5">
-                    Técnico de Sistemas & Dev
-                  </div>
-                  <div className="flex items-center gap-1 text-[10px] text-emerald-400 font-medium mt-0.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    En búsqueda activa de empleo
+                {/* Recruiter-Focused Badge EN FLUJO (nunca tapa la foto) */}
+                <div className="p-2.5 text-left">
+                  <div className="p-2 rounded-xl bg-slate-900/90 backdrop-blur-md border border-slate-700/70">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-white">
+                      <span>Manuel Álvarez</span>
+                      <CheckCircle2 size={13} className="text-cyan-400 shrink-0" />
+                    </div>
+                    <div className="text-[11px] text-slate-300 font-medium mt-0.5">
+                      Técnico de Sistemas & Dev
+                    </div>
+                    <div className="flex items-center gap-1 text-[10px] text-emerald-400 font-medium mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      En búsqueda activa de empleo
+                    </div>
                   </div>
                 </div>
               </div>
