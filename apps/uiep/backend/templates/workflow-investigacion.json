@@ -1,50 +1,82 @@
 {
-  "id": "workflow-investigacion",
+  "apiVersion": "uiep.io/ues/v1",
+  "kind": "Blueprint",
+  "metadata": {
+    "id": "workflow-investigacion",
+    "name": "Workflow: investigación y redacción",
+    "version": "1.1.0",
+    "description": "Blueprint: investigador con RAG → analizador (extrae el dato) → decisión condicional → redactor de informe. Los agentes investigador/redactor se instalan con la plantilla.",
+    "tags": ["workflow", "multi-agente", "plantilla"]
+  },
   "title": "Workflow: investigación y redacción",
-  "description": "Blueprint: investigador con RAG → analizador (extrae el dato) → decisión condicional → redactor de informe. Los agentes investigador/redactor se instalan con la plantilla.",
-  "specs": [
+  "parameters": [],
+  "artifacts": [
     {
-      "apiVersion": "uiep.io/v1",
-      "kind": "Agent",
-      "metadata": { "id": "tpl-investigador", "name": "Investigador (plantilla)", "version": "1.0.0" },
+      "id": "tpl-investigador",
+      "type": "agent",
+      "version": "1.0.0",
+      "name": "Investigador (plantilla)",
+      "dependencies": [],
       "spec": {
-        "identity": { "role": "investigador", "objective": "Recuperar el dato pedido del conocimiento autorizado." },
-        "model": { "profile": "default" },
-        "instructions": { "system": "Responde con el contexto recuperado citando [n]. Sin contexto, responde DATO-NO-ENCONTRADO." },
-        "tools": [],
-        "memory": { "enabled": true, "strategy": "semantic" },
-        "orchestration": { "mode": "single-agent", "maxIterations": 4 },
-        "security": { "approvalRequired": [] },
-        "evaluation": {}
+        "apiVersion": "uiep.io/v1",
+        "kind": "Agent",
+        "metadata": { "id": "tpl-investigador", "name": "Investigador (plantilla)", "version": "1.0.0" },
+        "spec": {
+          "identity": { "role": "investigador", "objective": "Recuperar el dato pedido del conocimiento autorizado." },
+          "model": { "profile": "default" },
+          "instructions": { "system": "Responde con el contexto recuperado citando [n]. Sin contexto, responde DATO-NO-ENCONTRADO." },
+          "tools": [],
+          "memory": { "enabled": true, "strategy": "semantic" },
+          "orchestration": { "mode": "single-agent", "maxIterations": 4 },
+          "security": { "approvalRequired": [] },
+          "evaluation": {}
+        }
       }
     },
     {
-      "apiVersion": "uiep.io/v1",
-      "kind": "Agent",
-      "metadata": { "id": "tpl-redactor", "name": "Redactor (plantilla)", "version": "1.0.0" },
+      "id": "tpl-redactor",
+      "type": "agent",
+      "version": "1.0.0",
+      "name": "Redactor (plantilla)",
+      "dependencies": [],
       "spec": {
-        "identity": { "role": "redactor", "objective": "Producir un informe breve y claro." },
-        "model": { "profile": "default" },
-        "instructions": { "system": "Redacta informes de 2 líneas, literales, con el dato que se te da." },
-        "tools": [],
-        "memory": { "enabled": false, "strategy": "none" },
-        "orchestration": { "mode": "single-agent", "maxIterations": 4 },
-        "security": { "approvalRequired": [] },
-        "evaluation": {}
+        "apiVersion": "uiep.io/v1",
+        "kind": "Agent",
+        "metadata": { "id": "tpl-redactor", "name": "Redactor (plantilla)", "version": "1.0.0" },
+        "spec": {
+          "identity": { "role": "redactor", "objective": "Producir un informe breve y claro." },
+          "model": { "profile": "default" },
+          "instructions": { "system": "Redacta informes de 2 líneas, literales, con el dato que se te da." },
+          "tools": [],
+          "memory": { "enabled": false, "strategy": "none" },
+          "orchestration": { "mode": "single-agent", "maxIterations": 4 },
+          "security": { "approvalRequired": [] },
+          "evaluation": {}
+        }
       }
     },
     {
-      "apiVersion": "uiep.io/v1",
-      "kind": "Workflow",
-      "metadata": { "id": "tpl-wf-investigacion", "name": "Investigación y redacción (plantilla)", "version": "1.0.0", "description": "RAG → extracción → condición → informe." },
+      "id": "tpl-wf-investigacion",
+      "type": "workflow",
+      "version": "1.0.0",
+      "name": "Investigación y redacción (plantilla)",
+      "dependencies": [
+        { "ref": "tpl-investigador", "required": true },
+        { "ref": "tpl-redactor", "required": true }
+      ],
       "spec": {
-        "start": "investigar",
-        "nodes": [
-          { "id": "investigar", "type": "agent", "agentSpecId": "tpl-investigador", "input": "{{input}}", "retries": 1 },
-          { "id": "extraer", "type": "agent", "agentSpecId": "tpl-redactor", "input": "Del texto siguiente, extrae SOLO el dato pedido en una línea: {{prev}}" },
-          { "id": "hay-dato", "type": "condition", "input": "{{extraer}}", "check": { "op": "not_empty", "value": "", "caseSensitive": false }, "then": "informar", "else": "informar" },
-          { "id": "informar", "type": "agent", "agentSpecId": "tpl-redactor", "input": "Redacta el informe final (2 líneas) con este dato: {{extraer}}" }
-        ]
+        "apiVersion": "uiep.io/v1",
+        "kind": "Workflow",
+        "metadata": { "id": "tpl-wf-investigacion", "name": "Investigación y redacción (plantilla)", "version": "1.0.0", "description": "RAG → extracción → condición → informe." },
+        "spec": {
+          "start": "investigar",
+          "nodes": [
+            { "id": "investigar", "type": "agent", "agentSpecId": "tpl-investigador", "input": "{{input}}", "retries": 1 },
+            { "id": "extraer", "type": "agent", "agentSpecId": "tpl-redactor", "input": "Del texto siguiente, extrae SOLO el dato pedido en una línea: {{prev}}" },
+            { "id": "hay-dato", "type": "condition", "input": "{{extraer}}", "check": { "op": "not_empty", "value": "", "caseSensitive": false }, "then": "informar", "else": "informar" },
+            { "id": "informar", "type": "agent", "agentSpecId": "tpl-redactor", "input": "Redacta el informe final (2 líneas) con este dato: {{extraer}}" }
+          ]
+        }
       }
     }
   ],
@@ -54,5 +86,7 @@
       "text": "Datos del proyecto de ejemplo.\n\nRECOVER: el código del proyecto de ejemplo es TPL-PROY-777.",
       "bindTo": ["tpl-investigador"]
     }
-  ]
+  ],
+  "idempotency": { "knowledgeByTitle": true },
+  "compatibility": { "notes": "Requiere un ModelProfile 'default' registrado y el proveedor de embeddings activo." }
 }

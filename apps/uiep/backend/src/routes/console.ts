@@ -32,6 +32,17 @@ import { listIntegrations, getIntegration, integrationHealth } from '../services
 import { mcpListTools } from '../services/mcp-client.service';
 import { exportProject, importProject, cloneAgentSpec, installTemplate, listTemplates, type ProjectBundle } from '../services/project.service';
 import { createSession, startAgentRun } from '../services/agent-runtime.service';
+import {
+  getCatalog,
+  listProjects,
+  getLatestProject,
+  listProjectVersions,
+  registerProject,
+  resolveProjectGraph,
+  getLifecycle,
+  transitionLifecycle,
+} from '../services/engineering-registry.service';
+import { LifecycleStateSchema } from '@uiep/agent-spec';
 
 /**
  * Control Center BFF (Fase 4) — capa de interfaz con autenticación propia.
@@ -1035,7 +1046,178 @@ export function registerConsoleRoute(app: Express): void {
       });
   });
 
-  /* ── Lifecycle de agentes (Fase 9): versiones y clonado ─────────────────── */
+  /* ── Engineering Core (Misión 11): UES + Registry + ciclo de vida ─────────
+   * Catálogo de tipos con capacidades REALES, proyectos UES (kind 'Project'),
+   * grafo de dependencias (ciclos/orden/compat), procedencia y transiciones
+   * de ciclo de vida auditables. Persistencia propia (data/engineering/) —
+   * NO contamina los listados de specs existentes. */
+
+  app.get('/api/console/engineering/catalog', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    res.json(getCatalog());
+  });
+
+  app.get('/api/console/engineering/graph', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    // Integridad global: grafo resuelto de todos los proyectos registrados.
+    listProjects()
+      .then(async (projects) => {
+        const graphs = [];
+        for (const p of projects) {
+          const doc = await getLatestProject(p.id);
+          if (doc) {
+            graphs.push(await resolveProjectGraph(doc));
+          }
+        }
+        res.json({ projects: graphs.length, ok: graphs.every((g) => g.ok), graphs });
+      })
+      .catch((err) => {
+        console.error('[UIEP] engineering_graph_failed', err);
+        res.status(500).json({ error: 'engineering_graph_failed' });
+      });
+  });
+
+  app.get('/api/console/engineering/projects', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    listProjects()
+      .then((p) => res.json(p))
+      .catch((err) => {
+        console.error('[UIEP] engineering_projects_list_failed', err);
+        res.status(500).json({ error: 'engineering_projects_failed' });
+      });
+  });
+
+  app.post('/api/console/engineering/projects', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    registerProject(req.body)
+      .then((r) =>
+        r.ok
+          ? res.status(201).json({
+              registered: true,
+              id: r.doc.metadata.id,
+              version: r.doc.metadata.version,
+              artifacts: r.doc.artifacts.length,
+              lifecycle: r.doc.lifecycle.state,
+            })
+          : res.status(r.status).json({ error: r.errors }),
+      )
+      .catch((err) => {
+        console.error('[UIEP] engineering_project_register_failed', err);
+        res.status(500).json({ error: 'engineering_register_failed' });
+      });
+  });
+
+  app.get('/api/console/engineering/projects/:id', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!ID_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    getLatestProject(id)
+      .then((doc) => (doc ? res.json(doc) : res.status(404).json({ error: 'project_not_found' })))
+      .catch((err) => {
+        console.error('[UIEP] engineering_project_get_failed', err);
+        res.status(500).json({ error: 'engineering_project_failed' });
+      });
+  });
+
+  app.get('/api/console/engineering/projects/:id/versions', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!ID_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    listProjectVersions(id)
+      .then((docs) =>
+        res.json(docs.map((d) => ({ id: d.metadata.id, version: d.metadata.version, createdAt: d.metadata.createdAt ?? null, artifacts: d.artifacts.length, lifecycle: d.lifecycle.state }))),
+      )
+      .catch((err) => {
+        console.error('[UIEP] engineering_versions_failed', err);
+        res.status(500).json({ error: 'engineering_versions_failed' });
+      });
+  });
+
+  app.get('/api/console/engineering/projects/:id/graph', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!ID_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    getLatestProject(id)
+      .then(async (doc) => {
+        if (!doc) {
+          return void res.status(404).json({ error: 'project_not_found' });
+        }
+        res.json(await resolveProjectGraph(doc));
+      })
+      .catch((err) => {
+        console.error('[UIEP] engineering_project_graph_failed', err);
+        res.status(500).json({ error: 'engineering_graph_failed' });
+      });
+  });
+
+  app.get('/api/console/engineering/projects/:id/provenance', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    if (!ID_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    getLatestProject(id)
+      .then((doc) => {
+        if (!doc) {
+          return void res.status(404).json({ error: 'project_not_found' });
+        }
+        res.json({
+          id: doc.metadata.id,
+          version: doc.metadata.version,
+          generation: doc.generation ?? null,
+          artifacts: doc.artifacts.map((a) => ({ ref: a.ref, type: a.type, provenance: a.provenance ?? null })),
+        });
+      })
+      .catch((err) => {
+        console.error('[UIEP] engineering_provenance_failed', err);
+        res.status(500).json({ error: 'engineering_provenance_failed' });
+      });
+  });
+
+  app.post('/api/console/engineering/projects/:id/lifecycle', (req, res) => {
+    if (!guard(res, consoleAuth(req))) {
+      return;
+    }
+    const id = String(req.params.id);
+    const body = (req.body ?? {}) as { to?: unknown; note?: unknown };
+    const to = LifecycleStateSchema.safeParse(body.to);
+    if (!ID_RE.test(id)) {
+      return void res.status(400).json({ error: { id: ['formato de id inválido'] } });
+    }
+    if (!to.success) {
+      return void res.status(400).json({ error: { to: ['estado de ciclo de vida inválido'] } });
+    }
+    transitionLifecycle(id, to.data, { actor: 'console', note: typeof body.note === 'string' ? body.note.slice(0, 500) : undefined })
+      .then((r) => (r.ok ? res.json({ ok: true, state: r.entry.state, history: r.entry.history }) : res.status(r.status).json({ error: r.reason })))
+      .catch((err) => {
+        console.error('[UIEP] engineering_lifecycle_failed', err);
+        res.status(500).json({ error: 'engineering_lifecycle_failed' });
+      });
+  });
+
+
 
   app.get('/api/console/agents/:id/versions', (req, res) => {
     if (!guard(res, consoleAuth(req))) {
