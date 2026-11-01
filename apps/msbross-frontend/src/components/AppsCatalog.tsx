@@ -129,7 +129,7 @@ export default function AppsCatalog() {
 
           {/* Filtros por categoría */}
           <div className="flex flex-wrap gap-2.5 my-8">
-            {([{ id: 'all', label: 'Todos' }, ...CATEGORIES] as Array<{ id: string; label: string }>).map((c) => (
+            {(CATEGORIES as Array<{ id: string; label: string }>).map((c) => (
               <button
                 key={c.id}
                 onClick={() => setActive(c.id)}
