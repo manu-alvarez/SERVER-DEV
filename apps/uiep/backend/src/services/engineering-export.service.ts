@@ -224,6 +224,19 @@ export async function writeExportFile(result: ExportResult): Promise<void> {
   await fs.rename(tmp, file);
 }
 
+/** Lee un bundle exportado (por nombre saneado) para su descarga vía BFF. */
+export async function readExportFile(filename: string): Promise<{ ok: true; bundle: unknown } | { ok: false; status: 404; reason: string }> {
+  if (!/^[a-z0-9@._-]{3,140}$/.test(filename) || !filename.endsWith('.export.json')) {
+    return { ok: false, status: 404, reason: 'filename_invalido' };
+  }
+  try {
+    const raw = await fs.readFile(path.join(EXPORTS_DIR, filename), 'utf8');
+    return { ok: true, bundle: JSON.parse(raw) };
+  } catch {
+    return { ok: false, status: 404, reason: 'export_no_encontrado' };
+  }
+}
+
 /** Lista los ficheros de export generados (nombre, tamaños, hash). */
 export async function listExportFiles(): Promise<Array<{ filename: string; sizeBytes: number; createdAt: string }>> {
   let files: string[] = [];
