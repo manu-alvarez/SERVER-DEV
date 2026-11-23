@@ -1,0 +1,28 @@
+name: Deployment safety checks
+
+on:
+  push:
+    branches: [security/pin-vps-ssh-host-20261124]
+    paths:
+      - .github/workflows/deploy-vps.yml
+      - .github/workflows/deploy.yml
+      - .github/workflows/deploy-cv.yml
+      - .github/workflows/deploy-safety.yml
+      - tests/test_deploy_security.py
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  static-deploy-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Assert manual-only workflows and pinned SSH identity
+        run: python -m unittest discover -s tests -p test_deploy_security.py -v
