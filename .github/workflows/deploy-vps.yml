@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 # Required secrets:
-#   VPS_SSH_KEY, VPS_HOST, VPS_USER, GROQ_API_KEY
+#   VPS_SSH_KEY, VPS_HOST, VPS_USER, VPS_SSH_KNOWN_HOSTS, GROQ_API_KEY
 
 jobs:
   deploy:
@@ -19,7 +19,11 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+          # Match VPS host identity against a known fingerprint supplied out of band.
+          # Never trust unauthenticated ssh-keyscan output during deployment.
+          test -n "${{ secrets.VPS_SSH_KNOWN_HOSTS }}"
+          printf '%s\n' "${{ secrets.VPS_SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -38,7 +42,7 @@ jobs:
 
       - name: Ensure directories
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
             "mkdir -p /home/ubuntu/MSBrossAI/apps /home/ubuntu/MSBrossAI/infrastructure /home/ubuntu/MSBrossAI/logs"
 
       - name: Fix permissions before sync
@@ -58,35 +62,35 @@ jobs:
             --exclude '.git' --exclude '__pycache__' --exclude 'venv' --exclude '.venv' \
             --exclude '.env' --exclude '*.log' --exclude '*.error.log' \
             --exclude 'storage' --exclude '*.db' --exclude '*.sqlite' --exclude '*.sqlite3' \
-            -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
+            -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes" \
             ./apps/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/apps/
 
       - name: Deploy EliteScout Build (.next)
         run: |
           rsync -avz --delete --no-perms \
-            -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
+            -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes" \
             ./apps/elitescout/.next/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/apps/elitescout/.next/
 
       - name: Deploy Static WWW
         run: |
           rsync -avz --delete --no-perms \
-            -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
+            -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes" \
             ./www/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/www/
 
       - name: Deploy Infrastructure
         run: |
-          rsync -avz --inplace --no-perms -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
+          rsync -avz --inplace --no-perms -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes" \
             ./infrastructure/docker-compose.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/docker-compose.yml
-          rsync -avz --inplace --no-perms -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
+          rsync -avz --inplace --no-perms -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes" \
             ./ecosystem.config.js ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/ecosystem.config.js
-          rsync -avz --inplace --no-perms -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
+          rsync -avz --inplace --no-perms -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes" \
             ./infrastructure/msbross-proxy/proxy_server.js ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/proxy_server.js
-          rsync -avz --inplace --no-perms -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
+          rsync -avz --inplace --no-perms -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes" \
             ./infrastructure/msbross-proxy/proxy_server.js ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/infrastructure/msbross-proxy/proxy_server.js
 
       - name: Deploy Traefik Config
         run: |
-          rsync -avz --no-perms -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" \
+          rsync -avz --no-perms -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes" \
             ./infrastructure/traefik/docker-compose.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/infrastructure/traefik/docker-compose.yml
 
       - name: Reload Services
