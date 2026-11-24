@@ -105,3 +105,9 @@ cd apps/msbross-frontend
 npm install
 npm run build
 ```
+
+## Política de propiedad del código y despliegue
+
+Este repositorio es la **fuente de configuración de infraestructura**, no una garantía de que sus copias de frontend sean las versiones más recientes. Las aplicaciones [CombiPro](https://github.com/manu-alvarez/CombiPro) y [TaskFlowPro](https://github.com/manu-alvarez/TaskFlowPro) se editan en sus propios repositorios. El catálogo y la publicación GitHub Pages del panel se mantienen en [MSB](https://github.com/manu-alvarez/MSB); el portal de la suite se coordina con [MSBrossAI](https://github.com/manu-alvarez/MSBrossAI).
+
+Antes de cualquier despliegue se debe identificar el artefacto exacto y su commit origen, conservar copia/rollback y verificar la identidad SSH de destino mediante `VPS_SSH_KNOWN_HOSTS`. **No se realiza ningún despliegue al VPS en esta fase de consolidación de GitHub.**
