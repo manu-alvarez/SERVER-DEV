@@ -46,14 +46,14 @@ jobs:
             "mkdir -p /home/ubuntu/MSBrossAI/apps /home/ubuntu/MSBrossAI/infrastructure /home/ubuntu/MSBrossAI/logs"
 
       - name: Fix permissions before sync
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            sudo chattr -i /home/ubuntu/MSBrossAI/docker-compose.yml 2>/dev/null || true
-            sudo chown -R ${{ secrets.VPS_USER }}:${{ secrets.VPS_USER }} /home/ubuntu/MSBrossAI/ || true
+        env:
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          ssh -i ~/.ssh/id_rsa -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=~/.ssh/known_hosts "$VPS_USER@$VPS_HOST" 'bash -s' <<'REMOTE_SCRIPT'
+          sudo chattr -i /home/ubuntu/MSBrossAI/docker-compose.yml 2>/dev/null || true
+          sudo chown -R $(id -un):$(id -un) /home/ubuntu/MSBrossAI/ || true
+          REMOTE_SCRIPT
 
       - name: Deploy Apps
         run: |
@@ -94,41 +94,41 @@ jobs:
             ./infrastructure/traefik/docker-compose.yml ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/MSBrossAI/infrastructure/traefik/docker-compose.yml
 
       - name: Reload Services
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          command_timeout: 30m
-          script: |
-            cd /home/ubuntu/MSBrossAI
+        env:
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          timeout 30m ssh -i ~/.ssh/id_rsa -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=~/.ssh/known_hosts "$VPS_USER@$VPS_HOST" 'bash -s' <<'REMOTE_SCRIPT'
+          cd /home/ubuntu/MSBrossAI
 
-            echo "=== Installing EliteScout dependencies ==="
-            cd /home/ubuntu/MSBrossAI/apps/elitescout && npm ci --omit=dev && cd /home/ubuntu/MSBrossAI
+          echo "=== Installing EliteScout dependencies ==="
+          cd /home/ubuntu/MSBrossAI/apps/elitescout && npm ci --omit=dev && cd /home/ubuntu/MSBrossAI
 
-            echo "=== Rebuilding Docker images ==="
-            docker build -t msbross-fitness:latest apps/txa-fitness-pro || echo "Build skipped: txa-fitness-pro"
-            docker build -t msbross-mapfre:latest apps/mapfre/frontend || echo "Build skipped: mapfre"
-            docker build -t msbross-perfume:latest apps/perfume-trading/erp || echo "Build skipped: perfume-trading"
+          echo "=== Rebuilding Docker images ==="
+          docker build -t msbross-fitness:latest apps/txa-fitness-pro || echo "Build skipped: txa-fitness-pro"
+          docker build -t msbross-mapfre:latest apps/mapfre/frontend || echo "Build skipped: mapfre"
+          docker build -t msbross-perfume:latest apps/perfume-trading/erp || echo "Build skipped: perfume-trading"
 
-            echo "=== Deploying Traefik ==="
-            cd infrastructure/traefik && docker compose up -d && cd /home/ubuntu/MSBrossAI
+          echo "=== Deploying Traefik ==="
+          cd infrastructure/traefik && docker compose up -d && cd /home/ubuntu/MSBrossAI
 
-            echo "=== Deploying Docker services ==="
-            docker rm -f msbross-proxy 2>/dev/null || true
-            docker compose up -d --build msbross-proxy
-            docker compose up -d --build || true
+          echo "=== Deploying Docker services ==="
+          docker rm -f msbross-proxy 2>/dev/null || true
+          docker compose up -d --build msbross-proxy
+          docker compose up -d --build || true
 
-            echo "=== Restarting Traefik to refresh routes & certificates ==="
-            cd infrastructure/traefik && docker compose restart && cd /home/ubuntu/MSBrossAI
-            sleep 5
-            docker logs --tail 25 traefik
+          echo "=== Restarting Traefik to refresh routes & certificates ==="
+          cd infrastructure/traefik && docker compose restart && cd /home/ubuntu/MSBrossAI
+          sleep 5
+          docker logs --tail 25 traefik
 
-            echo "=== Reloading PM2 ==="
-            pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js
-            pm2 save
+          echo "=== Reloading PM2 ==="
+          pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js
+          pm2 save
 
-            echo "=== Cleanup old images ==="
-            docker image prune -f
+          echo "=== Cleanup old images ==="
+          docker image prune -f
 
-            echo "=== Deploy complete ==="
+          echo "=== Deploy complete ==="
+          REMOTE_SCRIPT
+
