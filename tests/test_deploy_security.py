@@ -27,6 +27,16 @@ class DeploySecurityContractTests(unittest.TestCase):
                 self.assertNotIn("ssh-keyscan ", source.replace("# Never trust unauthenticated ssh-keyscan output during deployment.", ""))
                 self.assertNotIn("StrictHostKeyChecking=no", source)
 
+    def test_all_remote_script_steps_use_verified_openssh(self):
+        source = WORKFLOWS[0].read_text()
+        self.assertNotIn("appleboy/ssh-action", source)
+        self.assertEqual(source.count("<<'REMOTE_SCRIPT'"), 2)
+        for line in source.splitlines():
+            if "'bash -s' <<'REMOTE_SCRIPT'" in line:
+                self.assertIn("StrictHostKeyChecking=yes", line)
+                self.assertIn("UserKnownHostsFile=~/.ssh/known_hosts", line)
+                self.assertIn("BatchMode=yes", line)
+
     def test_missing_host_key_fails_closed(self):
         for path in WORKFLOWS:
             source = path.read_text()
