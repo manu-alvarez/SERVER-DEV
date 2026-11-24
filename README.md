@@ -14,37 +14,26 @@ El ecosistema está construido bajo una arquitectura de microservicios y desplie
 
 ---
 
-## 🌐 Mapeo de Dominios y Aplicaciones (24 Apps)
+## Catálogo de aplicaciones y despliegues registrados
 
-El ecosistema alberga una **selección de 10 proyectos** (6 principales + 4 secundarios) + utilidades de operación. **Nota (31-oct, Misión 04)**: los despliegues históricos no seleccionados fueron RETIRADOS del VPS (sus repos GH y Pages permanecen intactos): iaprod-os, industrialpro, traductor-pro, it-english-coach, atenea, edelweiss, taskflow, moko-tools, logitrack, app-generator, assistant, msbross, tarot-maya, jartosdto (stack+estático), uiep-web. El catálogo vivo: `data/proyectos.json`., categorizadas por área de negocio y uso.
+La referencia versionada es [`data/proyectos.json`](data/proyectos.json), con fecha de inventario **2026-10-31**. Los estados siguientes son registros históricos de configuración, no comprobaciones de disponibilidad actuales. Consultar el [inventario VPS](docs/VPS-INVENTARIO.md) y el [runbook](docs/RUNBOOK.md) antes de operar.
 
-| Aplicación | Subdominio (`*.manuelalvarez.dev`) | Tipo de Despliegue |
-| :--- | :--- | :--- |
-| **Nikolina Agent** | `nikolina` | Docker (Node/Python) + LiveKit WS |
-| **JartosDTO** | `jartosdto` | Docker (Node) + PostgreSQL + MinIO |
-| **Cuentos Mágicos** | `cuentos` | Docker (Node) + PostgreSQL |
-| **Gas Station** | `gasstation` | Docker (Node) |
-| **IAprod OS** | `iaprod` | Docker (Node) |
-| **Mapfre Gestión** | `mapfre` | Traefik Direct Proxy (Puerto 3333) |
-| **Perfume Trading** | `perfume` | Traefik Direct Proxy (Puerto 3011) |
-| **EliteScout** | `elitescout` | Docker (Node) |
-| **CombiPro** | `combipro` | App Estática (Servida por Node) |
-| **IndustrialPro** | `industrial` | Docker (Node) + React Frontend |
-| **TaskFlowPro** | `taskflow` | App Estática |
-| **Traductor Pro** | `traductor` | Docker (Node) |
-| **TxaFitnessPro** | `txafitness` | Traefik Direct Proxy (Puerto 3456) |
-| **Web Atenea** | `atenea` | Externa (`host.docker.internal:8009`) |
-| **Edelweiss** | `edelweiss` | App Estática |
-| **CV / Portfolio** | `cv` | App Estática |
-| **IT English Coach**| `itenglish` | Docker (Node) |
-| **LogiSearch** | `logisearch` | App Estática |
-| **LogiTrack** | `logitrack` | Alias de LogiSearch |
-| **MSBross Mano** | `mano` | App Estática |
-| **Moko Tools** | `mokotools` | App Estática |
-| **App Generator** | `appgenerator` | App Estática |
-| **Expositator RTE** | `expositator` | App Estática |
-| **MSBross Voice** | `msbross-voice` | Docker (Python) Directo Traefik |
-| **UIEP 1.0** | `uiep` | **Plataforma de agentes** (Docker + Ollama + RAG + workflows) |
+| Aplicación | Dominio registrado | Modalidad | Estado registrado |
+|---|---|---|---|
+| UIEP | uiep.manuelalvarez.dev | vps-docker | activo-congelado |
+| Tu Energía Maya | maya.manuelalvarez.dev | gh-pages | activo |
+| LogiSearch | logisearch.manuelalvarez.dev | vps-static | activo |
+| Nikolina AI | nikolina.manuelalvarez.dev | vps-docker | activo |
+| FoZ SoundPro | foz.manuelalvarez.dev | gh-pages | activo |
+| Teringo MailOps AI / Neural CockPit | teringo.manuelalvarez.dev | gh-pages | activo |
+| CombiPro | combipro.manuelalvarez.dev | vps-static | activo |
+| Cuentos Mágicos | cuentos.manuelalvarez.dev | vps-docker | activo |
+| GasStation | gasstation.manuelalvarez.dev | vps-docker | activo |
+| Tarot RWS | tarot.manuelalvarez.dev | gh-pages | activo |
+| CV Portfolio | cv.manuelalvarez.dev | vps-static | recurso profesional del portfolio — RECOMENDACIÓN: mantener |
+| JartosDTO | — | retirado-del-vps | stack retirado (31-oct); dumps pg/minio/redis en iCloud |
+
+Los proyectos históricos no incluidos en el catálogo no se consideran despliegues activos por defecto. No se ha verificado el estado del VPS en esta revisión.
 
 ---
 
@@ -60,15 +49,15 @@ El ecosistema alberga una **selección de 10 proyectos** (6 principales + 4 secu
 | `LA_BIBLIA.md` | Contexto histórico del ecosistema |
 | `docs/PROJECT_STANDARDS.md` · `docs/SECURITY.md` | Estándares del repo |
 
-**UIEP 1.0.0** (congelada, tag `uiep-1.0.0`): agentes ejecutables con RAG y memoria, workflows multiagente con diseñador visual, integraciones HTTP/MCP/webhooks, y observabilidad con quality gate automático. Desplegada en `https://uiep.manuelalvarez.dev`.
+**UIEP 1.0.0** (congelada, tag `uiep-1.0.0`): agentes ejecutables con RAG y memoria, workflows multiagente con diseñador visual, integraciones HTTP/MCP/webhooks, y observabilidad con quality gate automático. Dominio registrado: `https://uiep.manuelalvarez.dev`; disponibilidad actual pendiente de verificar.
 
 ---
 
 ## 🚀 Despliegue (CI/CD)
 
-El despliegue está automatizado mediante **GitHub Actions** (`.github/workflows/deploy.yml`).
+Los workflows de despliegue `deploy.yml`, `deploy-vps.yml` y `deploy-cv.yml` son exclusivamente manuales (`workflow_dispatch`).
 
-1. Un push a `main` dispara el workflow de despliegue del frontend principal (build + `rsync`).
+1. Un push a `main` no dispara el despliegue. El frontend principal puede desplegarse manualmente tras revisar el destino y el artefacto.
 2. El resto de servicios se despliegan según el [RUNBOOK](docs/RUNBOOK.md) (SSH + docker compose por proyecto; UIEP incluye verificación del binario servido).
 3. `Secret Scan` (gitleaks) corre en cada push — verdes requeridos.
 
@@ -77,18 +66,19 @@ Para que el despliegue automático funcione sin errores de conexión SSH, los si
 - `VPS_HOST`: Debe contener la IP actual del servidor Contabo (**84.247.186.126**).
 - `VPS_USER`: El usuario SSH (ej. `root` o `ubuntu`).
 - `VPS_SSH_KEY`: La clave privada SSH para acceder sin contraseña.
+- `VPS_SSH_KNOWN_HOSTS`: Identidad SSH del servidor verificada por un canal independiente.
 
 ---
 
-## 🛡️ Auditoría de Seguridad (Nivel 99 - Modo Ómnicron-Quetta)
+## Controles de seguridad documentados
 
-Todo el ecosistema ha sido auditado bajo estándares estrictos de seguridad de código:
+Los siguientes controles son objetivos documentados; su cumplimiento debe verificarse por componente.
 - **CORS Estricto:** Los backends (FastAPI, Express, Node) utilizan `allow_origin_regex` o listas blancas dinámicas (`CORS_ORIGINS`) en lugar de comodines `*`.
-- **Inyección de Código Prevenida:** 
+- **Prevención de inyección:** 
   - Subprocesos gestionados vía bindings seguros (`asyncio.create_subprocess_exec` o `subprocess.run` con arrays, NUNCA `shell=True`).
-  - Base de datos (SQLite/PostgreSQL) blindadas usando consultas preparadas (`?`) o Prisma ORM para evitar SQLi.
-- **Limpieza de Hardcodes:** Todas las IPs de staging obsoletas han sido purgadas, y los enlaces rotos (ej. perfiles de LinkedIn antiguos) han sido actualizados a sus URLs canónicas (`manu-alvarez-dev`).
-- **Secrets Seguros:** Gestión estricta a través de `.env` sin exponer tokens ni credenciales en código cliente.
+  - Base de datos (SQLite/PostgreSQL) deben utilizar consultas preparadas (`?`) o Prisma ORM para evitar SQLi.
+- **Limpieza de Hardcodes:** Revisar referencias de staging y enlaces antes de cada publicación.
+- **Secrets Seguros:** Gestionar credenciales fuera del código cliente y validar con Secret Scan.
 
 ---
 
