@@ -2,7 +2,7 @@ name: Deployment safety checks
 
 on:
   push:
-    branches: [security/pin-vps-ssh-host-20261124]
+    branches: [main]
     paths:
       - .github/workflows/deploy-vps.yml
       - .github/workflows/deploy.yml
